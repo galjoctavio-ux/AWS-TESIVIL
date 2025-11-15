@@ -1,0 +1,227 @@
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { 
+  obtenerListadoCotizaciones, 
+  aplicarDescuento, 
+  autorizarCotizacion, 
+  rechazarCotizacion,
+  finalizarProyecto,
+  clonarCotizacion,
+  reenviarCorreo
+} from '../apiService';
+import DetalleCotizacionModal from '../components/DetalleCotizacionModal';
+import CierreProyectoModal from '../components/CierreProyectoModal';
+
+const CotizacionesList = () => {
+  const [cotizaciones, setCotizaciones] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [mensaje, setMensaje] = useState('');
+  
+  const [cotizacionEnRevision, setCotizacionEnRevision] = useState(null);
+  const [cotizacionACerrar, setCotizacionACerrar] = useState(null);
+
+  useEffect(() => {
+    cargarCotizaciones();
+  }, []);
+
+  const cargarCotizaciones = async () => {
+    setLoading(true);
+    try {
+      const res = await obtenerListadoCotizaciones();
+      if (res.status === 'success') {
+        const dataSanitized = res.data.map(c => ({...c, descuento_pct: c.descuento_pct || 0}));
+        setCotizaciones(dataSanitized);
+      }
+    } catch (error) {
+      setMensaje(`Error al cargar: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // --- ACCIONES ---
+
+  const handleDescuentoClick = async (cotizacionId, descuentoActual) => {
+    const nuevoPct = window.prompt("Ingresa el nuevo porcentaje de descuento:", descuentoActual > 0 ? descuentoActual : '');
+    if (nuevoPct === null) return;
+    try {
+      const res = await aplicarDescuento(cotizacionId, parseFloat(nuevoPct) || 0);
+      if (res.status === 'success') {
+        setMensaje(`✅ ${res.message}`);
+        cargarCotizaciones();
+      } else { alert(res.error); }
+    } catch (error) { alert(error.message); }
+  };
+
+  const handleAutorizar = async (id) => {
+    if(!window.confirm("¿Aprobar y enviar al cliente?")) return;
+    setMensaje("Procesando...");
+    try {
+      const res = await autorizarCotizacion(id);
+      if (res.status === 'success') {
+        setMensaje(`✅ ${res.message}`);
+        setCotizacionEnRevision(null);
+        cargarCotizaciones();
+      } else { alert("Error: " + res.error); }
+    } catch (error) { alert("Error: " + error.message); }
+  };
+
+  const handleRechazar = async (id) => {
+    if(!window.confirm("¿Rechazar cotización?")) return;
+    try {
+      await rechazarCotizacion(id);
+      setCotizacionEnRevision(null);
+      cargarCotizaciones();
+    } catch (error) { alert("Error: " + error.message); }
+  };
+
+  const handleFinalizar = async (id, gastoMat, gastoMo) => {
+    try {
+      const res = await finalizarProyecto(id, gastoMat, gastoMo);
+      if (res.status === 'success') {
+        setMensaje(`🏁 Proyecto #${id} completado exitosamente.`);
+        setCotizacionACerrar(null);
+        cargarCotizaciones();
+      } else { alert("Error: " + res.error); }
+    } catch (error) { alert("Error: " + error.message); }
+  };
+
+  const handleClonar = async (id) => {
+    if(!window.confirm("¿Crear una COPIA (Versión B) de esta cotización?")) return;
+    setMensaje("Clonando cotización...");
+    try {
+      const res = await clonarCotizacion(id);
+      if (res.status === 'success') {
+        setMensaje(`✅ ${res.data.mensaje}`);
+        cargarCotizaciones();
+      } else {
+        alert("Error al clonar: " + (res.error || "Desconocido"));
+      }
+    } catch (error) {
+      alert("Error de conexión: " + error.message);
+    }
+  };
+
+  const handleReenviar = async (id) => {
+    if(!window.confirm("¿Reenviar el correo al cliente?")) return;
+    setMensaje("Enviando correo...");
+    try {
+      const res = await reenviarCorreo(id);
+      if (res.status === 'success') {
+        setMensaje(`✅ ${res.message}`);
+      } else {
+        alert("Error: " + res.error);
+      }
+    } catch (error) {
+      alert("Error: " + error.message);
+    }
+  };
+
+  // --- RENDERIZADO ---
+
+  const getStatusBadge = (estado) => {
+    switch (estado) {
+        case 'PENDIENTE_AUTORIZACION': return <span style={{background:'#ffc107',color:'#000',padding:'4px 8px',borderRadius:'4px',fontSize:'0.85em',fontWeight:'bold'}}>⚠️ REVISIÓN</span>;
+        case 'ENVIADA': return <span style={{background:'#28a745',color:'#fff',padding:'4px 8px',borderRadius:'4px',fontSize:'0.85em'}}>✅ ENVIADA</span>;
+        case 'COMPLETADA': return <span style={{background:'#343a40',color:'#fff',padding:'4px 8px',borderRadius:'4px',fontSize:'0.85em'}}>🏁 COMPLETADA</span>;
+        case 'RECHAZADA': return <span style={{background:'#dc3545',color:'#fff',padding:'4px 8px',borderRadius:'4px',fontSize:'0.85em'}}>❌ RECHAZADA</span>;
+        default: return <span style={{background:'#6c757d',color:'#fff',padding:'4px 8px',borderRadius:'4px',fontSize:'0.85em'}}>{estado}</span>;
+    }
+  };
+
+  const formatCurrency = (num) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(num || 0);
+  const formatDate = (dateString) => new Date(dateString).toLocaleDateString('es-MX', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'});
+
+  return (
+    <div style={{ padding: '20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+        <h2>📊 Tablero de Cotizaciones</h2>
+        <Link to="/dashboard" style={{ textDecoration: 'none', color: '#007bff' }}>&larr; Dashboard</Link>
+      </div>
+
+      {mensaje && <div style={{ padding: '10px', marginBottom: '15px', background: '#d4edda', color: '#155724', borderRadius: '5px' }}>{mensaje}</div>}
+
+      {loading ? <p>Cargando...</p> : (
+        <table style={{ width: '100%', borderCollapse: 'collapse', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+          <thead>
+            <tr style={{ background: '#343a40', color: 'white', textAlign: 'left' }}>
+              <th style={{ padding: '12px' }}>Estado</th>
+              <th style={{ padding: '12px' }}>Fecha</th>
+              <th style={{ padding: '12px' }}>Cliente</th>
+              <th style={{ padding: '12px' }}>Total Venta</th>
+              <th style={{ padding: '12px', background:'#555', borderLeft:'1px solid #666' }}>Costo Mat.</th>
+              <th style={{ padding: '12px' }}>Desc.</th>
+              <th style={{ padding: '12px' }}>IA (Est)</th>
+              <th style={{ padding: '12px' }}>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cotizaciones.map((coti) => (
+              <tr key={coti.id} style={{ borderBottom: '1px solid #eee', background: coti.estado === 'PENDIENTE_AUTORIZACION' ? '#fffdf0' : (coti.estado === 'COMPLETADA' ? '#f8f9fa' : 'white') }}>
+                <td style={{ padding: '12px' }}>{getStatusBadge(coti.estado)}</td>
+                <td style={{ padding: '12px' }}><small>{formatDate(coti.fecha_creacion)}</small></td>
+                <td style={{ padding: '12px' }}>
+                    <div>{coti.cliente_nombre}</div>
+                    <small style={{color:'#888'}}>{coti.tecnico_nombre}</small>
+                </td>
+                <td style={{ padding: '12px', fontWeight: 'bold' }}>{formatCurrency(coti.precio_venta_final)}</td>
+                
+                <td style={{ padding: '12px', color:'#555', fontSize:'0.9em', borderLeft:'1px solid #eee' }}>
+                    {formatCurrency(coti.total_materiales_cd)}
+                </td>
+
+                <td style={{ padding: '12px', color: parseFloat(coti.descuento_pct) > 0 ? '#dc3545' : '#ccc', fontWeight: 'bold' }}>
+                    {parseFloat(coti.descuento_pct) > 0 ? `-${coti.descuento_pct}%` : '0%'}
+                </td>
+                <td style={{ padding: '12px', color: '#666', fontSize: '0.9em' }}>
+                    {coti.estimacion_ia ? formatCurrency(coti.estimacion_ia) : '-'}
+                </td>
+                <td style={{ padding: '12px', display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                  
+                  {/* REVISAR (Pendientes) */}
+                  {coti.estado === 'PENDIENTE_AUTORIZACION' && (
+                    <button onClick={() => setCotizacionEnRevision(coti)} title="Revisar Alerta" style={{ padding: '6px 8px', background: '#ffc107', color: 'black', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                      🔍
+                    </button>
+                  )}
+
+                  {/* FINALIZAR / REENVIAR (Enviadas/Autorizadas) */}
+                  {(coti.estado === 'ENVIADA' || coti.estado === 'AUTORIZADA') && (
+                    <>
+                        <button onClick={() => setCotizacionACerrar(coti)} title="Finalizar Proyecto" style={{ padding: '6px 8px', background: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                          🏁
+                        </button>
+                        <button onClick={() => handleReenviar(coti.id)} title="Reenviar Correo" style={{ padding: '6px 8px', background: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                          ✉️
+                        </button>
+                    </>
+                  )}
+
+                  {/* EDITAR (Botón Nuevo) */}
+                  <Link to={`/cotizaciones/editar/${coti.id}`} title="Editar Detalle (Maestro)" style={{ padding: '6px 8px', background: '#6610f2', color: 'white', borderRadius: '4px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', border: 'none', cursor: 'pointer' }}>
+                    ✏️
+                  </Link>
+
+                  {/* CLONAR */}
+                  <button onClick={() => handleClonar(coti.id)} title="Clonar Cotización (Versión B)" style={{ padding: '6px 8px', background: '#6f42c1', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                    ♻️
+                  </button>
+
+                  {/* OTROS */}
+                  <button onClick={() => handleDescuentoClick(coti.id, coti.descuento_pct)} title="Descuento" style={{ padding: '6px 8px', background: '#17a2b8', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>💲</button>
+                  <a href={`/api/cotizar/pdf?uuid=${coti.uuid}`} target="_blank" rel="noopener noreferrer" title="Ver PDF" style={{ padding: '6px 8px', background: '#6c757d', color: 'white', borderRadius: '4px', textDecoration: 'none' }}>📄</a>
+                  <a href={`/api/cotizacion/exportar?id=${coti.id}`} target="_blank" rel="noopener noreferrer" title="Exportar Lista" style={{ padding: '6px 8px', background: '#007bff', color: 'white', borderRadius: '4px', textDecoration: 'none' }}>📦</a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {cotizacionEnRevision && <DetalleCotizacionModal cotizacion={cotizacionEnRevision} onClose={() => setCotizacionEnRevision(null)} onAutorizar={handleAutorizar} onRechazar={handleRechazar} />}
+      {cotizacionACerrar && <CierreProyectoModal cotizacion={cotizacionACerrar} onClose={() => setCotizacionACerrar(null)} onFinalizar={handleFinalizar} />}
+    </div>
+  );
+};
+
+export default CotizacionesList;

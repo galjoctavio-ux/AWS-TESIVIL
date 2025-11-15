@@ -1,0 +1,118 @@
+/* src/components/AgendarCasoForm.css */
+
+.agendar-caso-form {
+  max-height: 75vh;
+  overflow-y: auto;
+  padding-right: 15px;
+}
+
+.agendar-caso-form h4 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+}
+
+.tecnico-info {
+  background-color: #f8f9fa;
+  padding: 10px 15px;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  margin-bottom: 15px;
+  font-size: 1.1em;
+  line-height: 1.5;
+}
+
+.form-paso {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-paso-inline {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+.form-paso-inline > div {
+  flex: 1;
+}
+
+.agendar-caso-form input,
+.agendar-caso-form select,
+.agendar-caso-form textarea {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box; 
+}
+
+.agendar-caso-form textarea {
+  min-height: 80px;
+}
+
+.disponibilidad-visual {
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.disponibilidad-visual ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.disponibilidad-visual li {
+  padding: 8px;
+  border-radius: 4px;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.disponibilidad-visual li.libre {
+  background-color: #e6f7e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.disponibilidad-visual li.ocupado {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+  text-decoration: line-through;
+}
+
+.error-msg {
+  color: red;
+  font-weight: bold;
+}
+
+.form-botones {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* --- AÑADIDO PARA LA MEJORA DE UI (VERSIÓN CORREGIDA) --- */
+
+/* El bloque SELECCIONADO (tiene alta prioridad) */
+.disponibilidad-visual li.libre.seleccionado {
+  background-color: #1a73e8; /* Un azul (como Google) */
+  color: #ffffff;
+  border-color: #1a73e8;
+  font-weight: bold;
+  transform: scale(1.02);
+  transition: all 0.2s ease;
+  cursor: default; /* El cursor cambia a "normal" */
+}
+
+/* Al pasar el mouse SOBRE UN BLOQUE LIBRE (que NO esté seleccionado) */
+.disponibilidad-visual li.libre:not(.seleccionado):hover {
+  background-color: #f1f3f4; /* Un gris claro al pasar el mouse */
+  cursor: pointer;
+}
+/* -------------------------------------------------------- */

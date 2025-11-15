@@ -1,0 +1,18 @@
+# Dependencias
+node_modules/
+vendor/
+venv/
+*.venv
+__pycache__/
+
+# Logs y temporales
+*.log
+*.tmp
+.DS_Store
+dist/
+build/
+
+# Archivos de entorno (seguridad)
+.env
+.env.local
+config_secret.php
