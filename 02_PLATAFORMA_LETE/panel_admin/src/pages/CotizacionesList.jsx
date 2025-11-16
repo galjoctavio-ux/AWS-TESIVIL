@@ -14,7 +14,6 @@ import DetalleCotizacionModal from '../components/DetalleCotizacionModal';
 import CierreProyectoModal from '../components/CierreProyectoModal';
 import PowerCloneModal from '../components/PowerCloneModal';
 import AutorizarCotizacionModal from '../components/AutorizarCotizacionModal';
-import AgendarCotizacionModal from '../components/AgendarCotizacionModal';
 
 const CotizacionesList = () => {
   const [cotizaciones, setCotizaciones] = useState([]);
@@ -26,7 +25,6 @@ const CotizacionesList = () => {
   const [cotizacionACerrar, setCotizacionACerrar] = useState(null);
   const [cotizacionAClonar, setCotizacionAClonar] = useState(null);
   const [cotizacionAAutorizar, setCotizacionAAutorizar] = useState(null);
-  const [cotizacionAAgendar, setCotizacionAAgendar] = useState(null);
 
   useEffect(() => {
     cargarCotizaciones();
@@ -236,14 +234,16 @@ const CotizacionesList = () => {
 
                   {/* REVISAR (Pendientes) */}
                   {coti.estado === 'PENDIENTE_AUTORIZACION' && (
-                    <>
-                      <button onClick={() => setCotizacionEnRevision(coti)} title="Revisar Alerta" style={{ padding: '6px 8px', background: '#ffc107', color: 'black', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                        🔍
-                      </button>
-                      <button onClick={() => setCotizacionAAutorizar(coti)} title="Autorizar y Agendar" style={{ padding: '6px 8px', background: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                        📅
-                      </button>
-                    </>
+                    <button onClick={() => setCotizacionEnRevision(coti)} title="Revisar Alerta" style={{ padding: '6px 8px', background: '#ffc107', color: 'black', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                      🔍
+                    </button>
+                  )}
+
+                  {/* Unificar Agendamiento */}
+                  {(coti.estado === 'PENDIENTE_AUTORIZACION' || coti.estado === 'AUTORIZADA') && (
+                    <button onClick={() => setCotizacionAAutorizar(coti)} title="Autorizar y Agendar" style={{ padding: '6px 8px', background: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                      📅
+                    </button>
                   )}
 
                   {/* FINALIZAR / REENVIAR (Enviadas/Autorizadas) */}
@@ -256,12 +256,6 @@ const CotizacionesList = () => {
                           ✉️
                         </button>
                     </>
-                  )}
-
-                  {coti.estado === 'AUTORIZADA' && (
-                    <button onClick={() => setCotizacionAAgendar(coti)} title="Agendar" style={{ padding: '6px 8px', background: '#ffc107', color: 'black', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                      📅
-                    </button>
                   )}
 
                   {/* DETALLES (antes Editar) */}
@@ -294,16 +288,6 @@ const CotizacionesList = () => {
           onClose={() => setCotizacionAAutorizar(null)}
           onConfirm={() => {
             setCotizacionAAutorizar(null);
-            cargarCotizaciones();
-          }}
-        />
-      )}
-      {cotizacionAAgendar && (
-        <AgendarCotizacionModal
-          cotizacion={cotizacionAAgendar}
-          onClose={() => setCotizacionAAgendar(null)}
-          onConfirm={() => {
-            setCotizacionAAgendar(null);
             cargarCotizaciones();
           }}
         />
