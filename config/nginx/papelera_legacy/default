@@ -1,0 +1,118 @@
+# Bloque HTTP SOLO para actualizaciones OTA (firmware)
+server {
+    listen 80;
+    server_name api.mrfrio.mx;
+
+    # Servir SOLO la carpeta de firmware por HTTP
+    location /firmware/ {
+        alias /var/www/mrfrio/firmware/;
+        autoindex off;
+        
+        # Headers de seguridad adicionales
+        add_header X-Content-Type-Options nosniff;
+        add_header X-Frame-Options DENY;
+    }
+
+    # Redirigir TODO lo demás a HTTPS
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+
+# Bloque principal para la API con SSL (HTTPS)
+server {
+    listen 443 ssl;
+    server_name api.mrfrio.mx;
+
+    # --- SECCIÓN DEL FRONTEND ---
+    # Raíz donde Nginx buscará los archivos HTML (bienvenido.html, etc.)
+    root /var/www/mrfrio;
+    index index.html index.htm;
+
+    # Sirve los archivos estáticos del frontend.
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    # --- SECCIÓN DEL BACKEND (API de Node.js) ---
+    # Cuando una solicitud llega a /api/...
+    location /api/ {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # --- INICIO DE BLOQUES NUEVOS (Rutas de Node.js) ---
+
+    # Para el proxy de autenticación de Supabase
+    location /auth/v1/ {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # Para el PDF de instrucciones
+    location = /Instrucciones.pdf {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # Para la ruta de diagnóstico
+    location = /test-pdf {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # --- FIN DE BLOQUES NUEVOS ---
+
+    # --- SECCIÓN DE MEDICIONES (PYTHON) ---
+    location /mediciones/ {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+    }
+
+# =========================================================
+    # --- ¡NUEVO BLOQUE PARA ACTUALIZACIONES OTA! ---
+    # =========================================================
+    # Esto servirá archivos estáticos desde la carpeta que creamos
+    # cuando alguien acceda a https://api.mrfrio.mx/firmware/
+    location /firmware/ {
+        # 'alias' es importante aquí: mapea la URL a la carpeta
+        alias /var/www/ota_firmware/;
+        
+        # Opcional, pero buena práctica:
+        autoindex off; # No deja que la gente vea una lista de tus archivos
+    }
+    # =========================================================
+
+    # --- BLOQUE DE WEBHOOK PARA STRIPE ---
+    location /webhook/stripe {
+        proxy_pass http://localhost:3000/webhook/stripe;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # --- (Bloque de Mercado Pago - Puedes borrarlo si ya no lo usas) ---
+    location /webhook/mercadopago {
+        proxy_pass http://localhost:3000/webhook/mercadopago;
+        proxy_set_header Host $host;
+    }
+
+    # --- Configuración del Certificado SSL (Let's Encrypt) ---
+    ssl_certificate /etc/letsencrypt/live/api.mrfrio.mx/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.mrfrio.mx/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}

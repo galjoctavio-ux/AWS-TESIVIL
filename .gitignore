@@ -16,3 +16,6 @@ build/
 .env
 .env.local
 config_secret.php
+
+04_AGENDAMIENTO/easy_appointments_src/application/config/config.php
+04_AGENDAMIENTO/easy_appointments_src/config.php
