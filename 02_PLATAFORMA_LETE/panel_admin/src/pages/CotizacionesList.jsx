@@ -155,10 +155,10 @@ const CotizacionesList = () => {
   };
 
   const filteredCotizaciones = cotizaciones.filter(coti => {
-    const searchTermLower = searchTerm.toLowerCase();
-    const folio = coti.id.toString();
-    const cliente = coti.cliente_nombre.toLowerCase();
-    const asesor = (coti.asesor_nombre || coti.tecnico_nombre).toLowerCase();
+    const searchTermLower = (searchTerm || '').toLowerCase();
+    const folio = coti.id ? coti.id.toString() : '';
+    const cliente = (coti.cliente_nombre || '').toLowerCase();
+    const asesor = ((coti.asesor_nombre || coti.tecnico_nombre) || '').toLowerCase();
 
     return folio.includes(searchTermLower) ||
            cliente.includes(searchTermLower) ||
