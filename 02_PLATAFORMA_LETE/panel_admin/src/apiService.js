@@ -57,15 +57,6 @@ export const createCasoFromCotizacion = async (data) => {
   return response.data;
 };
 
-export const autorizarCotizacion = async (id) => {
-  const response = await fetch(`${PHP_API_URL}/admin/cotizacion/autorizar`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id })
-  });
-  return await response.json();
-};
-
 export const powerCloneCotizacion = async (cotizacionData) => {
   const response = await fetch(`${PHP_API_URL}/admin/cotizacion/powerclone`, {
     method: 'POST',
