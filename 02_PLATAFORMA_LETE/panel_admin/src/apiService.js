@@ -38,6 +38,25 @@ export const subirXml = async (file) => {
   return await response.json();
 };
 
+export const obtenerTecnicos = async () => {
+  const response = await api.get('/users/tecnicos');
+  return response.data;
+};
+
+export const checkAvailability = async (tecnico_id, fecha_inicio, fecha_fin) => {
+  const response = await api.post('/agenda/check-availability', {
+    tecnico_id,
+    fecha_inicio,
+    fecha_fin,
+  });
+  return response.data;
+};
+
+export const createCasoFromCotizacion = async (data) => {
+  const response = await api.post('/casos/create-from-cotizacion', data);
+  return response.data;
+};
+
 export const powerCloneCotizacion = async (cotizacionData) => {
   const response = await fetch(`${PHP_API_URL}/admin/cotizacion/powerclone`, {
     method: 'POST',
