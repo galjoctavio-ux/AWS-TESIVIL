@@ -164,6 +164,99 @@ const CotizacionesList = () => {
     }
   };
 
+  const renderAcciones = (coti) => {
+    switch (coti.estado) {
+      case 'APROBADA':
+      case 'AUTORIZADA':
+      case 'ENVIADA':
+        return (
+          <>
+            <button onClick={() => handleReenviar(coti.id)} title="Reenviar Correo" style={{ padding: '6px 8px', background: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+              ✉️
+            </button>
+            <Link to={`/cotizaciones/editar/${coti.id}`} title="Ver Detalles" style={{ padding: '6px 8px', background: '#17a2b8', color: 'white', borderRadius: '4px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', border: 'none', cursor: 'pointer' }}>
+              👁️
+            </Link>
+            <button onClick={() => handleClonar(coti.id)} title="Clonar Cotización (Versión B)" style={{ padding: '6px 8px', background: '#6f42c1', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+              ♻️
+            </button>
+            <button onClick={() => handleDescuentoClick(coti.id, coti.descuento_pct)} title="Descuento" style={{ padding: '6px 8px', background: '#17a2b8', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>💲</button>
+            <a href={`/api/cotizar/pdf?uuid=${coti.uuid}`} target="_blank" rel="noopener noreferrer" title="Ver PDF" style={{ padding: '6px 8px', background: '#6c757d', color: 'white', borderRadius: '4px', textDecoration: 'none' }}>📄</a>
+            <a href={`/api/cotizacion/exportar?id=${coti.id}`} target="_blank" rel="noopener noreferrer" title="Exportar Lista" style={{ padding: '6px 8px', background: '#007bff', color: 'white', borderRadius: '4px', textDecoration: 'none' }}>📦</a>
+            <button onClick={() => setCotizacionAAutorizar(coti)} title="Autorizar y Agendar" style={{ padding: '6px 8px', background: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+              📅
+            </button>
+          </>
+        );
+
+      case 'PENDIENTE_AUTORIZACION':
+        return (
+          <>
+            <Link to={`/cotizaciones/editar/${coti.id}`} title="Ver Detalles" style={{ padding: '6px 8px', background: '#17a2b8', color: 'white', borderRadius: '4px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', border: 'none', cursor: 'pointer' }}>
+              👁️
+            </Link>
+            <button onClick={() => handleClonar(coti.id)} title="Clonar Cotización (Versión B)" style={{ padding: '6px 8px', background: '#6f42c1', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+              ♻️
+            </button>
+            <a href={`/api/cotizar/pdf?uuid=${coti.uuid}`} target="_blank" rel="noopener noreferrer" title="Ver PDF" style={{ padding: '6px 8px', background: '#6c757d', color: 'white', borderRadius: '4px', textDecoration: 'none' }}>📄</a>
+            <button onClick={() => setCotizacionEnRevision(coti)} title="Revisar Alerta" style={{ padding: '6px 8px', background: '#ffc107', color: 'black', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+              🔍
+            </button>
+          </>
+        );
+
+      case 'RECHAZADA':
+        return (
+          <>
+            <Link to={`/cotizaciones/editar/${coti.id}`} title="Ver Detalles" style={{ padding: '6px 8px', background: '#17a2b8', color: 'white', borderRadius: '4px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', border: 'none', cursor: 'pointer' }}>
+              👁️
+            </Link>
+            <button onClick={() => handleClonar(coti.id)} title="Clonar Cotización (Versión B)" style={{ padding: '6px 8px', background: '#6f42c1', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+              ♻️
+            </button>
+          </>
+        );
+
+      case 'AGENDADA':
+      case 'EN_PROCESO':
+        return (
+          <>
+            <button onClick={() => setCotizacionACerrar(coti)} title="Finalizar Proyecto" style={{ padding: '6px 8px', background: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+              🏁
+            </button>
+            <button onClick={() => handleReenviar(coti.id)} title="Reenviar Correo" style={{ padding: '6px 8px', background: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+              ✉️
+            </button>
+            <Link to={`/cotizaciones/editar/${coti.id}`} title="Ver Detalles" style={{ padding: '6px 8px', background: '#17a2b8', color: 'white', borderRadius: '4px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', border: 'none', cursor: 'pointer' }}>
+              👁️
+            </Link>
+            <button onClick={() => handleClonar(coti.id)} title="Clonar Cotización (Versión B)" style={{ padding: '6px 8px', background: '#6f42c1', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+              ♻️
+            </button>
+            <a href={`/api/cotizar/pdf?uuid=${coti.uuid}`} target="_blank" rel="noopener noreferrer" title="Ver PDF" style={{ padding: '6px 8px', background: '#6c757d', color: 'white', borderRadius: '4px', textDecoration: 'none' }}>📄</a>
+            <a href={`/api/cotizacion/exportar?id=${coti.id}`} target="_blank" rel="noopener noreferrer" title="Exportar Lista" style={{ padding: '6px 8px', background: '#007bff', color: 'white', borderRadius: '4px', textDecoration: 'none' }}>📦</a>
+          </>
+        );
+
+      case 'FINALIZADA':
+      case 'COMPLETADA':
+        return (
+          <>
+            <Link to={`/cotizaciones/editar/${coti.id}`} title="Ver Detalles" style={{ padding: '6px 8px', background: '#17a2b8', color: 'white', borderRadius: '4px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', border: 'none', cursor: 'pointer' }}>
+              👁️
+            </Link>
+            <button onClick={() => handleClonar(coti.id)} title="Clonar Cotización (Versión B)" style={{ padding: '6px 8px', background: '#6f42c1', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+              ♻️
+            </button>
+            <a href={`/api/cotizar/pdf?uuid=${coti.uuid}`} target="_blank" rel="noopener noreferrer" title="Ver PDF" style={{ padding: '6px 8px', background: '#6c757d', color: 'white', borderRadius: '4px', textDecoration: 'none' }}>📄</a>
+          </>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   const filteredCotizaciones = cotizaciones.filter(coti => {
     const searchTermLower = (searchTerm || '').toLowerCase();
     const folio = coti.id ? coti.id.toString() : '';
@@ -231,47 +324,7 @@ const CotizacionesList = () => {
                     {coti.estimacion_ia ? formatCurrency(coti.estimacion_ia) : '-'}
                 </td>
                 <td style={{ padding: '12px', display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
-
-                  {/* REVISAR (Pendientes) */}
-                  {coti.estado === 'PENDIENTE_AUTORIZACION' && (
-                    <button onClick={() => setCotizacionEnRevision(coti)} title="Revisar Alerta" style={{ padding: '6px 8px', background: '#ffc107', color: 'black', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                      🔍
-                    </button>
-                  )}
-
-                  {/* Unificar Agendamiento */}
-                  {(coti.estado === 'PENDIENTE_AUTORIZACION' || coti.estado === 'AUTORIZADA') && (
-                    <button onClick={() => setCotizacionAAutorizar(coti)} title="Autorizar y Agendar" style={{ padding: '6px 8px', background: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                      📅
-                    </button>
-                  )}
-
-                  {/* FINALIZAR / REENVIAR (Enviadas/Autorizadas) */}
-                  {(coti.estado === 'ENVIADA' || coti.estado === 'AUTORIZADA') && (
-                    <>
-                        <button onClick={() => setCotizacionACerrar(coti)} title="Finalizar Proyecto" style={{ padding: '6px 8px', background: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                          🏁
-                        </button>
-                        <button onClick={() => handleReenviar(coti.id)} title="Reenviar Correo" style={{ padding: '6px 8px', background: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                          ✉️
-                        </button>
-                    </>
-                  )}
-
-                  {/* DETALLES (antes Editar) */}
-                  <Link to={`/cotizaciones/editar/${coti.id}`} title="Ver Detalles" style={{ padding: '6px 8px', background: '#17a2b8', color: 'white', borderRadius: '4px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', border: 'none', cursor: 'pointer' }}>
-                    👁️
-                  </Link>
-
-                  {/* CLONAR */}
-                  <button onClick={() => handleClonar(coti.id)} title="Clonar Cotización (Versión B)" style={{ padding: '6px 8px', background: '#6f42c1', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                    ♻️
-                  </button>
-
-                  {/* OTROS */}
-                  <button onClick={() => handleDescuentoClick(coti.id, coti.descuento_pct)} title="Descuento" style={{ padding: '6px 8px', background: '#17a2b8', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>💲</button>
-                  <a href={`/api/cotizar/pdf?uuid=${coti.uuid}`} target="_blank" rel="noopener noreferrer" title="Ver PDF" style={{ padding: '6px 8px', background: '#6c757d', color: 'white', borderRadius: '4px', textDecoration: 'none' }}>📄</a>
-                  <a href={`/api/cotizacion/exportar?id=${coti.id}`} target="_blank" rel="noopener noreferrer" title="Exportar Lista" style={{ padding: '6px 8px', background: '#007bff', color: 'white', borderRadius: '4px', textDecoration: 'none' }}>📦</a>
+                  {renderAcciones(coti)}
                 </td>
               </tr>
             ))}
