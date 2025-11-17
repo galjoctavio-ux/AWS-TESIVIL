@@ -39,7 +39,7 @@ export const subirXml = async (file) => {
 };
 
 export const obtenerTecnicos = async () => {
-  const response = await api.get('/users/tecnicos');
+  const response = await api.get('/usuarios/tecnicos');
   return response.data;
 };
 
