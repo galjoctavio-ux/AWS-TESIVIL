@@ -8,7 +8,8 @@ import {
   createCaso, 
   updateCaso, 
   getCasoById, // <-- CAMBIADO
-  createCasoFromCotizacion
+  createCasoFromCotizacion,
+  cerrarCasoManualTecnico
 } from '../controllers/casos.controller.js';
 
 const router = Router();
@@ -32,5 +33,9 @@ router.put('/:id', requireAuth, isAdmin, updateCaso);
 
 // --- RUTA NUEVA PARA CREAR CASO Y CITA DESDE COTIZACIÓN ---
 router.post('/create-from-cotizacion', requireAuth, isAdmin, createCasoFromCotizacion);
+
+// --- RUTA NUEVA Y SEGURA PARA CERRAR CASO (SOLO TÉCNICOS) ---
+router.patch('/:id/cerrar-manual', requireAuth, isTecnico, cerrarCasoManualTecnico);
+
 
 export default router;

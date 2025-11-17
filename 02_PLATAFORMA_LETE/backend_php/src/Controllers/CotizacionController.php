@@ -377,5 +377,20 @@ class CotizacionController {
             echo json_encode(['error' => 'Error interno: ' . $e->getMessage()]);
         }
     }
+    public function obtenerConteosPorTecnico(): void {
+        if (empty($_GET['tecnico_id'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Falta el parámetro tecnico_id']);
+            return;
+        }
+        try {
+            $conteos = $this->calculosService->contarCotizacionesPorCaso($_GET['tecnico_id']);
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'success', 'data' => $conteos]);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+    }
 }
 ?>
