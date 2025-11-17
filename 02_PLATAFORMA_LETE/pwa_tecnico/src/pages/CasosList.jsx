@@ -36,26 +36,6 @@ const actionButtonStyles = {
   textAlign: 'center',
 };
 
-// --- ESTILO DEL BOTÓN FLOTANTE (FAB) ---
-const fabStyle = {
-  position: 'fixed',
-  bottom: '30px',
-  right: '30px',
-  backgroundColor: '#0056b3', // Color azul fuerte corporativo
-  color: 'white',
-  borderRadius: '50px',
-  padding: '15px 25px',
-  boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
-  textDecoration: 'none',
-  fontSize: '18px',
-  fontWeight: 'bold',
-  display: 'flex',
-  alignItems: 'center',
-  gap: '10px',
-  zIndex: 1000,
-  cursor: 'pointer',
-  border: '2px solid white' // Un borde blanco para que resalte más
-};
 
 function CasosList() {
   const { user, logout } = useAuth();
@@ -157,17 +137,43 @@ function CasosList() {
                     </button>
                   </Link>
                 </div>
+
+                {/* ======================================================= */}
+                {/* ===========   AÑADIR ESTE NUEVO BOTÓN   =========== */}
+                {/* ======================================================= */}
+                {/* Solo mostrar si el caso no está completado */}
+                {caso.status !== 'completado' && (
+                  <Link
+                    to="/cotizador"
+                    state={{
+                      casoId: caso.id,
+                      clienteNombre: caso.cliente_nombre,
+                      clienteDireccion: caso.cliente_direccion
+                      // Aquí también podrías pasar el email si lo tuvieras
+                    }}
+                    style={{ textDecoration: 'none', display: 'block', marginTop: '12px' }}
+                  >
+                    <button
+                      style={{
+                        ...actionButtonStyles,
+                        backgroundColor: '#007bff', // Azul para cotizar
+                        color: 'white',
+                        width: '100%'
+                      }}
+                    >
+                      ⚡ Cotizar
+                    </button>
+                  </Link>
+                )}
+                {/* ======================================================= */}
+                {/* ==================  FIN DE LA ADICIÓN  ================== */}
+                {/* ======================================================= */}
+
               </div>
             )})
           )}
         </div>
       )}
-
-      {/* --- BOTÓN FLOTANTE DE COTIZADOR --- */}
-      <Link to="/cotizador" style={fabStyle}>
-        <span style={{fontSize: '24px'}}>➕</span> 
-        <span>Cotizar</span>
-      </Link>
 
     </div>
   );

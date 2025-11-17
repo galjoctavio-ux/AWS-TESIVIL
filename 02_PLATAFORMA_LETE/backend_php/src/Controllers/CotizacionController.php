@@ -23,9 +23,9 @@ class CotizacionController {
         $inputJSON = file_get_contents('php://input');
         $input = json_decode($inputJSON, true);
 
-        if (!isset($input['items']) || !isset($input['mano_de_obra']) || !isset($input['tecnico_id']) || empty($input['cliente_email'])) {
+        if (!isset($input['items']) || !isset($input['mano_de_obra']) || !isset($input['tecnico_id']) || empty($input['cliente_email']) || !isset($input['caso_id'])) {
             http_response_code(400);
-            echo json_encode(['error' => 'Faltan datos obligatorios']);
+            echo json_encode(['error' => 'Faltan datos obligatorios (items, mo, tecnico, email o caso_id)']);
             return;
         }
         
@@ -65,7 +65,17 @@ class CotizacionController {
             $nombreAsesorDesdeBD = $this->calculosService->obtenerNombreUsuarioPorId($input['tecnico_id']);
             $tecnicoNombreFinal = $nombreAsesorDesdeBD ?? $input['tecnico_nombre'] ?? 'Asesor de Servicio';
 
-            $uuid = $this->calculosService->guardarCotizacion($resultado, $input['tecnico_id'], $tecnicoNombreFinal, $clienteData, $estado, $razonDetencion, $estimacionIA, null);
+            $uuid = $this->calculosService->guardarCotizacion(
+                $resultado,
+                $input['tecnico_id'],
+                $tecnicoNombreFinal,
+                $clienteData,
+                $estado,
+                $razonDetencion,
+                $estimacionIA,
+
+          $input['caso_id'] // <-- PASAR EL ID DEL CASO
+            );
 
             $pdfUrl = null;
             if ($uuid) {
