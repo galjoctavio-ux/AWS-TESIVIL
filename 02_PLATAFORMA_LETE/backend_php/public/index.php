@@ -118,6 +118,12 @@ elseif ($uri === '/api/admin/auditoria-inventario' && $_SERVER['REQUEST_METHOD']
 
 // --- BLOQUE D: ADMINISTRACIÓN DE COTIZACIONES ---
 
+// RUTA NUEVA: Obtener conteos de cotizaciones por técnico
+elseif ($uri === '/api/cotizaciones/counts' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    header("Content-Type: application/json; charset=UTF-8");
+    $controller = new CotizacionController();
+    $controller->obtenerConteosPorTecnico();
+}
 // RUTA NUEVA: Autorizar Cotización (RESTful)
 elseif (preg_match('/^\/api\/cotizaciones\/authorize\/(\d+)$/', $uri, $matches) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Content-Type: application/json; charset=UTF-8");

@@ -136,3 +136,25 @@ export const obtenerSugerenciasIA = async (nombresMateriales) => {
     return { status: 'error', sugerencias: [] };
   }
 };
+export const getCotizacionesCountsByTecnico = async (tecnicoId) => {
+  try {
+    const response = await fetch(`/api/cotizaciones/counts?tecnico_id=${tecnicoId}`);
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error al obtener conteos de cotizaciones:', error);
+    throw error;
+  }
+};
+
+export const cerrarCasoManualmente = async (casoId) => {
+  try {
+    const response = await api.patch(`/casos/${casoId}/cerrar-manual`);
+    return response.data;
+  } catch (error) {
+    console.error('Error al cerrar el caso manualmente:', error);
+    throw error;
+  }
+};

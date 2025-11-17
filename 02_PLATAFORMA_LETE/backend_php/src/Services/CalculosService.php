@@ -670,5 +670,22 @@ class CalculosService {
             return null;
         }
     }
+    public function contarCotizacionesPorCaso(string $tecnicoId): array {
+        $sql = "SELECT
+                    version_padre_id AS caso_id,
+                    COUNT(*) AS cot_count
+                FROM
+                    cotizaciones
+                WHERE
+                    tecnico_id_externo = ?
+                    AND version_padre_id IS NOT NULL
+                GROUP BY
+                    version_padre_id";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$tecnicoId]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 ?>

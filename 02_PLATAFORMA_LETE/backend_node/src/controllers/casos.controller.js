@@ -216,3 +216,46 @@ export const createCasoFromCotizacion = async (req, res) => {
     res.status(500).json({ error: 'Error en el servidor al procesar la solicitud.', details: error.message });
   }
 };
+export const cerrarCasoManualTecnico = async (req, res) => {
+  const { id: casoId } = req.params;
+  const { id: tecnicoId } = req.user; // ID del técnico autenticado
+
+  try {
+    // 1. Verificamos que el caso existe y pertenece al técnico.
+    const { data: caso, error: findError } = await supabaseAdmin
+      .from('casos')
+      .select('id, tecnico_id, status')
+      .eq('id', casoId)
+      .single();
+
+    if (findError || !caso) {
+      return res.status(404).json({ error: 'Caso no encontrado.' });
+    }
+
+    if (caso.tecnico_id !== tecnicoId) {
+      return res.status(403).json({ error: 'No tienes permiso para modificar este caso.' });
+    }
+
+    if (caso.status === 'completado') {
+      return res.status(400).json({ error: 'El caso ya ha sido cerrado anteriormente.' });
+    }
+
+    // 2. Si todo es correcto, actualizamos el estado a "completado".
+    const { data: updatedCaso, error: updateError } = await supabaseAdmin
+      .from('casos')
+      .update({ status: 'completado' })
+      .eq('id', casoId)
+      .select()
+      .single();
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    res.status(200).json(updatedCaso);
+
+  } catch (error) {
+    console.error('Error al cerrar el caso manualmente:', error);
+    res.status(500).json({ error: 'Error interno al cerrar el caso.', details: error.message });
+  }
+};

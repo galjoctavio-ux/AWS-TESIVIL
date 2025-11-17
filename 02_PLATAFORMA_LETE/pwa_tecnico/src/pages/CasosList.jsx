@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import api from '../apiService';
+import api, { getCotizacionesCountsByTecnico, cerrarCasoManualmente } from '../apiService';
 import { Link } from 'react-router-dom';
-import '../App.css'; // Importa el CSS
+import '../App.css';
 
+// ... (estilos sin cambios)
 const listStyle = {
   backgroundColor: '#F8FAFC',
   minHeight: '100vh',
   padding: '32px',
-  paddingBottom: '100px' // Espacio extra abajo para que el botón flotante no tape el último caso
+  paddingBottom: '100px'
 };
 
 const headerStyles = {
@@ -18,7 +19,7 @@ const headerStyles = {
   marginBottom: '24px',
   paddingBottom: '16px',
   borderBottom: '1px solid #E2E8F0',
-  flexWrap: 'wrap', // Para que se ajuste en celulares pequeños
+  flexWrap: 'wrap',
   gap: '10px'
 };
 
@@ -45,25 +46,68 @@ function CasosList() {
   const [showCompleted, setShowCompleted] = useState(false);
 
   useEffect(() => {
-    const fetchCasos = async () => {
+    const fetchData = async () => {
+      if (!user?.id) return; // No hacer nada si el usuario no está cargado
+
       setIsLoading(true);
+      setError(null);
+
       try {
-        const response = await api.get('/casos');
-        setCasos(response.data);
+        // 1. Ejecutar ambas llamadas en paralelo
+        const [casosResponse, countsResponse] = await Promise.all([
+          api.get('/casos'),
+          getCotizacionesCountsByTecnico(user.id)
+        ]);
+
+        const casosData = casosResponse.data;
+        const countsData = countsResponse.data || [];
+
+        // 2. Crear un mapa para búsqueda rápida de conteos
+        const countsMap = new Map(countsData.map(item => [item.caso_id, item.cot_count]));
+
+        // 3. Fusionar los datos
+        const casosConConteos = casosData.map(caso => ({
+          ...caso,
+          cot_count: countsMap.get(caso.id) || 0 // Añadir cot_count, default a 0
+        }));
+
+        setCasos(casosConConteos);
+
       } catch (err) {
-        setError('Error al cargar casos asignados.');
+        console.error("Error al cargar datos combinados:", err);
+        setError('Error al cargar la información de los casos.');
       } finally {
         setIsLoading(false);
       }
     };
-    fetchCasos();
-  }, []);
+    fetchData();
+  }, [user]); // Depender de 'user' para re-ejecutar si cambia
+
+  const handleCerrarCaso = async (casoId) => {
+    if (!window.confirm('¿Estás seguro de que deseas cerrar este caso? Esta acción no se puede deshacer.')) {
+      return;
+    }
+
+    try {
+      await cerrarCasoManualmente(casoId);
+      // Actualizar el estado local para reflejar el cambio instantáneamente
+      setCasos(prevCasos =>
+        prevCasos.map(caso =>
+          caso.id === casoId ? { ...caso, status: 'completado' } : caso
+        )
+      );
+    } catch (err) {
+      console.error('Error al cerrar el caso:', err);
+      alert('Hubo un error al intentar cerrar el caso. Por favor, inténtalo de nuevo.');
+    }
+  };
 
   const filteredCasos = casos.filter(caso => showCompleted || caso.status !== 'completado');
 
   return (
     <div style={listStyle}>
       <header style={headerStyles}>
+        {/* ... (header sin cambios) */}
         <h1 style={{ fontSize: '26px', fontWeight: 'bold', color: '#1E293B', margin: 0 }}>Mis Casos</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap' }}>
           <label style={{ color: '#475569', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
@@ -92,16 +136,21 @@ function CasosList() {
       {!isLoading && !error && (
         <div>
           {filteredCasos.length === 0 ? (
-            <div style={{textAlign: 'center', padding: '40px', color: '#666'}}>
+             <div style={{textAlign: 'center', padding: '40px', color: '#666'}}>
                 <p>No tienes casos asignados pendientes.</p>
                 <p>Puedes crear una cotización nueva con el botón azul.</p>
             </div>
           ) : (
             filteredCasos.map(caso => {
+              // Corrección del color de la tarjeta
               const cardClassName = `card ${
                 caso.tipo === 'alto_consumo' ? 'card-amarillo' :
-                caso.tipo === 'proyecto' ? 'card-azul' : ''
+                caso.tipo === 'proyecto' ? 'card-azul' :
+                caso.tipo === 'levantamiento' ? 'card-morado' : '' // <-- CORRECCIÓN AQUÍ
               }`;
+
+              const isCerrable = caso.cot_count > 0;
+
               return (
               <div key={caso.id} className={cardClassName}>
                 <h3 style={{ fontSize: '20px', color: '#10213F', marginBottom: '12px' }}>
@@ -110,12 +159,16 @@ function CasosList() {
                 <p style={{ color: '#475569', marginBottom: '8px' }}>
                   <strong>Dirección:</strong> {caso.cliente_direccion}
                 </p>
+                <p style={{ color: '#475569', marginBottom: '8px' }}>
+                  <strong>Cotizaciones:</strong> {caso.cot_count}
+                </p>
                 <p style={{ color: '#475569', marginBottom: '20px' }}>
                   <strong>Estado:</strong> <span style={{ fontWeight: '600', color: caso.status === 'completado' ? '#16A34A' : '#F59E0B' }}>
                     {caso.status}
                   </span>
                 </p>
 
+                {/* --- SECCIÓN DE BOTONES MODIFICADA --- */}
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                   <button
                     onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(caso.cliente_direccion)}`, "_blank")}
@@ -123,25 +176,31 @@ function CasosList() {
                   >
                     📍 Mapa
                   </button>
-                  <Link to={`/revision/${caso.id}`} style={{ textDecoration: 'none', flex: 1, display: 'flex' }}>
+
+                  {caso.status !== 'completado' ? (
                     <button
+                      onClick={() => handleCerrarCaso(caso.id)}
                       style={{
                         ...actionButtonStyles,
-                        backgroundColor: caso.status === 'completado' ? '#D1D5DB' : '#10B981',
+                        backgroundColor: isCerrable ? '#EF4444' : '#D1D5DB', // Rojo si es cerrable, gris si no
                         color: 'white',
-                        width: '100%'
+                        flex: 1,
                       }}
-                      disabled={caso.status === 'completado'}
+                      disabled={!isCerrable}
+                      title={!isCerrable ? "Debe crear al menos una cotización para poder cerrar el caso." : "Cerrar el caso permanentemente."}
                     >
-                      {caso.status === 'completado' ? 'Completado' : '📝 Revisar'}
+                      {isCerrable ? 'Cerrar Caso' : 'Cerrar Caso'}
                     </button>
-                  </Link>
+                  ) : (
+                     <button
+                      style={{...actionButtonStyles, backgroundColor: '#D1D5DB', color: '#6B7280', flex: 1}}
+                      disabled
+                    >
+                      Completado
+                    </button>
+                  )}
                 </div>
 
-                {/* ======================================================= */}
-                {/* ===========   AÑADIR ESTE NUEVO BOTÓN   =========== */}
-                {/* ======================================================= */}
-                {/* Solo mostrar si el caso no está completado */}
                 {caso.status !== 'completado' && (
                   <Link
                     to="/cotizador"
@@ -149,14 +208,13 @@ function CasosList() {
                       casoId: caso.id,
                       clienteNombre: caso.cliente_nombre,
                       clienteDireccion: caso.cliente_direccion
-                      // Aquí también podrías pasar el email si lo tuvieras
                     }}
                     style={{ textDecoration: 'none', display: 'block', marginTop: '12px' }}
                   >
                     <button
                       style={{
                         ...actionButtonStyles,
-                        backgroundColor: '#007bff', // Azul para cotizar
+                        backgroundColor: '#007bff',
                         color: 'white',
                         width: '100%'
                       }}
@@ -165,16 +223,11 @@ function CasosList() {
                     </button>
                   </Link>
                 )}
-                {/* ======================================================= */}
-                {/* ==================  FIN DE LA ADICIÓN  ================== */}
-                {/* ======================================================= */}
-
               </div>
             )})
           )}
         </div>
       )}
-
     </div>
   );
 }
