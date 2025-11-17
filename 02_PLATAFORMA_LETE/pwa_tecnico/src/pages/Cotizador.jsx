@@ -59,6 +59,7 @@ const Cotizador = () => {
 
   const [clienteNombre, setClienteNombre] = useState('');
   const [clienteEmail, setClienteEmail] = useState('');
+  const [clienteDireccion, setClienteDireccion] = useState('');
 
   const [busqueda, setBusqueda] = useState('');
   const [sugerencias, setSugerencias] = useState([]);
@@ -81,12 +82,15 @@ const Cotizador = () => {
 
   useEffect(() => {
     if (location.state) {
-      const { casoId, clienteNombre } = location.state;
+      const { casoId, clienteNombre, clienteDireccion } = location.state;
       if (casoId) {
         setCasoId(casoId);
       }
       if (clienteNombre) {
         setClienteNombre(clienteNombre);
+      }
+      if (clienteDireccion) {
+        setClienteDireccion(clienteDireccion);
       }
     }
   }, [location.state]);
@@ -229,6 +233,8 @@ const Cotizador = () => {
         tecnico_nombre: user?.user_metadata?.name || user?.name || 'Ingeniero',
         cliente_nombre: clienteNombre,
         cliente_email: clienteEmail,
+        cliente_direccion: clienteDireccion,
+        caso_id: casoId,
         items: itemsCarrito.map(i => ({ id_recurso: i.id_recurso, cantidad: i.cantidad })),
         mano_de_obra: moItems
       };
@@ -311,8 +317,32 @@ const Cotizador = () => {
         <div className="card" style={{ background: 'white', padding: '15px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', marginBottom: '15px' }}>
           <div style={{ marginBottom: '10px' }}>
             <label style={{ display: 'block', fontSize: '0.9em', color: '#666' }}>Cliente (Opcional)</label>
-            <input type="text" value={clienteNombre} onChange={(e) => setClienteNombre(e.target.value)} style={commonInputStyle} placeholder="Nombre del cliente" />
+            <input
+              type="text"
+              value={clienteNombre}
+              onChange={(e) => setClienteNombre(e.target.value)}
+              style={commonInputStyle}
+              placeholder="Nombre del cliente"
+              disabled={!!casoId} // Deshabilitar si viene de un caso
+            />
           </div>
+
+          {/* ======================================================= */}
+          {/* ===========   AÑADIR CAMPO DE DIRECCIÓN   =========== */}
+          {/* ======================================================= */}
+          <div style={{ marginBottom: '10px' }}>
+            <label style={{ display: 'block', fontSize: '0.9em', color: '#666' }}>Dirección (Opcional)</label>
+            <input
+              type="text"
+              value={clienteDireccion}
+              onChange={(e) => setClienteDireccion(e.target.value)}
+              style={commonInputStyle}
+              placeholder="Dirección del cliente"
+              disabled={!!casoId} // Deshabilitar si viene de un caso
+            />
+          </div>
+          {/* ======================================================= */}
+
           <div>
             <label style={{ display: 'block', fontSize: '0.9em', color: '#D32F2F', fontWeight: 'bold' }}>Email del Cliente (Obligatorio)</label>
             <input
