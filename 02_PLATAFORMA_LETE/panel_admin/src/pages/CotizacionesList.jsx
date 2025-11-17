@@ -144,7 +144,7 @@ const CotizacionesList = () => {
   const formatDate = (dateString) => {
     if (!dateString) return 'Fecha no disponible';
     try {
-      const date = new Date(dateString);
+      const date = new Date(dateString + 'Z');
       // Fallback por si la fecha es inválida
       if (isNaN(date.getTime())) {
         return 'Fecha inválida';
@@ -289,6 +289,7 @@ const CotizacionesList = () => {
         <table style={{ width: '100%', borderCollapse: 'collapse', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
           <thead>
             <tr style={{ background: '#343a40', color: 'white', textAlign: 'left' }}>
+              <th style={{ padding: '12px' }}>ID</th>
               <th style={{ padding: '12px' }}>Estado</th>
               <th style={{ padding: '12px' }}>Fecha</th>
               <th style={{ padding: '12px' }}>Cliente</th>
@@ -304,6 +305,7 @@ const CotizacionesList = () => {
           <tbody>
             {filteredCotizaciones.map((coti) => (
               <tr key={coti.id} style={{ borderBottom: '1px solid #eee', background: coti.estado === 'PENDIENTE_AUTORIZACION' ? '#fffdf0' : (coti.estado === 'COMPLETADA' ? '#f8f9fa' : 'white') }}>
+                <td style={{ padding: '12px', fontWeight: 'bold' }}>#{coti.id}</td>
                 <td style={{ padding: '12px' }}>{getStatusBadge(coti.estado)}</td>
                 <td style={{ padding: '12px' }}><small>{formatDate(coti.fecha_creacion)}</small></td>
                 <td style={{ padding: '12px' }}>
