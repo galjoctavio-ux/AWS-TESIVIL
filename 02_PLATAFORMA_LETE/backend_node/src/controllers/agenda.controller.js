@@ -58,61 +58,93 @@ export const checkAvailability = async (req, res) => {
 };
 
 /**
- * Obtiene todas las citas de un técnico para un día específico.
- * (VERSIÓN OPTIMIZADA)
- */
+* Obtiene todas las citas de un técnico para un día específico.
+* (VERSIÓN FINAL OPTIMIZADA)
+*/
 export const getAgendaPorDia = async (req, res) => {
-  // OBTENEMOS EL ID del 'req.user' que inyectó el middleware 'requireAuth'
-  const tecnico_id = req.user.id;
-  const { fecha } = req.query; // Fecha en formato 'YYYY-MM-DD'
+// 1. Obtenemos el ID del 'req.user' que inyectó el middleware 'requireAuth'
+const tecnico_id = req.user.id;
+const { fecha } = req.query; // Fecha en formato 'YYYY-MM-DD'
 
-  if (!fecha) {
-    return res.status(400).json({
-      error: 'El parámetro "fecha" es requerido.',
-    });
-  }
+if (!fecha) {
+return res.status(400).json({ error: 'El parámetro "fecha" es requerido.' });
+}
 
-  try {
-    // 1. Preparamos el rango de fechas para que MySQL pueda usar índices
-    const fechaInicio = `${fecha} 00:00:00`;
-    // Calculamos el día siguiente
-    const fechaSiguiente = new Date(fecha);
-    fechaSiguiente.setDate(fechaSiguiente.getDate() + 1);
-    const fechaFin = fechaSiguiente.toISOString().split('T')[0] + ' 00:00:00';
+try {
+// 2. Preparamos el rango de fechas (esto usa los índices y es rápido)
+const fechaInicio = `${fecha} 00:00:00`;
+const fechaSiguiente = new Date(fecha);
+fechaSiguiente.setDate(fechaSiguiente.getDate() + 1);
+const fechaFin = fechaSiguiente.toISOString().split('T')[0] + ' 00:00:00';
 
-    const connection = await pool.getConnection();
+const connection = await pool.getConnection();
 
-    // 2. LA QUERY OPTIMIZADA
-    //    - Se cambió DATE(a.start_datetime) = ?
-    //    - Por un rango con >= y <
-    const sql = `
-      SELECT
-        a.id,
-        a.start_datetime,
-        a.end_datetime,
-        ac.caso_id
-      FROM ea_appointments a
-      LEFT JOIN ea_appointments_cases ac ON a.id = ac.appointment_id
-      WHERE
-        a.id_users_provider = ?
-        AND a.start_datetime >= ?  -- Inicio del día
-        AND a.start_datetime < ?   -- Antes del inicio del día siguiente
-      ORDER BY a.start_datetime ASC;
-    `;
+// 3. LA QUERY CORREGIDA:
+// - Eliminamos TODOS los LEFT JOINs.
+// - Seleccionamos los campos 'notes' y 'notas_estructuradas'.
+const sql = `
+SELECT
+id,
+start_datetime,
+end_datetime,
+notes,
+notas_estructuradas
+FROM ea_appointments
+WHERE
+id_users_provider = ?
+AND start_datetime >= ?
+AND start_datetime < ?
+ORDER BY start_datetime ASC;
+`;
 
-    // 3. Los parámetros ahora son 3
-    const params = [tecnico_id, fechaInicio, fechaFin];
+const params = [tecnico_id, fechaInicio, fechaFin];
 
-    const [rows] = await connection.execute(sql, params);
-    connection.release();
+const [rows] = await connection.execute(sql, params);
+connection.release();
 
-    res.json(rows);
+// 4. PROCESAMIENTO EN JAVASCRIPT
+// Aquí es donde "encontramos" el caso_id
+const citas = rows.map(cita => {
+let casoId = null;
 
-  } catch (error) {
-    console.error('Error al obtener la agenda por día:', error);
-    res.status(500).json({
-      error: 'Error interno del servidor al obtener la agenda.',
-      details: error.message
-    });
-  }
+// Intento 1: Asumir que 'notas_estructuradas' es un JSON
+if (cita.notas_estructuradas) {
+try {
+// Asumimos que guardas algo como: {"caso_id": 123, "otro": "dato"}
+const structured = JSON.parse(cita.notas_estructuradas);
+if (structured.caso_id) {
+casoId = structured.caso_id;
+}
+} catch (e) {
+// No era un JSON válido, no hacemos nada.
+}
+}
+
+// Intento 2: Si no se encontró, buscar en 'notes' (menos probable)
+// Asumimos que guardas algo como "ID del Caso: C-45"
+if (!casoId && cita.notes) {
+const match = cita.notes.match(/ID del Caso: (\S+)/); // <-- AJUSTA ESTE REGEX SI ES NECESARIO
+if (match && match[1]) {
+casoId = match[1];
+}
+}
+
+// 5. Devolvemos el formato que el frontend espera
+return {
+id: cita.id,
+start_datetime: cita.start_datetime,
+end_datetime: cita.end_datetime,
+caso_id: casoId // Será null si no se encontró en ningún lado
+};
+});
+
+res.json(citas);
+
+} catch (error) {
+console.error('Error al obtener la agenda por día:', error);
+res.status(500).json({
+error: 'Error interno del servidor al obtener la agenda.',
+details: error.message
+});
+}
 };
