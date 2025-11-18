@@ -3,11 +3,14 @@ import { useAuth } from '../context/AuthContext';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import dayjs from 'dayjs';
+import 'dayjs/locale/es-mx';
 import MainHeader from '../components/MainHeader';
 import SideMenu from '../components/SideMenu';
 import DatePickerFAB from '../components/DatePickerFAB';
 import DiaTimeline from '../components/DiaTimeline';
 import '../AgendaStyles.css';
+
+dayjs.locale('es-mx');
 
 function AgendaPage() {
   const { user, logout } = useAuth();
@@ -70,7 +73,7 @@ function AgendaPage() {
             <SwiperSlide key={index}>
               {/* Header de la fecha (Ej: "Lunes 17 de Noviembre") */}
               <div className='dia-header'>
-                <strong>{dayjs(dia).format('dddd')}</strong>
+                <strong>{dayjs(dia).format('dddd').charAt(0).toUpperCase() + dayjs(dia).format('dddd').slice(1)}</strong>
                 <span style={{color: '#666'}}>{dayjs(dia).format('D [de] MMMM')}</span>
               </div>
 
