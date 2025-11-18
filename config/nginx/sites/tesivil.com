@@ -92,6 +92,13 @@ server {
     # =========================================================
     # --- Frontend PWA Técnico (Producción en /dist) ---
     # =========================================================
+
+    # 1. BLOQUE NUEVO: Atrapa "/lete/app" (sin barra) y fuerza la redirección
+    location = /lete/app {
+        return 301 $scheme://$http_host/lete/app/;
+    }
+
+    # 2. TU BLOQUE ACTUAL: Maneja todo lo que esté DENTRO de "/lete/app/"
     location ^~ /lete/app/ {
         ### [MODIFICADO] Nueva ruta en PLATAFORMA_LETE ###
         alias /home/galj_octavio/TESIVIL_STACK/02_PLATAFORMA_LETE/pwa_tecnico/dist/;
