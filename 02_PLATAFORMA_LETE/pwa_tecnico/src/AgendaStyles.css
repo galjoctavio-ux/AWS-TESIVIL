@@ -10,9 +10,12 @@
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   min-height: 110px;
   z-index: 10;
+
+  /* --- NUEVO: Layout Horizontal --- */
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: space-between;
+  align-items: center;
 
   /* Estilos por defecto (ej. levantamiento o 'default') */
   background-color: #E0E7FF; /* Fondo azul claro */
@@ -63,8 +66,21 @@
   overflow: hidden;
   text-overflow: ellipsis;
   margin-top: 4px;
+/* --- NUEVO: Contenedor para el texto --- */
+.cita-content {
+  flex-basis: 75%; /* Ocupa el 75% del ancho */
+  overflow: hidden; /* Evita que el texto se desborde */
+}
+
 }/* --- Estilos para los botones de acción de la cita --- */
-.cita-actions { margin-top: 8px; display: flex; flex-wrap: wrap; /* Permite que los botones bajen si no caben / gap: 8px; border-top: 1px solid rgba(100, 116, 139, 0.2); / Separador sutil */ padding-top: 6px; }
+.cita-actions {
+  flex-basis: 25%; /* Ocupa el 25% restante */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px; /* Espacio entre iconos */
+  padding: 0;
+  margin: 0;
+}
 .cita-icon-button { display: inline-flex; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.4); border: 1px solid rgba(0, 0, 0, 0.05); border-radius: 6px; padding: 4px 6px; font-size: 1rem; /* Controla el tamaño del emoji / line-height: 1; cursor: pointer; color: #334155; / Color del emoji (texto) */ text-decoration: none; transition: background-color 0.2s ease; }
 .cita-icon-button:hover { background-color: rgba(255, 255, 255, 0.8); }
 
@@ -83,8 +99,14 @@
 }
 
 /* --- Estilos para el DatePicker FAB --- */
+.date-picker-fab-container {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 1000;
+}
 .react-datepicker-popper {
-  z-index: 101 !important; /* Asegura que esté por encima del FAB */
+  z-index: 1001 !important; /* Asegura que esté por encima del FAB */
   bottom: 85px !important; /* Posiciona arriba del botón (60px altura + 20px margen + 5px extra) */
   left: 10px !important; /* Margen desde la izquierda */
   top: auto !important; /* Anula el 'top' por defecto para que 'bottom' funcione */

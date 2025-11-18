@@ -36,11 +36,13 @@ const DatePickerFAB = ({ onDateSelect }) => {
   ));
 
   return (
-    <DatePicker
-      selected={startDate}
-      onChange={handleChange}
-      customInput={<CustomInput />}
-    />
+    <div className="date-picker-fab-container">
+      <DatePicker
+        selected={startDate}
+        onChange={handleChange}
+        customInput={<CustomInput />}
+      />
+    </div>
   );
 };
 

@@ -109,8 +109,10 @@ const DiaTimeline = ({ date }) => {
                     {/* 3. Renderizamos los detalles del caso si existen */}
                     {cita.caso ? (
                         <>
-                            <strong>{cita.caso.cliente_nombre}</strong>
-                            <p>{dayjs(cita.start_datetime).format('h:mm A')} - {dayjs(cita.end_datetime).format('h:mm A')}</p>
+                            <div className="cita-content">
+                                <strong>{cita.caso.cliente_nombre}</strong>
+                                <p>{dayjs(cita.start_datetime).format('h:mm A')} - {dayjs(cita.end_datetime).format('h:mm A')}</p>
+                            </div>
                             <div className="cita-actions"> {/* --- Botón de Mapa (Siempre visible) --- */} <button className="cita-icon-button" onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cita.caso.cliente_direccion)}`, "_blank")} title="Abrir en Google Maps" > 📍 </button>
                                 {/* --- Botón de Revisar (Lógica condicional) --- */} {(cita.caso.tipo !== 'levantamiento' && cita.caso.status !== 'completado') && (
                                 <Link to={`/revision/${cita.caso.id}`} className="cita-icon-button" title="Iniciar Revisión" > 📝 </Link> )}
