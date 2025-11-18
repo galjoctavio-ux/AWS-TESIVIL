@@ -109,12 +109,16 @@ const DiaTimeline = ({ date }) => {
                         <>
                             <strong>{cita.caso.cliente_nombre}</strong>
                             <p>{dayjs(cita.start_datetime).format('h:mm A')} - {dayjs(cita.end_datetime).format('h:mm A')}</p>
-                            <p className="cita-direccion">{cita.caso.cliente_direccion}</p>
                             <div className="cita-actions"> {/* --- Botón de Mapa (Siempre visible) --- */} <button className="cita-icon-button" onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cita.caso.cliente_direccion)}`, "_blank")} title="Abrir en Google Maps" > 📍 </button>
                                 {/* --- Botón de Revisar (Lógica condicional) --- */} {(cita.caso.tipo !== 'levantamiento' && cita.caso.status !== 'completado') && (
                                 <Link to={`/revision/${cita.caso.id}`} className="cita-icon-button" title="Iniciar Revisión" > 📝 </Link> )}
                                 {/* --- Botón de Cotizar (Lógica condicional) --- */} {cita.caso.status !== 'completado' && (
-                                <Link to="/cotizador" state={{ casoId: cita.caso.id, clienteNombre: cita.caso.cliente_nombre, clienteDireccion: cita.caso.cliente_direccion /* No pasamos clienteTelefono, tal como se especificó */ }} className="cita-icon-button" title="Crear Cotización" > ⚡ </Link> )} </div>
+                                <Link to="/cotizador" state={{ casoId: cita.caso.id, clienteNombre: cita.caso.cliente_nombre, clienteDireccion: cita.caso.cliente_direccion /* No pasamos clienteTelefono, tal como se especificó */ }} className="cita-icon-button" title="Crear Cotización" > ⚡ </Link> )}
+                                {/* --- Botón de Detalles (Nuevo) --- */}
+                                <Link to={`/detalle-caso/${cita.caso.id}`} className="cita-icon-button" title="Ver Detalles del Caso">
+                                ℹ️
+                                </Link>
+                                </div>
                         </>
                     ) : (
                         <>
