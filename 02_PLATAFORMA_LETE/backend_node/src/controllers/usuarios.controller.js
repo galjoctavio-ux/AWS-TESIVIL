@@ -107,8 +107,6 @@ export const getEaIdFromSupabaseId = async (req, res) => {
 
 export const createTecnico = async (req, res) => {
   // 1. OBTENEMOS LOS DATOS
-  // (Si quieres añadir el teléfono, añádelo aquí y en tu formulario del frontend)
-  // const { nombre, email, password, mobile_number } = req.body;
   const { nombre, email, password } = req.body;
 
   if (!nombre || !email || !password) {
@@ -131,29 +129,15 @@ export const createTecnico = async (req, res) => {
     createdAuthUserId = authData.user.id;
     console.log('TAREA 1: Usuario de Auth creado:', createdAuthUserId);
 
-    // --- TAREA 2: Crear el perfil en 'profiles' (Supabase DB) ---
-    console.log('TAREA 2: Creando perfil en Supabase...');
-    const { data: profileData, error: profileError } = await supabaseAdmin
-      .from('profiles')
-      .insert({
-        id: authData.user.id,
-        nombre: nombre,
-        rol: 'tecnico'
-      })
-      .select()
-      .single();
-    
-    if (profileError) throw new Error(`Error Supabase Profile: ${profileError.message}`);
-    console.log('TAREA 2: Perfil de Supabase creado.');
 
-    // --- TAREA 3: Crear el usuario en E!A (Tabla "ea_users") ---
-    console.log('TAREA 3: Creando perfil en Easy!Appointments (ea_users)...');
+    // --- TAREA 2 (NUEVO ORDEN): Crear el usuario en E!A (Tabla "ea_users") ---
+    // Movemos esta tarea aquí para obtener el ID antes de crear el perfil.
+    console.log('TAREA 2: Creando perfil en Easy!Appointments (ea_users)...');
     
     const [firstName, ...lastNameParts] = nombre.split(' ');
     const lastName = lastNameParts.join(' ') || 'Técnico';
-    const ID_ROL_PROVEEDOR = 2; // (Como descubrimos)
+    const ID_ROL_PROVEEDOR = 2; // (Rol de Proveedor)
 
-    // (Aquí es donde añadirías 'mobile_number' a la consulta si lo tuvieras)
     const sqlInsertUser = `
       INSERT INTO ea_users 
       (first_name, last_name, email, language, timezone, id_roles) 
@@ -165,24 +149,38 @@ export const createTecnico = async (req, res) => {
       lastName,
       email,
       ID_ROL_PROVEEDOR
-      // (Aquí iría 'mobile_number || null' si lo añades)
     ];
 
-    // ¡Importante! Obtenemos el ID del usuario que acabamos de crear
     const [userResult] = await eaPool.query(sqlInsertUser, valuesUser);
     createdEaUserId = userResult.insertId; // Guardamos el ID para las siguientes tareas
     
-    console.log(`TAREA 3: Perfil de E!A creado con ID: ${createdEaUserId}.`);
+    console.log(`TAREA 2: Perfil de E!A creado con ID: ${createdEaUserId}.`);
+
+
+    // --- TAREA 3 (NUEVO ORDEN): Crear el perfil en 'profiles' (Supabase DB) ---
+    // Ahora que TENEMOS el 'createdEaUserId', podemos insertarlo.
+    console.log('TAREA 3: Creando perfil en Supabase y vinculando ID de E!A...');
+    const { data: profileData, error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .insert({
+        id: createdAuthUserId,    // <-- El ID de Supabase Auth
+        nombre: nombre,
+        rol: 'tecnico',
+        ea_user_id: createdEaUserId // <-- ¡LA LÍNEA MÁGICA!
+      })
+      .select()
+      .single();
+    
+    if (profileError) throw new Error(`Error Supabase Profile: ${profileError.message}`);
+    console.log('TAREA 3: Perfil de Supabase creado y vinculado.');
 
 
     // --- TAREA 4: Insertar Credenciales y Horario (Tabla "ea_user_settings") ---
     console.log('TAREA 4: Insertando credenciales y horario (ea_user_settings)...');
 
-    // 4.1. Hashear el password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // 4.2. Definir un horario de trabajo default (Lunes-Viernes, 9am a 5pm)
     const defaultWorkingPlan = {
       "monday": {"start":"09:00", "end":"17:00", "breaks":[]},
       "tuesday": {"start":"09:00", "end":"17:00", "breaks":[]},
@@ -201,9 +199,9 @@ export const createTecnico = async (req, res) => {
     
     const valuesSettings = [
       createdEaUserId,
-      email, // Usamos el email como username (como pide la interfaz)
+      email,
       hashedPassword,
-      JSON.stringify(defaultWorkingPlan) // Guardamos el horario como JSON
+      JSON.stringify(defaultWorkingPlan)
     ];
 
     await eaPool.query(sqlInsertSettings, valuesSettings);
@@ -230,7 +228,7 @@ export const createTecnico = async (req, res) => {
         nombre: profileData.nombre,
         rol: profileData.rol,
         email: authData.user.email,
-        id_ea: createdEaUserId
+        id_ea: createdEaUserId // <-- Ahora se devuelve vinculado
       }
     });
 
@@ -238,9 +236,12 @@ export const createTecnico = async (req, res) => {
     console.error('Error completo al crear técnico (flujo sincronizado):', error);
 
     // --- TAREA DE ROLLBACK (Si algo falla) ---
+    // Esta lógica de rollback sigue funcionando perfectamente.
     if (createdEaUserId) {
       console.log(`ROLLBACK: Eliminando de ea_user_settings (ID: ${createdEaUserId})...`);
       await eaPool.query('DELETE FROM ea_user_settings WHERE id_users = ?', [createdEaUserId]);
+      // (Faltaba el rollback del servicio, lo añado por seguridad)
+      await eaPool.query('DELETE FROM ea_services_providers WHERE id_users = ?', [createdEaUserId]);
       console.log(`ROLLBACK: Eliminando de ea_users (ID: ${createdEaUserId})...`);
       await eaPool.query('DELETE FROM ea_users WHERE id = ?', [createdEaUserId]);
     }
