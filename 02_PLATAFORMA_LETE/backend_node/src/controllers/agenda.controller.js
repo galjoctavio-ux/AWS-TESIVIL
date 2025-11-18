@@ -1,5 +1,6 @@
 // src/controllers/agenda.controller.js
 import pool from '../services/eaDatabase.js';
+import dayjs from 'dayjs';
 // ¡IMPORTANTE! Asegúrate de importar supabaseAdmin
 import { supabaseAdmin } from '../services/supabaseClient.js';
 
@@ -144,10 +145,12 @@ const casosMap = new Map(casosData.map(caso => [caso.id, caso]));
 
 // 3.4. Fusionar los datos de E!A (MySQL) con los de Casos (Supabase)
 const citasConDetalles = citas.map(cita => ({
-...cita, // Contiene id_cita, start_datetime, end_datetime, caso_id
-// Añadimos un objeto 'caso' con los detalles
-caso: casosMap.get(cita.caso_id) || null
-}));
+    ...cita, // Contiene id_cita, start_datetime, end_datetime, caso_id
+    start_datetime: dayjs(cita.start_datetime).format('YYYY-MM-DD HH:mm:ss'),
+    end_datetime: dayjs(cita.end_datetime).format('YYYY-MM-DD HH:mm:ss'),
+    // Añadimos un objeto 'caso' con los detalles
+    caso: casosMap.get(cita.caso_id) || null
+    }));
 
 // ----------------------------------------------------
 // PASO 4: Enviar la respuesta completa
