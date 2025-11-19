@@ -25,19 +25,34 @@ export default api;
 // =========================================================
 // --- NUEVO: API PHP (COTI-LETE / GESTIÓN DE XML) ---
 // =========================================================
-const PHP_API_URL = '/api'; // Nginx redirige esto al puerto 8081
+const PHP_API_URL = '/api'; 
 
+// AYUDA: Función para obtener headers con el token actual
+const getAuthHeaders = (isJson = true) => {
+  const token = localStorage.getItem('authToken');
+  const headers = {
+    'Authorization': `Bearer ${token}` // <--- AQUÍ ESTÁ LA LLAVE MAESTRA
+  };
+  if (isJson) {
+    headers['Content-Type'] = 'application/json';
+  }
+  return headers;
+};
+
+// 1. SUBIDA DE XML (FormData no lleva Content-Type manual)
 export const subirXml = async (file) => {
   const formData = new FormData();
   formData.append('xml', file);
 
   const response = await fetch(`${PHP_API_URL}/xml/upload`, {
     method: 'POST',
+    headers: getAuthHeaders(false), // false porque es FormData
     body: formData,
   });
   return await response.json();
 };
 
+// Las funciones de Node (axios) se quedan igual porque ya tienen el interceptor
 export const obtenerTecnicos = async () => {
   const response = await api.get('/usuarios/tecnicos');
   return response.data;
@@ -57,29 +72,35 @@ export const createCasoFromCotizacion = async (data) => {
   return response.data;
 };
 
+// --- AQUÍ EMPIEZAN LAS CORRECCIONES A LAS PETICIONES PHP ---
+
 export const powerCloneCotizacion = async (cotizacionData) => {
   const response = await fetch(`${PHP_API_URL}/admin/cotizacion/powerclone`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify(cotizacionData)
   });
   return await response.json();
 };
 
 export const obtenerPendientes = async () => {
-  const response = await fetch(`${PHP_API_URL}/admin/pendientes`);
+  const response = await fetch(`${PHP_API_URL}/admin/pendientes`, {
+    headers: getAuthHeaders()
+  });
   return await response.json();
 };
 
 export const obtenerRecursos = async () => {
-  const response = await fetch(`${PHP_API_URL}/recursos`);
+  const response = await fetch(`${PHP_API_URL}/recursos`, {
+    headers: getAuthHeaders()
+  });
   return await response.json();
 };
 
 export const vincularProducto = async (idMapeo, idRecurso) => {
   const response = await fetch(`${PHP_API_URL}/admin/vincular`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ id_mapeo: idMapeo, id_recurso: idRecurso })
   });
   return await response.json();
@@ -88,7 +109,7 @@ export const vincularProducto = async (idMapeo, idRecurso) => {
 export const crearRecurso = async (nombre, unidad) => {
   const response = await fetch(`${PHP_API_URL}/recursos`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ nombre, unidad, tipo: 'MATERIAL' })
   });
   return await response.json();
@@ -97,7 +118,7 @@ export const crearRecurso = async (nombre, unidad) => {
 export const updateRecurso = async (id, datos) => {
   const response = await fetch(`${PHP_API_URL}/recursos/editar`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ id, ...datos }) 
   });
   return await response.json();
@@ -106,37 +127,48 @@ export const updateRecurso = async (id, datos) => {
 export const deleteRecurso = async (id) => {
   const response = await fetch(`${PHP_API_URL}/recursos/eliminar`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ id })
   });
   return await response.json();
 };
 
 export const obtenerInventarioAdmin = async () => {
-  const response = await fetch(`${PHP_API_URL}/admin/inventario`);
+  const response = await fetch(`${PHP_API_URL}/admin/inventario`, {
+    headers: getAuthHeaders()
+  });
   return await response.json();
 };
 
 export const aprobarRecurso = async (id) => {
   const response = await fetch(`${PHP_API_URL}/recursos/aprobar`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ id })
   });
   return await response.json();
 };
 
-// --- GESTIÓN DE COTIZACIONES ---
+// --- GESTIÓN DE COTIZACIONES (ESTA ES LA QUE FALLABA EN TU FOTO) ---
 
 export const obtenerListadoCotizaciones = async () => {
-  const response = await fetch(`${PHP_API_URL}/admin/cotizaciones`);
+  const response = await fetch(`${PHP_API_URL}/admin/cotizaciones`, {
+    headers: getAuthHeaders() // Ahora sí enviamos el token
+  });
+  
+  if (response.status === 401) {
+      // Opcional: Manejar redirección si el token expiró, 
+      // aunque el AuthContext lo suele manejar al recargar.
+      console.error("Sesión expirada en PHP");
+  }
+  
   return await response.json();
 };
 
 export const aplicarDescuento = async (idCotizacion, porcentaje) => {
   const response = await fetch(`${PHP_API_URL}/cotizacion/aplicar-descuento`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ id: idCotizacion, descuento_pct: porcentaje })
   });
   
@@ -153,7 +185,7 @@ export const aplicarDescuento = async (idCotizacion, porcentaje) => {
 export const autorizarCotizacion = async (id) => {
   const response = await fetch(`${PHP_API_URL}/admin/cotizacion/autorizar`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ id })
   });
   return await response.json();
@@ -162,7 +194,7 @@ export const autorizarCotizacion = async (id) => {
 export const rechazarCotizacion = async (id) => {
   const response = await fetch(`${PHP_API_URL}/admin/cotizacion/rechazar`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ id })
   });
   return await response.json();
@@ -171,7 +203,7 @@ export const rechazarCotizacion = async (id) => {
 export const finalizarProyecto = async (id, gastoMaterial, gastoMo) => {
   const response = await fetch(`${PHP_API_URL}/admin/cotizacion/finalizar`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ 
         id, 
         gasto_material: gastoMaterial, 
@@ -184,7 +216,7 @@ export const finalizarProyecto = async (id, gastoMaterial, gastoMo) => {
 export const clonarCotizacion = async (id) => {
   const response = await fetch(`${PHP_API_URL}/admin/cotizacion/clonar`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ id })
   });
   return await response.json();
@@ -193,23 +225,25 @@ export const clonarCotizacion = async (id) => {
 export const reenviarCorreo = async (id) => {
   const response = await fetch(`${PHP_API_URL}/admin/cotizacion/reenviar`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ id })
   });
   return await response.json();
 };
 
-// --- CONFIGURACIÓN FINANCIERA (SALA DE MÁQUINAS) ---
+// --- CONFIGURACIÓN FINANCIERA ---
 
 export const obtenerConfiguracion = async () => {
-  const response = await fetch(`${PHP_API_URL}/admin/configuracion`);
+  const response = await fetch(`${PHP_API_URL}/admin/configuracion`, {
+    headers: getAuthHeaders()
+  });
   return await response.json();
 };
 
 export const actualizarConfiguracion = async (nuevosValores) => {
   const response = await fetch(`${PHP_API_URL}/admin/configuracion/actualizar`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ config: nuevosValores })
   });
   return await response.json();
@@ -217,14 +251,16 @@ export const actualizarConfiguracion = async (nuevosValores) => {
 
 // --- EDITOR MAESTRO ---
 export const obtenerDetalleCotizacion = async (id) => {
-  const response = await fetch(`${PHP_API_URL}/admin/cotizacion/detalle?id=${id}`);
+  const response = await fetch(`${PHP_API_URL}/admin/cotizacion/detalle?id=${id}`, {
+    headers: getAuthHeaders()
+  });
   return await response.json();
 };
 
 export const guardarCambiosCotizacion = async (payload) => {
   const response = await fetch(`${PHP_API_URL}/admin/cotizacion/guardar-cambios`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify(payload)
   });
   return await response.json();
