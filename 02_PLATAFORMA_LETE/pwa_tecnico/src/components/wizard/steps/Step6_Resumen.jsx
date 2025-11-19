@@ -14,6 +14,7 @@ const Step6_Resumen = ({ formData, updateFormData }) => {
 
   const handleCausasChange = (e) => {
     const { value, checked } = e.target;
+    // Ensure formData.causas_alto_consumo is an array before spreading
     const currentCausas = formData.causas_alto_consumo || [];
     let newCausas;
     if (checked) {
@@ -54,7 +55,7 @@ const Step6_Resumen = ({ formData, updateFormData }) => {
                 value={causa}
                 checked={(formData.causas_alto_consumo || []).includes(causa)}
                 onChange={handleCausasChange}
-                className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="h-6 w-6 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500"
               />
               <span className="ml-4 text-md text-gray-700">{causa}</span>
             </label>
