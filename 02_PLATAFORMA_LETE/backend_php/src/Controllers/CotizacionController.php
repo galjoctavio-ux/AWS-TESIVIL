@@ -71,8 +71,8 @@ class CotizacionController {
             ];
 
             $nombreAsesorDesdeBD = $this->calculosService->obtenerNombreUsuarioPorId($input['tecnico_id']);
-            $tecnicoNombreFinal = $nombreAsesorDesdeBD ?? $input['tecnico_nombre'] ?? 'Asesor de Servicio';
-
+            $tecnicoNombreFinal = $input['tecnico_nombre'] ?? 'Asesor de Servicio';
+            
             $guardadoResult = $this->calculosService->guardarCotizacion(
                 $resultado,
                 $input['tecnico_id'],
