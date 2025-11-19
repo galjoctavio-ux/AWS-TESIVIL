@@ -7,24 +7,26 @@ const Step3_Mediciones = ({ formData, updateFormData }) => {
   };
 
   const { tipo_servicio } = formData;
-  const esMonofasico = tipo_servicio === 'Monofásico';
-  const esBifasico = tipo_servicio === '2F+Neutro' || tipo_servicio === '2F+N con Paneles';
-  const esTrifasico = tipo_servicio === 'Trifásico' || tipo_servicio === 'Trifásico con Paneles';
-  const tienePaneles = tipo_servicio === '2F+N con Paneles' || tipo_servicio === 'Trifásico con Paneles';
+
+  const showF2 = tipo_servicio?.includes('2F') || tipo_servicio?.includes('Trifásico');
+  const showF3 = tipo_servicio?.includes('Trifásico');
+  const showNeutro = tipo_servicio?.includes('Monofásico') || tipo_servicio?.includes('2F');
+  const showPaneles = tipo_servicio?.includes('Paneles');
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-slide-in">
       <InputCard
         label="Voltaje (Fase-Neutro)"
-        name="voltaje_medido"
-        value={formData.voltaje_medido || ''}
+        name="voltaje_fn"
+        value={formData.voltaje_fn || ''}
         onChange={handleChange}
         type="number"
         unit="V"
       />
 
-      <div className="p-4 bg-blue-50 rounded-lg space-y-4">
-        <h3 className="font-bold text-blue-800">Corriente de Red (Amperes)</h3>
+      {/* Grupo: Corrientes de Red */}
+      <div className="space-y-4 border border-gray-200 p-4 rounded-xl bg-gray-50">
+        <h3 className="font-bold text-gray-700">⚡ Corrientes de Red</h3>
         <InputCard
           label="Corriente Red F1"
           name="corriente_red_f1"
@@ -33,7 +35,7 @@ const Step3_Mediciones = ({ formData, updateFormData }) => {
           type="number"
           unit="A"
         />
-        {(esBifasico || esTrifasico) && (
+        {showF2 && (
           <InputCard
             label="Corriente Red F2"
             name="corriente_red_f2"
@@ -43,7 +45,7 @@ const Step3_Mediciones = ({ formData, updateFormData }) => {
             unit="A"
           />
         )}
-        {esTrifasico && (
+        {showF3 && (
           <InputCard
             label="Corriente Red F3"
             name="corriente_red_f3"
@@ -53,7 +55,7 @@ const Step3_Mediciones = ({ formData, updateFormData }) => {
             unit="A"
           />
         )}
-        {(esMonofasico || esBifasico) && (
+        {showNeutro && (
           <InputCard
             label="Corriente Red Neutro"
             name="corriente_red_n"
@@ -65,9 +67,10 @@ const Step3_Mediciones = ({ formData, updateFormData }) => {
         )}
       </div>
 
-      {tienePaneles && (
-        <div className="p-4 bg-green-50 rounded-lg space-y-4">
-          <h3 className="font-bold text-green-800">Mediciones de Paneles Solares</h3>
+      {/* Grupo: Paneles Solares */}
+      {showPaneles && (
+        <div className="space-y-4 border border-green-200 p-4 rounded-xl bg-green-50 animate-fade-in">
+          <h3 className="font-bold text-gray-700">☀️ Paneles Solares</h3>
           <InputCard
             label="Corriente Paneles F1"
             name="corriente_paneles_f1"
@@ -76,7 +79,7 @@ const Step3_Mediciones = ({ formData, updateFormData }) => {
             type="number"
             unit="A"
           />
-          {(tipo_servicio === '2F+N con Paneles' || tipo_servicio === 'Trifásico con Paneles') && (
+           {showF2 && (
             <InputCard
               label="Corriente Paneles F2"
               name="corriente_paneles_f2"
@@ -86,7 +89,7 @@ const Step3_Mediciones = ({ formData, updateFormData }) => {
               unit="A"
             />
           )}
-          {tipo_servicio === 'Trifásico con Paneles' && (
+           {showF3 && (
             <InputCard
               label="Corriente Paneles F3"
               name="corriente_paneles_f3"
@@ -96,13 +99,13 @@ const Step3_Mediciones = ({ formData, updateFormData }) => {
               unit="A"
             />
           )}
-          <h4 className="font-semibold text-green-700 pt-2">Datos Generales de Paneles</h4>
           <InputCard
-            label="Cantidad de Paneles"
+            label="Cantidad"
             name="cantidad_paneles"
             value={formData.cantidad_paneles || ''}
             onChange={handleChange}
             type="number"
+            unit="pzas"
           />
           <InputCard
             label="Watts por Panel"
@@ -113,9 +116,9 @@ const Step3_Mediciones = ({ formData, updateFormData }) => {
             unit="W"
           />
           <InputCard
-            label="Años de Antigüedad de Paneles"
-            name="paneles_antiguedad_anos"
-            value={formData.paneles_antiguedad_anos || ''}
+            label="Antigüedad"
+            name="antiguedad_paneles"
+            value={formData.antiguedad_paneles || ''}
             onChange={handleChange}
             type="number"
             unit="años"

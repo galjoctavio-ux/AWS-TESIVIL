@@ -1,74 +1,70 @@
 import React from 'react';
 import BigToggle from '../ui/BigToggle';
-import InputCard from '../ui/InputCard'; // Assuming this exists for text/number inputs
-import SelectCard from '../ui/SelectCard'; // Assuming a reusable select component
+import InputCard from '../ui/InputCard';
+import SelectCard from '../ui/SelectCard';
 
 const Step2_Medidor = ({ formData, updateFormData }) => {
-  const handleChange = (field, value) => {
-    updateFormData({ [field]: value });
+
+  // Handler for standard input/select changes that pass an event object
+  const handleChange = (e) => {
+    updateFormData({ [e.target.name]: e.target.value });
   };
 
-  const {
-    tipo_servicio,
-    sello_cfe,
-    condicion_base_medidor,
-    tornillos_flojos,
-    capacidad_vs_calibre
-  } = formData;
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-slide-in">
       <SelectCard
         label="Tipo de Servicio"
         name="tipo_servicio"
-        value={tipo_servicio}
-        onChange={(e) => handleChange('tipo_servicio', e.target.value)}
+        value={formData.tipo_servicio || ''}
+        onChange={handleChange}
         options={[
           'Monofásico',
           '2F+Neutro',
           '2F+N con Paneles',
           'Trifásico',
-          'Trifásico con Paneles',
+          'Trifásico con Paneles'
         ]}
       />
 
       <BigToggle
         label="¿Cuenta con Sello CFE?"
-        enabled={sello_cfe}
-        onChange={(val) => handleChange('sello_cfe', val)}
+        enabled={!!formData.sello_cfe}
+        onChange={(val) => updateFormData({ sello_cfe: val })}
       />
 
-      {!sello_cfe && (
-        <SelectCard
-          label="Condición Base Medidor (Si NO hay sello)"
-          name="condicion_base_medidor"
-          value={condicion_base_medidor}
-          onChange={(e) => handleChange('condicion_base_medidor', e.target.value)}
-          options={['Bueno', 'Regular', 'Malo']}
-        />
+      {!formData.sello_cfe && (
+        <div className="animate-fade-in">
+          <SelectCard
+            label="Condición Base Medidor"
+            name="condicion_base_medidor"
+            value={formData.condicion_base_medidor || ''}
+            onChange={handleChange}
+            options={['Bueno', 'Regular', 'Malo']}
+          />
+        </div>
       )}
 
       <BigToggle
-        label="¿Tornillos Flojos?"
-        enabled={tornillos_flojos}
-        onChange={(val) => handleChange('tornillos_flojos', val)}
+        label="¿Tornillos Flojos en Centro de Carga?"
+        enabled={!!formData.tornillos_flojos}
+        onChange={(val) => updateFormData({ tornillos_flojos: val })}
       />
 
-      {tornillos_flojos && (
-        <div className="p-4 bg-red-100 text-red-800 rounded-lg">
-          <p className="font-bold">¡Atención! Aprieta los tornillos para asegurar una buena conexión y evitar fallas.</p>
+      {formData.tornillos_flojos && (
+        <div className="bg-red-100 text-red-800 p-4 rounded-lg mt-2">
+          <p className="font-semibold">⚠️ ¡Atención! Aprieta los tornillos para asegurar una buena conexión y evitar fallas.</p>
         </div>
       )}
 
       <BigToggle
         label="¿Capacidad del Interruptor vs Calibre Correcto?"
-        enabled={capacidad_vs_calibre}
-        onChange={(val) => handleChange('capacidad_vs_calibre', val)}
+        enabled={!!formData.capacidad_vs_calibre}
+        onChange={(val) => updateFormData({ capacidad_vs_calibre: val })}
       />
 
-      {!capacidad_vs_calibre && (
-        <div className="p-4 bg-red-100 text-red-800 rounded-lg">
-          <p className="font-bold">¡PELIGRO! Riesgo de Incendio. El calibre del conductor no corresponde a la capacidad del interruptor.</p>
+      {!formData.capacidad_vs_calibre && (
+        <div className="bg-red-100 text-red-800 p-4 rounded-lg mt-2">
+          <p className="font-semibold">¡PELIGRO! El calibre del conductor no corresponde a la capacidad del interruptor. Riesgo de incendio.</p>
         </div>
       )}
 
@@ -76,9 +72,9 @@ const Step2_Medidor = ({ formData, updateFormData }) => {
         label="Observaciones del Centro de Carga"
         name="observaciones_cc"
         value={formData.observaciones_cc || ''}
-        onChange={(e) => handleChange('observaciones_cc', e.target.value)}
-        placeholder="Ej: Se sobrecalienta, huele a quemado..."
-        isTextarea
+        onChange={handleChange}
+        isTextarea={true}
+        placeholder="Ej: Se sobrecalienta, huele a quemado, zumbido..."
       />
     </div>
   );
