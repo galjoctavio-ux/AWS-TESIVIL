@@ -198,7 +198,7 @@ class CalculosService {
         ?float $estimacionIA = null,
         ?int $caso_id = null,
         float $descuentoPct = 0.0
-    ): string {
+    ): array {
         // Esta función ahora asume que una transacción ya ha sido iniciada si es necesario.
         try {
             $uuid = bin2hex(random_bytes(16));
