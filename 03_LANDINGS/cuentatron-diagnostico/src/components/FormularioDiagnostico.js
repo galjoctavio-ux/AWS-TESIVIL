@@ -88,7 +88,7 @@ export default function FormularioDiagnostico() {
       setAvailabilityLoading(true);
       setAvailabilityError('');
       try {
-        const response = await fetch('/cuentatron/diagnostico-personalizado/api/ea-availability', { 
+        const response = await fetch('/api/ea-availability', {
           method: 'POST' 
         });
         
@@ -223,7 +223,7 @@ export default function FormularioDiagnostico() {
 
     try {
       // Llamada a la API que usará inyección directa
-      const response = await fetch('/cuentatron/diagnostico-personalizado/api/confirmar-cita-y-perfil', {
+      const response = await fetch('/api/confirmar-cita-y-perfil', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -41,7 +41,7 @@ export default function HomePage() {
 
     try {
       // 1. Llamamos a nuestra propia API
-      const response = await fetch('/cuentatron/diagnostico-personalizado/api/checkout-session', {
+      const response = await fetch('/api/checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ export default function HomePage() {
           {/* Video de Fondo */}
           <video
             // Usamos basePath para la ruta correcta
-            src="/cuentatron/diagnostico-personalizado/assets/video-loop-medidor.mp4"
+            src="/assets/video-loop-medidor.mp4"
             autoPlay
             muted
             loop
@@ -226,7 +226,7 @@ export default function HomePage() {
       {/* Recuerda que 'Image' debe importarse de 'next/image' */}
       <img
         // Usamos basePath para la ruta correcta
-        src="/cuentatron/diagnostico-personalizado/assets/foto-ingeniero-analizando.jpg"
+        src="/assets/foto-ingeniero-analizando.jpg"
         alt="Ingeniero analizando datos de Cuentatrón"
         className="rounded-lg shadow-xl w-full h-auto object-cover"
         // No necesitas 'width' y 'height' si no usas 'next/image'
@@ -252,7 +252,7 @@ export default function HomePage() {
     <div className="mt-12 max-w-3xl mx-auto">
       <img
         // Usamos basePath para la ruta correcta
-        src="/cuentatron/diagnostico-personalizado/assets/grafico-antes-despues.png"
+        src="/assets/grafico-antes-despues.png"
         alt="Gráfica de consumo antes y después del diagnóstico Cuentatrón"
         className="rounded-lg shadow-xl w-full h-auto object-contain border border-gray-200"
       />
@@ -460,7 +460,7 @@ export default function HomePage() {
       {/* Columna de Imagen (Mockup) */}
       <div>
         <img
-          src="/cuentatron/diagnostico-personalizado/assets/mockup-pdf-reporte.png"
+          src="/assets/mockup-pdf-reporte.png"
           alt="Mockup del Reporte PDF de Diagnóstico Cuentatrón"
           className="rounded-lg shadow-xl w-full h-auto object-contain"
         />
