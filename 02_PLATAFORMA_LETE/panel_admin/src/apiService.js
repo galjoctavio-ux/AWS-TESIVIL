@@ -265,3 +265,13 @@ export const guardarCambiosCotizacion = async (payload) => {
   });
   return await response.json();
 };
+
+export const agendarCotizacion = async (id) => {
+  // CORRECCIÓN: Usamos PHP_API_URL y getAuthHeaders para mantener coherencia
+  const response = await fetch(`${PHP_API_URL}/admin/cotizacion/agendar`, {
+    method: 'POST',
+    headers: getAuthHeaders(), 
+    body: JSON.stringify({ id })
+  });
+  return await response.json();
+};

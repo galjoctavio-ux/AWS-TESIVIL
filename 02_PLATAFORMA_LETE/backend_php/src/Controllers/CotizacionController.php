@@ -292,7 +292,33 @@ class CotizacionController {
         }
     }
     // --- FIN LÓGICA CORREGIDA ---
-    
+
+    // --- NUEVA FUNCIÓN PARA EL FLUJO COMERCIAL ---
+    public function agendarCotizacion(): void {
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        if (empty($input['id'])) {
+             http_response_code(400); 
+             echo json_encode(['error' => 'Falta ID de la cotización']); 
+             return;
+        }
+
+        try {
+            // Cambiamos el estatus a AGENDADA. 
+            // Esto bloquea la edición y confirma que el cliente aceptó.
+            $this->calculosService->actualizarEstadoCotizacion((int)$input['id'], 'AGENDADA');
+            
+            echo json_encode([
+                'status' => 'success', 
+                'message' => 'Cotización marcada como AGENDADA exitosamente.'
+            ]);
+
+        } catch (Exception $e) {
+            http_response_code(500); 
+            echo json_encode(['error' => 'Error al agendar: ' . $e->getMessage()]);
+        }
+    }
+
     public function rechazarCotizacion(): void {
         $input = json_decode(file_get_contents('php://input'), true);
         if (empty($input['id'])) {
@@ -419,16 +445,6 @@ class CotizacionController {
         }
     }
 
-    public function authorize(int $id): void {
-        try {
-            $this->calculosService->actualizarEstadoCotizacion($id, 'autorizada');
-            header('Content-Type: application/json');
-            echo json_encode(['success' => true, 'message' => 'Cotización autorizada']);
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(['error' => 'Error interno: ' . $e->getMessage()]);
-        }
-    }
     public function obtenerConteosPorTecnico(): void {
         if (empty($_GET['tecnico_id'])) {
             http_response_code(400);

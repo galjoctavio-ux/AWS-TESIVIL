@@ -23,13 +23,12 @@ return [
 
     // --- BLOQUE D: ADMINISTRACIÓN DE COTIZACIONES ---
     ['method' => 'GET', 'uri' => '/api/cotizaciones/counts', 'controller' => 'CotizacionController', 'action' => 'obtenerConteosPorTecnico'],
-    // Ruta parametrizada: se manejará con una expresión regular en el router principal.
-    ['method' => 'POST', 'uri' => '/^\/api\/cotizaciones\/authorize\/(\d+)$/', 'controller' => 'CotizacionController', 'action' => 'authorize'],
     ['method' => 'GET', 'uri' => '/api/admin/cotizaciones', 'controller' => 'CotizacionController', 'action' => 'listarCotizacionesAdmin'],
     ['method' => 'GET', 'uri' => '/api/cotizacion/exportar', 'controller' => 'CotizacionController', 'action' => 'exportarMaterialesTxt'],
     ['method' => 'POST', 'uri' => '/api/cotizacion/aplicar-descuento', 'controller' => 'CotizacionController', 'action' => 'aplicarDescuento'],
     ['method' => 'POST', 'uri' => '/api/admin/cotizacion/autorizar', 'controller' => 'CotizacionController', 'action' => 'autorizarCotizacion'],
     ['method' => 'POST', 'uri' => '/api/admin/cotizacion/rechazar', 'controller' => 'CotizacionController', 'action' => 'rechazarCotizacion'],
+    ['method' => 'POST', 'uri' => '/api/admin/cotizacion/agendar', 'controller' => 'CotizacionController', 'action' => 'agendarCotizacion'],
     ['method' => 'POST', 'uri' => '/api/admin/cotizacion/finalizar', 'controller' => 'CotizacionController', 'action' => 'finalizarProyecto'],
     ['method' => 'POST', 'uri' => '/api/admin/cotizacion/clonar', 'controller' => 'CotizacionController', 'action' => 'clonarCotizacion'],
     ['method' => 'POST', 'uri' => '/api/admin/cotizacion/powerclone', 'controller' => 'CotizacionController', 'action' => 'powerCloneCotizacion'],
