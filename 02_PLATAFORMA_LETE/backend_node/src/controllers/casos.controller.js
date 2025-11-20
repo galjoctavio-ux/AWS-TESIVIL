@@ -151,7 +151,7 @@ export const getCasoById = async (req, res) => {
 export const createCasoFromCotizacion = async (req, res) => {
   const {
     cotizacionId,
-    tecnico_id, // Este es el ID externo (Google/Firebase)
+    tecnico_id, // ID externo (Supabase Auth / Firebase)
     fecha_inicio,
     fecha_fin,
     cliente_nombre,
@@ -165,50 +165,73 @@ export const createCasoFromCotizacion = async (req, res) => {
 
   try {
     // 1. Obtener el ID interno de E!A del técnico
-    // (Necesitamos traducir el ID de Google/Auth al ID numérico de E!A)
     const { data: perfilTecnico, error: errorPerfil } = await supabaseAdmin
       .from('profiles')
       .select('ea_user_id')
-      .eq('id', tecnico_id)
+      .eq('id', tecnico_id) 
       .single();
 
-    // Verificamos usando el nombre correcto de la columna
     if (errorPerfil || !perfilTecnico?.ea_user_id) {
-       console.error("Error perfil:", errorPerfil, perfilTecnico);
-       return res.status(400).json({ error: 'El técnico no está sincronizado con la agenda (Falta ea_user_id).' });
+       return res.status(400).json({ error: 'El técnico seleccionado no está sincronizado con la agenda (Falta ea_user_id).' });
     }
     
-    const idProvider = perfilTecnico.ea_user_id; // <--- CAMBIO AQUÍ
+    const idProvider = perfilTecnico.ea_user_id; // ID numérico de E!A
+
+    // --- CORRECCIÓN 1: VALIDACIÓN DE TRASLAPE (Issue 1) ---
+    // Consultamos si ya existe una cita que se solape con el horario solicitado
+    const sqlCheck = `
+        SELECT COUNT(*) as total 
+        FROM ea_appointments 
+        WHERE id_users_provider = ? 
+        AND (
+            (start_datetime < ? AND end_datetime > ?) -- Lógica estándar de traslape
+        )
+    `;
+    
+    const [rows] = await eaPool.query(sqlCheck, [idProvider, fecha_fin, fecha_inicio]);
+    
+    if (rows[0].total > 0) {
+        // Si encontramos citas, detenemos todo AQUÍ.
+        return res.status(409).json({ 
+            error: 'HORARIO NO DISPONIBLE: El técnico ya tiene una cita en ese rango de horas.' 
+        });
+    }
+    // -------------------------------------------------------
+
     // 2. Crear Caso en Supabase
     const { data: newCaso, error: casoError } = await supabaseAdmin
       .from('casos')
       .insert({
         cliente_nombre,
         cliente_direccion,
-        tecnico_id, // Aquí sí va el ID externo
+        tecnico_id, 
         tipo: 'proyecto',
-        status: 'asignado',
-        //origen_cotizacion_id: cotizacionId // (Opcional: si tienes esta columna para rastreo)
+        status: 'asignado'
+        // origen_cotizacion_id: cotizacionId // (Borrado para evitar error de columna)
       })
       .select()
       .single();
 
     if (casoError) throw new Error('Error al crear el caso en Supabase: ' + casoError.message);
 
-    // 3. Generar Hash para Easy!Appointments (Obligatorio)
+    // 3. Generar Hash
     const hash = randomBytes(16).toString('hex');
 
-    // 4. Insertar Cita en Easy!Appointments
-    // Notas: is_unavailable = 0 (Cita real), id_services = NULL (o pon un ID si es estricto)
-    // --- CONFIGURA AQUÍ TUS IDs REALES ---
-    const EA_SERVICE_ID = 1;   // <--- PON AQUÍ EL ID QUE VISTE EN EL PASO 1
-    const EA_CUSTOMER_ID = 21;  // <--- PON AQUÍ EL ID DEL CLIENTE (GENÉRICO) QUE OBTUVISTE EN EL PASO 2
-    // -------------------------------------
+    // 4. Insertar Cita en Easy!Appointments (CORRECCIÓN Issue 2)
+    
+    // --- TUS IDs REALES ---
+    const EA_SERVICE_ID = 1;   
+    const EA_CUSTOMER_ID = 21; 
+    // ----------------------
+
     const eaQuery = `
       INSERT INTO ea_appointments 
       (book_datetime, start_datetime, end_datetime, notes, hash, is_unavailable, id_users_provider, id_users_customer, id_services)
-      VALUES (NOW(), ?, ?, ?, ?, 0, ?, NULL, 1);
+      VALUES (NOW(), ?, ?, ?, ?, 0, ?, ?, ?); 
     `;
+    
+    // NOTA: Mira los últimos 3 signos de interrogación (?, ?, ?)
+    // Corresponden a: Provider, Customer, Service
 
     const plainNotes = `Proyecto #${newCaso.id}: ${cliente_nombre}. (Desde Cotización)`;
 
@@ -217,7 +240,9 @@ export const createCasoFromCotizacion = async (req, res) => {
       fecha_fin,
       plainNotes,
       hash,
-      idProvider
+      idProvider,     // ? -> id_users_provider
+      EA_CUSTOMER_ID, // ? -> id_users_customer (Ahora sí usamos la variable)
+      EA_SERVICE_ID   // ? -> id_services (Ahora sí usamos la variable)
     ]);
 
     if (eaResult.affectedRows === 0) {
@@ -228,6 +253,7 @@ export const createCasoFromCotizacion = async (req, res) => {
 
   } catch (error) {
     console.error('Error en createCasoFromCotizacion:', error);
+    // Manejo del error específico de base de datos
     res.status(500).json({ error: error.message });
   }
 };
