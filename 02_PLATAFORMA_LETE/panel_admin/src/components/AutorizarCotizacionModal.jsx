@@ -60,7 +60,8 @@ const AutorizarCotizacionModal = ({ cotizacion, onClose, onConfirm }) => {
         fecha_inicio: fechaInicio,
         fecha_fin: fechaFin,
         cliente_nombre: cotizacion.cliente_nombre,
-        cliente_direccion: cotizacion.cliente_direccion,
+        // CORRECCIÓN: Usamos 'direccion_obra' que viene de PHP, o un texto default
+        cliente_direccion: cotizacion.direccion_obra || cotizacion.cliente_direccion || 'Dirección no especificada', 
       });
 
       // Todo salió bien

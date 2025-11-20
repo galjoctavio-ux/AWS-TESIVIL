@@ -168,7 +168,7 @@ export const createCasoFromCotizacion = async (req, res) => {
     const { data: perfilTecnico, error: errorPerfil } = await supabaseAdmin
       .from('profiles')
       .select('ea_user_id')
-      .eq('id_externo', tecnico_id)
+      .eq('id', tecnico_id)
       .single();
 
     // Verificamos usando el nombre correcto de la columna
