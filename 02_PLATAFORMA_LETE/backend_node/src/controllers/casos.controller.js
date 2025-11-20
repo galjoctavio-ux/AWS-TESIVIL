@@ -203,7 +203,7 @@ export const createCasoFromCotizacion = async (req, res) => {
     const eaQuery = `
       INSERT INTO ea_appointments 
       (book_datetime, start_datetime, end_datetime, notes, hash, is_unavailable, id_users_provider, id_users_customer, id_services)
-      VALUES (NOW(), ?, ?, ?, ?, 0, ?, NULL, NULL);
+      VALUES (NOW(), ?, ?, ?, ?, 0, ?, NULL, 1);
     `;
 
     const plainNotes = `Proyecto #${newCaso.id}: ${cliente_nombre}. (Desde Cotización)`;
