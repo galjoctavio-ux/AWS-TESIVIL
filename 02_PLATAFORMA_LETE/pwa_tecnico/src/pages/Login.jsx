@@ -38,7 +38,7 @@ function Login() {
                 </svg>
              </div>
           <h2 className="mt-2 text-3xl font-extrabold text-gray-900 tracking-tight">
-            Técnico en Campo
+            Ingeniero en Campo
           </h2>
           <p className="mt-2 text-sm text-gray-600">
             Inicia sesión para gestionar tus casos
@@ -60,7 +60,7 @@ function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-all"
-                placeholder="tecnico@ejemplo.com"
+                placeholder="ingeniero@ejemplo.com"
               />
             </div>
             <div>
