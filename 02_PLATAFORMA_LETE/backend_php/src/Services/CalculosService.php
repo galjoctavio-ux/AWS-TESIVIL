@@ -275,8 +275,19 @@ class CalculosService {
         return $this->db->query($sql)->fetchAll();
     }
 
+    // --- ESTA ES LA FUNCIÓN MODIFICADA ---
     public function obtenerInventarioTotal(): array {
-        $sql = "SELECT * FROM recursos WHERE activo = 1 ORDER BY FIELD(estatus, 'PENDIENTE_TECNICO', 'APROBADO'), nombre ASC";
+        // Hacemos JOIN con materiales_proveedores para obtener el SKU y la fecha de XML
+        // Usamos LEFT JOIN porque quizás algunos recursos manuales no tengan proveedor.
+        $sql = "SELECT 
+                    r.*, 
+                    mp.sku_proveedor, 
+                    mp.fecha_ultimo_xml 
+                FROM recursos r 
+                LEFT JOIN materiales_proveedores mp ON r.id = mp.recurso_id 
+                WHERE r.activo = 1 
+                ORDER BY FIELD(r.estatus, 'PENDIENTE_TECNICO', 'APROBADO'), r.nombre ASC";
+        
         return $this->db->query($sql)->fetchAll();
     }
 

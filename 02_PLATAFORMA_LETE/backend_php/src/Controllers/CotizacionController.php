@@ -242,32 +242,57 @@ class CotizacionController {
             http_response_code(500); echo "Error: " . $e->getMessage();
         }
     }
-public function autorizarCotizacion(): void {
-$input = json_decode(file_get_contents('php://input'), true);
-if (empty($input['id'])) {
-http_response_code(400);
-echo json_encode(['error' => 'Falta ID']);
-return;
-}
+// --- LÓGICA CORREGIDA AQUÍ ---
+    public function autorizarCotizacion(): void {
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (empty($input['id'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Falta ID']);
+            return;
+        }
 
-try {
-// 1. Cambiamos el estado a EN_EJECUCION para indicar que el técnico va a trabajar
-// Esto desbloquea el flujo visual en el Panel Admin.
-$this->calculosService->actualizarEstadoCotizacion((int)$input['id'], 'EN_EJECUCION');
+        try {
+            // 1. Cambiamos el estado a ENVIADA (No EN_EJECUCION)
+            // Esto devuelve la cotización al flujo normal, como si nunca se hubiera bloqueado.
+            $this->calculosService->actualizarEstadoCotizacion((int)$input['id'], 'ENVIADA');
 
-// 2. NO enviamos correo aquí. La autorización es un proceso interno administrativo.
-// El PDF ya se envió cuando se creó la cotización originalmente.
+            // 2. Recuperamos los datos para enviar el correo
+            // (UUID, Email Cliente, Nombre Cliente)
+            $datosEnvio = $this->calculosService->obtenerDatosEnvio((int)$input['id']);
 
-echo json_encode([
-'status' => 'success',
-'message' => 'Cotización autorizada. Estado actualizado a EN_EJECUCION.'
-]);
+            if ($datosEnvio) {
+                // 3. Enviamos el correo ahora sí
+                $resend = new ResendService();
+                $resend->enviarCotizacion(
+                    $datosEnvio['uuid'], 
+                    $datosEnvio['cliente_email'], 
+                    $datosEnvio['cliente_nombre'], 
+                    (int)$input['id']
+                );
+                
+                // 4. Limpiamos la razón de detención en la BD para que quede limpia
+                // (Esto es un extra de seguridad, llamando a una query directa o asumiendo que el estado ENVIADA es suficiente)
+                // En tu CalculosService no vi función para limpiar solo la razón, pero el cambio de estado es lo vital.
+                
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'Cotización autorizada y enviada al cliente por correo.'
+                ]);
+            } else {
+                // Si por alguna razón no hay datos (raro), al menos ya se desbloqueó
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'Cotización autorizada (No se pudo reenviar correo automáticamente).'
+                ]);
+            }
 
-} catch (Exception $e) {
-http_response_code(500);
-echo json_encode(['error' => 'Error interno: ' . $e->getMessage()]);
-}
-}
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Error interno: ' . $e->getMessage()]);
+        }
+    }
+    // --- FIN LÓGICA CORREGIDA ---
+    
     public function rechazarCotizacion(): void {
         $input = json_decode(file_get_contents('php://input'), true);
         if (empty($input['id'])) {

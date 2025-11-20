@@ -1,159 +1,122 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
-// --- ESTILOS MODERNOS (CSS-in-JS ligero) ---
-const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '100vh',
-    backgroundColor: '#f3f4f6', // Un gris muy suave, más moderno
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-  },
-  card: {
-    width: '100%',
-    maxWidth: '400px',
-    padding: '40px',
-    backgroundColor: '#ffffff',
-    borderRadius: '12px',
-    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '24px',
-  },
-  title: {
-    fontSize: '24px',
-    fontWeight: '600',
-    color: '#111827',
-    textAlign: 'center',
-    margin: 0,
-  },
-  inputGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-  },
-  label: {
-    fontSize: '14px',
-    fontWeight: '500',
-    color: '#374151',
-  },
-  input: {
-    width: '100%',
-    padding: '12px 16px',
-    borderRadius: '8px',
-    border: '1px solid #d1d5db',
-    fontSize: '16px',
-    outline: 'none',
-    transition: 'border-color 0.2s',
-    boxSizing: 'border-box', // Importante para que el padding no rompa el ancho
-  },
-  button: {
-    width: '100%',
-    padding: '12px',
-    backgroundColor: '#2563eb', // Azul profesional
-    color: 'white',
-    border: 'none',
-    borderRadius: '8px',
-    fontSize: '16px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s',
-    marginTop: '10px',
-  },
-  errorMessage: {
-    backgroundColor: '#fee2e2',
-    color: '#991b1b',
-    padding: '12px',
-    borderRadius: '6px',
-    fontSize: '14px',
-    textAlign: 'center',
-    border: '1px solid #fecaca',
-  }
-};
-
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
-  const [isHovered, setIsHovered] = useState(false); // Estado para el efecto hover del botón
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado local de carga
   
-  // 1. Obtenemos la función 'login' del contexto
   const { login } = useAuth(); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    setIsSubmitting(true); // Activamos spinner
+
     try {
-      // 2. Solo llamamos a la función del contexto
       await login(email, password);
-      // La redirección la maneja el contexto
-      
+      // No necesitamos setIsSubmitting(false) si redirigimos, pero por seguridad:
     } catch (err) {
-      // 3. Capturamos el error que nos lanza el contexto
+      setIsSubmitting(false); // Desactivamos spinner si falla
       if (err.response && err.response.status === 401) {
-        setError('Credenciales inválidas. Por favor, inténtelo de nuevo.');
+        setError('Credenciales incorrectas.');
       } else {
-        // Muestra el error específico (ej. "Se requiere cuenta de Técnico")
-        setError(err.message || 'Error de conexión. Inténtelo más tarde.');
+        setError(err.message || 'Error de conexión.');
       }
-      console.error(err);
     }
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        {/* Puedes agregar aquí un logo si tienes uno: <img src={logo} alt="Logo" style={{height: '40px', margin: '0 auto'}} /> */}
-        <h2 style={styles.title}>App del Ingeniero</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+        <div className="text-center">
+            {/* Aquí podrías poner tu logo */}
+             <div className="mx-auto h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+             </div>
+          <h2 className="mt-2 text-3xl font-extrabold text-gray-900 tracking-tight">
+            Técnico en Campo
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Inicia sesión para gestionar tus casos
+          </p>
+        </div>
         
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-           <div style={styles.inputGroup}>
-            <label htmlFor="email" style={styles.label}>Correo Electrónico</label>
-            <input 
-              type="email" 
-              id="email" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required 
-              style={styles.input}
-              placeholder="ejemplo@empresa.com"
-              // Pequeño truco para simular focus visual usando estilos en línea
-              onFocus={(e) => e.target.style.borderColor = '#2563eb'}
-              onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-            />
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="rounded-md shadow-sm space-y-4">
+            <div>
+              <label htmlFor="email-address" className="block text-sm font-medium text-gray-700 mb-1">
+                Correo Electrónico
+              </label>
+              <input
+                id="email-address"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-all"
+                placeholder="tecnico@ejemplo.com"
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                Contraseña
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-all"
+                placeholder="••••••••"
+              />
+            </div>
           </div>
 
-          <div style={styles.inputGroup}>
-            <label htmlFor="password" style={styles.label}>Contraseña</label>
-            <input 
-              type="password" 
-              id="password" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required 
-              style={styles.input}
-              placeholder="••••••••"
-              onFocus={(e) => e.target.style.borderColor = '#2563eb'}
-              onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-            />
+          {error && (
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white 
+                ${isSubmitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-lg hover:shadow-xl transition-all duration-200'}
+              `}
+            >
+              {isSubmitting ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Entrando...
+                </>
+              ) : (
+                'Iniciar Sesión'
+              )}
+            </button>
           </div>
-          
-          {error && <div style={styles.errorMessage}>{error}</div>}
-          
-          <button 
-            type="submit" 
-            style={{
-                ...styles.button,
-                backgroundColor: isHovered ? '#1d4ed8' : '#2563eb' // Efecto Hover manual
-            }}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-          >
-            Iniciar Sesión
-          </button>
         </form>
       </div>
     </div>
