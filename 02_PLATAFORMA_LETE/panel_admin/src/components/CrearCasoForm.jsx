@@ -116,12 +116,15 @@ function CrearCasoForm({ onClose, onCasoCreado }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
 
     if (name === 'tecnico_id_ea') {
-      const tecnicoSeleccionado = tecnicos.find(t => t.id_ea == value);
+      // CORRECCIÓN: Usamos .ea_id en lugar de .id_ea
+      const tecnicoSeleccionado = tecnicos.find(t => t.ea_id == value);
+      
       if (tecnicoSeleccionado) {
         setFormData((prev) => ({
           ...prev,
-          tecnico_id_ea: tecnicoSeleccionado.id_ea,
-          tecnico_id_supabase: tecnicoSeleccionado.id_supabase
+          // CORRECCIÓN: Asignamos el valor correcto
+          tecnico_id_ea: tecnicoSeleccionado.ea_id,
+          tecnico_id_supabase: tecnicoSeleccionado.id_supabase // o .id, ambos funcionan ahora
         }));
       }
     }
@@ -197,7 +200,7 @@ function CrearCasoForm({ onClose, onCasoCreado }) {
             <select id="tecnico_id_ea" name="tecnico_id_ea" value={formData.tecnico_id_ea} onChange={handleChange} required>
               <option value="">Seleccione un técnico</option>
               {tecnicos.map((tecnico) => (
-                <option key={tecnico.id_supabase} value={tecnico.id_ea}>
+                <option key={tecnico.id} value={tecnico.ea_id}>
                   {tecnico.nombre}
                 </option>
               ))}
