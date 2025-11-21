@@ -19,10 +19,15 @@ export const getTecnicos = async (req, res) => {
 
     // 2. Mapeamos para que el Frontend reciba exactamente lo que espera
     const tecnicos = profiles.map(profile => ({
-      id: profile.id,            // <--- ¡ESTO ARREGLA EL ERROR 400! (Envía el UUID)
-      nombre: profile.nombre,    // Nombre para mostrar en el Select
-      ea_id: profile.ea_user_id, // Enviamos también el ID de E!A por si acaso
-      sincronizado: !!profile.ea_user_id // Flag útil para saber si está listo para agendar
+      id: profile.id,            // Para los componentes nuevos (Select del Modal)
+      
+      // --- AGREGA ESTA LÍNEA PARA REVIVIR TU PANEL ---
+      id_supabase: profile.id,   // Para los componentes viejos (Lista de Técnicos)
+      // -----------------------------------------------
+      
+      nombre: profile.nombre,
+      ea_id: profile.ea_user_id, 
+      sincronizado: !!profile.ea_user_id
     }));
 
     console.log(`Técnicos encontrados: ${tecnicos.length}`);
