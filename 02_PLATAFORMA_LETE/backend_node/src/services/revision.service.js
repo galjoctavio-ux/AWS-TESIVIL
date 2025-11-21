@@ -40,17 +40,14 @@ export const processRevision = async (payload, tecnico) => {
   // ---------------------------------------------------------
   // 2. SANITIZACIÓN DE EQUIPOS (Mapeo Frontend -> Backend)
   // ---------------------------------------------------------
-  // Convertimos lo que llegue del front a lo que espera calculos.service y la BD
   const equiposSanitizados = equiposData.map(eq => ({
       nombre_equipo: eq.nombre_equipo,
-      nombre_personalizado: eq.nombre_personalizado || '', // Evitar undefined
+      nombre_personalizado: eq.nombre_personalizado || '', 
       estado_equipo: eq.estado_equipo,
       unidad_tiempo: eq.unidad_tiempo || 'Horas/Día',
-      // CRÍTICO: Mapeamos 'horas_uso' (si viene del front) a 'tiempo_uso' (que pide la BD/Calculos)
+      // Mapeamos 'horas_uso' a 'tiempo_uso'
       tiempo_uso: parseFloat(eq.horas_uso || eq.tiempo_uso) || 0,
       amperaje_medido: parseFloat(eq.amperaje_medido) || 0,
-      // La 'cantidad' se usa para multiplicar filas si fuera necesario, 
-      // pero aquí solo la guardamos temporalmente por si la lógica cambiara, NO se insertará.
       cantidad: parseFloat(eq.cantidad) || 1 
   }));
 
@@ -65,7 +62,6 @@ export const processRevision = async (payload, tecnico) => {
     // ---------------------------------------------------------
     const voltajeCalculo = datosDeTrabajo.voltaje_medido > 0 ? datosDeTrabajo.voltaje_medido : 127;
 
-    // calculos.service espera 'tiempo_uso' y devuelve 'kwh_bimestre_calculado'
     const equiposCalculados = calcularConsumoEquipos(equiposSanitizados, voltajeCalculo);
     
     const diagnosticoFuga = detectarFugas(datosDeTrabajo);
@@ -82,7 +78,7 @@ export const processRevision = async (payload, tecnico) => {
     // 4. GUARDADO EN BASE DE DATOS (LISTA BLANCA)
     // ---------------------------------------------------------
     
-    // Preparar objeto REVISIONES (Solo columnas válidas)
+    // Preparar objeto REVISIONES
     const datosParaInsertar = { ...datosDeTrabajo };
     delete datosParaInsertar.voltaje_fn;   
     delete datosParaInsertar.fuga_total;   
@@ -101,8 +97,7 @@ export const processRevision = async (payload, tecnico) => {
 
     const newRevisionId = revisionResult.id;
 
-    // Preparar objeto EQUIPOS (Solo columnas válidas según tu esquema)
-    // Esquema: id, revision_id, nombre_equipo, nombre_personalizado, amperaje_medido, tiempo_uso, unidad_tiempo, estado_equipo, kwh_bimestre_calculado
+    // Preparar objeto EQUIPOS
     let equiposProcesados = 0;
     if (equiposCalculados.length > 0) {
         const equiposParaInsertar = equiposCalculados.map(equipo => ({
@@ -110,11 +105,10 @@ export const processRevision = async (payload, tecnico) => {
           nombre_equipo: equipo.nombre_equipo,
           nombre_personalizado: equipo.nombre_personalizado,
           amperaje_medido: equipo.amperaje_medido,
-          tiempo_uso: equipo.tiempo_uso,       // Ya aseguramos que es float arriba
+          tiempo_uso: equipo.tiempo_uso,
           unidad_tiempo: equipo.unidad_tiempo,
           estado_equipo: equipo.estado_equipo,
           kwh_bimestre_calculado: equipo.kwh_bimestre_calculado
-          // NOTA: Aquí filtramos explícitamente 'cantidad', 'horas_uso', etc.
         }));
 
         const { error: equiposError } = await supabaseAdmin
@@ -167,7 +161,11 @@ export const processRevision = async (payload, tecnico) => {
     // ---------------------------------------------------------
     // 6. GENERACIÓN PDF (PHP) Y EMAIL
     // ---------------------------------------------------------
-    const phpPdfEndpoint = process.env.PHP_PDF_ENDPOINT || 'http://localhost/lete/api/revisiones/generar_pdf_final';
+    
+    // CORRECCIÓN AQUÍ: Eliminamos '/lete' de la URL por defecto y añadimos logs de depuración
+    const phpPdfEndpoint = process.env.PHP_PDF_ENDPOINT || 'http://localhost/api/revisiones/generar_pdf_final';
+
+    console.log(`Delegando generación de PDF a: ${phpPdfEndpoint} (Revision ID: ${newRevisionId})`);
 
     try {
         const response = await axios.post(phpPdfEndpoint, {
@@ -176,13 +174,23 @@ export const processRevision = async (payload, tecnico) => {
 
         if (response.data && response.data.pdf_url) {
             pdfUrl = response.data.pdf_url;
+            console.log('PDF generado correctamente:', pdfUrl);
+            
             await supabaseAdmin
                 .from('revisiones')
                 .update({ pdf_url: pdfUrl })
                 .eq('id', newRevisionId);
-        } 
+        } else {
+             console.warn('PHP respondió 200 OK pero no devolvió pdf_url:', response.data);
+        }
     } catch (axiosError) {
         console.error('Error al llamar al servicio de PHP:', axiosError.message);
+        if (axiosError.response) {
+            console.error('Status PHP:', axiosError.response.status);
+            console.error('Respuesta PHP:', axiosError.response.data);
+        } else {
+            console.error('No hubo respuesta del servidor PHP (posible error de conexión o URL incorrecta).');
+        }
     }
 
     if (pdfUrl && revisionResult.cliente_email && casoData?.cliente_nombre) {
