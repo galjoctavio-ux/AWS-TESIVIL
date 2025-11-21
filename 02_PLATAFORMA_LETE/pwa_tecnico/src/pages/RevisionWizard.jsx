@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import api from '../apiService';
@@ -35,10 +35,12 @@ const ProgressBar = ({ current, total }) => {
 
 const RevisionWizard = () => {
   const navigate = useNavigate();
+  const { casoId } = useParams(); // Capturamos el ID de la URL
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const [formData, setFormData] = useState({
-    caso_id: null,
+    caso_id: casoId || null, // Intentamos inicializarlo directamente
     // Step 1: Generales
     cliente_email: '',
     // Step 2: Medidor y C.C.
@@ -78,6 +80,13 @@ const RevisionWizard = () => {
     firmaBase64: null,
   });
 
+  // Efecto de seguridad: si el casoId cambia o tarda en llegar, actualizamos el estado
+  useEffect(() => {
+    if (casoId) {
+      setFormData(prev => ({ ...prev, caso_id: casoId }));
+    }
+  }, [casoId]);
+
   const goToNext = () => {
     if (currentStepIndex < steps.length - 1) {
       setCurrentStepIndex(i => i + 1);
@@ -95,6 +104,12 @@ const RevisionWizard = () => {
   };
 
   const handleSubmit = async () => {
+    // Validación final de seguridad
+    if (!formData.caso_id) {
+      alert("Error: No se ha detectado el ID del caso. Vuelva a la agenda e intente de nuevo.");
+      return;
+    }
+
     if (!formData.cliente_email) {
       alert("El correo del cliente es obligatorio.");
       setCurrentStepIndex(0);
@@ -112,7 +127,8 @@ const RevisionWizard = () => {
     try {
       await api.post('/revisiones', payload);
       alert('Revisión enviada con éxito');
-      navigate('/casos');
+      // Redirigimos a la agenda o al detalle del caso completado
+      navigate('/'); 
     } catch (error) {
       console.error('Error al enviar la revisión:', error);
       alert('Hubo un error al enviar la revisión. Por favor, inténtalo de nuevo.');
