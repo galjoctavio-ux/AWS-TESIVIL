@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
+import { PlusCircle } from 'lucide-react';
 
 const CAUSAS_ALTO_CONSUMO = [
   "Fugas de corriente en la instalación eléctrica.",
@@ -9,12 +10,21 @@ const CAUSAS_ALTO_CONSUMO = [
   "Fallas en otras instalaciones.",
 ];
 
+const RECOMENDACIONES_SUGERIDAS = [
+  "Cambiar refrigerador por uno inverter",
+  "Balancear cargas en el centro de carga",
+  "Apretar conexiones en el centro de carga",
+  "Instalar varilla a tierra física",
+  "Revisar cableado interno por fugas",
+  "Reemplazar focos por tecnología LED",
+  "Mantenimiento a Aire Acondicionado"
+];
+
 const Step6_Resumen = ({ formData, updateFormData }) => {
   const sigCanvas = useRef(null);
 
   const handleCausasChange = (e) => {
     const { value, checked } = e.target;
-    // Ensure formData.causas_alto_consumo is an array before spreading
     const currentCausas = formData.causas_alto_consumo || [];
     let newCausas;
     if (checked) {
@@ -27,6 +37,14 @@ const Step6_Resumen = ({ formData, updateFormData }) => {
 
   const handleRecomendacionesChange = (e) => {
     updateFormData({ recomendaciones_tecnico: e.target.value });
+  };
+
+  const addRecomendacion = (texto) => {
+    const currentText = formData.recomendaciones_tecnico || '';
+    // Añade salto de línea si ya hay texto, o empieza limpio
+    const separator = currentText.length > 0 ? '\n- ' : '- ';
+    const newText = currentText + separator + texto;
+    updateFormData({ recomendaciones_tecnico: newText });
   };
 
   const clearSignature = () => {
@@ -44,7 +62,7 @@ const Step6_Resumen = ({ formData, updateFormData }) => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-slide-in">
       <div>
         <label className="text-lg font-bold text-gray-800">Causas de Alto Consumo</label>
         <div className="mt-3 space-y-3">
@@ -65,11 +83,27 @@ const Step6_Resumen = ({ formData, updateFormData }) => {
 
       <div>
         <label htmlFor="recomendaciones_tecnico" className="text-lg font-bold text-gray-800">Recomendaciones Finales</label>
+
+        {/* Chips de Sugerencias */}
+        <div className="flex flex-wrap gap-2 mt-2 mb-3">
+          {RECOMENDACIONES_SUGERIDAS.map((sugerencia, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() => addRecomendacion(sugerencia)}
+              className="flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 border border-blue-200 transition-colors"
+            >
+              <PlusCircle size={14} />
+              {sugerencia}
+            </button>
+          ))}
+        </div>
+
         <textarea
           id="recomendaciones_tecnico"
           rows="5"
-          className="mt-3 w-full p-3 bg-white rounded-lg shadow-sm border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-          placeholder="Describe las acciones recomendadas para el cliente..."
+          className="w-full p-3 bg-white rounded-lg shadow-sm border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+          placeholder="Selecciona sugerencias arriba o escribe aquí..."
           value={formData.recomendaciones_tecnico || ''}
           onChange={handleRecomendacionesChange}
         />
@@ -77,7 +111,7 @@ const Step6_Resumen = ({ formData, updateFormData }) => {
 
       <div>
         <label className="text-lg font-bold text-gray-800">Firma del Cliente</label>
-        <div className="mt-3 relative w-full h-48 bg-white border-2 border-dashed border-gray-300 rounded-lg">
+        <div className="mt-3 relative w-full h-48 bg-white border-2 border-dashed border-gray-300 rounded-lg touch-none">
           <SignatureCanvas
             ref={sigCanvas}
             penColor='black'
@@ -86,13 +120,13 @@ const Step6_Resumen = ({ formData, updateFormData }) => {
           />
         </div>
         <div className="text-right mt-2">
-            <button
+          <button
             type="button"
             onClick={clearSignature}
             className="text-sm font-semibold text-blue-600 hover:text-blue-800"
-            >
+          >
             Borrar Firma
-            </button>
+          </button>
         </div>
       </div>
     </div>

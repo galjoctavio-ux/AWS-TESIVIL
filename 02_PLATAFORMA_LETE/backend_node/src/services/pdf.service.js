@@ -4,246 +4,381 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// ---------------------------------------------------------
+// 1. GENERACIÓN DE DIAGNÓSTICO CON IA (GEMINI 2.5 FLASH)
+// ---------------------------------------------------------
 const generarDiagnosticoIA = async (datosRevision) => {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return "IA no configurada.";
+  if (!apiKey) return "IA no configurada en el sistema.";
 
+  // Modelo actualizado
   const model = 'gemini-2.5-flash';
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-  // Preparar datos para el prompt (seguro ante nulos)
+  // Preparamos el contexto para la IA
   const datosParaIA = {
-    servicio: datosRevision.mediciones?.tipo_servicio || 'Desconocido',
-    hallazgos_clave: {
-      sello_cfe: datosRevision.mediciones?.sello_cfe || false,
-      tornillos_flojos: datosRevision.mediciones?.tornillos_flojos || false,
-      capacidad_vs_calibre: datosRevision.mediciones?.capacidad_vs_calibre || true,
+    servicio: datosRevision.mediciones?.tipo_servicio,
+    hallazgos_criticos: {
+      sello_cfe: datosRevision.mediciones?.sello_cfe,
+      tornillos_flojos: datosRevision.mediciones?.tornillos_flojos,
+      capacidad_correcta: datosRevision.mediciones?.capacidad_vs_calibre,
     },
-    mediciones_fuga: {
-      fuga_f1: datosRevision.mediciones?.corriente_fuga_f1 || 0,
-    },
-    equipos_mal_estado: datosRevision.equipos ? datosRevision.equipos.filter(eq => eq.estado_equipo === 'Malo').length : 0,
-    causas_detectadas: datosRevision.causas_alto_consumo || [],
-    recomendaciones_tecnico: datosRevision.recomendaciones_tecnico || ''
+    fugas: datosRevision.mediciones?.corriente_fuga_f1,
+    consumo_estimado: datosRevision.consumo_total_estimado + " kWh/bimestre",
+    top_3_consumidores: datosRevision.equipos?.slice(0, 3).map(e => e.nombre_equipo),
+    recomendaciones: datosRevision.recomendaciones_tecnico
   };
 
-  const prompt = `Analiza los siguientes datos JSON de una revisión eléctrica: ${JSON.stringify(datosParaIA)}. Redacta un párrafo de 'Diagnóstico Ejecutivo' profesional, breve (max 60 palabras) y tranquilizador para el cliente. Concluye positivamente. Texto plano.`;
+  const prompt = `
+    Eres un ingeniero experto de la empresa 'Luz en tu Espacio'.
+    Analiza estos datos: ${JSON.stringify(datosParaIA)}.
+    Escribe un 'Diagnóstico Ejecutivo' para el cliente.
+    Requisitos:
+    1. Máximo 60 palabras.
+    2. Menciona si el consumo estimado es alto o normal.
+    3. Menciona el equipo que más gasta.
+    4. Sé profesional, empático y claro.
+    5. Si hay fugas o riesgos, advierte amablemente.
+    Responde solo con el texto del párrafo.
+  `;
 
   try {
     const response = await axios.post(url, {
       contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.4, maxOutputTokens: 500 }
+      generationConfig: { temperature: 0.3, maxOutputTokens: 400 }
     });
 
     if (response.data && response.data.candidates && response.data.candidates[0].content) {
       return response.data.candidates[0].content.parts[0].text.trim();
     }
-    return 'Revisión técnica realizada correctamente.';
+    return 'Diagnóstico técnico completado. Por favor revise los detalles numéricos a continuación.';
   } catch (error) {
-    console.error('Error Gemini:', error.message);
-    return 'Revisión técnica realizada correctamente.';
+    console.warn('Error al conectar con Gemini:', error.message);
+    return 'Revisión técnica realizada. Se anexan mediciones y observaciones del técnico.';
   }
 };
 
+// ---------------------------------------------------------
+// 2. CONSTRUCCIÓN DEL HTML DEL REPORTE
+// ---------------------------------------------------------
 const getHtmlPlantilla = (datos, diagnosticoIA) => {
-  // Helpers para formateo
+  // Helpers de formato
   const formatNum = (num) => parseFloat(num || 0).toFixed(1);
-  const formatDate = (dateStr) => {
-      try { return new Date(dateStr).toLocaleDateString('es-MX'); } catch(e) { return dateStr; }
+  const formatCurrency = (num) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(num);
+  const formatDate = (d) => {
+    try { return new Date(d).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' }); }
+    catch (e) { return d; }
   };
-  
-  // Lógica de clases CSS condicionales
+
+  // Clases CSS condicionales
   const valBueno = 'val-bueno';
   const valMalo = 'val-malo';
-  
-  const selloCfeClass = datos.mediciones?.sello_cfe ? valBueno : valMalo;
-  const selloCfeText = datos.mediciones?.sello_cfe ? 'Sí' : 'No';
-  
-  const tornillosClass = datos.mediciones?.tornillos_flojos ? valMalo : valBueno;
-  const tornillosText = datos.mediciones?.tornillos_flojos ? '¡Sí! (Riesgo Detectado)' : 'No (Correcto)';
-  
-  const capacidadClass = datos.mediciones?.capacidad_vs_calibre ? valBueno : valMalo;
-  const capacidadText = datos.mediciones?.capacidad_vs_calibre ? 'Correcto' : '¡Incorrecto! (Riesgo de Incendio)';
 
-  // Filas de equipos
+  // ---------------- TABLA DE EQUIPOS (Con kWh) ----------------
   let equiposHtml = '';
   if (datos.equipos && datos.equipos.length > 0) {
-      datos.equipos.forEach(eq => {
-          const estado = eq.estado_equipo || '';
-          equiposHtml += `
+    datos.equipos.forEach(eq => {
+      const estado = eq.estado_equipo || '';
+      equiposHtml += `
             <tr class="equipo-estado-${estado}">
-                <td>${eq.nombre_equipo || ''}</td>
-                <td>${eq.ubicacion || eq.nombre_personalizado || ''}</td>
-                <td>${formatNum(eq.amperaje || eq.amperaje_medido)} A</td>
-                <td>${estado}</td>
+                <td>${eq.nombre_equipo}</td>
+                <td>${eq.ubicacion || ''}</td>
+                <td style="text-align:center;">${formatNum(eq.amperaje)} A</td>
+                <td style="text-align:center;"><strong>${formatNum(eq.kwh_bimestre)}</strong></td>
+                <td style="text-align:center;">${estado}</td>
             </tr>`;
-      });
-  }
-
-  // Causas
-  let causasHtml = '';
-  if (datos.causas_alto_consumo && datos.causas_alto_consumo.length > 0) {
-      datos.causas_alto_consumo.forEach(c => causasHtml += `<li>${c}</li>`);
+    });
+    // Fila de Total
+    equiposHtml += `
+        <tr class="total-row">
+            <td colspan="3" style="text-align:right;">Consumo Bimestral Estimado (Carga Conectada):</td>
+            <td style="text-align:center;">${formatNum(datos.consumo_total_estimado)} kWh</td>
+            <td></td>
+        </tr>
+      `;
   } else {
-      causasHtml = '<li>No se detectaron causas críticas específicas.</li>';
+    equiposHtml = '<tr><td colspan="5" style="text-align:center; padding:15px;">No se registraron equipos de consumo significativo.</td></tr>';
   }
 
-  // Fases adicionales
-  let fasesHtml = '';
-  const tipoServicio = datos.mediciones?.tipo_servicio || '';
-  if (tipoServicio !== 'Monofásico') {
-      fasesHtml += `<tr><td class="lbl">Corriente Red F2</td><td class="val">${formatNum(datos.mediciones?.corriente_red_f2)} A</td></tr>`;
-  }
-  if (tipoServicio.includes('Trifásico')) {
-      fasesHtml += `<tr><td class="lbl">Corriente Red F3</td><td class="val">${formatNum(datos.mediciones?.corriente_red_f3)} A</td></tr>`;
-  }
+  // ---------------- CAUSAS Y RECOMENDACIONES ----------------
+  let causasHtml = (datos.causas_alto_consumo || [])
+    .map(c => `<li>${c}</li>`)
+    .join('');
 
-  // Solares
+  if (!causasHtml) causasHtml = '<li>No se detectaron causas críticas evidentes en esta visita rápida.</li>';
+
+  // ---------------- PANELES SOLARES ----------------
   let solaresHtml = '';
   if (datos.mediciones?.cantidad_paneles > 0) {
-      solaresHtml = `
-        <div class="section-header">Análisis de Paneles Solares</div>
-        <table class="items-table hallazgos-table">
-            <tr><td class="lbl">Cantidad de Paneles</td><td class="val">${datos.mediciones.cantidad_paneles}</td></tr>
-            <tr><td class="lbl">Watts por Panel</td><td class="val">${datos.mediciones.watts_por_panel} W</td></tr>
-            <tr><td class="lbl">Antigüedad</td><td class="val">${datos.mediciones.paneles_antiguedad_anos} años</td></tr>
+    solaresHtml = `
+        <div class="section-title">Sistema Fotovoltaico</div>
+        <table class="data-table">
+            <tr>
+                <td><strong>Paneles Instalados:</strong> ${datos.mediciones.cantidad_paneles} pzas</td>
+                <td><strong>Potencia:</strong> ${datos.mediciones.watts_por_panel} W c/u</td>
+                <td><strong>Antigüedad:</strong> ${datos.mediciones.paneles_antiguedad_anos} años</td>
+            </tr>
         </table>`;
   }
 
+  // ---------------- HTML COMPLETO ----------------
   return `
+    <!DOCTYPE html>
     <html>
     <head>
       <meta charset="UTF-8">
+      <title>Reporte Técnico LETE</title>
       <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
-        @page { margin: 25px; }
-        body { font-family: 'Roboto', sans-serif; color: #444; font-size: 12px; line-height: 1.5; }
-        .header-table { width: 100%; border-bottom: 2px solid #0056b3; padding-bottom: 10px; margin-bottom: 25px; }
-        .logo-img { max-width: 180px; max-height: 60px; }
-        .empresa-info { text-align: right; font-size: 10px; color: #6c757d; }
-        .empresa-info strong { font-size: 12px; color: #0056b3; }
-        .cliente-box { border: 1px solid #dee2e6; border-left: 5px solid #0056b3; padding: 15px; margin-bottom: 25px; border-radius: 4px; background-color: #f8f9fa; }
-        .cliente-label { font-weight: bold; color: #0056b3; font-size: 9px; text-transform: uppercase; margin-bottom: 4px; }
-        .cliente-dato { font-size: 12px; margin-bottom: 5px; }
-        .section-header { background-color: #0056b3; color: white; padding: 8px 12px; font-weight: bold; font-size: 12px; margin-top: 20px; border-radius: 4px 4px 0 0; }
-        .items-table { width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 20px; }
-        .items-table td { padding: 12px 15px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
-        .items-table th { background-color: #f8f9fa; color: #0056b3; text-transform: uppercase; font-size: 9px; letter-spacing: 1px; padding: 10px 15px; text-align: left; }
-        .items-table tr:nth-child(even) { background-color: #fbfbfb; }
-        .items-table tr:last-child td { border-bottom: none; }
-        .firma-box { border: 1px dashed #ccc; padding: 10px; width: 250px; height: 120px; text-align: center; display: inline-block; margin: 10px; }
-        .firma-img { max-width: 100%; max-height: 80px; object-fit: contain; }
-        .firma-label { font-size: 10px; color: #555; margin-top: 5px; }
-        .hallazgos-table { width: 100%; }
-        .hallazgos-table td { padding: 8px; border-bottom: 1px solid #f0f0f0; }
-        .hallazgos-table .lbl { font-weight: bold; width: 70%; }
-        .hallazgos-table .val { text-align: right; width: 30%; }
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        
+        @page { margin: 20px 40px; }
+        
+        body { font-family: 'Roboto', sans-serif; color: #333; font-size: 11px; line-height: 1.4; }
+        
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #0056b3; padding-bottom: 10px; margin-bottom: 20px; }
+        .logo { height: 55px; }
+        .report-meta { text-align: right; color: #555; font-size: 10px; }
+        .report-meta h1 { margin: 0; font-size: 16px; color: #0056b3; text-transform: uppercase; }
+        
+        /* Cajas Informativas */
+        .info-grid { display: flex; gap: 15px; margin-bottom: 20px; }
+        .info-box { flex: 1; background: #f8f9fa; border-left: 4px solid #0056b3; padding: 10px; border-radius: 4px; }
+        .info-label { font-weight: bold; color: #0056b3; font-size: 9px; text-transform: uppercase; margin-bottom: 3px; }
+        .info-val { font-size: 11px; }
+
+        /* Títulos */
+        .section-title { background: #0056b3; color: white; padding: 6px 12px; font-weight: bold; font-size: 12px; border-radius: 4px 4px 0 0; margin-top: 20px; }
+        
+        /* Tablas */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 5px; }
+        th { background: #e9ecef; color: #495057; padding: 8px; text-align: left; font-size: 10px; font-weight: bold; text-transform: uppercase; border-bottom: 2px solid #dee2e6; }
+        td { padding: 8px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+        
+        /* Colores de Estado */
         .val-bueno { color: #28a745; font-weight: bold; }
-        .val-regular { color: #fd7e14; font-weight: bold; }
         .val-malo { color: #dc3545; font-weight: bold; }
-        .equipo-estado-Bueno { background-color: #e8f5e9; }
-        .equipo-estado-Regular { background-color: #fff8e1; }
-        .equipo-estado-Malo { background-color: #fbe9e7; }
+        .equipo-estado-Malo { background-color: #ffebee; }
+        .equipo-estado-Regular { background-color: #fff3e0; }
+        .total-row { background-color: #e3f2fd; font-weight: bold; border-top: 2px solid #90caf9; }
+
+        /* IA Box */
+        .ia-container { background: #f0f7ff; border: 1px solid #cce5ff; padding: 15px; border-radius: 6px; margin-bottom: 15px; position: relative; }
+        .ia-badge { position: absolute; top: -10px; right: 15px; background: linear-gradient(45deg, #0056b3, #00a8ff); color: white; padding: 2px 8px; font-size: 9px; border-radius: 10px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .ia-text { font-style: italic; color: #444; text-align: justify; font-size: 12px; }
+
+        /* SECCIÓN CUENTATRÓN (UPSELL) */
+        .cuentatron-section {
+            margin-top: 30px;
+            border: 2px solid #FFC107; /* Amber border */
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #fff;
+            page-break-inside: avoid;
+        }
+        .ct-header {
+            background: #212529;
+            color: #FFC107;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .ct-body {
+            padding: 15px;
+            display: flex;
+            gap: 20px;
+        }
+        .ct-content { flex: 2; }
+        .ct-cta-box { 
+            flex: 1; 
+            background: #fffbf0; 
+            border: 1px dashed #FFC107; 
+            border-radius: 8px; 
+            padding: 15px; 
+            text-align: center; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center;
+        }
+        .ct-title { font-size: 13px; font-weight: bold; color: #d32f2f; margin-bottom: 5px; }
+        .ct-text { font-size: 10px; color: #555; text-align: justify; margin-bottom: 10px; }
+        .ct-list { font-size: 10px; color: #444; margin: 5px 0 10px 15px; padding: 0; }
+        .ct-btn {
+            background: #d32f2f;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 11px;
+            display: inline-block;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+            margin-bottom: 8px;
+        }
+        .ct-price { font-size: 16px; font-weight: bold; color: #212529; margin: 5px 0; }
+        .ct-guarantee { font-size: 9px; color: #666; font-style: italic; margin-top: 5px; }
+
+        /* Firmas */
+        .signatures { margin-top: 30px; display: flex; justify-content: space-around; text-align: center; page-break-inside: avoid; }
+        .sig-box { width: 200px; border-top: 1px solid #ccc; padding-top: 10px; }
+        .sig-img { max-height: 60px; display: block; margin: 0 auto 5px auto; }
       </style>
     </head>
     <body>
-      <table class="header-table">
+
+      <div class="header">
+        <img src="https://i.imgur.com/Q9bQ23T.png" class="logo" alt="LETE Logo">
+        <div class="report-meta">
+            <h1>Reporte de Diagnóstico</h1>
+            <div>Folio: #${datos.header?.id}</div>
+            <div>Fecha: ${formatDate(datos.header?.fecha_revision)}</div>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-box">
+            <div class="info-label">Cliente</div>
+            <div class="info-val"><strong>${datos.header?.cliente_nombre}</strong></div>
+            <div class="info-val">${datos.header?.cliente_direccion}</div>
+            <div class="info-val">${datos.header?.cliente_email}</div>
+        </div>
+        <div class="info-box">
+            <div class="info-label">Técnico Asignado</div>
+            <div class="info-val"><strong>${datos.header?.tecnico_nombre}</strong></div>
+            <div class="info-val">Ingeniería Civil y Eléctrica</div>
+        </div>
+      </div>
+
+      <div class="ia-container">
+         <div class="ia-badge">Análisis Gemini AI</div>
+         <div class="ia-text">"${diagnosticoIA}"</div>
+      </div>
+
+      <table style="margin-top: 10px;">
         <tr>
-            <td><img src="https://i.imgur.com/Q9bQ23T.png" class="logo-img"></td>
-            <td class="empresa-info">
-                <span style="font-size: 16px; color: #343a40;">REPORTE DE DIAGNÓSTICO</span><br>
-                <strong>REVISIÓN #${datos.header?.id || 'N/A'}</strong><br>
-                Fecha: ${formatDate(datos.header?.fecha_revision)}
+            <td width="50%" style="vertical-align: top; padding-right: 10px; border: none;">
+                <div class="section-title" style="margin-top: 0;">Instalación Eléctrica</div>
+                <table>
+                    <tr><td>Servicio</td><td>${datos.mediciones?.tipo_servicio || 'N/A'}</td></tr>
+                    <tr><td>Sello CFE</td><td class="${datos.mediciones?.sello_cfe ? valBueno : valMalo}">${datos.mediciones?.sello_cfe ? 'Presente' : 'Ausente'}</td></tr>
+                    <tr><td>Conexiones C.C.</td><td class="${datos.mediciones?.tornillos_flojos ? valMalo : valBueno}">${datos.mediciones?.tornillos_flojos ? 'Flojas (Riesgo)' : 'Correctas'}</td></tr>
+                    <tr><td>Protecciones</td><td class="${datos.mediciones?.capacidad_vs_calibre ? valBueno : valMalo}">${datos.mediciones?.capacidad_vs_calibre ? 'Adecuadas' : 'Inadecuadas'}</td></tr>
+                </table>
+            </td>
+            <td width="50%" style="vertical-align: top; padding-left: 10px; border: none;">
+                 <div class="section-title" style="margin-top: 0;">Mediciones Críticas</div>
+                 <table>
+                    <tr><td>Voltaje (F-N)</td><td><strong>${formatNum(datos.mediciones?.voltaje_medido)} V</strong></td></tr>
+                    <tr><td>Consumo Instantáneo</td><td>${formatNum(datos.mediciones?.corriente_red_f1)} A</td></tr>
+                    <tr><td>Fugas Detectadas</td><td class="${datos.mediciones?.corriente_fuga_f1 > 0.1 ? valMalo : valBueno}">${formatNum(datos.mediciones?.corriente_fuga_f1)} A</td></tr>
+                    <tr><td>Fases Activas</td><td>${datos.mediciones?.tipo_servicio?.includes('Tri') ? '3' : (datos.mediciones?.tipo_servicio?.includes('2F') ? '2' : '1')}</td></tr>
+                 </table>
             </td>
         </tr>
       </table>
 
-      <div class="cliente-box">
-        <table width="100%">
-            <tr>
-                <td width="60%">
-                    <div class="cliente-label">Cliente</div>
-                    <div class="cliente-dato" style="font-size: 14px; font-weight: bold;">${datos.header?.cliente_nombre || ''}</div>
-                    <div class="cliente-dato">${datos.header?.cliente_direccion || ''}</div>
-                    <div class="cliente-dato">${datos.header?.cliente_email || ''}</div>
-                </td>
-                <td width="40%" style="border-left: 1px solid #dee2e6; padding-left: 15px;">
-                    <div class="cliente-label">Técnico Asignado</div>
-                    <div class="cliente-dato">${datos.header?.tecnico_nombre || 'Técnico LETE'}</div>
-                </td>
-            </tr>
-        </table>
-      </div>
-
-      <div class="section-header">Diagnóstico Ejecutivo (Realizado con IA)</div>
-      <p style="text-align: justify; padding: 0 5px 15px 5px; font-style: italic; color: #555;">${diagnosticoIA}</p>
-      
-      <div class="section-header">Hallazgos de Instalación</div>
-      <table class="items-table hallazgos-table">
-          <tr> <td class="lbl">Tipo de Servicio</td> <td class="val">${datos.mediciones?.tipo_servicio || ''}</td> </tr>
-          <tr> <td class="lbl">¿Cuenta con Sello CFE?</td> <td class="val ${selloCfeClass}">${selloCfeText}</td> </tr>
-          <tr> <td class="lbl">Tornillos Flojos en C.C.</td> <td class="val ${tornillosClass}">${tornillosText}</td> </tr>
-          <tr> <td class="lbl">Capacidad Interruptor vs Calibre</td> <td class="val ${capacidadClass}">${capacidadText}</td> </tr>
-          <tr> <td class="lbl">Edad de Instalación</td> <td class="val">${datos.mediciones?.edad_instalacion || ''}</td> </tr>
-          <tr> <td class="lbl">Observaciones del C.C.</td> <td class="val">${datos.mediciones?.observaciones_cc || 'N/A'}</td> </tr>
-      </table>
-
-      <div class="section-header">Panel de Mediciones</div>
-      <table class="items-table hallazgos-table">
-          <tr><td colspan="2" style="background: #f8f9fa; font-weight: bold; color: #0056b3;">Mediciones de Carga</td></tr>
-          <tr><td class="lbl">Voltaje (Fase-Neutro)</td><td class="val">${formatNum(datos.mediciones?.voltaje_medido)} V</td></tr>
-          <tr><td class="lbl">Corriente Red F1</td><td class="val">${formatNum(datos.mediciones?.corriente_red_f1)} A</td></tr>
-          ${fasesHtml}
-      </table>
-
       ${solaresHtml}
 
-      <div class="section-header">Análisis de Equipos Registrados</div>
-      <table class="items-table">
-        <thead> <tr> <th>Equipo</th> <th>Ubicación/Detalle</th> <th>Amperaje</th> <th>Estado</th> </tr> </thead>
+      <div class="section-title">Desglose de Consumo Estimado (Top Consumidores)</div>
+      <table>
+        <thead>
+            <tr>
+                <th width="30%">Equipo</th>
+                <th width="25%">Ubicación</th>
+                <th width="15%" style="text-align:center;">Amperaje</th>
+                <th width="15%" style="text-align:center;">kWh/Bimestre</th>
+                <th width="15%" style="text-align:center;">Estado</th>
+            </tr>
+        </thead>
         <tbody>
             ${equiposHtml}
         </tbody>
       </table>
+      <div style="font-size: 9px; color: #666; margin-top: 2px;">* Cálculo estimado basado en amperaje medido y horas de uso reportadas.</div>
 
-      <div class="section-header">Causas de Alto Consumo Detectadas</div>
-      <div style="padding: 10px 15px;">
-        <ul>${causasHtml}</ul>
+      <div class="section-title">Conclusiones del Ingeniero</div>
+      <div style="padding: 10px; background: #fff;">
+        <p><strong>Causas Probables del Alto Consumo:</strong></p>
+        <ul style="margin-top: 0;">${causasHtml}</ul>
+        
+        <p><strong>Recomendaciones Técnicas:</strong></p>
+        <div style="background-color: #f1f3f5; padding: 10px; border-radius: 4px; border-left: 3px solid #adb5bd; white-space: pre-line;">
+            ${datos.recomendaciones_tecnico || 'Sin recomendaciones específicas.'}
+        </div>
       </div>
 
-      <div class="section-header">Recomendaciones Clave del Técnico</div>
-      <div style="padding: 10px 15px; text-align: justify; white-space: pre-wrap; background: #fdfdfd;">${datos.recomendaciones_tecnico || 'Ninguna recomendación adicional.'}</div>
-
-      <div class="section-header">Cierre y Firmas</div>
-      <div style="text-align: center; margin-top: 20px;">
-          <div class="firma-box">
-             <div class="firma-label">Firma del Ingeniero</div>
-          </div>
-          <div class="firma-box">
-              ${datos.firma_base64 ? `<img src="${datos.firma_base64}" class="firma-img">` : ''}
-              <div class="firma-label">Firma del Cliente</div>
-          </div>
+      <div class="cuentatron-section">
+         <div class="ct-header">
+            <span>⚠️ ¿Tu recibo sigue siendo una pesadilla?</span>
+            <span style="font-size:11px; background:#000; padding:2px 6px; border-radius:4px;">SERVICIO PREMIUM</span>
+         </div>
+         <div class="ct-body">
+            <div class="ct-content">
+                <div class="ct-title">Identifica y elimina el "consumo fantasma"</div>
+                <div class="ct-text">
+                    En 7 de cada 10 casos, la revisión visual resuelve el problema. Pero si tu recibo sigue alto, podrías tener fugas invisibles. Los problemas intermitentes (bombas que se pegan, ciclos erráticos de refrigeradores) no se ven en 1 hora.
+                </div>
+                <div class="ct-text">
+                    <strong>El Monitoreo Especial de 7 Días (Cuentatrón):</strong> Instalamos un dispositivo de grado ingeniería que vigila tu consumo 24/7. Un Ingeniero (no un robot) analiza los datos.
+                </div>
+                <ul class="ct-list">
+                    <li>✅ Detectamos fugas a tierra que no botan la pastilla.</li>
+                    <li>✅ Gráficas de consumo Día vs. Noche.</li>
+                    <li>✅ Análisis de Consumo "Fantasma" (en $ y kWh).</li>
+                    <li>✅ <strong>Garantía:</strong> Si no encontramos anomalías, te regresamos tu anticipo.</li>
+                </ul>
+            </div>
+            <div class="ct-cta-box">
+                <div style="font-size:10px; font-weight:bold; text-transform:uppercase;">Inversión Total</div>
+                <div class="ct-price">$999 MXN</div>
+                <div style="font-size:9px; margin-bottom:10px;">(50% Anticipo / 50% al Final)</div>
+                
+                <a href="https://www.tesivil.com/cuentatron/diagnostico" class="ct-btn">
+                    QUIERO MI DIAGNÓSTICO
+                </a>
+                <div class="ct-guarantee">🛡️ Garantía de Certeza</div>
+            </div>
+         </div>
       </div>
+
+      <div class="signatures">
+        <div class="sig-box">
+            <div style="font-weight: bold; margin-bottom: 30px;">ING. OCTAVIO GALLEGOS</div> 
+            <div style="font-size: 10px; color: #777;">Ingeniero Responsable</div>
+        </div>
+        <div class="sig-box">
+            ${datos.firma_base64 ? `<img src="${datos.firma_base64}" class="sig-img">` : '<div style="height:60px;"></div>'}
+            <div style="font-size: 10px; color: #777;">Firma de Conformidad del Cliente</div>
+        </div>
+      </div>
+
     </body>
     </html>
   `;
 };
 
+// ---------------------------------------------------------
+// 3. FUNCIÓN PRINCIPAL DE GENERACIÓN
+// ---------------------------------------------------------
 export const generarPDF = async (datos) => {
-  console.log('Iniciando generación de PDF Profesional (Node.js)...');
+  console.log('[PDF Service] Generando reporte profesional con Gemini 2.5...');
 
-  // 1. Obtener Diagnóstico IA
+  // 1. Consultar IA
   const diagnosticoIA = await generarDiagnosticoIA(datos);
 
-  // 2. Generar HTML
+  // 2. Armar HTML
   const html = getHtmlPlantilla(datos, diagnosticoIA);
 
-  // 3. Generar PDF con Puppeteer
+  // 3. Renderizar PDF con Puppeteer
   const browser = await puppeteer.launch({
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
-  const page = await browser.newPage();
 
+  const page = await browser.newPage();
   await page.setContent(html, { waitUntil: 'networkidle0' });
 
   const pdfBuffer = await page.pdf({
@@ -253,6 +388,5 @@ export const generarPDF = async (datos) => {
   });
 
   await browser.close();
-  console.log('PDF generado exitosamente.');
   return pdfBuffer;
 };
