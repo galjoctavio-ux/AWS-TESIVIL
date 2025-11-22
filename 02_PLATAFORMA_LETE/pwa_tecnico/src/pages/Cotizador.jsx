@@ -34,7 +34,7 @@ const ModalCrear = ({ alCerrar, alGuardar }) => {
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
       <div style={{ background: 'white', padding: '20px', borderRadius: '8px', width: '100%', maxWidth: '400px' }}>
         <h3>Crear Material Nuevo</h3>
-        <p style={{fontSize: '0.9em', color: '#666'}}>Este material se guardará como "Pendiente".</p>
+        <p style={{ fontSize: '0.9em', color: '#666' }}>Este material se guardará como "Pendiente".</p>
 
         <input type="text" value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Nombre del Material" style={inputModalStyle} />
         <input type="text" value={unidad} onChange={e => setUnidad(e.target.value)} placeholder="Unidad (pza, m...)" style={inputModalStyle} />
@@ -128,17 +128,17 @@ const Cotizador = () => {
   // --- FUNCIÓN MANUAL DE IA (Ahorro de Tokens) ---
   const handlePedirSugerencias = async () => {
     if (itemsCarrito.length === 0) {
-        alert("Agrega materiales al carrito primero.");
-        return;
+      alert("Agrega materiales al carrito primero.");
+      return;
     }
     setAiLoading(true);
     setAiSugerencias([]);
     try {
-        const nombres = itemsCarrito.map(item => item.nombre);
-        const res = await obtenerSugerenciasIA(nombres);
-        if (res.status === 'success') {
-          setAiSugerencias(res.sugerencias);
-        }
+      const nombres = itemsCarrito.map(item => item.nombre);
+      const res = await obtenerSugerenciasIA(nombres);
+      if (res.status === 'success') {
+        setAiSugerencias(res.sugerencias);
+      }
     } catch (e) { console.error(e); } finally { setAiLoading(false); }
   };
 
@@ -164,11 +164,11 @@ const Cotizador = () => {
   const agregarItem = (material, cant) => {
     if (!material || !cant || parseFloat(cant) <= 0) return;
     const nuevoItem = {
-        id_recurso: material.id,
-        nombre: material.nombre,
-        unidad: material.unidad,
-        cantidad: parseFloat(cant),
-        tiempo_instalacion_min: material.tiempo_instalacion_min
+      id_recurso: material.id,
+      nombre: material.nombre,
+      unidad: material.unidad,
+      cantidad: parseFloat(cant),
+      tiempo_instalacion_min: material.tiempo_instalacion_min
     };
     setItemsCarrito([...itemsCarrito, nuevoItem]);
     setMaterialSeleccionado(null);
@@ -185,8 +185,8 @@ const Cotizador = () => {
   // --- Lógica de Mano de Obra ---
   const agregarTareaMO = () => {
     if (!moDescripcion || !moHoras || parseFloat(moHoras) <= 0) {
-        setError("Faltan datos de la tarea.");
-        return;
+      setError("Faltan datos de la tarea.");
+      return;
     }
     setError('');
     const nuevaTarea = { descripcion: moDescripcion, horas: parseFloat(moHoras) };
@@ -211,12 +211,12 @@ const Cotizador = () => {
     // 1. Cálculo de Tiempos para la Alerta
     let tiempoMaterialesMin = 0;
     itemsCarrito.forEach(item => {
-        tiempoMaterialesMin += item.cantidad * (item.tiempo_instalacion_min || 0);
+      tiempoMaterialesMin += item.cantidad * (item.tiempo_instalacion_min || 0);
     });
 
     let tiempoTecnicoMin = 0;
     moItems.forEach(tarea => {
-        tiempoTecnicoMin += tarea.horas * 60;
+      tiempoTecnicoMin += tarea.horas * 60;
     });
 
     const tiempoMaterialesHoras = (tiempoMaterialesMin / 60).toFixed(1);
@@ -224,15 +224,15 @@ const Cotizador = () => {
 
     // 2. La Alerta
     if (itemsCarrito.length > 0 && tiempoTecnicoMin < tiempoMaterialesMin) {
-        let mensaje = `🟡 ALERTA DE TIEMPO 🔴\n\n`;
-        mensaje += `Tiempo estimado (Materiales): ${tiempoMaterialesHoras} horas\n`;
-        mensaje += `Tiempo capturado (Técnico): ${tiempoTecnicoHoras} horas\n\n`;
-        mensaje += `Estás cotizando MENOS tiempo del sugerido.\n\n`;
-        mensaje += `¿Continuar y enviar de todos modos?`;
+      let mensaje = `🟡 ALERTA DE TIEMPO 🔴\n\n`;
+      mensaje += `Tiempo estimado (Materiales): ${tiempoMaterialesHoras} horas\n`;
+      mensaje += `Tiempo capturado (Técnico): ${tiempoTecnicoHoras} horas\n\n`;
+      mensaje += `Estás cotizando MENOS tiempo del sugerido.\n\n`;
+      mensaje += `¿Continuar y enviar de todos modos?`;
 
-        if (!window.confirm(mensaje)) {
-            return; // Cancelar envío
-        }
+      if (!window.confirm(mensaje)) {
+        return; // Cancelar envío
+      }
     }
 
     setError('');
@@ -241,7 +241,7 @@ const Cotizador = () => {
     try {
       const payload = {
         tecnico_id: user?.email || 'sistema@lete.com',
-        tecnico_nombre: user?.user_metadata?.name || user?.name || 'Ingeniero',
+        tecnico_nombre: user?.nombre || user?.user_metadata?.name || 'Ingeniero',
         cliente_nombre: clienteNombre,
         cliente_email: clienteEmail,
         cliente_direccion: clienteDireccion,
@@ -255,16 +255,16 @@ const Cotizador = () => {
 
       if (data.status === 'success') {
         if (casoId) {
-            try {
-              await api.patch(`/casos/${casoId}`, { status: 'completado' });
-            } catch (patchError) {
-              console.error("Error al actualizar el caso a completado:", patchError);
-              // Opcional: informar al usuario que la cotización se creó pero el caso no se actualizó.
-            }
+          try {
+            await api.patch(`/casos/${casoId}`, { status: 'completado' });
+          } catch (patchError) {
+            console.error("Error al actualizar el caso a completado:", patchError);
+            // Opcional: informar al usuario que la cotización se creó pero el caso no se actualizó.
+          }
         }
         setResultadoEnvio({
-            estado: data.estado_final || 'ENVIADA',
-            mensaje: data.message
+          estado: data.estado_final || 'ENVIADA',
+          mensaje: data.message
         });
       } else {
         setError(data.error || "Error al guardar.");
@@ -282,22 +282,22 @@ const Cotizador = () => {
   if (resultadoEnvio) {
     const esRevision = resultadoEnvio.estado === 'PENDIENTE_AUTORIZACION';
     const estiloContenedor = esRevision
-        ? { background: '#fff3cd', color: '#856404', border: '1px solid #ffeeba' }
-        : { background: '#d4edda', color: '#155724', border: '1px solid #c3e6cb' };
+      ? { background: '#fff3cd', color: '#856404', border: '1px solid #ffeeba' }
+      : { background: '#d4edda', color: '#155724', border: '1px solid #c3e6cb' };
 
     return (
       <div style={{ padding: '40px 20px', textAlign: 'center', borderRadius: '8px', margin: '20px', ...estiloContenedor }}>
         <div style={{ fontSize: '50px', marginBottom: '10px' }}>{esRevision ? '⏳' : '✅'}</div>
         <h2>{esRevision ? 'En Revisión' : '¡Enviada!'}</h2>
 
-        {!esRevision && <p style={{fontWeight:'bold'}}>{resultadoEnvio.mensaje}</p>}
+        {!esRevision && <p style={{ fontWeight: 'bold' }}>{resultadoEnvio.mensaje}</p>}
         {!esRevision && <p>El cliente recibirá el PDF en su correo ({clienteEmail}) en breve.</p>}
 
         {esRevision && (
-             <div style={{ textAlign: 'left', background: 'rgba(255,255,255,0.5)', padding: '15px', borderRadius: '8px', margin: '20px 0' }}>
-                <p style={{ fontWeight: 'bold', margin: '0 0 10px 0' }}>📋 Estatus: Pendiente de Validación</p>
-                <p style={{ fontSize: '0.9em', margin: 0 }}>Tu cotización requiere validación administrativa. No necesitas hacer nada más.</p>
-             </div>
+          <div style={{ textAlign: 'left', background: 'rgba(255,255,255,0.5)', padding: '15px', borderRadius: '8px', margin: '20px 0' }}>
+            <p style={{ fontWeight: 'bold', margin: '0 0 10px 0' }}>📋 Estatus: Pendiente de Validación</p>
+            <p style={{ fontSize: '0.9em', margin: 0 }}>Tu cotización requiere validación administrativa. No necesitas hacer nada más.</p>
+          </div>
         )}
 
         <button onClick={() => window.location.reload()} style={{ padding: '12px 24px', background: '#007bff', color: 'white', border: 'none', borderRadius: '5px', marginTop: '20px', cursor: 'pointer' }}>
@@ -309,8 +309,8 @@ const Cotizador = () => {
 
   // Estilo común corregido (box-sizing)
   const commonInputStyle = {
-      width: '100%', padding: '10px', border: '1px solid #ccc',
-      borderRadius: '5px', boxSizing: 'border-box'
+    width: '100%', padding: '10px', border: '1px solid #ccc',
+    borderRadius: '5px', boxSizing: 'border-box'
   };
 
   return (
@@ -321,8 +321,8 @@ const Cotizador = () => {
 
         {/* CABECERA CON BOTÓN VOLVER */}
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-            <button onClick={() => navigate('/casos')} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', marginRight: '10px' }}>⬅️</button>
-            <h2 style={{ margin: 0 }}>⚡ Cotizador Rápido</h2>
+          <button onClick={() => navigate('/casos')} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', marginRight: '10px' }}>⬅️</button>
+          <h2 style={{ margin: 0 }}>⚡ Cotizador Rápido</h2>
         </div>
 
         {/* DATOS CLIENTE */}
@@ -370,21 +370,21 @@ const Cotizador = () => {
           <div>
             <label style={{ display: 'block', fontSize: '0.9em', color: '#D32F2F', fontWeight: 'bold' }}>Email del Cliente (Obligatorio)</label>
             <input
-                type="email"
-                value={clienteEmail}
-                onChange={(e) => setClienteEmail(e.target.value)}
-                style={{
-                    ...commonInputStyle,
-                    borderColor: (error && !clienteEmail) ? '#D32F2F' : '#ccc'
-                }}
-                placeholder="correo@cliente.com"
+              type="email"
+              value={clienteEmail}
+              onChange={(e) => setClienteEmail(e.target.value)}
+              style={{
+                ...commonInputStyle,
+                borderColor: (error && !clienteEmail) ? '#D32F2F' : '#ccc'
+              }}
+              placeholder="correo@cliente.com"
             />
           </div>
         </div>
 
         {/* MANO DE OBRA */}
         <div className="card" style={{ background: 'white', padding: '15px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', marginBottom: '15px' }}>
-          <h4 style={{marginTop:0}}>⏱️ Tareas de Mano de Obra</h4>
+          <h4 style={{ marginTop: 0 }}>⏱️ Tareas de Mano de Obra</h4>
           <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
             <input type="text" value={moDescripcion} onChange={(e) => setMoDescripcion(e.target.value)} placeholder="Descripción" style={{ ...commonInputStyle, flex: 3 }} />
             <input type="number" value={moHoras} onChange={(e) => setMoHoras(e.target.value)} placeholder="Hrs" style={{ ...commonInputStyle, flex: 1 }} />
@@ -403,7 +403,7 @@ const Cotizador = () => {
 
         {/* MATERIALES */}
         <div className="card" style={{ background: 'white', padding: '15px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', marginBottom: '15px' }}>
-          <h4 style={{marginTop:0}}>📦 Agregar Material</h4>
+          <h4 style={{ marginTop: 0 }}>📦 Agregar Material</h4>
           {!materialSeleccionado ? (
             <div style={{ position: 'relative' }}>
               <input type="text" value={busqueda} onChange={(e) => handleBuscar(e.target.value)} placeholder="🔍 Buscar..." style={commonInputStyle} />
@@ -421,11 +421,11 @@ const Cotizador = () => {
           ) : (
             <div style={{ background: '#e3f2fd', padding: '10px', borderRadius: '4px', border: '1px solid #90caf9' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <strong>{materialSeleccionado.nombre}</strong>
-                  <button onClick={cancelarSeleccion} style={{color:'red', background:'none', border:'none'}}>Cancelar</button>
+                <strong>{materialSeleccionado.nombre}</strong>
+                <button onClick={cancelarSeleccion} style={{ color: 'red', background: 'none', border: 'none' }}>Cancelar</button>
               </div>
               <div style={{ display: 'flex', gap: '10px' }}>
-                <input id="input-cantidad" type="number" value={cantidad} onChange={(e) => setCantidad(e.target.value)} placeholder="Cant." style={{...commonInputStyle, flex:1}} />
+                <input id="input-cantidad" type="number" value={cantidad} onChange={(e) => setCantidad(e.target.value)} placeholder="Cant." style={{ ...commonInputStyle, flex: 1 }} />
                 <button onClick={() => agregarItem(materialSeleccionado, cantidad)} style={{ flex: 1, background: '#007bff', color: 'white', border: 'none', borderRadius: '5px', fontWeight: 'bold' }}>Agregar</button>
               </div>
             </div>
@@ -443,11 +443,11 @@ const Cotizador = () => {
 
         {/* BOTÓN IA MANUAL */}
         {itemsCarrito.length > 0 && (
-            <div style={{textAlign:'center', margin:'20px 0'}}>
-                <button onClick={handlePedirSugerencias} disabled={aiLoading} style={{ background: 'none', border: '2px solid #6f42c1', color: '#6f42c1', padding: '8px 20px', borderRadius: '30px', cursor:'pointer' }}>
-                    {aiLoading ? '🧠 Analizando...' : '✨ ¿Sugerencias IA?'}
-                </button>
-            </div>
+          <div style={{ textAlign: 'center', margin: '20px 0' }}>
+            <button onClick={handlePedirSugerencias} disabled={aiLoading} style={{ background: 'none', border: '2px solid #6f42c1', color: '#6f42c1', padding: '8px 20px', borderRadius: '30px', cursor: 'pointer' }}>
+              {aiLoading ? '🧠 Analizando...' : '✨ ¿Sugerencias IA?'}
+            </button>
+          </div>
         )}
 
         {aiSugerencias.length > 0 && !aiLoading && (

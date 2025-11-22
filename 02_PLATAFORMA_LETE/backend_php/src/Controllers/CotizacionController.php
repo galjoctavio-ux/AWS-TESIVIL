@@ -225,29 +225,6 @@ class CotizacionController {
             $cotizaciones = $this->calculosService->obtenerListadoCotizaciones();
             header('Content-Type: application/json');
             echo json_encode(['status' => 'success', 'data' => $cotizaciones]);
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(['error' => $e->getMessage()]);
-        }
-    }
-    public function exportarMaterialesTxt(): void {
-        if (empty($_GET['id'])) {
-            http_response_code(400); echo "Error: Falta ID."; return;
-        }
-        try {
-            $texto = $this->calculosService->obtenerListaMaterialesExportar((int)$_GET['id']);
-            header('Content-Type: text/plain; charset=utf-8');
-            echo $texto;
-        } catch (Exception $e) {
-            http_response_code(500); echo "Error: " . $e->getMessage();
-        }
-    }
-// --- LÓGICA CORREGIDA AQUÍ ---
-    public function autorizarCotizacion(): void {
-        $input = json_decode(file_get_contents('php://input'), true);
-        if (empty($input['id'])) {
-            http_response_code(400);
-            echo json_encode(['error' => 'Falta ID']);
             return;
         }
 
@@ -327,54 +304,6 @@ class CotizacionController {
         try {
             $this->calculosService->actualizarEstadoCotizacion((int)$input['id'], 'RECHAZADA');
             echo json_encode(['status' => 'success', 'message' => 'Cotización marcada como rechazada.']);
-        } catch (Exception $e) {
-            http_response_code(500); echo json_encode(['error' => $e->getMessage()]);
-        }
-    }
-
-    public function powerCloneCotizacion(): void {
-        $input = json_decode(file_get_contents('php://input'), true);
-        if (empty($input['id_original']) || empty($input['items']) || empty($input['mano_de_obra'])) {
-            http_response_code(400);
-            echo json_encode(['error' => 'Faltan datos para el Power Clone']);
-            return;
-        }
-
-        try {
-            $res = $this->calculosService->powerCloneCotizacion(
-                (int)$input['id_original'],
-                $input['items'],
-                $input['mano_de_obra'],
-                $input['cliente_email'],
-                $input['cliente_nombre']
-            );
-
-            if (!empty($res['uuid'])) {
-                try {
-                    $pdfController = new PdfController();
-                    $pdfUrl = $pdfController->generarYGuardarPdf($res['uuid']);
-                    if ($pdfUrl) {
-                        $this->calculosService->actualizarUrlPdf($res['uuid'], $pdfUrl);
-                    }
-                } catch (Exception $e) {
-                    error_log("Error generando PDF para clon: " . $e->getMessage());
-                }
-
-                $resendService = new ResendService();
-                $resendService->enviarCotizacion($res['uuid'], $input['cliente_email'], $input['cliente_nombre'], $res['id']);
-            }
-
-            echo json_encode(['status' => 'success', 'data' => $res]);
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(['error' => 'Error en Power Clone: ' . $e->getMessage()]);
-        }
-    }
-    public function finalizarProyecto(): void {
-        $input = json_decode(file_get_contents('php://input'), true);
-        if (empty($input['id']) || !isset($input['gasto_material']) || !isset($input['gasto_mo'])) {
-             http_response_code(400); 
-             echo json_encode(['error' => 'Faltan datos: id, gasto_material o gasto_mo']); 
              return;
         }
         try {

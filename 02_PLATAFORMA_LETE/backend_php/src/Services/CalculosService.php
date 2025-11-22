@@ -322,38 +322,6 @@ class CalculosService {
         $this->db->prepare($sql)->execute([$id]);
     }
 
-    public function aprobarRecurso(int $id): void {
-        $sql = "UPDATE recursos SET estatus = 'APROBADO' WHERE id = ?";
-        $this->db->prepare($sql)->execute([$id]);
-    }
-
-    public function obtenerListadoCotizaciones(): array {
-        // REEMPLAZA LA LÍNEA $sql CON ESTA (Agregamos estimacion_ia y razon_detencion):
-        $sql = "SELECT 
-                    id, 
-                    uuid, 
-                    tecnico_nombre, 
-                    cliente_nombre, 
-                    precio_venta_final, 
-                    total_materiales_cd,
-                    descuento_pct,      -- Asegúrate de tener este
-                    estimacion_ia,      -- <--- ¡ESTE FALTABA!
-                    razon_detencion,    -- <--- ¡Y ESTE!
-                    estatus, 
-                    estado, 
-                    fecha_creacion,
-                    direccion_obra
-                FROM cotizaciones 
-                ORDER BY fecha_creacion DESC";
-                
-        return $this->db->query($sql)->fetchAll();
-    }
-
-    public function obtenerListaMaterialesExportar(int $cotizacionId): string {
-        $sql = "SELECT ci.cantidad, r.unidad, r.nombre 
-                FROM cotizaciones_items ci
-                JOIN recursos r ON ci.recurso_id = r.id
-                WHERE ci.cotizacion_id = ?
                 ORDER BY r.nombre ASC";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$cotizacionId]);

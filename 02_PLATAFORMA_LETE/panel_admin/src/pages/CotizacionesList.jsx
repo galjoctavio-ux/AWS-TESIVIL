@@ -43,8 +43,58 @@ const CotizacionesList = () => {
     try {
       const res = await obtenerListadoCotizaciones();
       if (res.status === 'success') {
-        const dataSanitized = res.data.map(c => ({...c, descuento_pct: c.descuento_pct || 0}));
-        setCotizaciones(dataSanitized);
+        let data = res.data.map(c => ({ ...c, descuento_pct: c.descuento_pct || 0 }));
+
+        // --- LÓGICA DE VERSIONADO (14.1, 14.2) ---
+        // 1. Agrupar por Familia (Padre o ID si es huérfano)
+        const groups = {};
+        data.forEach(c => {
+          const familyId = c.caso_id || c.id;
+          if (!groups[familyId]) groups[familyId] = [];
+          groups[familyId].push(c);
+        });
+
+        // 2. Asignar etiquetas
+        const dataVersioned = [];
+        Object.values(groups).forEach(group => {
+          // Ordenar por ID (cronológico)
+          group.sort((a, b) => a.id - b.id);
+
+          // El primero suele ser el padre original (si existe en la lista)
+          // Pero si el padre no está (filtrado), igual calculamos versiones relativos
+          group.forEach((c, index) => {
+            // Si es el padre original (id == familyId), se queda con su ID
+            if (c.id == (c.caso_id || c.id) && !c.caso_id) {
+              c.displayId = c.id;
+            } else {
+              // Es un hijo (o el padre no está y este es el primero)
+              // Si el padre está en el grupo, el índice 0 es el padre.
+              // Los hijos empiezan desde el índice 1 (si padre existe) o 0 (si no).
+              // Queremos que el primer CLON sea .1
+
+              // Buscamos si el padre "real" está en el grupo
+              const parentExists = group.some(g => g.id == (c.caso_id || c.id));
+
+              if (c.caso_id) {
+                // Es un clon
+                // Calculamos su índice relativo entre los clones
+                const clones = group.filter(g => g.caso_id == c.caso_id);
+                const myIndex = clones.findIndex(g => g.id === c.id);
+                const discountSuffix = parseFloat(c.descuento_pct) > 0 ? `.${parseFloat(c.descuento_pct)}` : '';
+                c.displayId = `${c.caso_id}.${myIndex + 1}${discountSuffix}`;
+              } else {
+                // Es un padre (que no debería entrar aquí por el if anterior, salvo casos raros)
+                c.displayId = c.id;
+              }
+            }
+            dataVersioned.push(c);
+          });
+        });
+
+        // Ordenar por fecha descendente para la vista
+        dataVersioned.sort((a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion));
+
+        setCotizaciones(dataVersioned);
       }
     } catch (error) {
       setMensaje(`Error al cargar: ${error.message}`);
@@ -68,7 +118,7 @@ const CotizacionesList = () => {
   };
 
   const handleAutorizar = async (id) => {
-    if(!window.confirm("¿Aprobar y enviar al cliente?")) return;
+    if (!window.confirm("¿Aprobar y enviar al cliente?")) return;
     setMensaje("Procesando...");
     try {
       const res = await autorizarCotizacion(id);
@@ -81,7 +131,7 @@ const CotizacionesList = () => {
   };
 
   const handleRechazar = async (id) => {
-    if(!window.confirm("¿Rechazar cotización?")) return;
+    if (!window.confirm("¿Rechazar cotización?")) return;
     try {
       await rechazarCotizacion(id);
       setCotizacionEnRevision(null);
@@ -121,7 +171,7 @@ const CotizacionesList = () => {
   };
 
   const handleReenviar = async (id) => {
-    if(!window.confirm("¿Reenviar el correo al cliente?")) return;
+    if (!window.confirm("¿Reenviar el correo al cliente?")) return;
     setMensaje("Enviando correo...");
     try {
       const res = await reenviarCorreo(id);
@@ -139,12 +189,12 @@ const CotizacionesList = () => {
 
   const getStatusBadge = (estado) => {
     switch (estado) {
-        case 'PENDIENTE_AUTORIZACION': return <span style={{background:'#ffc107',color:'#000',padding:'4px 8px',borderRadius:'4px',fontSize:'0.85em',fontWeight:'bold'}}>⚠️ REVISIÓN</span>;
-        case 'ENVIADA': return <span style={{background:'#28a745',color:'#fff',padding:'4px 8px',borderRadius:'4px',fontSize:'0.85em'}}>✅ ENVIADA</span>;
-        case 'AUTORIZADA': return <span style={{background:'#007bff',color:'#fff',padding:'4px 8px',borderRadius:'4px',fontSize:'0.85em'}}>👍 AUTORIZADA</span>;
-        case 'COMPLETADA': return <span style={{background:'#343a40',color:'#fff',padding:'4px 8px',borderRadius:'4px',fontSize:'0.85em'}}>🏁 COMPLETADA</span>;
-        case 'RECHAZADA': return <span style={{background:'#dc3545',color:'#fff',padding:'4px 8px',borderRadius:'4px',fontSize:'0.85em'}}>❌ RECHAZADA</span>;
-        default: return <span style={{background:'#6c757d',color:'#fff',padding:'4px 8px',borderRadius:'4px',fontSize:'0.85em'}}>{estado}</span>;
+      case 'PENDIENTE_AUTORIZACION': return <span style={{ background: '#ffc107', color: '#000', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85em', fontWeight: 'bold' }}>⚠️ REVISIÓN</span>;
+      case 'ENVIADA': return <span style={{ background: '#28a745', color: '#fff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85em' }}>✅ ENVIADA</span>;
+      case 'AUTORIZADA': return <span style={{ background: '#007bff', color: '#fff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85em' }}>👍 AUTORIZADA</span>;
+      case 'COMPLETADA': return <span style={{ background: '#343a40', color: '#fff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85em' }}>🏁 COMPLETADA</span>;
+      case 'RECHAZADA': return <span style={{ background: '#dc3545', color: '#fff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85em' }}>❌ RECHAZADA</span>;
+      default: return <span style={{ background: '#6c757d', color: '#fff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85em' }}>{estado}</span>;
     }
   };
 
@@ -272,8 +322,8 @@ const CotizacionesList = () => {
     const asesor = ((coti.asesor_nombre || coti.tecnico_nombre) || '').toLowerCase();
 
     return folio.includes(searchTermLower) ||
-           cliente.includes(searchTermLower) ||
-           asesor.includes(searchTermLower);
+      cliente.includes(searchTermLower) ||
+      asesor.includes(searchTermLower);
   });
 
   return (
@@ -304,7 +354,7 @@ const CotizacionesList = () => {
               <th style={{ padding: '12px' }}>Dirección</th>
               <th style={{ padding: '12px' }}>Asesor</th>
               <th style={{ padding: '12px' }}>Total Venta</th>
-              <th style={{ padding: '12px', background:'#555', borderLeft:'1px solid #666' }}>Costo Mat.</th>
+              <th style={{ padding: '12px', background: '#555', borderLeft: '1px solid #666' }}>Costo Mat.</th>
               <th style={{ padding: '12px' }}>Desc.</th>
               <th style={{ padding: '12px' }}>IA (Est)</th>
               <th style={{ padding: '12px' }}>Acciones</th>
@@ -313,29 +363,29 @@ const CotizacionesList = () => {
           <tbody>
             {filteredCotizaciones.map((coti) => (
               <tr key={coti.id} style={{ borderBottom: '1px solid #eee', background: coti.estado === 'PENDIENTE_AUTORIZACION' ? '#fffdf0' : (coti.estado === 'COMPLETADA' ? '#f8f9fa' : 'white') }}>
-                <td style={{ padding: '12px', fontWeight: 'bold' }}>#{coti.id}</td>
+                <td style={{ padding: '12px', fontWeight: 'bold' }}>#{coti.displayId || coti.id}</td>
                 <td style={{ padding: '12px' }}>{getStatusBadge(coti.estado)}</td>
                 <td style={{ padding: '12px' }}><small>{formatDate(coti.fecha_creacion)}</small></td>
                 <td style={{ padding: '12px' }}>
-                    <div>{coti.cliente_nombre}</div>
+                  <div>{coti.cliente_nombre}</div>
                 </td>
                 <td style={{ padding: '12px' }}>
-                    <div>{coti.direccion_obra}</div>
+                  <div>{coti.direccion_obra}</div>
                 </td>
                 <td style={{ padding: '12px' }}>
-                    <small style={{color:'#555'}}>{coti.asesor_nombre || coti.tecnico_nombre}</small>
+                  <small style={{ color: '#555' }}>{coti.asesor_nombre || coti.tecnico_nombre}</small>
                 </td>
                 <td style={{ padding: '12px', fontWeight: 'bold' }}>{formatCurrency(coti.precio_venta_final)}</td>
 
-                <td style={{ padding: '12px', color:'#555', fontSize:'0.9em', borderLeft:'1px solid #eee' }}>
-                    {formatCurrency(coti.total_materiales_cd)}
+                <td style={{ padding: '12px', color: '#555', fontSize: '0.9em', borderLeft: '1px solid #eee' }}>
+                  {formatCurrency(coti.total_materiales_cd)}
                 </td>
 
                 <td style={{ padding: '12px', color: parseFloat(coti.descuento_pct) > 0 ? '#dc3545' : '#ccc', fontWeight: 'bold' }}>
-                    {parseFloat(coti.descuento_pct) > 0 ? `-${coti.descuento_pct}%` : '0%'}
+                  {parseFloat(coti.descuento_pct) > 0 ? `-${coti.descuento_pct}%` : '0%'}
                 </td>
                 <td style={{ padding: '12px', color: '#666', fontSize: '0.9em' }}>
-                    {coti.estimacion_ia ? formatCurrency(coti.estimacion_ia) : '-'}
+                  {coti.estimacion_ia ? formatCurrency(coti.estimacion_ia) : '-'}
                 </td>
                 <td style={{ padding: '12px', display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
                   {renderAcciones(coti)}

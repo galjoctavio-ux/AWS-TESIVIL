@@ -92,7 +92,7 @@ Ejemplo de respuesta: 15";
         // (Nota: Tendríamos que hacer públicas la $apiKey y $apiUrl o re-instanciarlas aquí)
         // Para este script, es más fácil re-implementar el cURL básico.
         
-        $apiKey = 'AIzaSyCgkr08EEaYfolg8H9AIrep3y_vn3V0Kz8'; // Tu API Key
+        $apiKey = $_ENV['GEMINI_API_KEY']; // API Key desde variables de entorno
         $apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' . $apiKey;
 
         $ch = curl_init($apiUrl);

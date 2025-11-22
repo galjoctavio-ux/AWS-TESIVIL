@@ -8,6 +8,7 @@ const PowerCloneModal = ({ cotizacionId, onClose, onCloned }) => {
   const [manoObra, setManoObra] = useState([]);
   const [catalogo, setCatalogo] = useState([]);
   const [itemSeleccionado, setItemSeleccionado] = useState('');
+  const [cloning, setCloning] = useState(false);
 
   useEffect(() => {
     if (cotizacionId) {
@@ -47,7 +48,8 @@ const PowerCloneModal = ({ cotizacionId, onClose, onCloned }) => {
     }
   };
 
-  const handleClonar = () => {
+  const handleClonar = async () => {
+    setCloning(true);
     const payload = {
       id_original: cotizacionId,
       cliente_email: cotizacion.cliente_email,
@@ -55,7 +57,8 @@ const PowerCloneModal = ({ cotizacionId, onClose, onCloned }) => {
       items: materiales.map(m => ({ id_recurso: m.id_recurso_ref, cantidad: m.cantidad })),
       mano_de_obra: manoObra
     };
-    onCloned(payload);
+    await onCloned(payload);
+    setCloning(false);
   };
 
   // --- MANEJO DE MATERIALES ---
@@ -144,69 +147,81 @@ const PowerCloneModal = ({ cotizacionId, onClose, onCloned }) => {
 
             {/* MATERIALES */}
             <div style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', marginBottom: '20px' }}>
-                <h3 style={{ marginTop: 0, color: '#0056b3' }}>🧱 Materiales</h3>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <h3 style={{ marginTop: 0, color: '#0056b3' }}>🧱 Materiales</h3>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                    <tr style={{ background: '#f8f9fa', textAlign: 'left' }}>
+                  <tr style={{ background: '#f8f9fa', textAlign: 'left' }}>
                     <th style={{ padding: '8px' }}>Cant.</th>
                     <th style={{ padding: '8px' }}>Unidad</th>
                     <th style={{ padding: '8px' }}>Descripción</th>
                     <th style={{ padding: '8px' }}>Acción</th>
-                    </tr>
+                  </tr>
                 </thead>
                 <tbody>
-                    {materiales.map((item, idx) => (
+                  {materiales.map((item, idx) => (
                     <tr key={idx} style={{ borderBottom: '1px solid #eee' }}>
-                        <td style={{ padding: '8px', width: '80px' }}>
+                      <td style={{ padding: '8px', width: '80px' }}>
                         <input type="number" value={item.cantidad} onChange={(e) => changeMaterialCant(idx, e.target.value)} style={{ width: '60px', padding: '5px', textAlign: 'center' }} />
-                        </td>
-                        <td style={{ padding: '8px', color: '#666' }}>{item.unidad}</td>
-                        <td style={{ padding: '8px' }}>{item.nombre}</td>
-                        <td style={{ padding: '8px' }}><button onClick={() => eliminarMaterial(idx)} style={{ color: 'red', border: 'none', background: 'none', cursor: 'pointer' }}>&times;</button></td>
+                      </td>
+                      <td style={{ padding: '8px', color: '#666' }}>{item.unidad}</td>
+                      <td style={{ padding: '8px' }}>{item.nombre}</td>
+                      <td style={{ padding: '8px' }}><button onClick={() => eliminarMaterial(idx)} style={{ color: 'red', border: 'none', background: 'none', cursor: 'pointer' }}>&times;</button></td>
                     </tr>
-                    ))}
+                  ))}
                 </tbody>
-                </table>
-                <div style={{ marginTop: '15px', display: 'flex', gap: '10px', background: '#f1f1f1', padding: '10px', borderRadius: '5px' }}>
+              </table>
+              <div style={{ marginTop: '15px', display: 'flex', gap: '10px', background: '#f1f1f1', padding: '10px', borderRadius: '5px' }}>
                 <select value={itemSeleccionado} onChange={e => setItemSeleccionado(e.target.value)} style={{ flex: 1, padding: '8px' }}>
-                    <option value="">-- Agregar Material --</option>
-                    {catalogo.map(cat => <option key={cat.id} value={cat.id}>{cat.nombre}</option>)}
+                  <option value="">-- Agregar Material --</option>
+                  {catalogo.map(cat => <option key={cat.id} value={cat.id}>{cat.nombre}</option>)}
                 </select>
                 <button onClick={agregarMaterial} style={{ padding: '8px 15px', background: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>+</button>
-                </div>
+              </div>
             </div>
 
             {/* MANO DE OBRA */}
             <div style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', marginBottom: '20px' }}>
-                <h3 style={{ marginTop: 0, color: '#0056b3' }}>👷 Mano de Obra</h3>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <h3 style={{ marginTop: 0, color: '#0056b3' }}>👷 Mano de Obra</h3>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                    <tr style={{ background: '#f8f9fa', textAlign: 'left' }}>
+                  <tr style={{ background: '#f8f9fa', textAlign: 'left' }}>
                     <th style={{ padding: '8px' }}>Horas</th>
                     <th style={{ padding: '8px' }}>Descripción</th>
                     <th style={{ padding: '8px' }}>Acción</th>
-                    </tr>
+                  </tr>
                 </thead>
                 <tbody>
-                    {manoObra.map((item, idx) => (
+                  {manoObra.map((item, idx) => (
                     <tr key={idx} style={{ borderBottom: '1px solid #eee' }}>
-                        <td style={{ padding: '8px', width: '80px' }}>
+                      <td style={{ padding: '8px', width: '80px' }}>
                         <input type="number" value={item.horas} onChange={(e) => changeMOHoras(idx, e.target.value)} style={{ width: '60px', padding: '5px', textAlign: 'center' }} />
-                        </td>
-                        <td style={{ padding: '8px' }}>
+                      </td>
+                      <td style={{ padding: '8px' }}>
                         <input type="text" value={item.descripcion} onChange={(e) => changeMODesc(idx, e.target.value)} style={{ width: '100%', padding: '5px' }} />
-                        </td>
-                        <td style={{ padding: '8px' }}><button onClick={() => eliminarMO(idx)} style={{ color: 'red', border: 'none', background: 'none', cursor: 'pointer' }}>&times;</button></td>
+                      </td>
+                      <td style={{ padding: '8px' }}><button onClick={() => eliminarMO(idx)} style={{ color: 'red', border: 'none', background: 'none', cursor: 'pointer' }}>&times;</button></td>
                     </tr>
-                    ))}
+                  ))}
                 </tbody>
-                </table>
-                <button onClick={agregarMO} style={{ marginTop: '10px', padding: '8px 15px', background: '#17a2b8', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>+ Tarea</button>
+              </table>
+              <button onClick={agregarMO} style={{ marginTop: '10px', padding: '8px 15px', background: '#17a2b8', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>+ Tarea</button>
             </div>
 
             <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-              <button onClick={onClose} style={{ flex: 1, padding: '12px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Cancelar</button>
-              <button onClick={handleClonar} style={{ flex: 2, padding: '12px', background: '#6f42c1', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>Clonar y Crear Versión</button>
+              <button onClick={onClose} disabled={cloning} style={{ flex: 1, padding: '12px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', opacity: cloning ? 0.7 : 1 }}>Cancelar</button>
+              <button onClick={handleClonar} disabled={cloning} style={{ flex: 2, padding: '12px', background: '#6f42c1', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', opacity: cloning ? 0.7 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                {cloning ? (
+                  <>
+                    <span style={{
+                      width: '16px', height: '16px', border: '2px solid white', borderTop: '2px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite'
+                    }}></span>
+                    Clonando...
+                  </>
+                ) : 'Clonar y Crear Versión'}
+              </button>
+              <style>{`
+                @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+              `}</style>
             </div>
           </>
         )}
