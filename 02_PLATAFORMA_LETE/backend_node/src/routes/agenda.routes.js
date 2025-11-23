@@ -1,19 +1,20 @@
-// src/routes/agenda.routes.js
 import express from 'express';
-// AGREGA createRecurringUnavailable AQUÍ ABAJO:
-import { checkAvailability, getAgendaPorDia, createRecurringUnavailable } from '../controllers/agenda.controller.js';
+
+// 1. Funciones viejas que viven en agenda.controller.js
+import { checkAvailability, getAgendaPorDia } from '../controllers/agenda.controller.js';
+
+// 2. Función NUEVA que vive en availability.controller.js (Asegúrate de importar desde el archivo correcto)
+import { createRecurringUnavailable } from '../controllers/availability.controller.js';
+
 import { requireAuth } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
-// Ruta para verificar la disponibilidad de un técnico
+// Rutas existentes
 router.post('/check-availability', checkAvailability);
-
-// Ruta para obtener la agenda del día
 router.get('/por-dia', requireAuth, getAgendaPorDia);
 
-// Ruta para bloquear tiempo (CORRECTA)
+// Ruta nueva (Ahora sí encontrará la función)
 router.post('/bloquear-recurrente', requireAuth, createRecurringUnavailable);
-// Nota: Le agregué requireAuth por seguridad, para que sepamos quién es el usuario (user.id)
 
 export default router;
