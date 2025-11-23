@@ -322,10 +322,18 @@ class CalculosService {
         $this->db->prepare($sql)->execute([$id]);
     }
 
+    // --- FUNCIÓN RECUPERADA ---
+    public function obtenerTextoMateriales(int $cotizacionId): string {
+        $sql = "SELECT ci.cantidad, r.unidad, r.nombre 
+                FROM cotizaciones_items ci
+                JOIN recursos r ON ci.recurso_id = r.id
+                WHERE ci.cotizacion_id = ?
                 ORDER BY r.nombre ASC";
+
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$cotizacionId]);
         $items = $stmt->fetchAll();
+        
         if (empty($items)) return "Esta cotización no tiene materiales registrados.";
 
         $texto = "LISTA DE MATERIALES - Cotización #" . $cotizacionId . "\n";
