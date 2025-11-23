@@ -215,7 +215,14 @@ class CotizacionController {
         try {
             $this->calculosService->eliminarRecurso((int)$input['id']);
             echo json_encode(['status' => 'success', 'message' => 'Eliminado']);
-        
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+    }
+
+    public function agendarCotizacion(): void {
+        $input = json_decode(file_get_contents('php://input'), true);
         if (empty($input['id'])) {
              http_response_code(400); 
              echo json_encode(['error' => 'Falta ID de la cotización']); 
@@ -224,7 +231,6 @@ class CotizacionController {
 
         try {
             // Cambiamos el estatus a AGENDADA. 
-            // Esto bloquea la edición y confirma que el cliente aceptó.
             $this->calculosService->actualizarEstadoCotizacion((int)$input['id'], 'AGENDADA');
             
             echo json_encode([
@@ -246,16 +252,29 @@ class CotizacionController {
         try {
             $this->calculosService->actualizarEstadoCotizacion((int)$input['id'], 'RECHAZADA');
             echo json_encode(['status' => 'success', 'message' => 'Cotización marcada como rechazada.']);
-             return;
+        } catch (Exception $e) {
+            http_response_code(500); 
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+    }
+
+    public function finalizarProyecto(): void {
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (empty($input['id'])) {
+            http_response_code(400); echo json_encode(['error' => 'Falta ID']); return;
         }
         try {
-            $this->calculosService->finalizarProyecto((int)$input['id'], floatval($input['gasto_material']), floatval($input['gasto_mo']));
+            $gastoMaterial = isset($input['gasto_material']) ? floatval($input['gasto_material']) : 0;
+            $gastoMo = isset($input['gasto_mo']) ? floatval($input['gasto_mo']) : 0;
+
+            $this->calculosService->finalizarProyecto((int)$input['id'], $gastoMaterial, $gastoMo);
             echo json_encode(['status' => 'success', 'message' => 'Proyecto cerrado y utilidad calculada.']);
         } catch (Exception $e) {
             http_response_code(500); 
             echo json_encode(['error' => $e->getMessage()]);
         }
     }
+
     public function clonarCotizacion(): void {
         $input = json_decode(file_get_contents('php://input'), true);
         if (empty($input['id'])) {
@@ -268,6 +287,23 @@ class CotizacionController {
             http_response_code(500); echo json_encode(['error' => $e->getMessage()]);
         }
     }
+
+    public function powerCloneCotizacion(): void {
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (empty($input['id'])) {
+             http_response_code(400); echo json_encode(['error' => 'Falta ID']); return;
+        }
+        try {
+            // Asumiendo que existe este método en CalculosService, basado en rutas
+            $res = $this->calculosService->clonarCotizacion((int)$input['id']); 
+            // Nota: Si tienes un método específico powerClone en el service, úsalo aquí.
+            // Por ahora reutilizo clonarCotizacion para mantener la sintaxis válida.
+            echo json_encode(['status' => 'success', 'data' => $res]);
+        } catch (Exception $e) {
+            http_response_code(500); echo json_encode(['error' => $e->getMessage()]);
+        }
+    }
+
     public function reenviarCorreo(): void {
         $input = json_decode(file_get_contents('php://input'), true);
         if (empty($input['id'])) {
@@ -286,6 +322,7 @@ class CotizacionController {
             http_response_code(500); echo json_encode(['error' => 'Error al enviar: ' . $e->getMessage()]);
         }
     }
+
     public function actualizarCotizacion(): void {
         $input = json_decode(file_get_contents('php://input'), true);
         if (empty($input['id']) || !isset($input['items']) || !isset($input['mano_de_obra'])) {
@@ -300,6 +337,7 @@ class CotizacionController {
             http_response_code(500); echo json_encode(['error' => $e->getMessage()]);
         }
     }
+
     public function obtenerDetalleEdicion(): void {
         if (empty($_GET['id'])) { 
             http_response_code(400); echo json_encode(['error' => 'Falta ID']); return; 
@@ -314,6 +352,25 @@ class CotizacionController {
         } catch (Exception $e) {
             http_response_code(500); echo json_encode(['error' => $e->getMessage()]);
         }
+    }
+    
+    public function exportarMaterialesTxt(): void {
+         // Implementación placeholder si faltaba en tu archivo original, 
+         // pero requerida por routes.php
+         http_response_code(501);
+         echo json_encode(['error' => 'Not implemented yet']);
+    }
+
+    public function aplicarDescuento(): void {
+         // Implementación placeholder
+         http_response_code(501);
+         echo json_encode(['error' => 'Not implemented yet']);
+    }
+    
+    public function autorizarCotizacion(): void {
+         // Implementación placeholder
+         http_response_code(501);
+         echo json_encode(['error' => 'Not implemented yet']);
     }
 
     public function obtenerConteosPorTecnico(): void {
