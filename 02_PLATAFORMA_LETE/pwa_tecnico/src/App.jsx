@@ -1,14 +1,13 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import ReloadPrompt from './components/ReloadPrompt';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
+import AgendaPage from './pages/AgendaPage';
 import RevisionWizard from './pages/RevisionWizard';
 import Cotizador from './pages/Cotizador';
-import AgendaPage from './pages/AgendaPage';
+import FirmaPage from './pages/FirmaPage';
 import DetalleCaso from './pages/DetalleCaso';
-import './App.css';
-
-import ReloadPrompt from './components/ReloadPrompt';
 
 function App() {
   return (
@@ -18,7 +17,7 @@ function App() {
       <Routes>
         {/* --- RUTAS PÚBLICAS --- */}
         <Route path="/login" element={<Login />} />
-        
+
         {/* --- RUTA PÚBLICA "MAGIC LINK" --- 
             La sacamos de ProtectedRoute. Es segura por el token.
         ---*/}
@@ -45,15 +44,25 @@ function App() {
         {/* The /casos route is now deprecated, AgendaPage at root is the main view */}
 
         {/* --- 2. NUEVA RUTA PROTEGIDA: COTIZADOR --- */}
-        <Route 
-          path="/cotizador" 
+        <Route
+          path="/cotizador"
           element={
             <ProtectedRoute>
               <Cotizador />
             </ProtectedRoute>
-          } 
+          }
         />
-        
+
+        {/* --- 3. NUEVA RUTA PROTEGIDA: FIRMA --- */}
+        <Route
+          path="/firma"
+          element={
+            <ProtectedRoute>
+              <FirmaPage />
+            </ProtectedRoute>
+          }
+        />
+
         {/* La ruta antigua "/revision/:casoId" ya no es necesaria */}
 
         <Route
@@ -64,7 +73,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
       </Routes>
     </>
   );

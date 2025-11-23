@@ -1,4 +1,6 @@
 import React from 'react';
+import { urlBase64ToUint8Array } from '../utils/pushHelper';
+import apiService from '../apiService';
 
 const backdropStyles = {
   position: 'fixed',
@@ -93,6 +95,29 @@ const logoutButtonStyles = {
 };
 
 const SideMenu = ({ isOpen, onClose, user, logout, onOpenAvailability }) => {
+
+  const handleSubscribe = async () => {
+    if (!('serviceWorker' in navigator)) return;
+
+    // Tu llave PÚBLICA (La que empieza con BPEC0...)
+    const publicVapidKey = 'BPEC0_c6aUq8Bx67_55xzk9l9q1HCzwE4hwuKshnlTOrdRqUZbjkCFNBg7NWDo--bvKynoC8qkmjVHe30uj_UE4';
+
+    try {
+      const register = await navigator.serviceWorker.ready;
+      const subscription = await register.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+      });
+
+      // Enviar al backend
+      await apiService.post('/agenda/subscribe', { subscription });
+      alert('¡Notificaciones activadas!');
+    } catch (error) {
+      console.error(error);
+      alert('Error al activar notificaciones. Asegúrate de dar permiso.');
+    }
+  };
+
   return (
     <>
       <div
@@ -131,7 +156,36 @@ const SideMenu = ({ isOpen, onClose, user, logout, onOpenAvailability }) => {
             </div>
           </button>
 
-          {/* Aquí puedes agregar más opciones en el futuro */}
+          {/* Botón: Mi Firma */}
+          <button
+            style={menuOptionStyles}
+            onClick={() => {
+              onClose();
+              window.location.href = '/firma'; // Navegación simple por ahora, idealmente usar useNavigate
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+          >
+            <span style={{ fontSize: '1.2rem' }}>✍️</span>
+            <div>
+              <span style={{ display: 'block', fontWeight: '500' }}>Mi Firma</span>
+              <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Configurar firma digital</span>
+            </div>
+          </button>
+
+          {/* NUEVO BOTÓN: NOTIFICACIONES */}
+          <button
+            style={menuOptionStyles}
+            onClick={handleSubscribe}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+          >
+            <span style={{ fontSize: '1.2rem' }}>🔔</span>
+            <div>
+              <span style={{ display: 'block', fontWeight: '500' }}>Activar Notificaciones</span>
+              <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Recibe alertas de citas</span>
+            </div>
+          </button>
 
         </div>
 
