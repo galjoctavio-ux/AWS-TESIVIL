@@ -424,50 +424,6 @@ class CalculosService {
         ];
     }
 
-    // --- RECÁLCULO CON DESCUENTO ---
-    public function recalcularConDescuento(int $cotizacionId, float $descuentoPct): array {
-        $itemsStmt = $this->db->prepare("SELECT recurso_id as id_recurso, cantidad 
-                                          FROM cotizaciones_items WHERE cotizacion_id = ?");
-        $itemsStmt->execute([$cotizacionId]);
-        $items = $itemsStmt->fetchAll();
-
-        $moStmt = $this->db->prepare("SELECT descripcion, horas 
-                                       FROM cotizaciones_mano_de_obra WHERE cotizacion_id = ?");
-        $moStmt->execute([$cotizacionId]);
-        $manoDeObraItems = $moStmt->fetchAll();
-
-        if (empty($manoDeObraItems)) {
-            $cotiStmt = $this->db->prepare("SELECT horas_estimadas_tecnico 
-                                             FROM cotizaciones WHERE id = ?");
-            $cotiStmt->execute([$cotizacionId]);
-            $horas = $cotiStmt->fetchColumn();
-            $manoDeObraItems = [['descripcion' => 'Mano de Obra General', 'horas' => $horas ?: 0]];
-        }
-
-        $resultadoCalculo = $this->calcularCotizacion($items, $manoDeObraItems, $descuentoPct);
-        $totales = $resultadoCalculo['totales'];
-
-        $sql = "UPDATE cotizaciones 
-                SET subtotal_venta = ?, monto_iva = ?, precio_venta_final = ?, 
-                    monto_anticipo = ?, descuento_pct = ? 
-                WHERE id = ?";
-        $this->db->prepare($sql)->execute([
-            $totales['subtotal'], $totales['iva'], $totales['total_venta'], 
-            $totales['anticipo_sugerido'], $descuentoPct, $cotizacionId
-        ]);
-
-        $infoStmt = $this->db->prepare("SELECT uuid, cliente_email, cliente_nombre 
-                                         FROM cotizaciones WHERE id = ?");
-        $infoStmt->execute([$cotizacionId]);
-        $info = $infoStmt->fetch();
-
-        return [
-            'uuid' => $info['uuid'], 
-            'email' => $info['cliente_email'], 
-            'nombre' => $info['cliente_nombre']
-        ];
-    }
-
     // --- CIERRE FINANCIERO ---
     public function finalizarProyecto(int $id, float $realMateriales, float $realManoObra): void {
         $sql = "UPDATE cotizaciones 
