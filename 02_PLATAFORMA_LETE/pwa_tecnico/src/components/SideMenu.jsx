@@ -1,6 +1,7 @@
 import React from 'react';
 import { urlBase64ToUint8Array } from '../utils/pushHelper';
 import apiService from '../apiService';
+import { useNavigate } from 'react-router-dom';
 
 const backdropStyles = {
   position: 'fixed',
@@ -96,6 +97,7 @@ const logoutButtonStyles = {
 
 const SideMenu = ({ isOpen, onClose, user, logout, onOpenAvailability }) => {
 
+  const navigate = useNavigate();
   const handleSubscribe = async () => {
     if (!('serviceWorker' in navigator)) return;
 
@@ -161,7 +163,7 @@ const SideMenu = ({ isOpen, onClose, user, logout, onOpenAvailability }) => {
             style={menuOptionStyles}
             onClick={() => {
               onClose();
-              window.location.href = '/firma'; // Navegación simple por ahora, idealmente usar useNavigate
+              navigate('/firma'); // El router sabrá que es /lete/app/firma
             }}
             onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
             onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}

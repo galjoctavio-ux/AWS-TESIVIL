@@ -71,3 +71,92 @@ export const sendNotificationToUser = async (userId, payload) => {
         console.error("Error enviando push:", error);
     }
 };
+
+// 3. FUNCIÓN DE PRUEBA: "HOLA MUNDO"
+export const sendTestNotification = async (req, res) => {
+    const userEmail = req.user.email; // Viene del token
+
+    try {
+        // 1. Buscamos el ID del usuario
+        const [users] = await pool.query('SELECT id FROM ea_users WHERE email = ?', [userEmail]);
+        if (users.length === 0) return res.status(404).json({ message: 'Usuario no encontrado' });
+        const userId = users[0].id;
+
+        // 2. Buscamos sus dispositivos registrados
+        const [subs] = await pool.query('SELECT * FROM ea_push_subscriptions WHERE user_id = ?', [userId]);
+
+        if (subs.length === 0) {
+            return res.status(400).json({ message: 'No tienes dispositivos registrados. Activa las notificaciones primero.' });
+        }
+
+        // 3. Preparamos el mensaje "Hola Mundo"
+        const payload = JSON.stringify({
+            title: '¡Hola Mundo!',
+            body: 'Si lees esto, el sistema de notificaciones funciona al 100%.',
+            url: '/agenda' // Al hacer click te lleva a la agenda
+        });
+
+        // 4. Enviamos a TODOS sus dispositivos
+        const notifications = subs.map(sub => {
+            const pushConfig = {
+                endpoint: sub.endpoint,
+                keys: { auth: sub.auth, p256dh: sub.p256dh }
+            };
+            return webpush.sendNotification(pushConfig, payload);
+        });
+
+        await Promise.all(notifications);
+
+        res.json({ message: `Se enviaron notificaciones a ${subs.length} dispositivo(s).` });
+
+    } catch (error) {
+        console.error('Error en prueba:', error);
+        res.status(500).json({ message: 'Error al enviar prueba.' });
+    }
+};
+
+export const sendAdminNotification = async (req, res) => {
+    const { targetUserId, message } = req.body; // Recibimos el ID del técnico destino
+
+    if (!targetUserId) {
+        return res.status(400).json({ message: 'Falta el ID del técnico (targetUserId)' });
+    }
+
+    try {
+        // 1. Buscar suscripciones de ese técnico específico
+        const [subs] = await pool.query('SELECT * FROM ea_push_subscriptions WHERE user_id = ?', [targetUserId]);
+
+        if (subs.length === 0) {
+            return res.status(404).json({ message: 'Este técnico no tiene dispositivos registrados para notificaciones.' });
+        }
+
+        // 2. Preparar mensaje
+        const payload = JSON.stringify({
+            title: '🔔 Prueba desde Admin',
+            body: message || 'El administrador está probando tu conexión.',
+            url: '/agenda'
+        });
+
+        // 3. Enviar
+        const notifications = subs.map(sub => {
+            const pushConfig = {
+                endpoint: sub.endpoint,
+                keys: { auth: sub.auth, p256dh: sub.p256dh }
+            };
+            return webpush.sendNotification(pushConfig, payload)
+                .catch(err => {
+                    console.error("Error enviando a sub:", sub.id, err.statusCode);
+                    if (err.statusCode === 410 || err.statusCode === 404) {
+                        pool.query('DELETE FROM ea_push_subscriptions WHERE id = ?', [sub.id]);
+                    }
+                });
+        });
+
+        await Promise.all(notifications);
+        res.json({ success: true, message: `Notificación enviada a ${subs.length} dispositivo(s) del técnico ${targetUserId}.` });
+
+    } catch (error) {
+        console.error('Error Admin Push:', error);
+        res.status(500).json({ message: 'Error interno al enviar notificación.' });
+    }
+};

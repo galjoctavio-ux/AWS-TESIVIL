@@ -321,7 +321,7 @@ const Cotizador = () => {
 
         {/* CABECERA CON BOTÓN VOLVER */}
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-          <button onClick={() => navigate('/casos')} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', marginRight: '10px' }}>⬅️</button>
+          <button onClick={() => navigate('/')} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', marginRight: '10px' }}>⬅️</button>
           <h2 style={{ margin: 0 }}>⚡ Cotizador Rápido</h2>
         </div>
 

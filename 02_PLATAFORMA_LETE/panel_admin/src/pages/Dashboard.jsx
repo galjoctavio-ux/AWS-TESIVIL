@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { Link } from 'react-router-dom'; // <--- 1. IMPORTANTE: Agregamos esto
-import CasosList from '../components/CasosList';
-import Modal from '../components/Modal';
-import CrearCasoForm from '../components/CrearCasoForm';
-import TecnicosList from '../components/TecnicosList';
-import CrearTecnicoForm from '../components/CrearTecnicoForm';
-import AgendarCasoForm from '../components/AgendarCasoForm';
+import { useAuth } from '../context/AuthContext.jsx';
+import { Link } from 'react-router-dom';
+import CasosList from '../components/CasosList.jsx';
+import Modal from '../components/Modal.jsx';
+import CrearCasoForm from '../components/CrearCasoForm.jsx';
+import TecnicosList from '../components/TecnicosList.jsx';
+import CrearTecnicoForm from '../components/CrearTecnicoForm.jsx';
+import AgendarCasoForm from '../components/AgendarCasoForm.jsx';
 
 function Dashboard() {
   const { user, logout } = useAuth();
@@ -34,59 +34,52 @@ function Dashboard() {
           <span>
             ¡Bienvenido, <strong>{user?.nombre || 'Admin'}</strong>!
           </span>
-          <button
-            onClick={logout}
-            className="secondary-button"
-          >
+          <button onClick={logout} className="secondary-button">
             Cerrar Sesión
           </button>
         </div>
       </header>
 
       <main>
-        {/* --- 2. NUEVA SECCIÓN DE BOTONES DE NAVEGACIÓN --- */}
+        {/* --- BARRA DE NAVEGACIÓN RÁPIDA --- */}
         <div style={{ display: 'flex', gap: '15px', marginBottom: '20px', flexWrap: 'wrap' }}>
-            
-            {/* Botón para ir a Gestión de Costos / XML */}
-            <Link 
-                to="/costos" 
-                className="main-button" 
-                style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '200px' }}
-            >
-                💰 Gestión XML y Costos
-            </Link>
+          <Link
+            to="/costos"
+            className="main-button"
+            style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '200px' }}
+          >
+            💰 Gestión XML y Costos
+          </Link>
 
-            {/* Botón para ir a Base de Datos de Materiales */}
-            <Link 
-                to="/materiales" 
-                className="main-button" 
-                style={{ background: '#17a2b8', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '200px' }}
-            >
-                🗄️ Inventario Materiales
-            </Link>
+          <Link
+            to="/materiales"
+            className="main-button"
+            style={{ background: '#17a2b8', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '200px' }}
+          >
+            🗄️ Inventario Materiales
+          </Link>
 
-            {/* --- ¡NUEVO BOTÓN! --- */}
-    <Link 
-        to="/cotizaciones" 
-        className="main-button" 
-        style={{ background: '#28a745', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '200px' }}
-    >
-        📊 Ver Cotizaciones
-    </Link>
-    <Link to="/configuracion" style={{ display:'inline-block', padding:'10px', background:'#333', color:'white', borderRadius:'5px', textDecoration:'none' }}>
-  ⚙️ Configuración Financiera
-</Link>
+          <Link
+            to="/cotizaciones"
+            className="main-button"
+            style={{ background: '#28a745', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '200px' }}
+          >
+            📊 Ver Cotizaciones
+          </Link>
 
+          <Link
+            to="/configuracion"
+            style={{ display: 'flex', alignItems: 'center', padding: '10px', background: '#333', color: 'white', borderRadius: '5px', textDecoration: 'none' }}
+          >
+            ⚙️ Configuración Financiera
+          </Link>
         </div>
-        {/* ----------------------------------------------- */}
 
+        {/* --- GESTIÓN DE CASOS --- */}
         <div className="card">
           <div className="card-header">
             <h2>Gestión de Casos</h2>
-            <button
-              onClick={() => setIsCasoModalOpen(true)}
-              className="main-button"
-            >
+            <button onClick={() => setIsCasoModalOpen(true)} className="main-button">
               + Crear Nuevo Caso
             </button>
           </div>
@@ -97,20 +90,20 @@ function Dashboard() {
           />
         </div>
 
+        {/* --- GESTIÓN DE TÉCNICOS --- */}
         <div className="card">
           <div className="card-header">
             <h2>Gestión de Técnicos</h2>
-            <button
-              onClick={() => setIsTecnicoModalOpen(true)}
-              className="main-button"
-            >
+            <button onClick={() => setIsTecnicoModalOpen(true)} className="main-button">
               + Crear Nuevo Técnico
             </button>
           </div>
+          {/* La funcionalidad de notificación ahora está dentro de TecnicosList */}
           <TecnicosList key={refreshTecnicosKey} onTecnicoActualizado={handleTecnicoActualizado} />
         </div>
       </main>
 
+      {/* --- MODALES --- */}
       <Modal isOpen={isCasoModalOpen} onClose={() => setIsCasoModalOpen(false)}>
         <CrearCasoForm onClose={() => setIsCasoModalOpen(false)} onCasoCreado={handleCasoActualizado} />
       </Modal>

@@ -65,15 +65,45 @@ function TecnicosList({ onTecnicoActualizado }) {
     if (window.confirm('¿Estás seguro de que quieres eliminar este técnico?')) {
       try {
         await api.delete(`/usuarios/tecnicos/${tecnicoIdSupabase}`);
-        
+
         // --- MODIFICACIÓN 1: Usar 'id_supabase' ---
         setTecnicos(tecnicos.filter(t => t.id_supabase !== tecnicoIdSupabase));
-        
-        if(onTecnicoActualizado) onTecnicoActualizado();
+
+        if (onTecnicoActualizado) onTecnicoActualizado();
       } catch (err) {
         console.error('Error al eliminar el técnico:', err);
         setError('No se pudo eliminar el técnico.');
       }
+    }
+  };
+
+  // --- NUEVA FUNCIÓN: ENVIAR NOTIFICACIÓN ---
+  const handleTestPush = async (tecnico) => {
+    // Usamos 'id' (el numérico de Easy!Appointments)
+    const targetId = tecnico.id;
+
+    if (!targetId) {
+      alert("Error: No se encontró el ID numérico de este técnico. Verifica que la API devuelva el campo 'id'.");
+      return;
+    }
+
+    const confirm = window.confirm(`¿Enviar notificación de prueba a ${tecnico.nombre}?`);
+    if (!confirm) return;
+
+    try {
+      const response = await api.post('/agenda/admin-test-notification', {
+        targetUserId: targetId,
+        message: "🔔 Admin te está saludando desde el Dashboard."
+      });
+
+      if (response.data.success) {
+        alert("✅ Éxito: " + response.data.message);
+      } else {
+        alert("⚠️ Aviso: " + response.data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("❌ Error: " + (err.response?.data?.message || err.message));
     }
   };
 
@@ -87,13 +117,13 @@ function TecnicosList({ onTecnicoActualizado }) {
           <tr>
             <th style={thStyle}>ID</th>
             <th style={thStyle}>Nombre</th>
-            
+
             {/* --- CORRECCIÓN DEL TYPO ---
                 Mi código anterior tenía 'style{...thStyle}'
                 El código correcto es 'style={thStyle}'
             ---*/}
-            <th style={thStyle}>Email</th> 
-            
+            <th style={thStyle}>Email</th>
+
             <th style={thStyle}>Acciones</th>
           </tr>
         </thead>
@@ -104,14 +134,23 @@ function TecnicosList({ onTecnicoActualizado }) {
             tecnicos.map(tecnico => (
               // --- MODIFICACIÓN 2: Usar 'id_supabase' para la key ---
               <tr key={tecnico.id_supabase} style={{ backgroundColor: '#FFFFFF', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-                
+
                 {/* --- MODIFICACIÓN 3 (LA DEL CRASH): Usar 'id_supabase' ---
                     El error 'tecnico.id is undefined' venía de esta línea */}
                 <td style={tdStyle}>{tecnico.id_supabase.substring(0, 8)}...</td>
-                
+
                 <td style={tdStyle}>{tecnico.nombre}</td>
                 <td style={tdStyle}>{tecnico.email}</td>
                 <td style={tdStyle}>
+                  <button
+                    onClick={() => handleTestPush(tecnico)}
+                    style={{ ...actionButtonStyles, borderColor: '#8B5CF6', color: '#7C3AED' }}
+                    title="Enviar notificación de prueba"
+                    onMouseOver={e => { e.currentTarget.style.backgroundColor = '#F3E8FF'; }}
+                    onMouseOut={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                  >
+                    🔔 Probar
+                  </button>
                   <button
                     style={actionButtonStyles}
                     onMouseOver={e => e.currentTarget.style.backgroundColor = '#F1F5F9'}
@@ -119,11 +158,11 @@ function TecnicosList({ onTecnicoActualizado }) {
                   >
                     Editar
                   </button>
-                  
+
                   {/* --- MODIFICACIÓN 4: Usar 'id_supabase' en el handler --- */}
                   <button
                     onClick={() => handleDelete(tecnico.id_supabase)}
-                    style={{...actionButtonStyles, color: '#DC2626', borderColor: '#F87171'}}
+                    style={{ ...actionButtonStyles, color: '#DC2626', borderColor: '#F87171' }}
                     onMouseOver={e => { e.currentTarget.style.backgroundColor = '#FEE2E2'; e.currentTarget.style.color = '#991B1B'; }}
                     onMouseOut={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#DC2626'; }}
                   >
