@@ -101,10 +101,17 @@ function CasosList() {
             casos.map(caso => (
               <tr key={caso.id}>
                 <td style={tdStyle}>{caso.id}</td>
-                <td style={tdStyle}>{caso.nombre_completo}</td>
-                <td style={tdStyle}>{caso.direccion_principal}</td>
+
+                {/* --- CORRECCIÓN AQUÍ: Accedemos al objeto 'cliente' --- */}
                 <td style={tdStyle}>
-                  {/* Usamos 'tipo_servicio' y lo ponemos bonito (Capitalizado) */}
+                  {caso.cliente?.nombre_completo || 'Cliente Desconocido'}
+                </td>
+                <td style={tdStyle}>
+                  {caso.cliente?.direccion_principal || 'Sin Dirección'}
+                </td>
+                {/* ----------------------------------------------------- */}
+
+                <td style={tdStyle}>
                   {caso.tipo_servicio
                     ? caso.tipo_servicio.replace('_', ' ').toUpperCase()
                     : 'DIAGNÓSTICO'}
@@ -114,10 +121,21 @@ function CasosList() {
                 <td style={tdStyle}>
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <button onClick={() => handleEditClick(caso)} style={{ background: '#007bff', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}>✏️ Editar</button>
-                    <Link to={`/cotizaciones?search=${encodeURIComponent(caso.cliente_nombre)}`} style={{ background: '#28a745', color: 'white', textDecoration: 'none', padding: '5px 10px', borderRadius: '4px' }}>
+
+                    {/* --- CORRECCIÓN ADICIONAL: El enlace a cotizaciones también estaba roto --- */}
+                    <Link
+                      to={`/cotizaciones?search=${encodeURIComponent(caso.cliente?.nombre_completo || '')}`}
+                      style={{ background: '#28a745', color: 'white', textDecoration: 'none', padding: '5px 10px', borderRadius: '4px' }}
+                    >
                       💰 Cotizaciones
                     </Link>
-                    {caso.tipo === 'alto_consumo' && (
+                    {/* ------------------------------------------------------------------------- */}
+
+                    {/* Nota: En tu código original usabas 'caso.tipo' aquí abajo, pero en el backend traes 'tipo_servicio'. 
+                        Si 'caso.tipo' no existe en la respuesta del backend, esto nunca se mostrará. 
+                        Asumiré que 'tipo_servicio' es lo correcto o que 'tipo' viene de otro lado no visto. 
+                        Por seguridad, usaré la lógica que ya tenías pero verifica si es 'tipo_servicio'. */}
+                    {(caso.tipo === 'alto_consumo' || caso.tipo_servicio === 'alto_consumo') && (
                       <a
                         href={caso.revisiones?.[0]?.pdf_url || '#'}
                         target="_blank"
