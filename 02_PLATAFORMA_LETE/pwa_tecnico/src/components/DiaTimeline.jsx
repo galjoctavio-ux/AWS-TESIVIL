@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { getAgendaPorDia } from '../apiService';
+import CierreCasoModal from './CierreCasoModal'; // <--- 1. IMPORTAR EL NUEVO MODAL
 
 const HOUR_HEIGHT = 80; // 80px per hour
 
@@ -37,32 +38,36 @@ const timeLabelStyles = {
 const DiaTimeline = ({ date }) => {
   const [citas, setCitas] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // --- 2. NUEVO ESTADO PARA EL MODAL ---
+  const [casoParaCerrar, setCasoParaCerrar] = useState(null);
+
   const timelineRef = useRef(null);
 
-  useEffect(() => {
-    const fetchAgenda = async () => {
-      setIsLoading(true);
-      try {
-        const response = await getAgendaPorDia(date);
-        setCitas(response.data || []);
-      } catch (error) {
-        console.error('Error fetching agenda:', error);
-        setCitas([]); // Clear citas on error
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchAgenda();
+  // --- 3. REFACTORIZAR FETCH PARA PODER REUTILIZARLO ---
+  const fetchAgenda = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await getAgendaPorDia(date);
+      setCitas(response.data || []);
+    } catch (error) {
+      console.error('Error fetching agenda:', error);
+      setCitas([]);
+    } finally {
+      setIsLoading(false);
+    }
   }, [date]);
 
   useEffect(() => {
-    // Auto-scroll to current time if the view is for today
+    fetchAgenda();
+  }, [fetchAgenda]);
+
+  useEffect(() => {
+    // Auto-scroll logic
     if (!isLoading && dayjs(date).isSame(dayjs(), 'day')) {
-      // Small timeout to ensure DOM is fully rendered
       setTimeout(() => {
         if (timelineRef.current) {
           const currentHour = dayjs().hour();
-          // Scroll to current hour
           const hourEl = timelineRef.current.querySelector(`#hora-${currentHour}`);
           if (hourEl) {
             hourEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -71,6 +76,11 @@ const DiaTimeline = ({ date }) => {
       }, 100);
     }
   }, [date, isLoading]);
+
+  // Manejador para refrescar después de cerrar
+  const handleCaseClosedSuccess = () => {
+    fetchAgenda(); // Recargamos la lista para que el caso aparezca cerrado
+  };
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
@@ -87,47 +97,86 @@ const DiaTimeline = ({ date }) => {
           ))}
 
           {citas.map(cita => {
-            // 1. La función que calcula el 'top' y 'height' sigue igual
             const start = dayjs(cita.start_datetime);
             const end = dayjs(cita.end_datetime);
-
             const top = (start.hour() + start.minute() / 60) * HOUR_HEIGHT;
             const durationInMinutes = end.diff(start, 'minute');
             const height = (durationInMinutes / 60) * HOUR_HEIGHT;
 
-            const style = {
-              top: `${top}px`,
-              height: `${height}px`,
-            };
+            const style = { top: `${top}px`, height: `${height}px` };
 
-            // 2. Definimos las clases dinámicas para el color
-            const tipoCaso = cita.caso?.tipo || 'default'; // ej: 'alto_consumo'
-            const cardClassName = `cita-card card-${tipoCaso}`; // -> "cita-card card-alto_consumo"
+            const tipoCaso = cita.caso?.tipo || 'default';
+            const cardClassName = `cita-card card-${tipoCaso}`;
+
+            // Verificamos si el caso está activo para mostrar botones
+            const isCasoActivo = cita.caso &&
+              cita.caso.status !== 'cerrado' &&
+              cita.caso.status !== 'completado';
 
             return (
               <div
                 key={cita.id}
-                // This line applies the dynamic classes from AgendaStyles.css
-                // e.g., "cita-card card-alto_consumo"
                 className={cardClassName}
                 style={style}
               >
-                {/* 3. Renderizamos los detalles del caso si existen */}
                 {cita.caso ? (
                   <>
                     <div className="cita-content">
                       <strong>{cita.caso.cliente_nombre}</strong>
                       <p>{dayjs(cita.start_datetime).format('h:mm A')} - {dayjs(cita.end_datetime).format('h:mm A')}</p>
                     </div>
-                    <div className="cita-actions"> {/* --- Botón de Mapa (Siempre visible) --- */} <button className="cita-icon-button" onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cita.caso.cliente_direccion)}`, "_blank")} title="Abrir en Google Maps" > 📍 </button>
-                      {/* --- Botón de Revisar (Lógica condicional) --- */} {(cita.caso.tipo !== 'levantamiento' && cita.caso.status !== 'completado') && (
-                        <Link to={`/revision/${cita.caso.id}`} className="cita-icon-button" title="Iniciar Revisión" > 📝 </Link>)}
-                      {/* --- Botón de Cotizar (Lógica condicional) --- */} {(cita.caso.status !== 'completado' || cita.caso.tipo === 'alto_consumo') && (
-                        <Link to="/cotizador" state={{ casoId: cita.caso.id, clienteNombre: cita.caso.cliente_nombre, clienteDireccion: cita.caso.cliente_direccion /* No pasamos clienteTelefono, tal como se especificó */ }} className="cita-icon-button" title="Crear Cotización" > ⚡ </Link>)}
-                      {/* --- Botón de Detalles (Nuevo) --- */}
-                      <Link to={`/detalle-caso/${cita.caso.id}`} className="cita-icon-button" title="Ver Detalles del Caso">
+
+                    <div className="cita-actions">
+
+                      {/* 1. Botón Mapa */}
+                      <button
+                        className="cita-icon-button"
+                        onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cita.caso.cliente_direccion)}`, "_blank")}
+                        title="Abrir en Google Maps"
+                      >
+                        📍
+                      </button>
+
+                      {/* --- 4. NUEVO BOTÓN DE CIERRE --- */}
+                      {isCasoActivo && (
+                        <button
+                          className="cita-icon-button"
+                          style={{ backgroundColor: '#e8f5e9', borderColor: '#4caf50' }} // Un toque verde para diferenciar
+                          onClick={() => setCasoParaCerrar(cita.caso)}
+                          title="Cobrar y Cerrar Caso"
+                        >
+                          💰
+                        </button>
+                      )}
+
+                      {/* Botón Revisión */}
+                      {(cita.caso.tipo !== 'levantamiento' && isCasoActivo) && (
+                        <Link to={`/revision/${cita.caso.id}`} className="cita-icon-button" title="Iniciar Revisión">
+                          📝
+                        </Link>
+                      )}
+
+                      {/* Botón Cotizar */}
+                      {(isCasoActivo || cita.caso.tipo === 'alto_consumo') && (
+                        <Link
+                          to="/cotizador"
+                          state={{
+                            casoId: cita.caso.id,
+                            clienteNombre: cita.caso.cliente_nombre,
+                            clienteDireccion: cita.caso.cliente_direccion
+                          }}
+                          className="cita-icon-button"
+                          title="Crear Cotización"
+                        >
+                          ⚡
+                        </Link>
+                      )}
+
+                      {/* Botón Detalles */}
+                      <Link to={`/detalle-caso/${cita.caso.id}`} className="cita-icon-button" title="Ver Detalles">
                         ℹ️
                       </Link>
+
                     </div>
                   </>
                 ) : (
@@ -146,6 +195,15 @@ const DiaTimeline = ({ date }) => {
             </div>
           )}
         </div>
+      )}
+
+      {/* --- 5. RENDERIZADO DEL MODAL --- */}
+      {casoParaCerrar && (
+        <CierreCasoModal
+          caso={casoParaCerrar}
+          onClose={() => setCasoParaCerrar(null)}
+          onCaseClosed={handleCaseClosedSuccess}
+        />
       )}
     </div>
   );

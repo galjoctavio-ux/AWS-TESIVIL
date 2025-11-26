@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { LoadScript, Autocomplete } from '@react-google-maps/api';
 import api from '../apiService';
-import './AgendarCasoForm.css'; // Re-usamos el CSS
+import './AgendarCasoForm.css'; // Usamos el mismo CSS
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const libraries = ["places"];
 
-// Helper de Bloques (sin cambios)
+// --- HELPER PARA BLOQUES DE TIEMPO (Sin cambios) ---
 const generarBloquesVisibles = (horariosOcupados, horaInicio = 8, horaFin = 18) => {
   const bloques = [];
   const aNumero = (horaStr) => {
@@ -27,56 +27,70 @@ const generarBloquesVisibles = (horariosOcupados, horaInicio = 8, horaFin = 18) 
         break;
       }
     }
-    // MEJORA 2: Guardamos la hora en formato "HH:MM"
-    const horaISO = `${String(i).padStart(2, '0')}:00`; 
+    const horaISO = `${String(i).padStart(2, '0')}:00`;
     bloques.push({
       horaLabel: `${horaISO} - ${String(i + 1).padStart(2, '0')}:00`,
-      horaValor: horaISO, // El valor que usaremos para el input
+      horaValor: horaISO,
       ocupado: estaOcupado
     });
   }
   return bloques;
 };
 
-// --- ESTE ES AHORA EL FORMULARIO "MAESTRO" ---
+// --- COMPONENTE PRINCIPAL ---
 function CrearCasoForm({ onClose, onCasoCreado }) {
-  
+
   const [formData, setFormData] = useState({
-    tecnico_id_ea: '', 
+    // Datos Técnicos
+    tecnico_id_ea: '',
     tecnico_id_supabase: '',
     fecha: '',
-    cliente_nombre: '',
-    cliente_telefono: '',
-    tipo_caso: 'alto_consumo',
-    direccion_legible: '',
-    link_gmaps: '',
     hora: '',
     duracion_horas: '1',
+
+    // Datos Cliente (El nuevo núcleo)
+    cliente_telefono: '', // Ahora es el campo principal
+    cliente_nombre: '',
+    tipo_caso: 'alto_consumo',
+
+    // Dirección
+    direccion_legible: '',
+    link_gmaps: '',
+    ubicacion_lat: null, // Nuevo: Para guardar coordenadas si Google las da
+    ubicacion_lng: null,
+
     notas_adicionales: ''
   });
 
+  // Estados de UI
   const [tecnicos, setTecnicos] = useState([]);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const [horariosOcupados, setHorariosOcupados] = useState([]);
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [loadingDisponibilidad, setLoadingDisponibilidad] = useState(false);
+
+  // Estados para el CRM (Buscador)
+  const [buscandoCliente, setBuscandoCliente] = useState(false);
+  const [infoCliente, setInfoCliente] = useState(null); // Para guardar el status (Semáforo)
+
   const autocompleteRef = useRef(null);
   const inputRef = useRef(null);
 
-  // EFECTO 1: Cargar técnicos
+  // 1. Cargar Técnicos al inicio
   useEffect(() => {
     const fetchTecnicos = async () => {
       try {
-        const response = await api.get('/usuarios/tecnicos'); 
+        const response = await api.get('/usuarios/tecnicos');
         setTecnicos(response.data);
       } catch (err) {
-        setError('Error al cargar la lista de técnicos.');
+        setError('Error al cargar técnicos.');
       }
     };
     fetchTecnicos();
   }, []);
 
-  // EFECTO 2: Cargar Disponibilidad
+  // 2. Cargar Disponibilidad cuando cambia Técnico o Fecha
   useEffect(() => {
     if (formData.tecnico_id_ea && formData.fecha) {
       const fetchDisponibilidad = async () => {
@@ -91,7 +105,7 @@ function CrearCasoForm({ onClose, onCasoCreado }) {
           });
           setHorariosOcupados(response.data);
         } catch (err) {
-          setError('Error al cargar la disponibilidad.');
+          setError('Error consultando disponibilidad.');
           setHorariosOcupados([]);
         } finally {
           setLoadingDisponibilidad(false);
@@ -103,34 +117,73 @@ function CrearCasoForm({ onClose, onCasoCreado }) {
     }
   }, [formData.tecnico_id_ea, formData.fecha]);
 
-  // Lógica de bloques (corregida)
+  // 3. Generar Bloques Visuales
   const bloquesVisibles = useMemo(() => {
-    if (!formData.tecnico_id_ea || !formData.fecha) return [];
-    if (loadingDisponibilidad) return [];
+    if (!formData.tecnico_id_ea || !formData.fecha || loadingDisponibilidad) return [];
     return generarBloquesVisibles(horariosOcupados);
   }, [horariosOcupados, loadingDisponibilidad, formData.tecnico_id_ea, formData.fecha]);
 
-  // Handler Genérico (con lógica de IDs)
+  // --- LÓGICA CRM: BUSCAR CLIENTE ---
+  const handlePhoneBlur = async () => {
+    const telefono = formData.cliente_telefono.trim();
+    if (telefono.length < 8) return; // Validación básica
+
+    setBuscandoCliente(true);
+    setInfoCliente(null); // Reset
+
+    try {
+      // Llamamos al nuevo endpoint que creamos
+      const response = await api.get(`/clientes/buscar?telefono=${telefono}`);
+
+      if (response.data && response.data.length > 0) {
+        // ¡Cliente Encontrado!
+        const cliente = response.data[0];
+        setInfoCliente(cliente); // Guardamos info completa (incluyendo calificacion)
+
+        // Autocompletamos el formulario
+        setFormData(prev => ({
+          ...prev,
+          cliente_nombre: cliente.nombre_completo,
+          direccion_legible: cliente.direccion_principal || '',
+          link_gmaps: cliente.google_maps_link || '',
+          // Si tuviéramos lat/lng guardados en cliente, también los pondríamos aquí
+        }));
+
+        // Actualizamos el input visual de Google Maps si existe referencia
+        if (inputRef.current) {
+          inputRef.current.value = cliente.direccion_principal || '';
+        }
+      }
+    } catch (err) {
+      console.log('Cliente no encontrado o error, permitiendo captura manual.');
+      // No mostramos error, simplemente dejamos que el usuario llene los datos
+    } finally {
+      setBuscandoCliente(false);
+    }
+  };
+
+  // --- HANDLERS GENERALES ---
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
     if (name === 'tecnico_id_ea') {
-      // CORRECCIÓN: Usamos .ea_id en lugar de .id_ea
       const tecnicoSeleccionado = tecnicos.find(t => t.ea_id == value);
-      
       if (tecnicoSeleccionado) {
         setFormData((prev) => ({
           ...prev,
-          // CORRECCIÓN: Asignamos el valor correcto
           tecnico_id_ea: tecnicoSeleccionado.ea_id,
-          tecnico_id_supabase: tecnicoSeleccionado.id_supabase // o .id, ambos funcionan ahora
+          tecnico_id_supabase: tecnicoSeleccionado.id_supabase
         }));
       }
     }
   };
 
-  // Handlers de Google Maps (sin cambios)
+  const handleBloqueClick = (horaValor) => {
+    setFormData((prev) => ({ ...prev, hora: horaValor }));
+  };
+
+  // Google Maps
   const onAutocompleteLoad = (autocompleteInstance) => {
     autocompleteRef.current = autocompleteInstance;
   };
@@ -141,170 +194,262 @@ function CrearCasoForm({ onClose, onCasoCreado }) {
         setFormData((prev) => ({
           ...prev,
           direccion_legible: place.formatted_address,
-          link_gmaps: place.url
+          link_gmaps: place.url,
+          ubicacion_lat: place.geometry?.location?.lat(),
+          ubicacion_lng: place.geometry?.location?.lng()
         }));
         setError('');
       }
     }
   };
 
-  // --- MEJORA 2: Handler para Clic en Bloque ---
-  const handleBloqueClick = (horaValor) => {
-    setFormData((prev) => ({ ...prev, hora: horaValor }));
-  };
-
-  // --- MODIFICADO: handleSubmit ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    // --- DEBUG: Añadido para ver qué falta ---
-    console.log('Datos del formulario al guardar:', formData);
-    
-    if (!formData.tecnico_id_ea || !formData.tecnico_id_supabase || !formData.fecha || !formData.hora || !formData.link_gmaps || !formData.cliente_nombre || !formData.cliente_telefono) {
-      setError('Por favor, complete todos los campos (Técnico, Fecha, Hora, Dirección, Nombre y Teléfono de Cliente).');
-      // Imprimimos en consola qué campo falló
-      for (const [key, value] of Object.entries(formData)) {
-        if (!value && ['tecnico_id_ea', 'tecnico_id_supabase', 'fecha', 'hora', 'link_gmaps', 'cliente_nombre', 'cliente_telefono'].includes(key)) {
-          console.error(`Error de validación: El campo ${key} está vacío.`);
-        }
-      }
+    // --- 🔍 DEBUG: Restaurado para pruebas ---
+    console.log('--- INTENTANDO CREAR CASO ---');
+    console.log('Datos actuales:', formData);
+
+    // --- ✅ VALIDACIÓN: Restaurada y completa ---
+    // Verificamos explícitamente los IDs y el link de mapas
+    const camposFaltantes = [];
+    if (!formData.tecnico_id_ea) camposFaltantes.push('Técnico (Agenda)');
+    if (!formData.tecnico_id_supabase) camposFaltantes.push('Técnico (Base de Datos)');
+    if (!formData.fecha) camposFaltantes.push('Fecha');
+    if (!formData.hora) camposFaltantes.push('Hora');
+    if (!formData.cliente_nombre) camposFaltantes.push('Nombre Cliente');
+    if (!formData.cliente_telefono) camposFaltantes.push('Teléfono Cliente');
+    if (!formData.link_gmaps) camposFaltantes.push('Dirección (Seleccionar de Google Maps)');
+
+    if (camposFaltantes.length > 0) {
+      const msg = `Faltan campos obligatorios: ${camposFaltantes.join(', ')}`;
+      console.error(msg); // Log para ti
+      setError(msg);      // UI para el usuario
       return;
     }
-    
+
     setLoading(true);
     try {
-      await api.post('/citas', formData);
-      onCasoCreado(); 
+      // 1. Crear Caso + Cliente (CRM Logic)
+      const casoPayload = {
+        cliente_nombre: formData.cliente_nombre,
+        cliente_telefono: formData.cliente_telefono,
+        cliente_direccion: formData.direccion_legible,
+        comentarios_iniciales: `Caso Nuevo - ${formData.tipo_caso} - ${formData.notas_adicionales}`,
+        ubicacion_lat: formData.ubicacion_lat,
+        ubicacion_lng: formData.ubicacion_lng
+      };
+
+      console.log('Enviando Caso:', casoPayload); // Debug
+      const respCaso = await api.post('/casos', casoPayload);
+      const nuevoCaso = respCaso.data.caso;
+
+      // 2. Agendar Cita (Agenda Logic)
+      const citaPayload = {
+        caso_id: nuevoCaso.id,
+        tecnico_id_ea: formData.tecnico_id_ea,
+        fecha: formData.fecha,
+        hora: formData.hora,
+        duracion_horas: formData.duracion_horas,
+        direccion_legible: formData.direccion_legible,
+        link_gmaps: formData.link_gmaps,
+        notas_adicionales: formData.notas_adicionales
+      };
+
+      console.log('Enviando Cita:', citaPayload); // Debug
+      await api.post('/citas', citaPayload);
+
+      onCasoCreado();
       onClose();
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al agendar la cita.');
+      console.error('Error en el proceso:', err);
+      setError(err.response?.data?.error || 'Error al crear el caso.');
     } finally {
       setLoading(false);
     }
   };
 
+  // --- RENDER ---
   return (
-    <LoadScript
-      googleMapsApiKey={GOOGLE_MAPS_API_KEY}
-      libraries={libraries}
-    >
+    <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY} libraries={libraries}>
       <form className="agendar-caso-form" onSubmit={handleSubmit} noValidate>
-        <h3>Crear y Agendar Nuevo Caso</h3>
+        <h3>Nuevo Servicio / Caso</h3>
 
-        {/* --- PASO 1: DISPONIBILIDAD --- */}
-        <h4>Paso 1: Ver Disponibilidad</h4>
+        {/* --- PASO 1: DATOS DEL CLIENTE (PRIORIDAD) --- */}
+        <h4>1. Datos del Cliente</h4>
+        <div className="form-paso">
+
+          {/* CAMPO TELÉFONO - CON BUSCADOR */}
+          <div style={{ position: 'relative' }}>
+            <label htmlFor="cliente_telefono">Teléfono (Móvil)</label>
+            <input
+              type="tel"
+              id="cliente_telefono"
+              name="cliente_telefono"
+              value={formData.cliente_telefono}
+              onChange={handleChange}
+              onBlur={handlePhoneBlur} // <--- AQUÍ OCURRE LA MAGIA
+              placeholder="Ej: 3312345678"
+              autoComplete="off"
+              required
+              style={{ borderColor: infoCliente ? '#4CAF50' : '#ccc' }}
+            />
+            {buscandoCliente && <span style={{ position: 'absolute', right: 10, top: 35, fontSize: '0.8em', color: '#666' }}>Buscando...</span>}
+          </div>
+
+          <div>
+            <label htmlFor="cliente_nombre">Nombre Completo</label>
+            <input
+              type="text"
+              id="cliente_nombre"
+              name="cliente_nombre"
+              value={formData.cliente_nombre}
+              onChange={handleChange}
+              placeholder="Nombre del cliente"
+              required
+            />
+          </div>
+        </div>
+
+        {/* ALERTA DE SEMÁFORO DEL CLIENTE */}
+        {infoCliente && (
+          <div style={{
+            padding: '10px',
+            marginBottom: '15px',
+            borderRadius: '6px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            backgroundColor:
+              infoCliente.calificacion === 'TOXICO' ? '#ffebee' :
+                infoCliente.calificacion === 'EXIGENTE' ? '#fff3e0' : '#e8f5e9',
+            border:
+              infoCliente.calificacion === 'TOXICO' ? '1px solid #ffcdd2' :
+                infoCliente.calificacion === 'EXIGENTE' ? '1px solid #ffe0b2' : '1px solid #c8e6c9'
+          }}>
+            <div>
+              <strong>Cliente Registrado:</strong>
+              <span style={{ marginLeft: '8px', fontSize: '0.9em' }}>
+                Servicios previos: (Ver historial)
+              </span>
+            </div>
+            <span style={{
+              padding: '4px 8px',
+              borderRadius: '4px',
+              fontWeight: 'bold',
+              fontSize: '0.85em',
+              color: 'white',
+              backgroundColor:
+                infoCliente.calificacion === 'TOXICO' ? '#d32f2f' :
+                  infoCliente.calificacion === 'EXIGENTE' ? '#f57c00' : '#388e3c'
+            }}>
+              {infoCliente.calificacion}
+            </span>
+          </div>
+        )}
+
         <div className="form-paso">
           <div>
-            <label htmlFor="tecnico_id_ea">Técnico</label>
-            <select id="tecnico_id_ea" name="tecnico_id_ea" value={formData.tecnico_id_ea} onChange={handleChange} required>
-              <option value="">Seleccione un técnico</option>
-              {tecnicos.map((tecnico) => (
-                <option key={tecnico.id} value={tecnico.ea_id}>
-                  {tecnico.nombre}
-                </option>
+            <label htmlFor="tipo_caso">Tipo de Servicio</label>
+            <select id="tipo_caso" name="tipo_caso" value={formData.tipo_caso} onChange={handleChange}>
+              <option value="alto_consumo">Diagnóstico Alto Consumo</option>
+              <option value="instalacion">Instalación Eléctrica</option>
+              <option value="levantamiento">Levantamiento de Proyecto</option>
+            </select>
+          </div>
+          <div style={{ flex: 2 }}>
+            <label>Dirección (Google Maps)</label>
+            <Autocomplete onLoad={onAutocompleteLoad} onPlaceChanged={onPlaceChanged}>
+              <input
+                type="text"
+                placeholder="Escribe y selecciona la dirección..."
+                ref={inputRef}
+                // IMPORTANTE: defaultValue permite escribir sin bloqueos.
+                // La actualización automática la maneja 'handlePhoneBlur' vía inputRef.current.value
+                defaultValue={formData.direccion_legible}
+                required
+                style={{ width: '100%' }}
+              />
+            </Autocomplete>
+          </div>
+        </div>
+
+        {/* --- PASO 2: ASIGNACIÓN TÉCNICA --- */}
+        <h4>2. Agenda y Técnico</h4>
+        <div className="form-paso">
+          <div>
+            <label>Técnico</label>
+            <select name="tecnico_id_ea" value={formData.tecnico_id_ea} onChange={handleChange} required>
+              <option value="">-- Seleccionar --</option>
+              {tecnicos.map((t) => (
+                <option key={t.id} value={t.ea_id}>{t.nombre}</option>
               ))}
             </select>
           </div>
           <div>
-            <label htmlFor="fecha">Fecha</label>
-            <input type="date" id="fecha" name="fecha" value={formData.fecha} onChange={handleChange} required />
+            <label>Fecha</label>
+            <input type="date" name="fecha" value={formData.fecha} onChange={handleChange} required />
           </div>
         </div>
 
-        {/* --- MEJORA 2: onClick añadido --- */}
-        {loadingDisponibilidad && <p>Cargando disponibilidad...</p>}
+        {/* Selector Visual de Horarios */}
+        {loadingDisponibilidad && <p style={{ fontSize: '0.9em', color: '#666' }}>Consultando agenda...</p>}
         {bloquesVisibles.length > 0 && (
           <div className="disponibilidad-visual">
-            <strong>Clic en un horario libre para seleccionarlo:</strong>
+            <strong>Selecciona Hora de Inicio:</strong>
             <ul>
               {bloquesVisibles.map((bloque) => (
-                    <li 
-                      key={bloque.horaValor} 
-                      // --- ESTA ES LA LÍNEA CORREGIDA ---
-                      className={`
-                        ${bloque.ocupado ? 'ocupado' : 'libre'}
-                        ${!bloque.ocupado && bloque.horaValor === formData.hora ? 'seleccionado' : ''}
-                      `}
-                      onClick={!bloque.ocupado ? () => handleBloqueClick(bloque.horaValor) : undefined}
-                    >
-                      {bloque.horaLabel}
-                    </li>
-                  ))}
+                <li
+                  key={bloque.horaValor}
+                  className={`
+                    ${bloque.ocupado ? 'ocupado' : 'libre'}
+                    ${!bloque.ocupado && bloque.horaValor === formData.hora ? 'seleccionado' : ''}
+                  `}
+                  onClick={!bloque.ocupado ? () => handleBloqueClick(bloque.horaValor) : undefined}
+                >
+                  {bloque.horaLabel}
+                </li>
+              ))}
             </ul>
           </div>
         )}
-        
-        {/* --- PASO 2: DATOS DEL CASO --- */}
-        <h4>Paso 2: Datos del Caso y Cliente</h4>
-        <div className="form-paso">
-          <div>
-            <label htmlFor="cliente_nombre">Nombre del Cliente</label>
-            <input type="text" id="cliente_nombre" name="cliente_nombre" value={formData.cliente_nombre} onChange={handleChange} required />
-          </div>
-          <div>
-            <label htmlFor="cliente_telefono">Teléfono Cliente</label>
-            <input type="tel" id="cliente_telefono" name="cliente_telefono" value={formData.cliente_telefono} onChange={handleChange} required />
-          </div>
-          <div>
-            <label htmlFor="tipo_caso">Tipo de Caso</label>
-            <select id="tipo_caso" name="tipo_caso" value={formData.tipo_caso} onChange={handleChange} required>
-              <option value="alto_consumo">Alto Consumo</option>
-              <option value="levantamiento">Levantamiento</option>
-            </select>
-          </div>
-        </div>
-        
-        {/* --- PASO 3: DIRECCIÓN --- */}
-        <h4>Paso 3: Dirección</h4>
-        <div className="form-paso">
-          <label htmlFor="direccion">Dirección del Cliente (Buscar en Google)</label>
-          <Autocomplete
-            onLoad={onAutocompleteLoad}
-            onPlaceChanged={onPlaceChanged}
-          >
-            <input
-              type="text"
-              id="direccion"
-              placeholder="Escribe la dirección y selecciónala..."
-              ref={inputRef}
-              required
-              style={{ width: '100%' }}
-            />
-          </Autocomplete>
-          {formData.link_gmaps && <small style={{ color: 'green' }}>✓ Dirección seleccionada</small>}
-        </div>
 
-        {/* --- PASO 4: AGENDAR --- */}
-        <h4>Paso 4: Confirmar Cita</h4>
         <div className="form-paso-inline">
           <div>
-            <label htmlFor="hora">Hora de Inicio (ej: 14:30)</label>
-            {/* MEJORA 2: El 'value' se llena solo */}
-            <input type="time" id="hora" name="hora" value={formData.hora} onChange={handleChange} required />
+            <label>Hora Seleccionada</label>
+            <input type="time" name="hora" value={formData.hora} readOnly />
           </div>
           <div>
-            <label htmlFor="duracion_horas">Duración</label>
-            <select id="duracion_horas" name="duracion_horas" value={formData.duracion_horas} onChange={handleChange}>
+            <label>Duración Estimada</label>
+            <select name="duracion_horas" value={formData.duracion_horas} onChange={handleChange}>
               <option value="1">1 hora</option>
               <option value="2">2 horas</option>
               <option value="3">3 horas</option>
+              <option value="5">Proyecto (5 hrs)</option>
             </select>
           </div>
         </div>
+
         <div className="form-paso">
-          <label htmlFor="notas_adicionales">Notas Adicionales (Técnico)</label>
-          <textarea id="notas_adicionales" name="notas_adicionales" value={formData.notas_adicionales} onChange={handleChange} />
+          <label>Notas Internas</label>
+          <textarea
+            name="notas_adicionales"
+            value={formData.notas_adicionales}
+            onChange={handleChange}
+            placeholder="Detalles para el técnico..."
+          />
         </div>
 
-        {/* --- BOTONES Y ERRORES --- */}
         {error && <p className="error-msg">{error}</p>}
+
         <div className="form-botones">
           <button type="button" onClick={onClose} disabled={loading}>Cancelar</button>
-          <button type="submit" disabled={loading}>
-            {loading ? 'Guardando...' : 'Crear y Guardar Cita'}
+          <button type="submit" disabled={loading} className="btn-primary">
+            {loading ? 'Procesando...' : 'Crear Caso y Agendar'}
           </button>
         </div>
+
       </form>
     </LoadScript>
   );
