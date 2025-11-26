@@ -18,7 +18,7 @@ const fabStyles = {
   alignItems: 'center',
   fontSize: '24px',
   cursor: 'pointer',
-  zIndex: 100,
+  zIndex: 90,
 };
 
 const DatePickerFAB = ({ onDateSelect }) => {

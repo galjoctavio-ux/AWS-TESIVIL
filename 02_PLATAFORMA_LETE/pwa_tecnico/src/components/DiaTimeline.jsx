@@ -2,18 +2,18 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { getAgendaPorDia } from '../apiService';
-import CierreCasoModal from './CierreCasoModal'; // <--- 1. IMPORTAR EL NUEVO MODAL
+import CierreCasoModal from './CierreCasoModal';
 
-const HOUR_HEIGHT = 80; // 80px per hour
+const HOUR_HEIGHT = 80;
 
 const timelineContainerStyles = {
   position: 'relative',
   overflowY: 'auto',
-  height: 'calc(100vh - 70px)', // Adjust based on header height
+  height: 'calc(100vh - 70px)',
 };
 
 const hourGridStyles = {
-  paddingLeft: '60px', // Space for the time labels
+  paddingLeft: '60px',
 };
 
 const hourSlotStyles = {
@@ -38,13 +38,10 @@ const timeLabelStyles = {
 const DiaTimeline = ({ date }) => {
   const [citas, setCitas] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  // --- 2. NUEVO ESTADO PARA EL MODAL ---
   const [casoParaCerrar, setCasoParaCerrar] = useState(null);
 
   const timelineRef = useRef(null);
 
-  // --- 3. REFACTORIZAR FETCH PARA PODER REUTILIZARLO ---
   const fetchAgenda = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -63,7 +60,6 @@ const DiaTimeline = ({ date }) => {
   }, [fetchAgenda]);
 
   useEffect(() => {
-    // Auto-scroll logic
     if (!isLoading && dayjs(date).isSame(dayjs(), 'day')) {
       setTimeout(() => {
         if (timelineRef.current) {
@@ -77,10 +73,31 @@ const DiaTimeline = ({ date }) => {
     }
   }, [date, isLoading]);
 
-  // Manejador para refrescar después de cerrar
+  // --- CORRECCIÓN CLAVE: ACTUALIZACIÓN OPTIMISTA ---
   const handleCaseClosedSuccess = () => {
-    fetchAgenda(); // Recargamos la lista para que el caso aparezca cerrado
+    // 1. Actualizamos LOCALMENTE el estado para reflejar el cambio INMEDIATAMENTE
+    if (casoParaCerrar) {
+      setCitas(prevCitas => prevCitas.map(cita => {
+        if (cita.caso && cita.caso.id === casoParaCerrar.id) {
+          return {
+            ...cita,
+            caso: {
+              ...cita.caso,
+              status: 'cerrado' // Forzamos el estado visualmente
+            }
+          };
+        }
+        return cita;
+      }));
+    }
+
+    // 2. Cerramos el modal
+    setCasoParaCerrar(null);
+
+    // 3. Recargamos del servidor en segundo plano para asegurar consistencia
+    fetchAgenda();
   };
+  // ------------------------------------------------
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
@@ -108,17 +125,13 @@ const DiaTimeline = ({ date }) => {
             const tipoCaso = cita.caso?.tipo || 'default';
             const cardClassName = `cita-card card-${tipoCaso}`;
 
-            // Verificamos si el caso está activo para mostrar botones
+            // Verificamos estado (ahora sensible a nuestra actualización local)
             const isCasoActivo = cita.caso &&
               cita.caso.status !== 'cerrado' &&
               cita.caso.status !== 'completado';
 
             return (
-              <div
-                key={cita.id}
-                className={cardClassName}
-                style={style}
-              >
+              <div key={cita.id} className={cardClassName} style={style}>
                 {cita.caso ? (
                   <>
                     <div className="cita-content">
@@ -127,8 +140,6 @@ const DiaTimeline = ({ date }) => {
                     </div>
 
                     <div className="cita-actions">
-
-                      {/* 1. Botón Mapa */}
                       <button
                         className="cita-icon-button"
                         onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cita.caso.cliente_direccion)}`, "_blank")}
@@ -137,11 +148,10 @@ const DiaTimeline = ({ date }) => {
                         📍
                       </button>
 
-                      {/* --- 4. NUEVO BOTÓN DE CIERRE --- */}
                       {isCasoActivo && (
                         <button
                           className="cita-icon-button"
-                          style={{ backgroundColor: '#e8f5e9', borderColor: '#4caf50' }} // Un toque verde para diferenciar
+                          style={{ backgroundColor: '#e8f5e9', borderColor: '#4caf50' }}
                           onClick={() => setCasoParaCerrar(cita.caso)}
                           title="Cobrar y Cerrar Caso"
                         >
@@ -149,14 +159,12 @@ const DiaTimeline = ({ date }) => {
                         </button>
                       )}
 
-                      {/* Botón Revisión */}
                       {(cita.caso.tipo !== 'levantamiento' && isCasoActivo) && (
                         <Link to={`/revision/${cita.caso.id}`} className="cita-icon-button" title="Iniciar Revisión">
                           📝
                         </Link>
                       )}
 
-                      {/* Botón Cotizar */}
                       {(isCasoActivo || cita.caso.tipo === 'alto_consumo') && (
                         <Link
                           to="/cotizador"
@@ -172,11 +180,9 @@ const DiaTimeline = ({ date }) => {
                         </Link>
                       )}
 
-                      {/* Botón Detalles */}
                       <Link to={`/detalle-caso/${cita.caso.id}`} className="cita-icon-button" title="Ver Detalles">
                         ℹ️
                       </Link>
-
                     </div>
                   </>
                 ) : (
@@ -197,7 +203,6 @@ const DiaTimeline = ({ date }) => {
         </div>
       )}
 
-      {/* --- 5. RENDERIZADO DEL MODAL --- */}
       {casoParaCerrar && (
         <CierreCasoModal
           caso={casoParaCerrar}
