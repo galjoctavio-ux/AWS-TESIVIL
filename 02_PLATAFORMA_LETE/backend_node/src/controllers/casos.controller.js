@@ -86,17 +86,18 @@ export const getCasos = async (req, res) => {
 
   try {
     // Ahora hacemos JOIN con la tabla 'clientes' en lugar de usar columnas de texto
+    // CÁMBIALO POR ESTO (Usando created_at):
     let query = supabaseAdmin
       .from('casos')
       .select(`
-        id, 
-        status, 
-        fecha_creacion, 
-        tipo_servicio,
-        cliente:clientes ( nombre_completo, telefono, direccion_principal, calificacion ),
-        tecnico:profiles ( nombre )
-      `)
-      .order('fecha_creacion', { ascending: false });
+    id, 
+    status, 
+    created_at,  /* <--- CORRECCIÓN */
+    tipo_servicio,
+    cliente:clientes ( nombre_completo, telefono, direccion_principal, calificacion ),
+    tecnico:profiles ( nombre )
+  `)
+      .order('created_at', { ascending: false }); /* <--- CORRECCIÓN */
 
     if (rol === 'tecnico') {
       query = query.eq('tecnico_id', userId);
@@ -238,18 +239,22 @@ export const getCasoById = async (req, res) => {
     const { data: caso, error } = await supabaseAdmin
       .from('casos')
       .select(`
-        *,
-        cliente:clientes (
-          id,
-          nombre_completo,
-          telefono,
-          direccion_principal,
-          google_maps_link,
-          calificacion,
-          notas_internas
-        ),
-        tecnico:profiles ( nombre )
-      `)
+  id,
+  cliente_nombre, -- (Ojo: estos campos viejos ya no existen si usas la relación, revisa abajo)
+  status,
+  created_at, /* <--- CORRECCIÓN */
+  tipo_servicio,
+  cliente:clientes (
+    id,
+    nombre_completo,
+    telefono,
+    direccion_principal,
+    google_maps_link,
+    calificacion,
+    notas_internas
+  ),
+  tecnico:profiles ( nombre )
+`)
       .eq('id', casoId)
       .single();
 
