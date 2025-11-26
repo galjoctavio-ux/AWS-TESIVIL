@@ -101,9 +101,14 @@ function CasosList() {
             casos.map(caso => (
               <tr key={caso.id}>
                 <td style={tdStyle}>{caso.id}</td>
-                <td style={tdStyle}>{caso.cliente_nombre}</td>
-                <td style={tdStyle}>{caso.cliente_direccion}</td>
-                <td style={tdStyle}>{caso.tipo || 'N/A'}</td>
+                <td style={tdStyle}>{caso.nombre_completo}</td>
+                <td style={tdStyle}>{caso.direccion_principal}</td>
+                <td style={tdStyle}>
+                  {/* Usamos 'tipo_servicio' y lo ponemos bonito (Capitalizado) */}
+                  {caso.tipo_servicio
+                    ? caso.tipo_servicio.replace('_', ' ').toUpperCase()
+                    : 'DIAGNÓSTICO'}
+                </td>
                 <td style={tdStyle}>{caso.status}</td>
                 <td style={tdStyle}>{caso.tecnico?.nombre || 'Sin asignar'}</td>
                 <td style={tdStyle}>
