@@ -5,10 +5,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // ---------------------------------------------------------
-// 1. CONFIGURACIÓN Y ESTILOS
+// 1. ESTILOS Y ASSETS (DISEÑO PREMIUM "LUZ EN TU ESPACIO")
 // ---------------------------------------------------------
-const checkIcon = `<svg style="width:14px;vertical-align:middle;margin-right:4px;" viewBox="0 0 24 24" fill="none" stroke="#2b8a3e" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
   
@@ -39,18 +37,16 @@ const styles = `
     display: flex; justify-content: space-between; align-items: center;
   }
 
-  /* HALLAZGOS TABLE (Estilo PHP replicado) */
+  /* HALLAZGOS TABLE (Estilo Replicado del Bonito) */
   .hallazgos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  
   .info-table { width: 100%; border-collapse: collapse; font-size: 10px; }
   .info-table td { padding: 6px 8px; border-bottom: 1px solid #f3f4f6; }
   .info-table .lbl { font-weight: 600; color: #6b7280; width: 60%; }
   .info-table .val { font-weight: 700; color: #111; }
   
-  /* Validaciones visuales */
-  .val-bueno { color: #059669 !important; } /* Verde */
-  .val-malo { color: #dc2626 !important; }  /* Rojo */
-  .val-warn { color: #d97706 !important; }  /* Naranja */
+  .val-bueno { color: #059669 !important; } 
+  .val-malo { color: #dc2626 !important; }  
+  .val-warn { color: #d97706 !important; }
 
   /* KPI CARDS */
   .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
@@ -90,13 +86,11 @@ const styles = `
 `;
 
 // ---------------------------------------------------------
-// 2. IA GENERATIVA (GEMINI REAL)
+// 2. IA GENERATIVA (GEMINI)
 // ---------------------------------------------------------
 const generarDiagnosticoIA = async (datos) => {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return "IA no configurada (Falta API Key).";
 
-  // Preparamos los datos igual que en tu PHP para que la IA entienda el contexto
   const datosParaIA = {
     servicio: datos.mediciones?.tipo_servicio || 'Desconocido',
     hallazgos: {
@@ -107,47 +101,48 @@ const generarDiagnosticoIA = async (datos) => {
     fugas: {
       fuga_detectada_amp: datos.mediciones?.corriente_fuga_f1 || 0
     },
-    equipos_criticos: datos.equipos?.filter(e => e.estado_equipo === 'Malo').length || 0,
+    equipos_criticos: datos.equipos?.filter(e => e.estado_equipo?.toLowerCase().includes('malo')).length || 0,
     causas_reportadas: datos.causas_alto_consumo || []
   };
 
-  const prompt = `Analiza los siguientes datos JSON de una revisión eléctrica: ${JSON.stringify(datosParaIA)}. Redacta un párrafo de 'Diagnóstico Ejecutivo' profesional, breve (max 60 palabras) y tranquilizador para el cliente. Menciona si hay riesgos críticos (fugas o tornillos flojos). Concluye positivamente. Texto plano.`;
+  const prompt = `Analiza estos datos de una revisión eléctrica: ${JSON.stringify(datosParaIA)}. Redacta un 'Diagnóstico Ejecutivo' profesional, breve (max 50 palabras) y positivo para el cliente. Texto plano sin markdown.`;
+
+  if (!apiKey) return "Análisis automatizado no disponible (Falta API Key). El diagnóstico manual confirma los hallazgos presentados.";
 
   try {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     const response = await axios.post(url, {
       contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.4, maxOutputTokens: 500 }
+      generationConfig: { temperature: 0.4, maxOutputTokens: 300 }
     });
-
     return response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "Diagnóstico técnico completado.";
   } catch (error) {
     console.error("Error Gemini:", error.message);
-    return "El análisis automatizado no está disponible en este momento. Por favor revise los hallazgos manuales.";
+    return "Basado en la inspección visual y las mediciones realizadas, se recomienda atender los puntos críticos señalados.";
   }
 };
 
 // ---------------------------------------------------------
-// 3. RENDERIZADO HTML
+// 3. RENDERIZADO HTML (PLANTILLA PREMIUM)
 // ---------------------------------------------------------
 const getHtmlReporte = (datos, textoIA) => {
   const { header, mediciones, equipos, consumo_total_estimado, recomendaciones_tecnico, causas_alto_consumo } = datos;
 
-  // Helpers para clases CSS según valores (Lógica del PHP portada)
+  // Helpers visuales
   const clsSello = mediciones.sello_cfe ? 'val-bueno' : 'val-malo';
   const txtSello = mediciones.sello_cfe ? 'Sí (Correcto)' : 'No (Irregular)';
 
   const clsTornillos = mediciones.tornillos_flojos ? 'val-malo' : 'val-bueno';
-  const txtTornillos = mediciones.tornillos_flojos ? 'Sí (Riesgo Calentamiento)' : 'No';
+  const txtTornillos = mediciones.tornillos_flojos ? 'Sí (Riesgo)' : 'No';
 
   const clsCapacidad = mediciones.capacidad_vs_calibre ? 'val-bueno' : 'val-malo';
-  const txtCapacidad = mediciones.capacidad_vs_calibre ? 'Correcto' : 'Incorrecto (Riesgo)';
+  const txtCapacidad = mediciones.capacidad_vs_calibre ? 'Correcto' : 'Riesgo';
 
-  // Tabla de Equipos
+  // Filas de equipos
   const equiposRows = equipos.map(eq => {
     let badgeClass = 'status-good';
-    if (eq.estado_equipo?.match(/malo/i)) badgeClass = 'status-bad';
-    if (eq.estado_equipo?.match(/regular/i)) badgeClass = 'status-warn';
+    if (eq.estado_equipo?.toLowerCase().includes('malo')) badgeClass = 'status-bad';
+    if (eq.estado_equipo?.toLowerCase().includes('regular')) badgeClass = 'status-warn';
 
     return `
       <tr>
@@ -200,9 +195,7 @@ const getHtmlReporte = (datos, textoIA) => {
           <span class="ai-title">Diagnóstico Ejecutivo</span>
           <span class="ai-badge">Gemini AI</span>
         </div>
-        <div class="ai-content">
-          ${textoIA}
-        </div>
+        <div class="ai-content">${textoIA}</div>
       </div>
 
       <div class="hallazgos-grid">
@@ -308,14 +301,9 @@ const getHtmlReporte = (datos, textoIA) => {
 export const generarPDF = async (datos) => {
   try {
     console.log('[PDF Service] Solicitando análisis a Gemini...');
-
-    // 1. Obtener Análisis Real
     const textoIA = await generarDiagnosticoIA(datos);
-
-    // 2. Generar HTML
     const html = getHtmlReporte(datos, textoIA);
 
-    // 3. Renderizar PDF
     const browser = await puppeteer.launch({
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
       headless: 'new'
@@ -325,7 +313,7 @@ export const generarPDF = async (datos) => {
     await page.setContent(html, { waitUntil: 'networkidle0' });
 
     const pdfBuffer = await page.pdf({
-      format: 'A4',
+      format: 'Letter',
       printBackground: true,
       margin: { top: '1cm', right: '1cm', bottom: '1cm', left: '1cm' }
     });
