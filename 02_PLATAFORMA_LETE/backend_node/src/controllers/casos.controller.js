@@ -18,7 +18,8 @@ export const createCaso = async (req, res) => {
     cliente_telefono,
     comentarios_iniciales,
     ubicacion_lat, // Opcionales
-    ubicacion_lng
+    ubicacion_lng,
+    google_maps_link
   } = req.body;
 
   if (!cliente_telefono || !cliente_nombre) {
@@ -44,6 +45,7 @@ export const createCaso = async (req, res) => {
           telefono: telefonoLimpio,
           nombre_completo: cliente_nombre,
           direccion_principal: cliente_direccion,
+          google_maps_link: google_maps_link,
           ubicacion_lat,
           ubicacion_lng
         })

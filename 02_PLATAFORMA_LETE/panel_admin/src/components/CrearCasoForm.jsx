@@ -236,6 +236,7 @@ function CrearCasoForm({ onClose, onCasoCreado }) {
         cliente_nombre: formData.cliente_nombre,
         cliente_telefono: formData.cliente_telefono,
         cliente_direccion: formData.direccion_legible,
+        google_maps_link: formData.link_gmaps,
         comentarios_iniciales: `Caso Nuevo - ${formData.tipo_caso} - ${formData.notas_adicionales}`,
         ubicacion_lat: formData.ubicacion_lat,
         ubicacion_lng: formData.ubicacion_lng
