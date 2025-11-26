@@ -1,10 +1,12 @@
 import { Router } from 'express';
 import { requireAuth, isAdmin } from '../middleware/auth.middleware.js';
-import { getResumenFinumen, reportarPagoSemanal, aprobarTransaccion } from '../controllers/finanzas.controller.js';
+// CORRECCIÓN AQUÍ: Cambiamos 'getResumenFinumen' por 'getResumenFinanciero'
+import { getResumenFinanciero, reportarPagoSemanal, aprobarTransaccion } from '../controllers/finanzas.controller.js';
 
 const router = Router();
 
 // Ver estado de cuenta (Tecnico ve el suyo, Admin puede ver cualquiera si implementas logica extra)
+// CORRECCIÓN AQUÍ: Usamos la función correcta
 router.get('/resumen/:tecnicoId', requireAuth, getResumenFinanciero);
 
 // Tecnico reporta pago
