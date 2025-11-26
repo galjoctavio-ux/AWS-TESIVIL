@@ -4,7 +4,9 @@ import dayjs from 'dayjs';
 import { getAgendaPorDia } from '../apiService';
 import CierreCasoModal from './CierreCasoModal';
 
-const HOUR_HEIGHT = 80;
+// --- CAMBIO 1: AUMENTAMOS LA ALTURA POR HORA ---
+// Antes 80, ahora 140 para que quepan los botones sin encimarse
+const HOUR_HEIGHT = 140;
 
 const timelineContainerStyles = {
   position: 'relative',
@@ -14,12 +16,14 @@ const timelineContainerStyles = {
 
 const hourGridStyles = {
   paddingLeft: '60px',
-  paddingRight: '10px', // Agregamos un poco de aire a la derecha
+  paddingRight: '10px',
+  // Aseguramos que el contenedor tenga la altura total correcta
+  height: `${24 * HOUR_HEIGHT}px`,
 };
 
 const hourSlotStyles = {
   height: `${HOUR_HEIGHT}px`,
-  borderBottom: '1px solid #e0e0e0',
+  borderBottom: '1px solid #f0f0f0', // Color más sutil
   boxSizing: 'border-box',
   position: 'relative',
   zIndex: 1,
@@ -28,21 +32,22 @@ const hourSlotStyles = {
 const timeLabelStyles = {
   position: 'absolute',
   left: '0px',
-  transform: 'translateY(-50%)',
+  top: '0px', // Alineamos el texto de la hora al inicio de la línea
   fontSize: '12px',
-  color: '#666',
+  color: '#999',
   width: '50px',
   textAlign: 'right',
   paddingRight: '10px',
+  marginTop: '-6px' // Pequeño ajuste visual para centrar con la línea
 };
 
-// --- CORRECCIÓN VISUAL: ESTILOS DE LA GRILLA DE ACCIONES ---
 const actionsGridStyles = {
   display: 'grid',
-  gridTemplateColumns: 'repeat(4, 1fr)', // 4 Columnas exactas
-  gap: '8px',            // Espacio entre botones
-  marginTop: 'auto',     // Empuja los botones al fondo de la tarjeta
-  paddingTop: '5px'
+  gridTemplateColumns: 'repeat(4, 1fr)',
+  gap: '6px',
+  marginTop: 'auto',
+  paddingTop: '8px',
+  borderTop: '1px solid rgba(0,0,0,0.05)' // Separador sutil
 };
 
 const DiaTimeline = ({ date }) => {
@@ -74,10 +79,9 @@ const DiaTimeline = ({ date }) => {
       setTimeout(() => {
         if (timelineRef.current) {
           const currentHour = dayjs().hour();
-          const hourEl = timelineRef.current.querySelector(`#hora-${currentHour}`);
-          if (hourEl) {
-            hourEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
+          // Hacemos scroll un poco antes de la hora actual para dar contexto
+          const scrollPos = (currentHour * HOUR_HEIGHT) - 50;
+          timelineRef.current.scrollTop = scrollPos > 0 ? scrollPos : 0;
         }
       }, 100);
     }
@@ -103,16 +107,11 @@ const DiaTimeline = ({ date }) => {
   };
 
   const handleOpenMaps = (caso) => {
-    // --- CORRECCIÓN MAPAS ---
-    // 1. Buscamos la dirección en el objeto anidado (cliente) O en la raíz (por si acaso)
     const direccion = caso.cliente?.direccion_principal || caso.cliente_direccion || caso.direccion;
-
     if (!direccion) {
       alert("No hay dirección registrada para este cliente.");
       return;
     }
-
-    // 2. Usamos la URL universal de Google Maps API
     const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`;
     window.open(url, "_blank");
   };
@@ -126,7 +125,7 @@ const DiaTimeline = ({ date }) => {
       ) : (
         <div style={hourGridStyles}>
           {hours.map(hour => (
-            <div key={hour} id={`hora-${hour}`} style={{ ...hourSlotStyles, position: 'relative' }}>
+            <div key={hour} id={`hora-${hour}`} style={hourSlotStyles}>
               <span style={timeLabelStyles}>{`${String(hour).padStart(2, '0')}:00`}</span>
             </div>
           ))}
@@ -136,15 +135,21 @@ const DiaTimeline = ({ date }) => {
             const end = dayjs(cita.end_datetime);
             const top = (start.hour() + start.minute() / 60) * HOUR_HEIGHT;
             const durationInMinutes = end.diff(start, 'minute');
-            const height = (durationInMinutes / 60) * HOUR_HEIGHT;
+            // Mínimo visual de 45 mins para que no colapse el diseño si la cita es muy corta
+            const visualDuration = Math.max(durationInMinutes, 45);
+            const height = (visualDuration / 60) * HOUR_HEIGHT;
 
-            // Ajustamos el estilo para que use Flexbox columna y acomode los botones al final
             const style = {
               top: `${top}px`,
               height: `${height}px`,
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'space-between' // Esparce contenido: texto arriba, botones abajo
+              justifyContent: 'space-between',
+              zIndex: 10, // Elevamos las tarjetas sobre la grilla base
+              // Añadimos un pequeño margen derecho para que no pegue al borde
+              width: 'calc(100% - 70px)', // Ajuste según padding del contenedor
+              // Corrección visual: si las tarjetas se solapan, usa box-shadow para separarlas
+              boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
             };
 
             const tipoCaso = cita.caso?.tipo || 'default';
@@ -158,28 +163,26 @@ const DiaTimeline = ({ date }) => {
               <div key={cita.id} className={cardClassName} style={style}>
                 {cita.caso ? (
                   <>
-                    <div className="cita-content">
-                      {/* Intentamos mostrar nombre del cliente del objeto anidado o plano */}
-                      <strong>{cita.caso.cliente?.nombre_completo || cita.caso.cliente_nombre || 'Cliente'}</strong>
-                      <p style={{ margin: 0, fontSize: '0.85em' }}>
+                    <div className="cita-content" style={{ overflow: 'hidden' }}>
+                      {/* Texto compacto */}
+                      <strong style={{ display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '0.95rem' }}>
+                        {cita.caso.cliente?.nombre_completo || cita.caso.cliente_nombre || 'Cliente'}
+                      </strong>
+                      <p style={{ margin: '2px 0 0 0', fontSize: '0.8rem', color: '#555' }}>
                         {dayjs(cita.start_datetime).format('h:mm A')} - {dayjs(cita.end_datetime).format('h:mm A')}
                       </p>
                     </div>
 
-                    {/* --- APLICAMOS LA GRILLA DE 4 COLUMNAS AQUÍ --- */}
                     <div className="cita-actions" style={actionsGridStyles}>
-
-                      {/* 1. Botón Mapa */}
                       <button
                         className="cita-icon-button"
                         onClick={() => handleOpenMaps(cita.caso)}
                         title="Abrir en Google Maps"
-                        style={{ width: '100%' }} // Asegura que llene la celda de la grilla
+                        style={{ width: '100%' }}
                       >
                         📍
                       </button>
 
-                      {/* 2. Botón Detalles (Siempre visible) */}
                       <Link
                         to={`/detalle-caso/${cita.caso.id}`}
                         className="cita-icon-button"
@@ -189,7 +192,6 @@ const DiaTimeline = ({ date }) => {
                         ℹ️
                       </Link>
 
-                      {/* 3. Botón Revisión (Condicional) */}
                       {(cita.caso.tipo !== 'levantamiento' && isCasoActivo) ? (
                         <Link
                           to={`/revision/${cita.caso.id}`}
@@ -200,51 +202,33 @@ const DiaTimeline = ({ date }) => {
                           📝
                         </Link>
                       ) : (
-                        /* Rellenar espacio vacío si no aplica, para mantener alineación (opcional) */
                         isCasoActivo && <div />
                       )}
 
-                      {/* 4. Slot Variable: Cotizar O Cerrar */}
-                      {/* Priorizamos CERRAR si ya está listo, o COTIZAR si es el flujo */}
                       {isCasoActivo && (
-                        <>
-                          {/* Si quieres mostrar AMBOS (Cotizar y Cerrar) necesitaríamos 5 columnas. 
-                                Asumiré que quieres el botón de COBRAR aquí. */}
-                          <button
-                            className="cita-icon-button"
-                            style={{ backgroundColor: '#e8f5e9', borderColor: '#4caf50', width: '100%' }}
-                            onClick={() => setCasoParaCerrar(cita.caso)}
-                            title="Cobrar y Cerrar Caso"
-                          >
-                            💰
-                          </button>
-                        </>
+                        <button
+                          className="cita-icon-button"
+                          style={{ backgroundColor: '#e8f5e9', borderColor: '#4caf50', width: '100%' }}
+                          onClick={() => setCasoParaCerrar(cita.caso)}
+                          title="Cobrar y Cerrar Caso"
+                        >
+                          💰
+                        </button>
                       )}
-
-                      {/* Si prefieres mantener el botón de Cotizar disponible, 
-                          puedes descomentar esto y ajustar el grid a 5 columnas o reemplazar otro icono */}
-                      {/* {(isCasoActivo || cita.caso.tipo === 'alto_consumo') && (
-                        <Link to="/cotizador" ... >⚡</Link>
-                      )} 
-                      */}
-
                     </div>
                   </>
                 ) : (
                   <>
-                    <strong>Cita (sin caso vinculado)</strong>
-                    <p>{dayjs(cita.start_datetime).format('h:mm A')}</p>
+                    <strong style={{ fontSize: '0.9rem' }}>Cita Personal</strong>
+                    <p style={{ fontSize: '0.8rem', margin: 0 }}>{dayjs(cita.start_datetime).format('h:mm A')}</p>
                   </>
                 )}
               </div>
             );
           })}
 
-          {!isLoading && citas.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
-              <p>No hay citas programadas para este día.</p>
-            </div>
-          )}
+          {/* Espaciador final para poder hacer scroll hasta la última hora cómodamente */}
+          <div style={{ height: '100px' }}></div>
         </div>
       )}
 
