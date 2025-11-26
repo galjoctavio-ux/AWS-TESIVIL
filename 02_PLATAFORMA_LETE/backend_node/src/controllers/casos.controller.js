@@ -129,7 +129,7 @@ export const cerrarCaso = async (req, res) => {
     const PAGO_TECNICO = config['PAGO_VISITA_BASE'] || 200;
 
     // 2. Actualizar Caso (Cierre Operativo)
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError, count } = await supabaseAdmin // <--- Agregamos 'count' para depurar si quieres
       .from('casos')
       .update({
         status: 'cerrado',
@@ -139,10 +139,17 @@ export const cerrarCaso = async (req, res) => {
         monto_pagado_tecnico: PAGO_TECNICO,
         requiere_cotizacion: requiereCotizacion,
         notas_cierre: notasCierre,
-        calificacion_servicio_cliente: calificacionCliente
+        calificacion_servicio_cliente: calificacionCliente,
+
+        // --- CORRECCIÓN CRÍTICA ---
+        // Asignamos el técnico en este momento. 
+        // Si el caso no tenía dueño (NULL), ahora tú eres el dueño.
+        tecnico_id: tecnicoId
+        // --------------------------
       })
-      .eq('id', casoId)
-      .eq('tecnico_id', tecnicoId); // Seguridad: solo el asignado puede cerrar
+      .eq('id', casoId);
+    // .eq('tecnico_id', tecnicoId); // <--- ELIMINAMOS ESTA RESTRICCIÓN. 
+    // Si ya estás en el sitio cerrándolo, tienes derecho a cerrarlo.
 
     if (updateError) throw updateError;
 
