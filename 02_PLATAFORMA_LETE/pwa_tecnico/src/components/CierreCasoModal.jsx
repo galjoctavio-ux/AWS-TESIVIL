@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import api from '../apiService';
 import './CierreCasoModal.css'; // Crearemos este CSS rápido abajo
 
@@ -61,9 +62,11 @@ function CierreCasoModal({ caso, onClose, onCaseClosed }) {
 
     // --- RENDERIZADO DEL WIZARD ---
 
-    return (
+    return createPortal(
         <div className="modal-overlay">
             <div className="modal-content wizard-container">
+                {/* ... (Todo tu contenido del modal, header, steps, etc. igual que antes) ... */}
+
                 <div className="wizard-header">
                     <h3>Cerrar Caso #{caso.id}</h3>
                     <span className="step-indicator">Paso {step} de 3</span>
@@ -71,11 +74,12 @@ function CierreCasoModal({ caso, onClose, onCaseClosed }) {
 
                 {error && <p className="error-alert">{error}</p>}
 
+                {/* Copia aquí tus Steps 1, 2 y 3 exactamente como los tenías */}
                 {/* PASO 1: FINANZAS */}
                 {step === 1 && (
                     <div className="wizard-step">
                         <h4>💰 Cobro y Finanzas</h4>
-
+                        {/* ... inputs ... */}
                         <label>¿Cómo pagó el cliente?</label>
                         <div className="payment-toggle">
                             <button
@@ -106,7 +110,6 @@ function CierreCasoModal({ caso, onClose, onCaseClosed }) {
                                 ? '⚠️ Este dinero se descontará de tu saldo.'
                                 : '✅ Este dinero entra directo a la empresa.'}
                         </p>
-
                         <div className="wizard-actions">
                             <button className="btn-secondary" onClick={onClose}>Cancelar</button>
                             <button className="btn-primary" onClick={() => setStep(2)}>Siguiente ➡</button>
@@ -114,12 +117,11 @@ function CierreCasoModal({ caso, onClose, onCaseClosed }) {
                     </div>
                 )}
 
-                {/* PASO 2: CRM (SEMÁFORO) */}
+                {/* PASO 2: CRM */}
                 {step === 2 && (
                     <div className="wizard-step">
                         <h4>🚦 Calificación del Cliente</h4>
-                        <p>Ayuda a tus compañeros a saber cómo es este cliente.</p>
-
+                        {/* ... Botones semáforo ... */}
                         <div className="semaforo-grid">
                             <button
                                 className={`semaforo-btn green ${formData.tipoCliente === 'AMABLE' ? 'selected' : ''}`}
@@ -140,7 +142,6 @@ function CierreCasoModal({ caso, onClose, onCaseClosed }) {
                                 🔴<br />Conflictivo
                             </button>
                         </div>
-
                         <div className="wizard-actions">
                             <button className="btn-secondary" onClick={() => setStep(1)}>⬅ Atrás</button>
                             <button className="btn-primary" onClick={() => setStep(3)}>Siguiente ➡</button>
@@ -148,9 +149,10 @@ function CierreCasoModal({ caso, onClose, onCaseClosed }) {
                     </div>
                 )}
 
-                {/* PASO 3: CIERRE Y VENTAS */}
+                {/* PASO 3: CIERRE */}
                 {step === 3 && (
                     <div className="wizard-step">
+                        {/* ... inputs finales ... */}
                         <h4>📝 Notas Finales</h4>
 
                         <div className="switch-container">
@@ -180,9 +182,9 @@ function CierreCasoModal({ caso, onClose, onCaseClosed }) {
                         </div>
                     </div>
                 )}
-
             </div>
-        </div>
+        </div>,
+        document.body // <--- 2. ESTO ASEGURA QUE SE RENDERICE EN EL BODY
     );
 }
 
