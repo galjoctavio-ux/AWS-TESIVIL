@@ -3,13 +3,14 @@ import { Router } from 'express';
 import { requireAuth, isAdmin, isTecnico } from '../middleware/auth.middleware.js';
 
 // --- MODIFICACIÓN: Importar el nuevo controlador ---
-import { 
-  getCasos, 
-  createCaso, 
-  updateCaso, 
+import {
+  getCasos,
+  createCaso,
+  updateCaso,
   getCasoById, // <-- CAMBIADO
   createCasoFromCotizacion,
-  cerrarCasoManualTecnico
+  cerrarCasoManualTecnico,
+  cerrarCaso
 } from '../controllers/casos.controller.js';
 
 const router = Router();
@@ -37,5 +38,6 @@ router.post('/create-from-cotizacion', requireAuth, isAdmin, createCasoFromCotiz
 // --- RUTA NUEVA Y SEGURA PARA CERRAR CASO (SOLO TÉCNICOS) ---
 router.patch('/:id/cerrar-manual', requireAuth, isTecnico, cerrarCasoManualTecnico);
 
+router.patch('/:id/cerrar', requireAuth, isTecnico, cerrarCaso);
 
 export default router;

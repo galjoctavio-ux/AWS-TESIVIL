@@ -2,70 +2,187 @@ import { randomBytes } from 'crypto'; // <--- Importamos SOLO lo que necesitamos
 import { supabaseAdmin } from '../services/supabaseClient.js';
 import eaPool from '../services/eaDatabase.js'; // --- AÑADIDO: Importar la conexión a E!A ---
 
-// POST /casos (Crear nuevo caso)
-export const createCaso = async (req, res) => {
-  const { cliente_nombre, cliente_direccion, cliente_telefono, comentarios_iniciales } = req.body;
+// --- NUEVO: Helper para obtener configuración financiera ---
+async function getFinancialConfig() {
+  const { data, error } = await supabaseAdmin.from('configuracion_financiera').select('*');
+  if (error || !data) return {};
+  // Convierte array a objeto: { 'PAGO_VISITA_BASE': 200, ... }
+  return data.reduce((acc, item) => ({ ...acc, [item.clave]: Number(item.valor) }), {});
+}
 
-  if (!cliente_nombre || !cliente_direccion) {
-    return res.status(400).json({ error: 'Nombre y dirección del cliente son requeridos' });
+// POST /casos (Crear Caso + Gestión Automática de Cliente CRM)
+export const createCaso = async (req, res) => {
+  const {
+    cliente_nombre,
+    cliente_direccion,
+    cliente_telefono,
+    comentarios_iniciales,
+    ubicacion_lat, // Opcionales
+    ubicacion_lng
+  } = req.body;
+
+  if (!cliente_telefono || !cliente_nombre) {
+    return res.status(400).json({ error: 'Nombre y Teléfono son obligatorios para el CRM.' });
   }
 
   try {
-    // Como el middleware limpió el cliente, esto usa la SERVICE_KEY
-    // y se salta el RLS
-    const { data, error } = await supabaseAdmin
+    // 1. LÓGICA CRM: Buscar o Crear Cliente
+    // Buscamos si ya existe el cliente por teléfono (limpiando espacios)
+    const telefonoLimpio = cliente_telefono.replace(/\D/g, '');
+
+    let { data: cliente } = await supabaseAdmin
+      .from('clientes')
+      .select('id, nombre_completo')
+      .eq('telefono', telefonoLimpio)
+      .single();
+
+    if (!cliente) {
+      // Si no existe, lo creamos "al vuelo"
+      const { data: newClient, error: clientError } = await supabaseAdmin
+        .from('clientes')
+        .insert({
+          telefono: telefonoLimpio,
+          nombre_completo: cliente_nombre,
+          direccion_principal: cliente_direccion,
+          ubicacion_lat,
+          ubicacion_lng
+        })
+        .select()
+        .single();
+
+      if (clientError) throw new Error(`Error creando cliente: ${clientError.message}`);
+      cliente = newClient;
+    }
+
+    // 2. Crear el Caso vinculado al Cliente
+    const { data: caso, error: casoError } = await supabaseAdmin
       .from('casos')
       .insert({
-        cliente_nombre,
-        cliente_direccion,
-        cliente_telefono,
-        comentarios_iniciales,
-        status: 'pendiente' // Status inicial
+        cliente_id: cliente.id, // VINCULACIÓN IMPORTANTE
+        status: 'pendiente',
+        tipo_servicio: 'DIAGNOSTICO', // Default
+        descripcion_problema: comentarios_iniciales
       })
       .select()
       .single();
 
-    if (error) throw error;
-    res.status(201).json(data);
+    if (casoError) throw casoError;
+
+    res.status(201).json({
+      message: 'Caso creado exitosamente',
+      caso,
+      cliente_vinculado: cliente.nombre_completo
+    });
+
   } catch (error) {
     console.error('Error al crear caso:', error);
-    res.status(500).json({ error: 'Error al crear el caso', details: error.message });
+    res.status(500).json({ error: 'Error interno', details: error.message });
   }
 };
 
-// GET /casos (Listar casos por rol)
+// GET /casos (Listar)
 export const getCasos = async (req, res) => {
-  // req.user fue añadido por el middleware requireAuth
   const { id: userId, rol } = req.user;
 
   try {
-    // Construimos la query base
+    // Ahora hacemos JOIN con la tabla 'clientes' en lugar de usar columnas de texto
     let query = supabaseAdmin
       .from('casos')
-      .select('id, cliente_nombre, cliente_direccion, cliente_telefono, status, fecha_creacion, tipo, tecnico:profiles(nombre), revisiones(pdf_url)')
+      .select(`
+        id, 
+        status, 
+        fecha_creacion, 
+        tipo_servicio,
+        cliente:clientes ( nombre_completo, telefono, direccion_principal, calificacion ),
+        tecnico:profiles ( nombre )
+      `)
       .order('fecha_creacion', { ascending: false });
 
-    // ¡Lógica de Roles!
-    if (rol === 'admin') {
-      // El admin ve todo (no añade filtros)
-      console.log('Listando casos para ADMIN');
-    } else if (rol === 'tecnico') {
-      // El técnico solo ve sus casos asignados
-      console.log(`Listando casos para TECNICO: ${userId}`);
+    if (rol === 'tecnico') {
       query = query.eq('tecnico_id', userId);
-    } else {
-      return res.status(403).json({ error: 'Rol no autorizado para ver casos' });
     }
 
-    // Ejecutamos la query
     const { data, error } = await query;
-
     if (error) throw error;
     res.status(200).json(data);
-
   } catch (error) {
     console.error('Error al listar casos:', error);
-    res.status(500).json({ error: 'Error al listar los casos', details: error.message });
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// PATCH /casos/:id/cerrar (El cierre Maestro con Lógica Financiera)
+export const cerrarCaso = async (req, res) => {
+  const { id: casoId } = req.params;
+  const { id: tecnicoId } = req.user;
+  const {
+    metodoPago, // 'EFECTIVO', 'TRANSFERENCIA', 'TARJETA'
+    montoCobrado, // Lo que pagó el cliente
+    calificacionCliente, // 1-5 estrellas (opcional)
+    requiereCotizacion, // boolean
+    notasCierre
+  } = req.body;
+
+  try {
+    // 1. Obtener Tarifas Vigentes
+    const config = await getFinancialConfig();
+    const PAGO_TECNICO = config['PAGO_VISITA_BASE'] || 200;
+
+    // 2. Actualizar Caso (Cierre Operativo)
+    const { error: updateError } = await supabaseAdmin
+      .from('casos')
+      .update({
+        status: 'cerrado',
+        fecha_cierre: new Date(),
+        metodo_pago_cierre: metodoPago,
+        monto_cobrado: montoCobrado,
+        monto_pagado_tecnico: PAGO_TECNICO,
+        requiere_cotizacion: requiereCotizacion,
+        notas_cierre: notasCierre,
+        calificacion_servicio_cliente: calificacionCliente
+      })
+      .eq('id', casoId)
+      .eq('tecnico_id', tecnicoId); // Seguridad: solo el asignado puede cerrar
+
+    if (updateError) throw updateError;
+
+    // 3. GENERAR MOVIMIENTOS EN BILLETERA (Lógica Financiera)
+    const transacciones = [];
+
+    // A. El Pago al Técnico (Siempre se genera a favor)
+    transacciones.push({
+      tecnico_id: tecnicoId,
+      caso_id: casoId,
+      tipo: 'VISITA_COMISION',
+      monto: PAGO_TECNICO, // +200
+      descripcion: `Comisión por Visita #${casoId}`,
+      estado: 'APROBADO'
+    });
+
+    // B. La Deuda (Si el técnico cobró en efectivo)
+    if (metodoPago === 'EFECTIVO') {
+      transacciones.push({
+        tecnico_id: tecnicoId,
+        caso_id: casoId,
+        tipo: 'COBRO_EFECTIVO',
+        monto: -Math.abs(montoCobrado), // -400 (Debe esto a la empresa)
+        descripcion: `Retención Efectivo Caso #${casoId}`,
+        estado: 'APROBADO'
+      });
+    }
+
+    // Insertar Transacciones
+    const { error: walletError } = await supabaseAdmin
+      .from('billetera_transacciones')
+      .insert(transacciones);
+
+    if (walletError) throw walletError;
+
+    res.status(200).json({ success: true, message: 'Caso cerrado y finanzas calculadas.' });
+
+  } catch (error) {
+    console.error('Error cerrando caso:', error);
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -111,23 +228,26 @@ export const updateCaso = async (req, res) => {
   }
 };
 
-// --- NUEVO: Controlador para obtener un caso por ID ---
+// GET /casos/:id
 export const getCasoById = async (req, res) => {
   const { id: casoId } = req.params;
   const { id: userId, rol } = req.user;
 
   try {
+    // MODIFICADO: Ahora traemos la relación con la tabla 'clientes'
     const { data: caso, error } = await supabaseAdmin
       .from('casos')
       .select(`
-        id,
-        cliente_nombre,
-        cliente_direccion,
-        cliente_telefono,
-        comentarios_iniciales,
-        status,
-        fecha_creacion,
-        tecnico_id,
+        *,
+        cliente:clientes (
+          id,
+          nombre_completo,
+          telefono,
+          direccion_principal,
+          google_maps_link,
+          calificacion,
+          notas_internas
+        ),
         tecnico:profiles ( nombre )
       `)
       .eq('id', casoId)
@@ -136,7 +256,7 @@ export const getCasoById = async (req, res) => {
     if (error) throw error;
     if (!caso) return res.status(404).json({ message: 'Caso no encontrado.' });
 
-    // Authorization: Admin can see any case, technician can only see their own.
+    // Autorización: Admin ve todo, Técnico solo lo suyo
     if (rol === 'admin' || (rol === 'tecnico' && caso.tecnico_id === userId)) {
       return res.json(caso);
     }

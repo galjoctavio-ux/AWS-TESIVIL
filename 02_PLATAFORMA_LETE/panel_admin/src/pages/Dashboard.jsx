@@ -83,11 +83,13 @@ function Dashboard() {
               + Crear Nuevo Caso
             </button>
           </div>
-          <CasosList
-            key={refreshCasosKey}
-            onDatosActualizados={handleCasoActualizado}
-            onAgendarClick={openAgendarModal}
-          />
+          <div style={{ maxHeight: '500px', overflowY: 'auto', paddingRight: '5px' }}>
+            <CasosList
+              key={refreshCasosKey}
+              onDatosActualizados={handleCasoActualizado}
+              onAgendarClick={openAgendarModal}
+            />
+          </div>
         </div>
 
         {/* --- GESTIÓN DE TÉCNICOS --- */}
