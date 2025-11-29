@@ -38,9 +38,17 @@ const RevisionWizard = () => {
   const { casoId } = useParams(); // Capturamos el ID de la URL
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const [formData, setFormData] = useState({
-    caso_id: casoId || null, // Intentamos inicializarlo directamente
+    caso_id: casoId || null,
+
+    // --- NUEVOS CAMPOS V2.0 (INICIO) ---
+    tarifa_cfe: '01',                 // Por defecto Tarifa doméstica básica
+    condicion_infraestructura: 'Regular', // Por defecto Regular
+    kwh_recibo_cfe: 0,                // Consumo del recibo
+    se_midieron_cargas_menores: false, // Para el cálculo de holgura
+    // --- NUEVOS CAMPOS V2.0 (FIN) ---
+
     // Step 1: Generales
     cliente_email: '',
     // Step 2: Medidor y C.C.
@@ -128,7 +136,7 @@ const RevisionWizard = () => {
       await api.post('/revisiones', payload);
       alert('Revisión enviada con éxito');
       // Redirigimos a la agenda o al detalle del caso completado
-      navigate('/'); 
+      navigate('/');
     } catch (error) {
       console.error('Error al enviar la revisión:', error);
       alert('Hubo un error al enviar la revisión. Por favor, inténtalo de nuevo.');

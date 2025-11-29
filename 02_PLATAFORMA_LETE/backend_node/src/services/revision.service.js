@@ -1,14 +1,3 @@
-import { supabaseAdmin } from './supabaseClient.js';
-import { Buffer } from 'buffer';
-import {
-  calcularConsumoEquipos,
-  detectarFugas,
-  verificarSolar,
-  generarDiagnosticosAutomaticos
-} from './calculos.service.js';
-import { enviarReportePorEmail } from './email.service.js';
-import { generarPDF } from './pdf.service.js'; // Importamos el generador local (Puppeteer)
-
 export const processRevision = async (payload, tecnicoAuth) => {
   const { revisionData, equiposData, firmaBase64 } = payload;
 
@@ -25,18 +14,16 @@ export const processRevision = async (payload, tecnicoAuth) => {
   let firmaIngenieroUrl = null;
 
   try {
-    // Intentamos buscar en la tabla 'profiles' usando el ID del usuario autenticado
     const { data: perfil, error: perfilError } = await supabaseAdmin
       .from('profiles')
       .select('nombre, firma_url')
-      .eq('user_id', tecnicoAuth.id) // O eq('ea_user_id', ...) si usas ese ID
+      .eq('user_id', tecnicoAuth.id)
       .maybeSingle();
 
     if (!perfilError && perfil) {
       nombreIngeniero = perfil.nombre || tecnicoAuth.user_metadata?.full_name;
       firmaIngenieroUrl = perfil.firma_url;
     } else {
-      console.warn('No se halló perfil en tabla, usando metadatos de Auth.');
       nombreIngeniero = tecnicoAuth.user_metadata?.full_name || tecnicoAuth.email;
     }
   } catch (e) {
@@ -45,39 +32,38 @@ export const processRevision = async (payload, tecnicoAuth) => {
   }
 
   // ---------------------------------------------------------
-  // 1. SANITIZACIÓN Y NORMALIZACIÓN DE DATOS
+  // 1. SANITIZACIÓN Y LÓGICA DE NEGOCIO (CEREBRO v2.0)
   // ---------------------------------------------------------
   const datosDeTrabajo = { ...revisionData };
 
-  // Asegurar números
+  // A. Sanitización de Inputs Básicos
   datosDeTrabajo.caso_id = Number(datosDeTrabajo.caso_id);
-
-  // Variables eléctricas críticas
   const iFase1 = parseFloat(datosDeTrabajo.corriente_red_f1) || 0;
   const iNeutro = parseFloat(datosDeTrabajo.corriente_red_n) || 0;
   const iFugaPinza = parseFloat(datosDeTrabajo.corriente_fuga_f1) || 0;
   const voltaje = parseFloat(datosDeTrabajo.voltaje_medido) || 127;
-
-  // Lógica de "Se puede apagar todo"
   const sePuedeApagar = datosDeTrabajo.se_puede_apagar_todo === true || datosDeTrabajo.se_puede_apagar_todo === 'true';
 
-  // --- CÁLCULO INTELIGENTE DE FUGA ---
-  // Sobreescribimos el valor de fuga basándonos en la lógica de ingeniería
+  // B. Sanitización de Inputs v2.0 (Financieros)
+  const kwhRecibo = parseFloat(datosDeTrabajo.kwh_recibo_cfe) || 0;
+  const tarifa = datosDeTrabajo.tarifa_cfe || '01';
+  const condicionInfra = datosDeTrabajo.condicion_infraestructura || 'Regular';
+  const midieronCargasMenores = datosDeTrabajo.se_midieron_cargas_menores === true || datosDeTrabajo.se_midieron_cargas_menores === 'true';
+
+  // C. Cálculo Inteligente de Fuga Eléctrica (Física)
   if (sePuedeApagar) {
-    // Si se apagó todo, cualquier consumo en Fase 1 es FUGA FANTASMA
+    // Si todo se apagó, lo que marque la fase es fuga pura
     datosDeTrabajo.corriente_fuga_f1 = iFase1;
   } else {
-    // Si no se pudo apagar, comparamos Neutro vs Fase
-    // Si el Neutro trae más corriente que la fase (con tolerancia de 0.5A), hay fuga/retorno
+    // Si no se apagó, comparamos desbalance Neutro vs Fase (tolerancia 0.5A)
     if (iNeutro > (iFase1 + 0.5)) {
       datosDeTrabajo.corriente_fuga_f1 = iNeutro - iFase1;
     } else {
-      // Si no hay desbalance crítico, usamos lo que midió la pinza de fuga (si se usó)
       datosDeTrabajo.corriente_fuga_f1 = iFugaPinza;
     }
   }
 
-  // Limpiar array de equipos y calcular consumos
+  // D. Procesamiento de Equipos
   const equiposSanitizados = equiposData.map(eq => ({
     nombre_equipo: eq.nombre_equipo,
     nombre_personalizado: eq.nombre_personalizado || '',
@@ -88,38 +74,61 @@ export const processRevision = async (payload, tecnicoAuth) => {
     cantidad: parseFloat(eq.cantidad) || 1
   }));
 
-  // Calculamos consumo estimado
+  // Calcular consumos individuales (función importada existente)
   let equiposCalculados = calcularConsumoEquipos(equiposSanitizados, voltaje);
 
-  // Ordenamos por consumo (Mayor a Menor) para el reporte
+  // Ordenar Pareto (Mayor consumo arriba)
   equiposCalculados.sort((a, b) => (b.kwh_bimestre_calculado || 0) - (a.kwh_bimestre_calculado || 0));
 
-  // Total Bimestral
-  const totalKwhBimestre = equiposCalculados.reduce((acc, curr) => acc + (curr.kwh_bimestre_calculado || 0), 0);
+  // E. MATEMÁTICA DE LA "CAJA NEGRA" (Consumo vs Recibo)
+  const totalKwhAuditado = equiposCalculados.reduce((acc, curr) => acc + (curr.kwh_bimestre_calculado || 0), 0);
 
-  // Generamos diagnósticos automáticos (Textos de ayuda)
+  // Factor de Holgura: Si NO midieron cargas menores, sumamos 20%
+  const factorHolgura = midieronCargasMenores ? 1.0 : 1.20;
+  const totalAuditadoAjustado = totalKwhAuditado * factorHolgura;
+
+  let kwhDesperdicio = 0;
+  let porcentajeFuga = 0;
+  let alertaFuga = false;
+
+  if (kwhRecibo > 0) {
+    kwhDesperdicio = kwhRecibo - totalAuditadoAjustado;
+
+    // Si el desperdicio es negativo, significa que el cálculo excedió al recibo (error de medición o recibo viejo)
+    // Lo ajustamos a 0 para no confundir al cliente
+    if (kwhDesperdicio < 0) kwhDesperdicio = 0;
+
+    porcentajeFuga = (kwhDesperdicio / kwhRecibo) * 100;
+
+    // TRIGGER: Si el desperdicio es mayor al 15% del recibo, activamos alerta
+    if (porcentajeFuga >= 15) alertaFuga = true;
+  }
+
+  // Generar textos automáticos (función importada existente)
   const diagnosticosAuto = generarDiagnosticosAutomaticos(datosDeTrabajo, equiposCalculados);
+
 
   // ---------------------------------------------------------
   // 2. GUARDADO EN BASE DE DATOS (Supabase)
   // ---------------------------------------------------------
-
-  // Preparamos objeto para insertar en 'revisiones'
   const datosParaInsertar = { ...datosDeTrabajo };
 
-  // Borramos campos temporales que no existen en la tabla
+  // Limpieza de campos temporales
   delete datosParaInsertar.voltaje_fn;
   delete datosParaInsertar.fuga_total;
   delete datosParaInsertar.amperaje_medido;
   delete datosParaInsertar.antiguedad_paneles;
-  delete datosParaInsertar.equiposData; // Por si acaso
+  delete datosParaInsertar.equiposData;
 
-  // Agregamos metadatos del sistema
+  // Asignar nuevos campos v2.0 a la BD
   datosParaInsertar.tecnico_id = tecnicoAuth.id;
   datosParaInsertar.diagnosticos_automaticos = diagnosticosAuto;
   datosParaInsertar.fecha_revision = new Date().toISOString();
+  datosParaInsertar.tarifa_cfe = tarifa;
+  datosParaInsertar.kwh_recibo_cfe = kwhRecibo;
+  datosParaInsertar.condicion_infraestructura = condicionInfra;
+  datosParaInsertar.se_midieron_cargas_menores = midieronCargasMenores;
 
-  // INSERTAR REVISIÓN
   const { data: revData, error: revError } = await supabaseAdmin
     .from('revisiones')
     .insert(datosParaInsertar)
@@ -130,7 +139,7 @@ export const processRevision = async (payload, tecnicoAuth) => {
 
   const newRevisionId = revData.id;
 
-  // INSERTAR EQUIPOS REVISADOS
+  // Insertar equipos
   if (equiposCalculados.length > 0) {
     const equiposInsert = equiposCalculados.map(eq => ({
       revision_id: newRevisionId,
@@ -142,13 +151,11 @@ export const processRevision = async (payload, tecnicoAuth) => {
       estado_equipo: eq.estado_equipo,
       kwh_bimestre_calculado: eq.kwh_bimestre_calculado
     }));
-
     const { error: eqErr } = await supabaseAdmin.from('equipos_revisados').insert(equiposInsert);
     if (eqErr) console.error('Error insertando equipos:', eqErr.message);
   }
 
-  // ACTUALIZAR CASO (Estado Completado) Y OBTENER CLIENTE (Relacional)
-  // Nota: Usamos la sintaxis relacional cliente:clientes(...) para sacar el nombre
+  // Actualizar status del Caso y obtener datos del Cliente
   const { data: casoUpdated, error: casoError } = await supabaseAdmin
     .from('casos')
     .update({ status: 'completado' })
@@ -159,10 +166,9 @@ export const processRevision = async (payload, tecnicoAuth) => {
   if (casoError) console.warn('No se pudo actualizar el caso:', casoError.message);
 
   // ---------------------------------------------------------
-  // 3. PROCESAMIENTO DE FIRMA CLIENTE (Subida a Storage)
+  // 3. PROCESAMIENTO DE FIRMA CLIENTE
   // ---------------------------------------------------------
   let firmaClienteUrl = null;
-
   if (firmaBase64) {
     try {
       const matches = firmaBase64.match(/^data:(.+);base64,(.+)$/);
@@ -170,7 +176,6 @@ export const processRevision = async (payload, tecnicoAuth) => {
         const contentType = matches[1];
         const bufferData = Buffer.from(matches[2], 'base64');
         const filePath = `firmas/revision-cliente-${newRevisionId}.png`;
-
         const { error: upErr } = await supabaseAdmin.storage
           .from('reportes')
           .upload(filePath, bufferData, { contentType, upsert: true });
@@ -178,12 +183,7 @@ export const processRevision = async (payload, tecnicoAuth) => {
         if (!upErr) {
           const { data: urlData } = supabaseAdmin.storage.from('reportes').getPublicUrl(filePath);
           firmaClienteUrl = urlData.publicUrl;
-
-          // Guardamos la URL en la revisión
-          await supabaseAdmin
-            .from('revisiones')
-            .update({ firma_url: firmaClienteUrl })
-            .eq('id', newRevisionId);
+          await supabaseAdmin.from('revisiones').update({ firma_url: firmaClienteUrl }).eq('id', newRevisionId);
         }
       }
     } catch (errFirma) {
@@ -196,26 +196,35 @@ export const processRevision = async (payload, tecnicoAuth) => {
   // ---------------------------------------------------------
   let pdfUrl = null;
 
-  // Preparamos el objeto de datos para el PDF Service
+  // Objeto enriquecido para el generador PDF
   const datosParaPdf = {
     header: {
       id: newRevisionId,
       fecha_revision: revData.fecha_revision,
-      // Extraemos datos del cliente de la relación (paso anterior)
       cliente_nombre: casoUpdated?.cliente?.nombre_completo || 'Cliente',
       cliente_direccion: casoUpdated?.cliente?.direccion_principal || 'Dirección no registrada',
       cliente_email: revData.cliente_email || '',
       tecnico_nombre: nombreIngeniero,
-      firma_ingeniero_url: firmaIngenieroUrl
+      firma_ingeniero_url: firmaIngenieroUrl,
+      // Nuevos datos Header
+      tarifa: tarifa,
+      condicion_infra: condicionInfra
     },
     mediciones: {
-      // Pasamos todos los datos eléctricos ya calculados
       ...datosDeTrabajo,
-      // Aseguramos que pasamos la fuga calculada inteligentemente
       corriente_fuga_f1: datosDeTrabajo.corriente_fuga_f1
     },
-    equipos: equiposCalculados, // Ya llevan el kwh calculado
-    consumo_total_estimado: totalKwhBimestre,
+    // NUEVO: Objeto financiero para gráficas
+    finanzas: {
+      kwh_recibo: kwhRecibo,
+      kwh_auditado: totalKwhAuditado,
+      kwh_ajustado: totalAuditadoAjustado, // Incluye holgura
+      kwh_desperdicio: kwhDesperdicio,
+      porcentaje_desperdicio: porcentajeFuga,
+      alerta_fuga: alertaFuga
+    },
+    equipos: equiposCalculados,
+    consumo_total_estimado: totalAuditadoAjustado,
     causas_alto_consumo: revData.diagnosticos_automaticos || [],
     recomendaciones_tecnico: revData.recomendaciones_tecnico || '',
     firma_cliente_url: firmaClienteUrl
@@ -223,38 +232,25 @@ export const processRevision = async (payload, tecnicoAuth) => {
 
   try {
     console.log('Generando PDF localmente...');
-
-    // Llamada al servicio local (pdf.service.js)
     const pdfBuffer = await generarPDF(datosParaPdf);
 
     if (pdfBuffer) {
-      // Subir PDF a Supabase Storage
       const pdfPath = `reportes/reporte-${newRevisionId}.pdf`;
-
       const { error: upPdfErr } = await supabaseAdmin.storage
         .from('reportes')
-        .upload(pdfPath, pdfBuffer, {
-          contentType: 'application/pdf',
-          upsert: true
-        });
+        .upload(pdfPath, pdfBuffer, { contentType: 'application/pdf', upsert: true });
 
       if (upPdfErr) {
-        console.error('Error subiendo PDF a Storage:', upPdfErr.message);
+        console.error('Error subiendo PDF:', upPdfErr.message);
       } else {
         const { data: urlData } = supabaseAdmin.storage.from('reportes').getPublicUrl(pdfPath);
         pdfUrl = urlData.publicUrl;
         console.log('PDF generado y subido:', pdfUrl);
-
-        // Guardamos la URL final en la BD
-        await supabaseAdmin
-          .from('revisiones')
-          .update({ pdf_url: pdfUrl })
-          .eq('id', newRevisionId);
+        await supabaseAdmin.from('revisiones').update({ pdf_url: pdfUrl }).eq('id', newRevisionId);
       }
     }
   } catch (pdfError) {
     console.error('Error en proceso de PDF:', pdfError);
-    // No lanzamos error fatal, permitimos que termine el proceso de guardado
   }
 
   // ---------------------------------------------------------
@@ -274,7 +270,6 @@ export const processRevision = async (payload, tecnicoAuth) => {
     }
   }
 
-  // Retorno final al controlador
   return {
     success: true,
     message: 'Revisión guardada exitosamente.',

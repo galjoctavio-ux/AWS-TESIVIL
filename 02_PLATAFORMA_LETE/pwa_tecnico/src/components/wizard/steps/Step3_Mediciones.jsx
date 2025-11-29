@@ -15,10 +15,28 @@ const Step3_Mediciones = ({ formData, updateFormData }) => {
 
   return (
     <div className="space-y-6 animate-slide-in">
+
+      {/* --- NUEVO: CONSUMO RECIBO --- */}
+      <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 shadow-sm">
+        <h3 className="font-bold text-blue-900 mb-2">Datos del Recibo</h3>
+        <InputCard
+          label="Consumo Último Recibo CFE"
+          name="kwh_recibo_cfe"
+          value={formData.kwh_recibo_cfe || ''}
+          onChange={handleChange}
+          type="number"
+          unit="kWh"
+          placeholder="Ej. 850"
+        />
+        <p className="text-xs text-blue-700 mt-2">
+          <strong>Importante:</strong> Este dato es vital para calcular el "Consumo Fantasma" y la "Fuga no Identificada".
+        </p>
+      </div>
+
       <InputCard
         label="Voltaje (Fase-Neutro)"
-        name="voltaje_fn"
-        value={formData.voltaje_fn || ''}
+        name="voltaje_medido" // Corregido para coincidir con formData
+        value={formData.voltaje_medido || ''}
         onChange={handleChange}
         type="number"
         unit="V"
@@ -79,7 +97,7 @@ const Step3_Mediciones = ({ formData, updateFormData }) => {
             type="number"
             unit="A"
           />
-           {showF2 && (
+          {showF2 && (
             <InputCard
               label="Corriente Paneles F2"
               name="corriente_paneles_f2"
@@ -89,7 +107,7 @@ const Step3_Mediciones = ({ formData, updateFormData }) => {
               unit="A"
             />
           )}
-           {showF3 && (
+          {showF3 && (
             <InputCard
               label="Corriente Paneles F3"
               name="corriente_paneles_f3"
@@ -117,8 +135,8 @@ const Step3_Mediciones = ({ formData, updateFormData }) => {
           />
           <InputCard
             label="Antigüedad"
-            name="antiguedad_paneles"
-            value={formData.antiguedad_paneles || ''}
+            name="paneles_antiguedad_anos"
+            value={formData.paneles_antiguedad_anos || ''}
             onChange={handleChange}
             type="number"
             unit="años"

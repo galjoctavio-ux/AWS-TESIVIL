@@ -5,289 +5,303 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // ---------------------------------------------------------
-// 1. ESTILOS Y ASSETS (DISEÑO PREMIUM "LUZ EN TU ESPACIO")
+// 1. ESTILOS VISUALES (DISEÑO PREMIUM)
 // ---------------------------------------------------------
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
   
-  body { font-family: 'Inter', sans-serif; padding: 40px; color: #1f2937; margin: 0; background: #fff; font-size: 11px; line-height: 1.5; }
+  body { font-family: 'Roboto', sans-serif; padding: 40px; color: #1f2937; margin: 0; background: #fff; font-size: 12px; line-height: 1.4; }
   
   /* HEADER */
-  .header-container { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 25px; }
-  .brand-section h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: #000; text-transform: uppercase; }
-  .brand-section .subtitle { font-size: 9px; color: #6b7280; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+  .header { display: flex; justify-content: space-between; border-bottom: 3px solid #000; padding-bottom: 15px; margin-bottom: 25px; }
+  .brand h1 { font-size: 26px; font-weight: 900; margin: 0; color: #111; text-transform: uppercase; letter-spacing: -1px; }
+  .brand p { font-size: 9px; color: #666; margin: 2px 0 0 0; text-transform: uppercase; letter-spacing: 2px; }
+  .client-info { text-align: right; }
+  .client-name { font-size: 16px; font-weight: 700; color: #000; }
+  .client-meta { font-size: 10px; color: #555; margin-top: 2px; }
+  .tarifa-badge { background: #111; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 10px; margin-left: 5px; }
   
-  .client-card { text-align: right; }
-  .client-name { font-size: 14px; font-weight: 700; color: #111827; }
-  .client-address { font-size: 10px; color: #6b7280; max-width: 250px; margin-left: auto; }
+  /* ZONA B: RESUMEN FINANCIERO (GANCHO) */
+  .financial-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+  .fin-card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; text-align: center; }
+  .fin-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #6b7280; margin-bottom: 5px; }
+  .fin-value { font-size: 24px; font-weight: 900; color: #111; }
+  .fin-unit { font-size: 12px; font-weight: 500; color: #9ca3af; }
   
-  /* TITLE BLOCK */
-  .report-title { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px; }
-  .main-title { font-size: 24px; font-weight: 900; line-height: 1; color: #111; }
-  .main-title span { display: block; font-size: 10px; font-weight: 500; color: #ef4444; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; }
+  .card-danger { background: #fef2f2; border-color: #fecaca; }
+  .card-danger .fin-value { color: #dc2626; }
+  .card-success { background: #f0fdf4; border-color: #bbf7d0; }
+  .card-success .fin-value { color: #16a34a; }
+
+  /* ZONA C: IA */
+  .ai-box { background: #eff6ff; border-left: 4px solid #2563eb; padding: 15px; margin-bottom: 25px; border-radius: 0 8px 8px 0; }
+  .ai-title { font-size: 10px; font-weight: 900; color: #1e40af; text-transform: uppercase; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+  .ai-text { font-style: italic; color: #1e3a8a; font-size: 11px; text-align: justify; }
+
+  /* ZONA D: VISUALIZACIÓN */
+  .viz-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; margin-bottom: 25px; align-items: start; }
+  .chart-container { text-align: center; }
+  .infra-card { padding: 15px; border-radius: 8px; text-align: center; border: 1px solid transparent; }
+  .infra-good { background: #ecfdf5; border-color: #10b981; color: #065f46; }
+  .infra-regular { background: #fffbeb; border-color: #f59e0b; color: #92400e; }
+  .infra-bad { background: #fef2f2; border-color: #ef4444; color: #991b1b; }
   
-  .meta-grid { display: grid; grid-template-columns: auto auto auto; gap: 15px; text-align: right; }
-  .meta-item strong { display: block; font-size: 8px; text-transform: uppercase; color: #9ca3af; }
-  .meta-item div { font-weight: 600; font-size: 11px; }
+  .tech-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 10px; }
+  .tech-table td { padding: 4px 0; border-bottom: 1px solid #f3f4f6; }
+  .tech-val { font-weight: 700; text-align: right; }
 
-  /* SECTION HEADERS */
-  .section-title { 
-    font-size: 10px; font-weight: 700; text-transform: uppercase; color: #4b5563; 
-    border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; margin: 20px 0 10px 0; 
-    display: flex; justify-content: space-between; align-items: center;
-  }
-
-  /* HALLAZGOS TABLE (Estilo Replicado del Bonito) */
-  .hallazgos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .info-table { width: 100%; border-collapse: collapse; font-size: 10px; }
-  .info-table td { padding: 6px 8px; border-bottom: 1px solid #f3f4f6; }
-  .info-table .lbl { font-weight: 600; color: #6b7280; width: 60%; }
-  .info-table .val { font-weight: 700; color: #111; }
+  /* ZONA E: TABLA EQUIPOS */
+  .section-title { font-size: 12px; font-weight: 800; text-transform: uppercase; color: #374151; border-bottom: 2px solid #e5e7eb; padding-bottom: 5px; margin-bottom: 10px; margin-top: 20px; }
   
-  .val-bueno { color: #059669 !important; } 
-  .val-malo { color: #dc2626 !important; }  
-  .val-warn { color: #d97706 !important; }
-
-  /* KPI CARDS */
-  .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
-  .kpi-card { padding: 12px; border-radius: 6px; border: 1px solid #e5e7eb; background: #f9fafb; }
-  .kpi-label { font-size: 8px; text-transform: uppercase; color: #6b7280; font-weight: 600; margin-bottom: 4px; }
-  .kpi-value { font-size: 18px; font-weight: 800; color: #111; }
-  .kpi-unit { font-size: 9px; font-weight: 500; color: #6b7280; margin-left: 2px; }
-  .kpi-card.warning { background: #fef2f2; border-color: #fee2e2; }
-  .kpi-card.warning .kpi-value { color: #dc2626; }
-
-  /* EQUIPOS TABLE */
-  table.main-table { width: 100%; border-collapse: collapse; font-size: 10px; }
-  table.main-table th { text-align: left; padding: 8px; border-bottom: 2px solid #e5e7eb; color: #6b7280; font-size: 8px; text-transform: uppercase; font-weight: 600; }
-  table.main-table td { padding: 8px; border-bottom: 1px solid #f3f4f6; color: #374151; }
+  .main-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+  .main-table th { text-align: left; padding: 8px; background: #f3f4f6; color: #4b5563; font-weight: 700; text-transform: uppercase; }
+  .main-table td { padding: 8px; border-bottom: 1px solid #e5e7eb; }
   
-  .status-badge { padding: 2px 6px; border-radius: 10px; font-size: 8px; font-weight: 700; display: inline-block; text-transform: uppercase; }
-  .status-good { background: #d1fae5; color: #065f46; }
-  .status-bad { background: #fee2e2; color: #991b1b; }
-  .status-warn { background: #fef3c7; color: #92400e; }
+  .badge { padding: 2px 6px; border-radius: 10px; font-size: 8px; font-weight: 800; text-transform: uppercase; }
+  .b-malo { background: #fee2e2; color: #991b1b; }
+  .b-regular { background: #fef3c7; color: #92400e; }
+  .b-bueno { background: #d1fae5; color: #065f46; }
 
-  /* AI BOX */
-  .ai-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
-  .ai-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .ai-title { font-weight: 700; color: #0f172a; font-size: 10px; text-transform: uppercase; }
-  .ai-badge { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; font-size: 8px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
-  .ai-content { font-size: 10px; color: #334155; text-align: justify; font-style: italic; }
+  /* ZONA F: TRIGGERS (VENTA) */
+  .trigger-box { display: flex; align-items: center; gap: 15px; padding: 15px; border-radius: 8px; margin-top: 20px; color: white; }
+  .t-solar { background: linear-gradient(135deg, #b91c1c, #7f1d1d); }
+  .t-leak { background: #111; }
+  .trigger-icon { font-size: 24px; }
+  .trigger-content h3 { margin: 0; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+  .trigger-content p { margin: 2px 0 0 0; font-size: 10px; opacity: 0.9; }
 
-  /* FIRMAS */
-  .footer-signatures { display: flex; justify-content: space-between; margin-top: 40px; page-break-inside: avoid; }
-  .sig-box { width: 45%; border-top: 1px solid #d1d5db; padding-top: 8px; text-align: center; }
-  .sig-img { height: 45px; object-fit: contain; display: block; margin: 0 auto 5px auto; }
-  .sig-placeholder { height: 45px; }
-
-  /* PROMO */
-  .promo-box { margin-top: 25px; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 12px; display: flex; gap: 15px; background: #f8fafc; page-break-inside: avoid; }
-  .promo-price { background: #0f172a; color: white; padding: 10px; border-radius: 6px; text-align: center; min-width: 80px; display: flex; flex-direction: column; justify-content: center; }
+  /* FOOTER */
+  .footer { margin-top: 40px; display: flex; justify-content: space-between; page-break-inside: avoid; }
+  .sig-box { width: 40%; text-align: center; border-top: 1px solid #d1d5db; padding-top: 10px; }
+  .sig-img { height: 50px; object-fit: contain; }
 `;
 
 // ---------------------------------------------------------
-// 2. IA GENERATIVA (GEMINI)
+// 2. IA GENERATIVA (GEMINI PROMPT REFORZADO)
 // ---------------------------------------------------------
 const generarDiagnosticoIA = async (datos) => {
   const apiKey = process.env.GEMINI_API_KEY;
 
-  const datosParaIA = {
-    servicio: datos.mediciones?.tipo_servicio || 'Desconocido',
-    hallazgos: {
-      sello_cfe: datos.mediciones?.sello_cfe,
-      tornillos_flojos: datos.mediciones?.tornillos_flojos,
-      capacidad_ok: datos.mediciones?.capacidad_vs_calibre
-    },
-    fugas: {
-      fuga_detectada_amp: datos.mediciones?.corriente_fuga_f1 || 0
-    },
-    equipos_criticos: datos.equipos?.filter(e => e.estado_equipo?.toLowerCase().includes('malo')).length || 0,
-    causas_reportadas: datos.causas_alto_consumo || []
+  // Preparamos solo los datos que le importan al "Auditor Financiero"
+  const payloadIA = {
+    tarifa: datos.header?.tarifa,
+    condicion_infraestructura: datos.header?.condicion_infra,
+    kwh_recibo: datos.finanzas?.kwh_recibo,
+    kwh_desperdicio: datos.finanzas?.kwh_desperdicio,
+    alerta_fuga: datos.finanzas?.alerta_fuga,
+    equipos_criticos: datos.equipos?.filter(e => e.estado_equipo === 'Malo').map(e => e.nombre_equipo)
   };
 
-  const prompt = `Analiza estos datos de una revisión eléctrica: ${JSON.stringify(datosParaIA)}. Redacta un 'Diagnóstico Ejecutivo' profesional, breve (max 50 palabras) y positivo para el cliente. Texto plano sin markdown.`;
+  const prompt = `
+    Actúa como un Auditor Energético Senior experto en finanzas.
+    Analiza este JSON: ${JSON.stringify(payloadIA)}.
+    
+    Escribe un "Diagnóstico Ejecutivo" de máximo 60 palabras.
+    
+    REGLAS OBLIGATORIAS:
+    1. Si 'condicion_infraestructura' es 'Malo', DEBES iniciar con: "URGENTE: Riesgo crítico de seguridad e incendio por instalación obsoleta."
+    2. Si 'alerta_fuga' es true, menciona explícitamente que hay "Dinero perdido en fugas o consumo fantasma".
+    3. Si la tarifa es 'DAC', menciona que están pagando sobreprecio y la solución es solar.
+    4. Tono: Profesional, directo y alarmante si hay riesgo. Sin saludos.
+  `;
 
-  if (!apiKey) return "Análisis automatizado no disponible (Falta API Key). El diagnóstico manual confirma los hallazgos presentados.";
+  if (!apiKey) return "Análisis IA no disponible. Se recomienda atender los puntos rojos marcados en este reporte.";
 
   try {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     const response = await axios.post(url, {
       contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.4, maxOutputTokens: 3000 }
+      generationConfig: { temperature: 0.3, maxOutputTokens: 200 }
     });
-    return response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "Diagnóstico técnico completado.";
+    return response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "Revisión técnica completada.";
   } catch (error) {
     console.error("Error Gemini:", error.message);
-    return "Basado en la inspección visual y las mediciones realizadas, se recomienda atender los puntos críticos señalados.";
+    return "Basado en la inspección visual y mediciones, se detectaron oportunidades críticas de ahorro y seguridad.";
   }
 };
 
 // ---------------------------------------------------------
-// 3. RENDERIZADO HTML (PLANTILLA PREMIUM)
+// 3. GENERADOR HTML
 // ---------------------------------------------------------
 const getHtmlReporte = (datos, textoIA) => {
-  const { header, mediciones, equipos, consumo_total_estimado, recomendaciones_tecnico, causas_alto_consumo } = datos;
+  const { header, finanzas, equipos, mediciones } = datos;
 
-  // Helpers visuales
-  const clsSello = mediciones.sello_cfe ? 'val-bueno' : 'val-malo';
-  const txtSello = mediciones.sello_cfe ? 'Sí (Correcto)' : 'No (Irregular)';
+  // A. Lógica Gráfica QuickChart (Dona)
+  const chartData = {
+    type: 'doughnut',
+    data: {
+      labels: ['Consumo Real', 'Desperdicio/Fuga'],
+      datasets: [{
+        data: [finanzas.kwh_ajustado, finanzas.kwh_desperdicio],
+        backgroundColor: ['#22c55e', '#ef4444'], // Verde vs Rojo
+        borderWidth: 0
+      }]
+    },
+    options: {
+      cutoutPercentage: 70,
+      plugins: { legend: { display: false }, outlabels: { display: false } }
+    }
+  };
+  const chartUrl = `https://quickchart.io/chart?c=${encodeURIComponent(JSON.stringify(chartData))}&w=250&h=250`;
 
-  const clsTornillos = mediciones.tornillos_flojos ? 'val-malo' : 'val-bueno';
-  const txtTornillos = mediciones.tornillos_flojos ? 'Sí (Riesgo)' : 'No';
+  // B. Lógica Visual de Infraestructura
+  let infraHtml = '';
+  if (header.condicion_infra === 'Malo') {
+    infraHtml = `
+      <div class="infra-card infra-bad">
+        <div style="font-size:20px;">🚨</div>
+        <div style="font-weight:900; font-size:12px; margin-top:5px;">INSTALACIÓN DE ALTO RIESGO</div>
+        <div style="font-size:9px;">Componentes oxidados, cables viejos (>30 años) o fuera de norma. <strong>Peligro de Incendio.</strong></div>
+      </div>`;
+  } else if (header.condicion_infra === 'Regular') {
+    infraHtml = `
+      <div class="infra-card infra-regular">
+        <div style="font-size:20px;">⚠️</div>
+        <div style="font-weight:900; font-size:12px; margin-top:5px;">REQUIERE MANTENIMIENTO</div>
+        <div style="font-size:9px;">Instalación con desgaste visible. Se recomienda corrección preventiva.</div>
+      </div>`;
+  } else {
+    infraHtml = `
+      <div class="infra-card infra-good">
+        <div style="font-size:20px;">✅</div>
+        <div style="font-weight:900; font-size:12px; margin-top:5px;">INSTALACIÓN APROBADA</div>
+        <div style="font-size:9px;">Cumple con los estándares de seguridad y operación.</div>
+      </div>`;
+  }
 
-  const clsCapacidad = mediciones.capacidad_vs_calibre ? 'val-bueno' : 'val-malo';
-  const txtCapacidad = mediciones.capacidad_vs_calibre ? 'Correcto' : 'Riesgo';
-
-  // Filas de equipos
-  const equiposRows = equipos.map(eq => {
-    let badgeClass = 'status-good';
-    if (eq.estado_equipo?.toLowerCase().includes('malo')) badgeClass = 'status-bad';
-    if (eq.estado_equipo?.toLowerCase().includes('regular')) badgeClass = 'status-warn';
+  // C. Tabla de Equipos
+  const rows = equipos.map(eq => {
+    let badge = 'b-bueno';
+    if (eq.estado_equipo === 'Malo') badge = 'b-malo';
+    if (eq.estado_equipo === 'Regular') badge = 'b-regular';
 
     return `
       <tr>
-        <td style="font-weight:600;">${eq.nombre_equipo}</td>
-        <td>${eq.ubicacion || '-'}</td>
-        <td>${eq.amperaje} A</td>
-        <td><strong>${eq.kwh_bimestre?.toFixed(1) || 0}</strong> kWh</td>
-        <td><span class="status-badge ${badgeClass}">${eq.estado_equipo || 'N/A'}</span></td>
+        <td>
+          <div style="font-weight:bold;">${eq.nombre_equipo}</div>
+          <div style="font-size:9px; color:#666;">${eq.nombre_personalizado || ''}</div>
+        </td>
+        <td style="text-align:center;"><span class="badge ${badge}">${eq.estado_equipo}</span></td>
+        <td style="text-align:center;">${eq.tiempo_uso} h</td>
+        <td style="text-align:right;">${eq.amperaje_medido} A</td>
+        <td style="text-align:right; font-weight:bold;">${eq.kwh_bimestre_calculado?.toFixed(0)} kWh</td>
       </tr>
     `;
   }).join('');
 
-  const causasList = causas_alto_consumo?.map(c => `<li>${c}</li>`).join('') || '<li>No se reportaron anomalías específicas.</li>';
-
   return `
     <!DOCTYPE html>
     <html>
-    <head>
-      <meta charset="UTF-8">
-      <style>${styles}</style>
-    </head>
+    <head><style>${styles}</style></head>
     <body>
 
-      <div class="header-container">
-        <div class="brand-section">
-          <h1>Luz en tu Espacio</h1>
-          <div class="subtitle">Ingeniería & Eficiencia Energética</div>
+      <div class="header">
+        <div class="brand">
+          <h1 style="margin-bottom:5px;">LUZ EN TU ESPACIO</h1>
+          <div style="font-size:9px; color:#4b5563; line-height:1.3;">
+            Av. Sebastian Bach 4978, Prados Guadalupe, Zapopan, Jal.<br>
+            Tel: 33 2639 5038 | contacto-lete@tesivil.com<br>
+            www.tesivil.com/lete
+          </div>
         </div>
-        <div class="client-card">
-          <div class="client-name">${header.cliente_nombre || 'Cliente'}</div>
-          <div class="client-address">${header.cliente_direccion || ''}</div>
-          <div style="font-size:9px; color:#9ca3af;">${header.cliente_email || ''}</div>
+        <div class="client-info">
+          <div class="client-name">
+            ${header.cliente_nombre} 
+            <span class="tarifa-badge">TARIFA ${header.tarifa}</span>
+          </div>
+          <div class="client-meta">${header.cliente_direccion}</div>
+          <div class="client-meta">Folio #${header.id} | ${new Date(header.fecha_revision).toLocaleDateString()}</div>
         </div>
       </div>
 
-      <div class="report-title">
-        <div class="main-title">
-          <span>REPORTE DE DIAGNÓSTICO</span>
-          POR ALTO CONSUMO
+      <div class="financial-grid">
+        <div class="fin-card">
+          <div class="fin-label">Reportado en Recibo</div>
+          <div class="fin-value">${finanzas.kwh_recibo} <span class="fin-unit">kWh</span></div>
         </div>
-        <div class="meta-grid">
-          <div class="meta-item"><strong>Folio</strong><div>#${header.id}</div></div>
-          <div class="meta-item"><strong>Fecha</strong><div>${new Date(header.fecha_revision).toLocaleDateString()}</div></div>
-          <div class="meta-item"><strong>Técnico</strong><div>${header.tecnico_nombre?.split(' ')[0] || 'Ingeniero'}</div></div>
+        <div class="fin-card card-success">
+          <div class="fin-label">Consumo Auditado Real</div>
+          <div class="fin-value">${finanzas.kwh_ajustado.toFixed(0)} <span class="fin-unit">kWh</span></div>
+        </div>
+        <div class="fin-card ${finanzas.alerta_fuga ? 'card-danger' : ''}">
+          <div class="fin-label">Desperdicio / Fuga</div>
+          <div class="fin-value">${finanzas.kwh_desperdicio.toFixed(0)} <span class="fin-unit">kWh</span></div>
         </div>
       </div>
 
       <div class="ai-box">
-        <div class="ai-header">
-          <span class="ai-title">Diagnóstico Ejecutivo</span>
-          <span class="ai-badge">Gemini AI</span>
-        </div>
-        <div class="ai-content">${textoIA}</div>
+        <div class="ai-title">⚡ Diagnóstico Ejecutivo (IA)</div>
+        <div class="ai-text">"${textoIA}"</div>
       </div>
 
-      <div class="hallazgos-grid">
-        
-        <div>
-          <div class="section-title">Hallazgos de Instalación</div>
-          <table class="info-table">
-            <tr><td class="lbl">Tipo Servicio</td><td class="val">${mediciones.tipo_servicio || 'Monofásico'}</td></tr>
-            <tr><td class="lbl">Sello CFE</td><td class="val ${clsSello}">${txtSello}</td></tr>
-            <tr><td class="lbl">Tornillos Flojos</td><td class="val ${clsTornillos}">${txtTornillos}</td></tr>
-            <tr><td class="lbl">Capacidad Interruptor</td><td class="val ${clsCapacidad}">${txtCapacidad}</td></tr>
-            <tr><td class="lbl">Edad Instalación</td><td class="val" style="font-weight:400;">${mediciones.edad_instalacion || '-'}</td></tr>
-            <tr><td class="lbl">Observaciones</td><td class="val" style="font-weight:400; font-size:9px;">${mediciones.observaciones_cc || 'Ninguna'}</td></tr>
-          </table>
+      <div class="viz-grid">
+        <div class="chart-container">
+          <img src="${chartUrl}" width="160" />
+          <div style="font-size:9px; color:#888; margin-top:5px;">Distribución de Energía</div>
         </div>
-
         <div>
-           <div class="section-title">Panel de Mediciones</div>
-           <div class="kpi-grid" style="grid-template-columns: 1fr 1fr;">
-              <div class="kpi-card">
-                <div class="kpi-label">Voltaje (F-N)</div>
-                <span class="kpi-value">${mediciones.voltaje_medido}</span><span class="kpi-unit">V</span>
-              </div>
-              <div class="kpi-card ${mediciones.corriente_fuga_f1 > 0.5 ? 'warning' : ''}">
-                <div class="kpi-label">Fuga Detectada</div>
-                <span class="kpi-value">${mediciones.corriente_fuga_f1}</span><span class="kpi-unit">A</span>
-              </div>
-           </div>
-           
-           <table class="info-table">
-             <tr><td class="lbl">Corriente F1</td><td class="val">${mediciones.corriente_red_f1} A</td></tr>
-             ${mediciones.corriente_red_f2 > 0 ? `<tr><td class="lbl">Corriente F2</td><td class="val">${mediciones.corriente_red_f2} A</td></tr>` : ''}
-             ${mediciones.corriente_red_f3 > 0 ? `<tr><td class="lbl">Corriente F3</td><td class="val">${mediciones.corriente_red_f3} A</td></tr>` : ''}
-             <tr><td class="lbl">Consumo Est.</td><td class="val">${consumo_total_estimado?.toFixed(1)} kWh</td></tr>
-           </table>
+          ${infraHtml}
+          <div style="margin-top:15px; border-top:1px solid #eee; padding-top:10px;">
+            <table class="tech-table">
+              <tr><td>Voltaje de Operación</td><td class="tech-val">${mediciones.voltaje_medido} V</td></tr>
+              <tr><td>Corriente de Fuga (Medición Directa)</td><td class="tech-val ${mediciones.corriente_fuga_f1 > 0.5 ? 'color:red' : ''}">${mediciones.corriente_fuga_f1} A</td></tr>
+              <tr><td>Capacidad vs Calibre</td><td class="tech-val">${mediciones.capacidad_vs_calibre ? '✅ Correcto' : '❌ Incorrecto'}</td></tr>
+            </table>
+          </div>
         </div>
-
       </div>
 
-      <div class="section-title" style="margin-top:30px;">Desglose de Equipos</div>
+      <div class="section-title">Desglose de Consumo por Equipo</div>
       <table class="main-table">
         <thead>
           <tr>
-            <th width="35%">Equipo</th>
-            <th width="25%">Ubicación</th>
-            <th width="15%">Amp.</th>
-            <th width="15%">Consumo</th>
-            <th width="10%">Estado</th>
+            <th width="40%">Equipo</th>
+            <th width="15%" style="text-align:center;">Estado</th>
+            <th width="15%" style="text-align:center;">Uso Diario</th>
+            <th width="15%" style="text-align:right;">Amperaje</th>
+            <th width="15%" style="text-align:right;">Bimestral</th>
           </tr>
         </thead>
         <tbody>
-          ${equiposRows || '<tr><td colspan="5" style="text-align:center">Sin equipos</td></tr>'}
+          ${rows}
         </tbody>
       </table>
 
-      <div class="section-title">Conclusiones Técnicas</div>
-      <div style="background:#fff; border:1px solid #f3f4f6; padding:10px; border-radius:6px;">
-        <strong style="font-size:10px; color:#111;">Causas Detectadas:</strong>
-        <ul style="margin:5px 0 15px 0; padding-left:20px; font-size:10px;">${causasList}</ul>
-        
-        <strong style="font-size:10px; color:#111;">Recomendaciones:</strong>
-        <p style="margin:5px 0 0 0; font-size:10px; white-space:pre-wrap;">${recomendaciones_tecnico || 'Sin recomendaciones adicionales.'}</p>
+      ${header.tarifa === 'DAC' ? `
+        <div class="trigger-box t-solar">
+          <div class="trigger-icon">☀️</div>
+          <div class="trigger-content">
+            <h3>Alerta: Tarifa DAC Detectada</h3>
+            <p>Estás pagando el precio más alto de energía en México. La única forma efectiva de salir y congelar el costo es instalar Paneles Solares.</p>
+          </div>
+        </div>` : ''
+    }
+
+      ${finanzas.alerta_fuga ? `
+        <div class="trigger-box t-leak">
+          <div class="trigger-icon">👻</div>
+          <div class="trigger-content">
+            <h3>Alerta: Consumo Fantasma Crítico</h3>
+            <p>Detectamos una diferencia mayor al 15% entre lo que usas y lo que pagas. Recomendamos instalar el monitor "Cuentatrón" 24/7 para hallar la fuga.</p>
+          </div>
+        </div>` : ''
+    }
+
+      <div class="footer">
+        <div class="sig-box">
+          ${header.firma_ingeniero_url ? `<img src="${header.firma_ingeniero_url}" class="sig-img"/>` : '<div style="height:50px;"></div>'}
+          <div style="font-weight:bold; font-size:10px; margin-top:5px;">${header.tecnico_nombre}</div>
+          <div style="font-size:9px; color:#666;">Ingeniero Auditor</div>
+        </div>
+        <div class="sig-box">
+          ${datos.firma_cliente_url ? `<img src="${datos.firma_cliente_url}" class="sig-img"/>` : '<div style="height:50px;"></div>'}
+          <div style="font-weight:bold; font-size:10px; margin-top:5px;">Firma de Conformidad</div>
+          <div style="font-size:9px; color:#666;">Cliente / Representante</div>
+        </div>
       </div>
 
-      <div class="footer-signatures">
-        <div class="sig-box">
-           ${header.firma_ingeniero_url
-      ? `<img src="${header.firma_ingeniero_url}" class="sig-img" />`
-      : `<div class="sig-placeholder"></div>`
-    }
-           <div style="font-weight:700; font-size:10px;">${header.tecnico_nombre}</div>
-           <div style="font-size:8px; color:#6b7280;">Ingeniero Responsable</div>
-        </div>
-        <div class="sig-box">
-           ${datos.firma_cliente_url
-      ? `<img src="${datos.firma_cliente_url}" class="sig-img" />`
-      : `<div class="sig-placeholder"></div>`
-    }
-           <div style="font-weight:700; font-size:10px;">Firma del Cliente</div>
-           <div style="font-size:8px; color:#6b7280;">Conformidad de Servicio</div>
-        </div>
-      </div>
-
-      <div class="promo-box">
-        <div style="flex:1;">
-          <div style="font-weight:800; font-size:12px; margin-bottom:4px;">¿Tu recibo no baja? Encuentra el "Consumo Fantasma"</div>
-          <div style="font-size:9px; color:#555;">El servicio <strong>Cuentatrón</strong> vigila tu instalación 24/7. Detectamos fugas ocultas y calculamos pérdidas en dinero.</div>
-        </div>
-        <div class="promo-price">
-          <span style="font-size:16px; font-weight:800;">$999</span>
-          <span style="font-size:8px;">MXN</span>
-        </div>
+      <div style="margin-top:30px; padding-top:10px; border-top:1px solid #e5e7eb; font-size:8px; color:#9ca3af; text-align:justify;">
+        <strong>AVISO LEGAL:</strong> Este documento es un diagnóstico técnico basado en las condiciones visibles y mediciones puntuales realizadas durante la visita. Los cálculos de consumo, desperdicio y ahorro son estimaciones de ingeniería con fines informativos y pueden variar según los hábitos de uso del usuario. Este reporte no constituye una garantía de facturación futura ante CFE ni responsabiliza a <em>Luz en tu Espacio</em> por vicios ocultos en la infraestructura eléctrica o cambios posteriores en la instalación.
       </div>
 
     </body>
@@ -296,7 +310,7 @@ const getHtmlReporte = (datos, textoIA) => {
 };
 
 // ---------------------------------------------------------
-// 4. FUNCIÓN PRINCIPAL
+// 4. FUNCIÓN PRINCIPAL (EXPORT)
 // ---------------------------------------------------------
 export const generarPDF = async (datos) => {
   try {
@@ -315,7 +329,7 @@ export const generarPDF = async (datos) => {
     const pdfBuffer = await page.pdf({
       format: 'Letter',
       printBackground: true,
-      margin: { top: '1cm', right: '1cm', bottom: '1cm', left: '1cm' }
+      margin: { top: '0.8cm', right: '0.8cm', bottom: '0.8cm', left: '0.8cm' }
     });
 
     await browser.close();

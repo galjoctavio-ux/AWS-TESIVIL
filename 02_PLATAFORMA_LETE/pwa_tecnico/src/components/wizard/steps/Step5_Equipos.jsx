@@ -4,16 +4,15 @@ import InputCard from '../ui/InputCard';
 import SelectCard from '../ui/SelectCard';
 
 // Definimos los límites suaves basados en tus reglas.
-// Si se pasa de esto, mostramos alerta, pero permitimos guardar.
 const LIMITES_REFERENCIA = {
-  'Refrigerador': 1.2, // Tu ref: 1.2A (damos margen)
-  'Aire Acondicionado': 8.0, // Tu ref: 9A a 110v (damos margen de arranque)
-  'Ventilador': 0.4, // Tu ref: 0.4A
-  'Lavadora': 4.0, // Tu ref: 4-6A
-  'Secadora': 12.0, // Tu ref: 14A
-  'TV': 1.0, // Tu ref: 0.4-1A
-  'Bomba de Agua': 6.0, // Tu ref: 4A
-  'Iluminación': 3.0, // Generalmente bajo
+  'Refrigerador': 1.2,
+  'Aire Acondicionado': 8.0,
+  'Ventilador': 0.4,
+  'Lavadora': 4.0,
+  'Secadora': 12.0,
+  'TV': 1.0,
+  'Bomba de Agua': 6.0,
+  'Iluminación': 3.0,
   'Microondas': 10.0,
   'Computadora': 4.0
 };
@@ -55,7 +54,6 @@ const Step5_Equipos = ({ formData, updateFormData }) => {
 
     const limite = LIMITES_REFERENCIA[equipo.nombre_equipo];
 
-    // Validación especial para "Otro" si quisiéramos, por ahora solo lista predefinida
     if (limite && val > limite) {
       return `El consumo (${val}A) es inusualmente alto para un(a) ${equipo.nombre_equipo}. Verifica la medición.`;
     }
@@ -70,6 +68,35 @@ const Step5_Equipos = ({ formData, updateFormData }) => {
 
   return (
     <div className="animate-slide-in">
+
+      {/* --- NUEVO: VALIDACIÓN DE CARGAS MENORES (FACTOR HOLGURA) --- */}
+      <div className="mb-6 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-bold text-gray-700 w-3/4">
+            ¿Se incluyeron cargas menores en el inventario?
+            <span className="block font-normal text-gray-500 text-xs mt-1">
+              (Cargadores, focos LED, módems, equipos en stand-by)
+            </span>
+          </span>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={!!formData.se_midieron_cargas_menores}
+              onChange={(e) => updateFormData({ se_midieron_cargas_menores: e.target.checked })}
+              className="sr-only peer"
+            />
+            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+          </label>
+        </div>
+        {/* Feedback visual de la lógica matemática */}
+        <div className={`mt-3 text-xs p-2 rounded ${!formData.se_midieron_cargas_menores ? 'bg-yellow-50 text-yellow-800' : 'bg-green-50 text-green-800'}`}>
+          {!formData.se_midieron_cargas_menores
+            ? "ℹ️ El sistema agregará un +20% de consumo estimado para compensar lo no medido."
+            : "ℹ️ Cálculo exacto: Se usará solo la suma de los equipos listados."
+          }
+        </div>
+      </div>
+
       <div className="space-y-4">
         {equipos.map(equipo => {
           const warning = getAmperajeWarning(equipo);
@@ -97,7 +124,7 @@ const Step5_Equipos = ({ formData, updateFormData }) => {
                   label={equipo.nombre_equipo === 'Otro' ? "Nombre Personalizado" : "Ubicación / Detalle"}
                   name="nombre_personalizado"
                   value={equipo.nombre_personalizado}
-                  onChange={(e) => handleEquipoChange(equipo.id, e.target.name, e.target.value)}
+                  onChange={(e) => handleEquipoChange(equipo.id, 'nombre_personalizado', e.target.value)}
                   placeholder="Ej. Sala, Cocina, Recámara principal"
                 />
 
@@ -107,11 +134,10 @@ const Step5_Equipos = ({ formData, updateFormData }) => {
                       label="Amperaje"
                       name="amperaje_medido"
                       value={equipo.amperaje_medido}
-                      onChange={(e) => handleEquipoChange(equipo.id, e.target.name, e.target.value)}
+                      onChange={(e) => handleEquipoChange(equipo.id, 'amperaje_medido', e.target.value)}
                       unit="A"
                       type="number"
                     />
-                    {/* Alerta de validación justo debajo del input */}
                     {warning && (
                       <div className="mt-2 flex items-start gap-2 text-xs text-amber-700 bg-amber-50 p-2 rounded-md border border-amber-200">
                         <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
@@ -130,7 +156,7 @@ const Step5_Equipos = ({ formData, updateFormData }) => {
                         id={`tiempo_uso_${equipo.id}`}
                         name="tiempo_uso"
                         value={equipo.tiempo_uso}
-                        onChange={(e) => handleEquipoChange(equipo.id, e.target.name, e.target.value)}
+                        onChange={(e) => handleEquipoChange(equipo.id, 'tiempo_uso', e.target.value)}
                         type="number"
                         placeholder="0"
                         className="flex-1 min-w-0 w-full p-3 bg-gray-50 border-gray-200 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
@@ -138,7 +164,7 @@ const Step5_Equipos = ({ formData, updateFormData }) => {
                       <select
                         name="unidad_tiempo"
                         value={equipo.unidad_tiempo}
-                        onChange={(e) => handleEquipoChange(equipo.id, e.target.name, e.target.value)}
+                        onChange={(e) => handleEquipoChange(equipo.id, 'unidad_tiempo', e.target.value)}
                         className="w-32 p-3 bg-gray-50 border-gray-200 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                       >
                         <option>Horas/Día</option>
@@ -146,7 +172,6 @@ const Step5_Equipos = ({ formData, updateFormData }) => {
                       </select>
                     </div>
                   </div>
-
                 </div>
 
                 <SelectCard
