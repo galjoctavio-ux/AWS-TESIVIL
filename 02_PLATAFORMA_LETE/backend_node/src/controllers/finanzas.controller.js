@@ -74,3 +74,30 @@ export const aprobarTransaccion = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+// POST /api/finanzas/bono (Admin Only)
+export const otorgarBono = async (req, res) => {
+    const { tecnicoId, monto, motivo, casoId } = req.body; // casoId es opcional
+
+    try {
+        const { error } = await supabaseAdmin
+            .from('billetera_transacciones')
+            .insert({
+                tecnico_id: tecnicoId,
+                caso_id: casoId || null,
+                tipo: 'BONO',
+                monto: Number(monto), // +100
+                descripcion: motivo || 'Bono por desempeño',
+                estado: 'APROBADO'
+            });
+
+        if (error) throw error;
+
+        // AQUÍ PODRÍAS DISPARAR NOTIFICACIÓN PUSH AL TÉCNICO
+        // sendPushNotification(tecnicoId, "¡Has recibido un bono de $100!");
+
+        res.json({ success: true, message: 'Bono aplicado correctamente' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};

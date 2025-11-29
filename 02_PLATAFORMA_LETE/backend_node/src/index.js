@@ -13,6 +13,7 @@ import agendaRoutes from './routes/agenda.routes.js';
 // --- NUEVAS RUTAS (CRM y Finanzas) ---
 import clientesRoutes from './routes/clientes.routes.js';
 import finanzasRoutes from './routes/finanzas.routes.js';
+import configRoutes from './routes/config.routes.js';
 
 import './services/eaDatabase.js';
 
@@ -53,6 +54,7 @@ apiRouter.use('/finanzas', finanzasRoutes);
 
 // ¡IMPORTANTE! Montamos nuestro router en el prefijo
 app.use('/lete/api', apiRouter);
+app.use('/api/config', configRoutes);
 
 // --- Manejador de errores básico ---
 app.use((err, req, res, next) => {

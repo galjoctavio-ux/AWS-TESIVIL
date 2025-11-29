@@ -116,76 +116,80 @@ export const cerrarCaso = async (req, res) => {
   const { id: casoId } = req.params;
   const { id: tecnicoId } = req.user;
   const {
-    metodoPago, // 'EFECTIVO', 'TRANSFERENCIA', 'TARJETA'
-    montoCobrado, // Lo que pagó el cliente
-    calificacionCliente, // 1-5 estrellas (opcional)
-    requiereCotizacion, // boolean
-    notasCierre
+    metodoPago, // 'EFECTIVO' o 'TRANSFERENCIA'/'TARJETA'
+    montoCobrado, // Lo que pagó el cliente (Ej: 400)
+    calificacionCliente,
+    requiereCotizacion,
+    notasCierre,
+    tipoClienteCRM
   } = req.body;
 
   try {
-    // 1. Obtener Tarifas Vigentes
+    // 1. Obtener Configuración Financiera (Base $200)
     const config = await getFinancialConfig();
-    const PAGO_TECNICO = config['PAGO_VISITA_BASE'] || 200;
+    let COMISION_BASE = config['PAGO_VISITA_BASE'] || 200;
 
-    // 2. Actualizar Caso (Cierre Operativo)
-    const { error: updateError, count } = await supabaseAdmin // <--- Agregamos 'count' para depurar si quieres
+    // Lógica para Foráneos/Extras (Simplificada para MVP, luego el Admin ajusta)
+    // Si el cobro fue inusualmente alto, podrías marcar un flag, 
+    // pero por ahora mantenemos la comisión base y el Admin ajusta con Bonos/Ajustes.
+
+    // 2. Actualizar Caso
+    const { error: updateError } = await supabaseAdmin
       .from('casos')
       .update({
         status: 'cerrado',
         fecha_cierre: new Date(),
         metodo_pago_cierre: metodoPago,
         monto_cobrado: montoCobrado,
-        monto_pagado_tecnico: PAGO_TECNICO,
+        monto_pagado_tecnico: COMISION_BASE, // Se registra lo "estándar"
         requiere_cotizacion: requiereCotizacion,
         notas_cierre: notasCierre,
         calificacion_servicio_cliente: calificacionCliente,
-
-        // --- CORRECCIÓN CRÍTICA ---
-        // Asignamos el técnico en este momento. 
-        // Si el caso no tenía dueño (NULL), ahora tú eres el dueño.
-        tecnico_id: tecnicoId
-        // --------------------------
+        tecnico_id: tecnicoId // Aseguramos propiedad
       })
       .eq('id', casoId);
-    // .eq('tecnico_id', tecnicoId); // <--- ELIMINAMOS ESTA RESTRICCIÓN. 
-    // Si ya estás en el sitio cerrándolo, tienes derecho a cerrarlo.
 
     if (updateError) throw updateError;
 
-    // 3. GENERAR MOVIMIENTOS EN BILLETERA (Lógica Financiera)
+    // 3. MOVIMIENTOS DE BILLETERA (El Corazón del Sistema)
     const transacciones = [];
 
-    // A. El Pago al Técnico (Siempre se genera a favor)
+    // A. LA COMISIÓN (Siempre suma a favor del técnico)
     transacciones.push({
       tecnico_id: tecnicoId,
       caso_id: casoId,
       tipo: 'VISITA_COMISION',
-      monto: PAGO_TECNICO, // +200
-      descripcion: `Comisión por Visita #${casoId}`,
-      estado: 'APROBADO'
+      monto: COMISION_BASE, // +200
+      descripcion: `Comisión Caso #${casoId}`,
+      estado: 'APROBADO' // La comisión es automática
     });
 
-    // B. La Deuda (Si el técnico cobró en efectivo)
+    // B. EL DINERO FÍSICO (Solo resta si el técnico lo cobró)
     if (metodoPago === 'EFECTIVO') {
       transacciones.push({
         tecnico_id: tecnicoId,
         caso_id: casoId,
         tipo: 'COBRO_EFECTIVO',
-        monto: -Math.abs(montoCobrado), // -400 (Debe esto a la empresa)
+        monto: -Math.abs(montoCobrado), // -400 (Deuda total generada)
         descripcion: `Retención Efectivo Caso #${casoId}`,
         estado: 'APROBADO'
       });
     }
+    // NOTA: Si es Transferencia, no restamos nada, por lo que el saldo del técnico sube +200.
 
-    // Insertar Transacciones
+    // Insertar
     const { error: walletError } = await supabaseAdmin
       .from('billetera_transacciones')
       .insert(transacciones);
 
     if (walletError) throw walletError;
 
-    res.status(200).json({ success: true, message: 'Caso cerrado y finanzas calculadas.' });
+    // 4. (Opcional) Actualizar Semáforo Cliente si cambió
+    if (tipoClienteCRM) {
+      // Lógica para actualizar tabla clientes...
+    }
+
+    res.status(200).json({ success: true });
 
   } catch (error) {
     console.error('Error cerrando caso:', error);

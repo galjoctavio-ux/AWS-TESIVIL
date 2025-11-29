@@ -333,12 +333,18 @@ const getHtmlReporte = (datos, textoIA) => {
         </tbody>
       </table>
 
-      ${header.tarifa === 'DAC' ? `
+      ${(header.tarifa === 'DAC' || finanzas.kwh_recibo > 500) ? `
         <div class="trigger-box t-solar">
           <div class="trigger-icon">☀️</div>
           <div class="trigger-content">
-            <h3>Alerta: Tarifa DAC Detectada</h3>
-            <p>Estás pagando el precio más alto de energía. Sal de DAC instalando Paneles Solares.</p>
+            <h3>
+              ${header.tarifa === 'DAC' ? 'Alerta: Tarifa DAC Detectada' : 'Aviso: Alto Consumo (>500 kWh)'}
+            </h3>
+            <p>
+              ${header.tarifa === 'DAC'
+        ? 'Estás pagando el precio más alto de energía. La solución inmediata para salir de DAC es instalar Paneles Solares.'
+        : 'Tu consumo es elevado y corres riesgo de caer en Tarifa de Alto Consumo (DAC). Congela el precio de tu luz instalando Paneles Solares hoy.'}
+            </p>
           </div>
         </div>` : ''
     }
