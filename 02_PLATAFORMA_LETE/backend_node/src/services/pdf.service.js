@@ -191,24 +191,24 @@ const getHtmlReporte = (datos, textoIA) => {
   // LOGICA TABLA EQUIPOS (Colores de filas)
   const rows = equipos.map(eq => {
     let badgeClass = 'b-bueno';
-    let rowClass = ''; // Clase para pintar toda la fila
+    let rowClass = '';
 
     if (eq.estado_equipo === 'Malo') {
       badgeClass = 'b-malo';
-      rowClass = 'row-malo'; // Pinta rojo
+      rowClass = 'row-malo';
     }
     if (eq.estado_equipo === 'Regular') {
       badgeClass = 'b-regular';
-      rowClass = 'row-regular'; // Pinta naranja
+      rowClass = 'row-regular';
     }
 
     return `
-      <tr class="${rowClass}">
-        <td>
+      <tr class="${rowClass}">  <td>
           <div style="font-weight:bold;">${eq.nombre_equipo}</div>
           <div style="font-size:9px; color:#666;">${eq.nombre_personalizado || ''}</div>
         </td>
-        <td style="text-align:center;"><span class="badge ${badge}">${eq.estado_equipo}</span></td>
+        <td style="text-align:center;">
+            <span class="badge ${badgeClass}">${eq.estado_equipo}</span> </td>
         <td style="text-align:center;">${eq.tiempo_uso} h</td>
         <td style="text-align:right;">${eq.amperaje_medido} A</td>
         <td style="text-align:right; font-weight:bold;">${eq.kwh_bimestre_calculado?.toFixed(0)} kWh</td>
