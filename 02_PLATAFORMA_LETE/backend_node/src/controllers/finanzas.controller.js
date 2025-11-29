@@ -1,11 +1,69 @@
 import { supabaseAdmin } from '../services/supabaseClient.js';
+import webpush from 'web-push'; // <--- NUEVO
+import pool from '../services/eaDatabase.js'; // <--- NUEVO (Para acceder a ea_push_subscriptions)
+
+// --- CONFIGURACIÓN DE WEBPUSH (Reutilizamos las env vars) ---
+webpush.setVapidDetails(
+    process.env.VAPID_SUBJECT || 'mailto:admin@letesolar.com',
+    process.env.VAPID_PUBLIC_KEY,
+    process.env.VAPID_PRIVATE_KEY
+);
+
+// --- HELPER: ENVIAR PUSH AL TÉCNICO ---
+// Esta función conecta el mundo Supabase (UUID) con el mundo Push (E!A ID)
+async function enviarPushAlTecnico(tecnicoUuid, titulo, mensaje) {
+    try {
+        // 1. Obtener el ID numérico de E!A desde el perfil de Supabase
+        const { data: perfil } = await supabaseAdmin
+            .from('profiles')
+            .select('ea_user_id')
+            .eq('id', tecnicoUuid)
+            .single();
+
+        if (!perfil || !perfil.ea_user_id) {
+            console.warn(`⚠️ No se pudo notificar al técnico ${tecnicoUuid}: No tiene ea_user_id.`);
+            return;
+        }
+
+        const eaUserId = perfil.ea_user_id;
+
+        // 2. Buscar suscripciones en MySQL
+        const [subs] = await pool.query('SELECT * FROM ea_push_subscriptions WHERE user_id = ?', [eaUserId]);
+
+        if (subs.length === 0) return; // No tiene celular registrado
+
+        const payload = JSON.stringify({
+            title: titulo,
+            body: mensaje,
+            url: '/billetera' // Al hacer clic, lleva a la billetera
+        });
+
+        // 3. Disparar a todos sus dispositivos
+        const promesas = subs.map(sub => {
+            return webpush.sendNotification({
+                endpoint: sub.endpoint,
+                keys: { auth: sub.auth, p256dh: sub.p256dh }
+            }, payload).catch(err => {
+                if (err.statusCode === 410 || err.statusCode === 404) {
+                    pool.query('DELETE FROM ea_push_subscriptions WHERE id = ?', [sub.id]);
+                }
+            });
+        });
+
+        await Promise.all(promesas);
+        console.log(`🔔 Push enviado a ${subs.length} dispositivos del técnico.`);
+
+    } catch (error) {
+        console.error("Error enviando push financiero:", error);
+    }
+}
+
 
 // GET /api/finanzas/resumen/:tecnicoId
 export const getResumenFinanciero = async (req, res) => {
     const { tecnicoId } = req.params;
 
     try {
-        // Traemos todo lo que NO haya sido rechazado por el admin
         const { data, error } = await supabaseAdmin
             .from('billetera_transacciones')
             .select('*')
@@ -15,11 +73,10 @@ export const getResumenFinanciero = async (req, res) => {
 
         if (error) throw error;
 
-        // Calculamos el saldo sumando todo
         const saldoTotal = data.reduce((acc, curr) => acc + Number(curr.monto), 0);
 
         res.json({
-            saldo_actual: saldoTotal, // Si es negativo, debe dinero. Si es positivo, se le debe.
+            saldo_actual: saldoTotal,
             historial: data
         });
 
@@ -28,7 +85,7 @@ export const getResumenFinanciero = async (req, res) => {
     }
 };
 
-// POST /api/finanzas/reportar-pago (El técnico avisa que ya depositó)
+// POST /api/finanzas/reportar-pago
 export const reportarPagoSemanal = async (req, res) => {
     const { tecnicoId, monto, comprobanteUrl } = req.body;
 
@@ -38,14 +95,17 @@ export const reportarPagoSemanal = async (req, res) => {
             .insert({
                 tecnico_id: tecnicoId,
                 tipo: 'PAGO_SEMANAL',
-                monto: Math.abs(monto), // Positivo, porque está "pagando" su deuda
+                monto: Math.abs(monto),
                 descripcion: 'Depósito semanal reportado',
                 comprobante_url: comprobanteUrl,
-                estado: 'EN_REVISION' // <--- Requiere tu aprobación
+                estado: 'EN_REVISION'
             });
 
         if (error) throw error;
-        res.json({ success: true, message: 'Pago reportado correctamente' });
+
+        // (Opcional) Aquí podrías notificarte a ti mismo (Admin) si tuvieras suscripción
+
+        res.json({ success: true, message: 'Pago reportado' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -54,36 +114,36 @@ export const reportarPagoSemanal = async (req, res) => {
 // PUT /api/finanzas/aprobar/:id
 export const aprobarTransaccion = async (req, res) => {
     const { id } = req.params;
-    const { accion, adminId } = req.body; // 'APROBAR' o 'RECHAZAR'
+    const { accion, adminId } = req.body;
 
     try {
         const nuevoEstado = accion === 'APROBAR' ? 'APROBADO' : 'RECHAZADO';
 
-        // 1. Actualizar la transacción
+        // Actualizamos y traemos el tecnico_id para notificarle
         const { data: tx, error } = await supabaseAdmin
             .from('billetera_transacciones')
             .update({
                 estado: nuevoEstado,
                 fecha_aprobacion: new Date(),
-                aprobado_por: adminId // Guardamos quién autorizó
+                aprobado_por: adminId
             })
             .eq('id', id)
-            .select('*, tecnico:tecnico_id(id)') // Traemos el técnico para notificarle
+            .select('tecnico_id, monto')
             .single();
 
         if (error) throw error;
 
-        // 2. (Opcional) Crear Notificación en BD para el técnico
-        if (tx) {
-            const mensaje = accion === 'APROBAR'
-                ? `✅ Tu depósito de $${tx.monto} ha sido aprobado.`
-                : `❌ Tu depósito de $${tx.monto} fue rechazado. Revisa el comprobante.`;
+        res.json({ success: true, estado: nuevoEstado });
 
-            // Insertamos en tabla de notificaciones (si tienes una)
-            // await supabaseAdmin.from('notifications').insert({ userId: tx.tecnico_id, message: mensaje });
+        // --- NOTIFICACIÓN ASÍNCRONA ---
+        if (tx && tx.tecnico_id) {
+            const mensaje = accion === 'APROBAR'
+                ? `✅ Tu depósito de $${tx.monto} fue APROBADO.`
+                : `❌ Tu depósito de $${tx.monto} fue RECHAZADO.`;
+
+            await enviarPushAlTecnico(tx.tecnico_id, 'Actualización Financiera', mensaje);
         }
 
-        res.json({ success: true, estado: nuevoEstado });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -94,30 +154,28 @@ export const otorgarBono = async (req, res) => {
     const { tecnicoId, monto, motivo, casoId } = req.body;
 
     try {
-        // 1. Crear la transacción de BONO (Saldo a favor del técnico)
-        const { data: tx, error } = await supabaseAdmin
+        const { error } = await supabaseAdmin
             .from('billetera_transacciones')
             .insert({
                 tecnico_id: tecnicoId,
-                caso_id: casoId || null, // Opcional: Ligar a un caso específico
+                caso_id: casoId || null,
                 tipo: 'BONO',
-                monto: Math.abs(monto), // Positivo (+)
-                descripcion: motivo || 'Bono por excelencia',
+                monto: Math.abs(monto),
+                descripcion: motivo || 'Bono por desempeño',
                 estado: 'APROBADO'
-            })
-            .select()
-            .single();
+            });
 
         if (error) throw error;
 
-        // 2. LOGICA DE NOTIFICACIÓN
-        // Aquí es donde "Suena" el celular del técnico.
-        // Simularemos que insertamos en una tabla de notificaciones interna o usaríamos web-push
+        res.json({ success: true, message: 'Bono aplicado' });
 
-        // Ejemplo simple: Devolvemos el éxito y el frontend admin confirma
-        console.log(`🔔 Notificación enviada al técnico ${tecnicoId}: Ganaste $${monto}`);
+        // --- NOTIFICACIÓN ASÍNCRONA ---
+        await enviarPushAlTecnico(
+            tecnicoId,
+            '🎉 ¡Recibiste un Bono!',
+            `Se te acreditaron $${monto} por: ${motivo}`
+        );
 
-        res.json({ success: true, message: 'Bono aplicado y notificado', data: tx });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
