@@ -336,15 +336,51 @@ export const processRevision = async (payload, tecnicoAuth) => {
   // 5. Envío de correo (solo si hay PDF y email)
   // ---------------------------------------------------------
   const clienteEmail = revData.cliente_email || casoUpdated?.cliente?.email || '';
+
   if (pdfUrl && clienteEmail) {
     try {
-      console.log(`Enviando email a ${clienteEmail}...`);
+      console.log(`Preparando datos para email a ${clienteEmail}...`);
+
+      // A. Recuperar listas crudas de la base de datos (pueden ser null)
+      const manuales = revData.causas_alto_consumo || [];
+      const automaticos = revData.diagnosticos_automaticos || [];
+
+      // B. UNIFICACIÓN Y LIMPIEZA (Aquí corregimos el [object Object])
+      // Creamos una sola lista combinando ambas fuentes.
+      let hallazgosCombinados = [
+        ...manuales,
+        ...automaticos
+      ];
+
+      // C. FILTRADO INTELIGENTE
+      // 1. Aseguramos que cada elemento sea TEXTO (String). Si es un objeto, lo ignoramos o extraemos texto.
+      // 2. Eliminamos duplicados (Set).
+      // 3. Filtramos valores vacíos o nulos.
+
+      const listaFinalParaEmail = hallazgosCombinados
+        .map(item => {
+          // Si el item es un objeto complejo (ej: {id:1, texto:"..."}), intenta sacar el texto.
+          if (typeof item === 'object' && item !== null) {
+            return item.texto || item.mensaje || item.description || '';
+          }
+          // Si ya es texto, lo devolvemos tal cual.
+          return String(item);
+        })
+        .filter(texto => texto && texto.trim().length > 0) // Quitar vacíos
+        // Truco para quitar duplicados exactos:
+        .filter((valor, indice, self) => self.indexOf(valor) === indice);
+
+      // Log para depuración (ver qué estamos enviando)
+      console.log('Enviando al correo los siguientes hallazgos:', listaFinalParaEmail);
+
+      // D. Enviar el correo con la lista limpia
       await enviarReportePorEmail(
         clienteEmail,
         casoUpdated?.cliente?.nombre_completo || 'Cliente Estimado',
         pdfUrl,
-        revData.diagnosticos_automaticos
+        listaFinalParaEmail // <--- Aquí va la lista limpia, sin objetos raros
       );
+
     } catch (mailErr) {
       console.error('Error enviando correo:', mailErr?.message || mailErr);
     }
@@ -352,12 +388,4 @@ export const processRevision = async (payload, tecnicoAuth) => {
     if (!pdfUrl) console.warn('No se envió correo: no existe pdfUrl.');
     if (!clienteEmail) console.warn('No se envió correo: no existe clienteEmail.');
   }
-
-  // Resultado final
-  return {
-    success: true,
-    message: 'Revisión guardada exitosamente.',
-    revision_id: newRevisionId,
-    pdf_url: pdfUrl
-  };
 };

@@ -6,7 +6,7 @@ dotenv.config();
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Asumimos que tu dominio verificado en Resend es tesivil.com
-const fromEmail = 'reportes@tesivil.com'; 
+const fromEmail = 'reportes@tesivil.com';
 
 /**
  * Envía el email con el reporte al cliente
@@ -25,13 +25,20 @@ export const enviarReportePorEmail = async (clienteEmail, clienteNombre, pdfUrl,
     return;
   }
 
+  const hallazgosSeguros = Array.isArray(listaHallazgos) ? listaHallazgos : [];
+
   // Generar la lista de causas de alto consumo
-  const causasHtml = causasAltoConsumo && causasAltoConsumo.length > 0
+  const causasHtml = hallazgosSeguros.length > 0
     ? `
         <div style="background-color: #f0f5ff; padding: 20px; border-radius: 6px; margin: 25px 0;">
-          <h2 style="color: #10213f; font-size: 18px; margin-bottom: 15px;">Nuestro proceso de revisión identificó:</h2>
-          <ul style="list-style-type: '✔ '; padding-left: 20px; font-size: 16px;">
-            ${causasAltoConsumo.map(causa => `<li style="margin-bottom: 10px;">${causa}</li>`).join('')}
+          <h2 style="color: #10213f; font-size: 18px; margin-bottom: 15px;">Resultados de la Revisión:</h2>
+          <ul style="list-style-type: none; padding-left: 0; font-size: 16px;">
+            ${hallazgosSeguros.map(item => `
+              <li style="margin-bottom: 10px; display: flex; align-items: start;">
+                <span style="color: #2563eb; margin-right: 10px; font-weight: bold;">✔</span>
+                <span>${item}</span>
+              </li>
+            `).join('')}
           </ul>
         </div>
       `
