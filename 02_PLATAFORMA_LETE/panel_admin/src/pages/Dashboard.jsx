@@ -68,6 +68,23 @@ function Dashboard() {
           </Link>
 
           <Link
+            to="/pagos-config"
+            className="main-button"
+            style={{
+              background: '#6f42c1', /* Color Púrpura para diferenciarlo */
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minWidth: '200px',
+              color: 'white',
+              fontWeight: 'bold'
+            }}
+          >
+            🛠️ Tarifas Técnicos
+          </Link>
+
+          <Link
             to="/configuracion"
             style={{ display: 'flex', alignItems: 'center', padding: '10px', background: '#333', color: 'white', borderRadius: '5px', textDecoration: 'none' }}
           >

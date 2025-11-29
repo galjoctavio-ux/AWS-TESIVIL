@@ -39,7 +39,7 @@ apiRouter.get('/health', (req, res) => {
   });
 });
 
-// --- Registro de Rutas ---
+// --- Registro de Rutas dentro de apiRouter ---
 apiRouter.use('/auth', authRoutes);
 apiRouter.use('/usuarios', usuariosRoutes);
 apiRouter.use('/casos', casosRoutes);
@@ -48,14 +48,12 @@ apiRouter.use('/citas', citasRoutes);
 apiRouter.use('/agenda', agendaRoutes);
 
 // --- NUEVOS ENDPOINTS REGISTRADOS ---
-// Accesibles en: /lete/api/clientes y /lete/api/finanzas
 apiRouter.use('/clientes', clientesRoutes);
 apiRouter.use('/finanzas', finanzasRoutes);
+apiRouter.use('/config', configRoutes); // <--- 1. AGREGAR AQUÍ (Mover de abajo hacia acá)
 
 // ¡IMPORTANTE! Montamos nuestro router en el prefijo
 app.use('/lete/api', apiRouter);
-app.use('/api/config', configRoutes);
-app.use('/api/finanzas', finanzasRoutes); // <--- Usar
 
 // --- Manejador de errores básico ---
 app.use((err, req, res, next) => {
