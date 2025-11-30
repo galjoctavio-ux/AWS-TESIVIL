@@ -53,8 +53,10 @@ const ChatSoporte = () => {
         const fetchMessages = async () => {
             try {
                 const res = await api.get(`/conversations/${selectedChat.id}/messages`);
+                // Solo actualizamos si hay cambios reales para evitar re-renders innecesarios (opcional), 
+                // pero por ahora dejamos que React maneje el estado.
                 setMessages(res.data);
-                scrollToBottom();
+                // NOTA: Quitamos scrollToBottom() de aquí para que no salte cada 3 segundos
             } catch (error) { console.error(error); }
         };
         fetchMessages();
@@ -199,8 +201,8 @@ const ChatSoporte = () => {
                     return (
                         <div key={msg.id} className={`flex ${isClient ? 'justify-start' : 'justify-end'}`}>
                             <div className={`max-w-[85%] rounded-lg p-2 text-sm shadow-sm relative ${isInternalMsg ? 'bg-yellow-100 border border-yellow-300 text-gray-800' :
-                                    isClient ? 'bg-white text-gray-900 rounded-tl-none' :
-                                        'bg-[#d9fdd3] text-gray-900 rounded-tr-none'
+                                isClient ? 'bg-white text-gray-900 rounded-tl-none' :
+                                    'bg-[#d9fdd3] text-gray-900 rounded-tr-none'
                                 }`}>
                                 {!isClient && (
                                     <p className="text-[9px] font-bold mb-1 opacity-60 flex gap-1 uppercase">
