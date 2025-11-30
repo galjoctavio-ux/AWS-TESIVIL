@@ -133,8 +133,8 @@ export const getAgendaPorDia = async (req, res) => {
           nombre_completo, 
           direccion_principal,
           google_maps_link,
-          telefono,
-          celular
+          telefono
+          
         )
       `)
       .in('id', casoIds);
