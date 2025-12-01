@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // <--- 1. IMPORTAR useNavigate
-import axios from 'axios'; // <--- 2. IMPORTAR axios
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import dayjs from 'dayjs';
 import { getAgendaPorDia } from '../apiService';
 import CierreCasoModal from './CierreCasoModal';
 
-// Altura aumentada para dar espacio
+// Altura aumentada para dar espacio a la tarjeta
 const HOUR_HEIGHT = 140;
 
-// URL DEL BACKEND NUEVO (Node.js)
+// URL DEL BACKEND NUEVO (Node.js) - Asegúrate de que tenga HTTPS
 const CRM_API = 'https://api.tesivil.com/api';
 
 const timelineContainerStyles = {
@@ -45,7 +45,7 @@ const timeLabelStyles = {
 
 const actionsGridStyles = {
   display: 'grid',
-  gridTemplateColumns: 'repeat(6, 1fr)', // <--- 3. CAMBIO: 6 Columnas ahora
+  gridTemplateColumns: 'repeat(6, 1fr)', // 6 Columnas para incluir el Chat
   gap: '4px',
   marginTop: 'auto',
   paddingTop: '8px',
@@ -53,7 +53,7 @@ const actionsGridStyles = {
 };
 
 const DiaTimeline = ({ date }) => {
-  const navigate = useNavigate(); // Hook de navegación
+  const navigate = useNavigate();
   const [citas, setCitas] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [casoParaCerrar, setCasoParaCerrar] = useState(null);
@@ -114,18 +114,17 @@ const DiaTimeline = ({ date }) => {
       alert("No hay dirección registrada para este cliente.");
       return;
     }
-    const url = `https://www.google.com/maps/search/?api=1&query=$?q=${encodeURIComponent(direccion)}`;
+    // FIX: URL corregida para Google Maps
+    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`;
     window.open(url, "_blank");
   };
 
-  // --- 4. NUEVA FUNCIÓN: ABRIR CHAT WHATSAPP ---
+  // --- 4. FUNCIÓN ROBUSTA: ABRIR CHAT WHATSAPP ---
   const handleOpenChat = async (caso) => {
-    // 1. DEBUG: Vamos a ver qué trae el objeto realmente en la consola del navegador
-    console.log("🔍 DATOS DEL CASO RECIBIDO:", caso);
-    console.log("👤 DATOS DEL CLIENTE:", caso.cliente);
+    // Debug para verificar qué llega desde el backend
+    console.log("🔍 Caso recibido:", caso);
 
-    // 2. Intentamos sacar el teléfono de TODAS las partes posibles
-    // A veces viene en caso.cliente.telefono, a veces en caso.cliente_telefono, a veces directo en caso.telefono
+    // Intentamos sacar el teléfono de donde sea que venga
     const telefono =
       caso.cliente?.telefono ||
       caso.cliente?.celular ||
@@ -135,28 +134,37 @@ const DiaTimeline = ({ date }) => {
 
     const nombre = caso.cliente?.nombre_completo || caso.cliente_nombre || caso.cliente?.nombre || 'Cliente';
 
-    // 3. Validación
+    // Validación visual para el usuario
     if (!telefono) {
-      // Si falla, muestra en la alerta qué datos sí llegaron para saber qué falta
-      alert(`Error: No encuentro el teléfono. \nDatos encontrados: ID Caso: ${caso.id}, Cliente: ${nombre}`);
+      alert(`⚠️ No se encontró un teléfono para este caso.\n\nDatos disponibles:\nID: ${caso.id}\nCliente: ${nombre}`);
       return;
     }
 
     try {
-      // Pedimos al CRM Nuevo que nos de el chat ID
+      // 1. Petición al Backend Nuevo (CRM)
+      // Usamos el Header 'x-app-key' por si activaste la seguridad en el CRM, 
+      // si no, no afecta enviarlo.
       const res = await axios.post(`${CRM_API}/conversations/init`, {
         phone: telefono,
         name: nombre
+      }, {
+        //Opcional: Si pusiste seguridad en el CRM, descomenta esto:
+        headers: { 'x-app-key': 'Luz2025_Seguro$' }
       });
 
-      // Redirigimos a la pantalla de Soporte con el chat precargado
-      navigate('/soporte', { state: { autoSelectChat: res.data } });
+      // 2. Redirección fluida
+      if (res.data && res.data.id) {
+        navigate('/soporte', { state: { autoSelectChat: res.data } });
+      } else {
+        alert("El servidor no devolvió el ID del chat.");
+      }
 
     } catch (error) {
       console.error('Error abriendo chat:', error);
-      alert("No se pudo iniciar el chat. Verifica tu conexión.");
+      alert("No se pudo conectar con el servicio de chat. Revisa tu internet.");
     }
   };
+
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
   return (
@@ -211,15 +219,17 @@ const DiaTimeline = ({ date }) => {
                     </div>
 
                     <div className="cita-actions" style={actionsGridStyles}>
-                      {/* 1. WHATSAPP (NUEVO) - Lo pongo primero por relevancia */}
-                      <button
-                        className="cita-icon-button"
-                        onClick={() => handleOpenChat(cita.caso)}
-                        title="Chat WhatsApp"
-                        style={{ width: '100%', backgroundColor: '#dcfce7', borderColor: '#22c55e' }}
-                      >
-                        💬
-                      </button>
+                      {/* 1. WHATSAPP (BOTÓN DE CHAT) */}
+                      {isCasoActivo ? (
+                        <button
+                          className="cita-icon-button"
+                          onClick={() => handleOpenChat(cita.caso)}
+                          title="Chat WhatsApp"
+                          style={{ width: '100%', backgroundColor: '#dcfce7', borderColor: '#22c55e', color: '#15803d' }}
+                        >
+                          💬
+                        </button>
+                      ) : (<div />)}
 
                       {/* 2. MAPA */}
                       <button

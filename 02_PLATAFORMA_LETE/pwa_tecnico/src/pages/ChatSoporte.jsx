@@ -6,7 +6,12 @@ import { useNavigate, useLocation } from 'react-router-dom';
 // URL SEGURA de tu Backend Nuevo
 const API_URL = 'https://api.tesivil.com/api';
 
-const api = axios.create({ baseURL: API_URL });
+const api = axios.create({
+    baseURL: API_URL,
+    headers: {
+        'x-app-key': 'Luz2025_Seguro$' // <--- LA MISMA CLAVE DEL .ENV
+    }
+});
 
 const ChatSoporte = () => {
     const navigate = useNavigate();
