@@ -83,6 +83,15 @@ const ChatSoporte = () => {
         const tempContent = inputText;
         setInputText('');
 
+        // 1. OBTENER EL NOMBRE DEL TÉCNICO
+        // Intentamos sacar el nombre de los metadatos de Supabase
+        const nombreTecnico =
+            user?.user_metadata?.nombre_completo ||
+            user?.user_metadata?.nombre ||
+            user?.user_metadata?.full_name ||
+            user?.email?.split('@')[0] || // Fallback al email si no hay nombre
+            "Un Ingeniero";
+
         try {
             // Auto-asignar si respondo a un ticket de la bolsa
             if (selectedChat.status === 'TECH_POOL' && !isInternal) {
@@ -92,7 +101,7 @@ const ChatSoporte = () => {
             await api.post(`/conversations/${selectedChat.id}/send`, {
                 content: tempContent,
                 is_internal: isInternal,
-                senderId: user?.id // Enviamos el UUID del técnico
+                senderName: nombreTecnico // <--- CAMBIO CLAVE
             });
 
             const res = await api.get(`/conversations/${selectedChat.id}/messages`);
