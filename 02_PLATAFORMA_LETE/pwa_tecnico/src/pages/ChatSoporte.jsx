@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Send, User, HardHat, StickyNote, ArrowLeft } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { crmApi as api } from '../apiService';
+import { useAuth } from '../context/AuthContext'; // <--- 1. IMPORTAR ESTO
 
 // URL SEGURA de tu Backend Nuevo
 //const API_URL = 'https://api.tesivil.com/api';
@@ -16,7 +17,8 @@ import { crmApi as api } from '../apiService';
 
 const ChatSoporte = () => {
     const navigate = useNavigate();
-    const location = useLocation(); // Para recibir datos de la Agenda
+    const location = useLocation();
+    const { user } = useAuth();
 
     const [conversations, setConversations] = useState([]);
     const [selectedChat, setSelectedChat] = useState(null);
@@ -89,7 +91,8 @@ const ChatSoporte = () => {
 
             await api.post(`/conversations/${selectedChat.id}/send`, {
                 content: tempContent,
-                is_internal: isInternal
+                is_internal: isInternal,
+                senderId: user?.id // Enviamos el UUID del técnico
             });
 
             const res = await api.get(`/conversations/${selectedChat.id}/messages`);
