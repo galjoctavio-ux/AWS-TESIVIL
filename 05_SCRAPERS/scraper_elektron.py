@@ -7,7 +7,7 @@ import random
 from datetime import datetime
 import re
 
-# --- CONFIGURACIÓN ---
+# --- CONFIGURACIÓN LETE SYSTEMS ---
 DB_CONFIG = {
     'user': 'lete_scraper',
     'password': 'Lete2025',
@@ -17,22 +17,19 @@ DB_CONFIG = {
 
 PROVEEDOR_ID = 12
 LIMIT_PRODUCTOS_PRUEBA = 0 
-
-# URL Semilla: Desde aquí descubriremos todo lo demás
 URL_BASE = "https://www.elektron.com.mx/"
+
+# User-Agents Rotativos
+USER_AGENTS = [
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36'
+]
+
+# --- BASE DE DATOS ---
 
 def obtener_conexion():
     return mysql.connector.connect(**DB_CONFIG)
-
-def calcular_tiempo_espera():
-    hora_actual = datetime.now().hour
-    if 0 <= hora_actual < 7:
-        espera = random.randint(15, 25)
-        modo = "🌙 NOCTURNO"
-    else:
-        espera = 60 + random.randint(10, 50)
-        modo = "☀️ DIURNO"
-    return espera, modo
 
 def obtener_info_bd(url):
     conn = None
@@ -54,11 +51,11 @@ def actualizar_producto(id_registro, nuevo_precio, cambio_precio):
         if cambio_precio:
             sql = "UPDATE scraping_staging SET precio_detectado = %s, fecha_captura = NOW(), estatus = 'PENDIENTE' WHERE id = %s"
             cursor.execute(sql, (nuevo_precio, id_registro))
-            print(f"      🔄 PRECIO ACTUALIZADO: ${nuevo_precio}")
+            print(f"      🔄 UPDATE PRECIO: ${nuevo_precio}")
         else:
             sql = "UPDATE scraping_staging SET fecha_captura = NOW() WHERE id = %s"
             cursor.execute(sql, (id_registro,))
-            print(f"      ok (Sin cambios)")
+            print(f"      ok (Up-to-date)")
         conn.commit()
     finally:
         conn.close()
@@ -68,133 +65,176 @@ def guardar_nuevo_staging(datos):
     cursor = conn.cursor()
     sql = """
     INSERT INTO scraping_staging 
-    (proveedor_id, sku_detectado, descripcion_detectada, marca_detectada, precio_detectado, url_producto, estatus)
-    VALUES (%s, %s, %s, %s, %s, %s, 'PENDIENTE')
+    (proveedor_id, sku_detectado, descripcion_detectada, marca_detectada, precio_detectado, url_producto, estatus, fecha_captura)
+    VALUES (%s, %s, %s, %s, %s, %s, 'PENDIENTE', NOW())
     """
     val = (PROVEEDOR_ID, datos['sku'], datos['nombre'], datos['marca'], datos['precio'], datos['url'])
     try:
         cursor.execute(sql, val)
         conn.commit()
-        print(f"      ✅ NUEVO: {datos['sku']} | ${datos['precio']}")
+        print(f"      ✅ INSERT: {datos['sku']} | ${datos['precio']}")
     except mysql.connector.Error as err:
-        print(f"      ❌ Error Insert: {err}")
+        print(f"      ❌ DB Error: {err}")
     finally:
         conn.close()
 
+# --- UTILS ---
+
+def get_headers():
+    return {'User-Agent': random.choice(USER_AGENTS)}
+
+def calcular_tiempo_espera():
+    """Tiempos optimizados para Magento (suelen ser sitios pesados, no bajar de 3s)"""
+    hora_actual = datetime.now().hour
+    if 0 <= hora_actual < 6: # Madrugada
+        espera = random.uniform(2.0, 4.0)
+        modo = "🌙 NOCHE"
+    else: # Día
+        espera = random.uniform(4.5, 9.0)
+        modo = "☀️ DÍA"
+    return espera, modo
+
 def descubrir_categorias():
-    """Entra a la home y busca enlaces del mega-menú para no fallar con URLs viejas"""
-    print(f"🕵️  Descubriendo categorías en {URL_BASE}...")
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36'}
+    """
+    Escanea el Mega-Menú de Magento para encontrar categorías automáticamente.
+    """
+    print(f"🕵️  Analizando estructura del sitio: {URL_BASE}...")
     try:
-        res = requests.get(URL_BASE, headers=headers, timeout=20)
+        res = requests.get(URL_BASE, headers=get_headers(), timeout=20)
         soup = BeautifulSoup(res.text, 'html.parser')
-        
-        # En Magento, el menú suele estar en nav.navigation o ul.ui-menu
-        # Buscamos enlaces que parezcan categorías principales
         enlaces = set()
         
-        # Estrategia 1: Buscar en el menú de navegación principal
-        nav_links = soup.select('nav.navigation a')
+        # 1. Menú Principal (Standard Magento 2: nav.navigation)
+        # Buscamos enlaces de nivel superior y subcategorías
+        nav_links = soup.select('nav.navigation a.level-top') 
+        if not nav_links:
+            nav_links = soup.select('.navigation a') # Fallback
+
         for a in nav_links:
             href = a.get('href')
-            # Filtros de calidad para asegurar que es una categoría de producto
-            if href and href.startswith(URL_BASE) and not 'blog' in href and not 'contacto' in href:
-                # Evitar sub-items muy profundos o irrelevantes (opcional)
-                if href.count('/') < 6: 
+            if href and href.startswith('http') and 'elektron.com.mx' in href:
+                # Filtros de exclusión
+                if not any(x in href for x in ['blog', 'contact', 'customer', 'login', 'cart', 'checkout']):
                     enlaces.add(href)
         
-        # Estrategia 2 (Fallback): Si no encuentra en nav, buscar palabras clave en todo el body
+        # 2. Si no encontró nada, buscar enlaces genéricos del body
         if len(enlaces) < 3:
-            keywords = ['conductores', 'iluminacion', 'control', 'placas', 'herramientas', 'tuberia', 'media-tension']
+            print("⚠️  Menú no detectado, escaneando body...")
             all_links = soup.find_all('a', href=True)
+            keywords = ['cable', 'iluminacion', 'placas', 'herramienta', 'tuber', 'control']
             for a in all_links:
                 href = a['href']
                 for k in keywords:
-                    if k in href and href.startswith('http'):
+                    if k in href and 'elektron.com.mx' in href:
                         enlaces.add(href)
 
-        lista_final = list(enlaces)
-        print(f"✅ Se descubrieron {len(lista_final)} categorías automáticas.")
-        return lista_final
+        lista = list(enlaces)
+        print(f"✅ Se descubrieron {len(lista)} categorías.")
+        return lista
 
     except Exception as e:
-        print(f"⚠️  Error descubriendo categorías: {e}")
-        # Si falla, usamos una lista de respaldo manual (Backup)
-        return [
-            "https://www.elektron.com.mx/conductores",
-            "https://www.elektron.com.mx/residencial/iluminacion-interior",
-            "https://www.elektron.com.mx/industrial/control-y-automatizacion", # Posible cambio de URL
-            "https://www.elektron.com.mx/herramientas",
-            "https://www.elektron.com.mx/tuberia-y-poliductos"
-        ]
+        print(f"🔥 Error autodescubrimiento: {e}")
+        return []
 
-def extraer_meta_tags(soup, url):
+def extraer_datos_hibrido(soup, url):
+    """
+    Prioridad: JSON-LD > Meta Tags > HTML Visual
+    """
+    datos = {'sku': 'SIN_SKU', 'nombre': 'Desconocido', 'marca': 'GENERICA', 'precio': 0.0, 'url': url}
+    
+    # --- 1. ESTRATEGIA JSON-LD (Magento suele tener esto) ---
+    scripts = soup.find_all('script', type='application/ld+json')
+    json_found = False
+    
+    for script in scripts:
+        try:
+            content = json.loads(script.string)
+            if isinstance(content, list): items = content
+            else: items = [content]
+
+            for item in items:
+                if item.get('@type') == 'Product':
+                    datos['nombre'] = item.get('name', datos['nombre'])
+                    datos['sku'] = item.get('sku', datos['sku'])
+                    
+                    # Marca
+                    brand = item.get('brand')
+                    if isinstance(brand, dict): datos['marca'] = brand.get('name', 'GENERICA')
+                    elif isinstance(brand, str): datos['marca'] = brand
+                    
+                    # Precio
+                    offers = item.get('offers')
+                    if isinstance(offers, dict):
+                         datos['precio'] = float(offers.get('price', 0))
+                    elif isinstance(offers, list):
+                         datos['precio'] = float(offers[0].get('price', 0))
+                    
+                    if datos['precio'] > 0: json_found = True
+                    break
+        except: continue
+        if json_found: break
+
+    if json_found: return datos
+
+    # --- 2. ESTRATEGIA META TAGS / HTML (Fallback) ---
     try:
+        # Precio
         precio_meta = soup.find("meta", property="product:price:amount")
-        if not precio_meta:
-            precio_span = soup.select_one('.price-final_price .price')
+        if precio_meta:
+            datos['precio'] = float(precio_meta["content"])
+        else:
+            # Selector visual Magento standard
+            precio_span = soup.select_one('.price-final_price .price') or soup.select_one('.price-box .price')
             if precio_span:
-                precio_txt = precio_span.get_text().replace('$', '').replace(',', '')
-                precio = float(precio_txt)
-            else:
-                return None 
-        else:
-            precio = float(precio_meta["content"])
+                txt = precio_span.get_text().replace('$', '').replace(',', '').strip()
+                try: datos['precio'] = float(txt)
+                except: pass
 
+        # Nombre
         nombre_meta = soup.find("meta", property="og:title")
-        nombre = nombre_meta["content"] if nombre_meta else "Sin Nombre"
-
-        sku = "SIN_SKU"
-        sku_div = soup.select_one('.product.attribute.sku .value')
-        if sku_div:
-            sku = sku_div.get_text(strip=True)
+        if nombre_meta: datos['nombre'] = nombre_meta["content"]
         else:
-            input_sku = soup.select_one('input[name="product"]')
-            if input_sku: sku = "ID_" + input_sku['value']
+            h1 = soup.select_one('h1.page-title')
+            if h1: datos['nombre'] = h1.get_text(strip=True)
 
-        marca = "GENERICA"
-        th_marca = soup.find('th', string=re.compile('Fabricante|Marca', re.IGNORECASE))
-        if th_marca:
-            td_marca = th_marca.find_next_sibling('td')
-            if td_marca: marca = td_marca.get_text(strip=True)
-        
-        if marca == "GENERICA":
-            posibles = ["BTICINO", "SCHNEIDER", "CONDUMEX", "VIAKON", "IUSA", "ABB", "PHILLIPS", "ROYER", "ARGOS", "3M", "KLEIN TOOLS", "TRUPER"]
-            nombre_upper = nombre.upper()
+        # SKU
+        sku_div = soup.select_one('.product.attribute.sku .value')
+        if sku_div: datos['sku'] = sku_div.get_text(strip=True)
+
+        # Marca (Inferencia si no vino en JSON)
+        if datos['marca'] == 'GENERICA':
+            posibles = ["SCHNEIDER", "BTICINO", "CONDUMEX", "VIAKON", "IUSA", "ABB", "PHILLIPS", "3M", "KLEIN", "MILWAUKEE"]
+            nombre_upper = datos['nombre'].upper()
             for m in posibles:
                 if m in nombre_upper:
-                    marca = m
+                    datos['marca'] = m
                     break
 
-        return {'sku': sku, 'nombre': nombre, 'marca': marca, 'precio': precio, 'url': url}
-
     except Exception as e:
-        print(f"      ⚠️ Error parseando: {e}")
-        return None
+        print(f"      ⚠️ Parse Error HTML: {e}")
+
+    return datos
 
 def procesar_producto(url):
     tiempo, modo = calcular_tiempo_espera()
     info_bd = obtener_info_bd(url)
     existe = info_bd is not None
     
-    accion = "Revisando" if existe else "Nuevo"
-    print(f"   [{modo}] {accion}... (Espere {tiempo}s)")
+    # print(f"   [{modo} {tiempo:.1f}s] ... {url[-30:]}")
     time.sleep(tiempo)
     
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36'}
     try:
-        res = requests.get(url, headers=headers, timeout=20)
+        res = requests.get(url, headers=get_headers(), timeout=20)
         if res.status_code != 200: return False
 
         soup = BeautifulSoup(res.text, 'html.parser')
-        datos = extraer_meta_tags(soup, url)
+        datos = extraer_datos_hibrido(soup, url)
 
-        if datos and datos['precio'] > 0:
+        if datos['precio'] > 0:
             if existe:
                 id_reg = info_bd['id']
                 precio_bd = float(info_bd['precio_detectado'])
-                if abs(datos['precio'] - precio_bd) > 0.01:
-                    print(f"      💲 CAMBIO: BD=${precio_bd} -> Web=${datos['precio']}")
+                if abs(datos['precio'] - precio_bd) > 1.0:
                     actualizar_producto(id_reg, datos['precio'], True)
                 else:
                     actualizar_producto(id_reg, datos['precio'], False)
@@ -202,74 +242,101 @@ def procesar_producto(url):
                 guardar_nuevo_staging(datos)
             return True
         else:
-            print(f"      ⚠️ Datos incompletos en {url}")
+            print(f"      ⚠️ Precio 0 o datos vacíos.")
             return False
+
     except Exception as e:
-        print(f"      🔥 Error: {e}")
+        print(f"      🔥 Error Request: {e}")
         return False
 
 def barrer_paginacion(url_base):
     pagina = 1
-    total_procesados = 0
-    print(f"\n🚀 Barrido Elektron: {url_base}")
+    errores_consecutivos = 0
+    print(f"\n🚀 CATEGORÍA: {url_base}")
 
     while True:
-        # Algunos sitios Magento usan ?p=X, otros /p/X
-        # Probamos la forma más estándar primero
+        # Magento usa ?p=X
         url_actual = f"{url_base}?p={pagina}" if pagina > 1 else url_base
-            
         print(f"\n--- 📄 Pag {pagina} ---")
         
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36'}
         try:
-            res = requests.get(url_actual, headers=headers, timeout=15)
-            if res.status_code == 404:
-                print("🏁 Fin paginación (404).")
+            res = requests.get(url_actual, headers=get_headers(), timeout=20)
+            
+            # --- DETECCIONES DE FIN DE MAGENTO ---
+            # 1. Error 404
+            if res.status_code == 404: 
+                print("🏁 Fin (404).")
                 break
             
+            # 2. Redirección (Si pides pag 100 y te manda a la 1 o a la home)
+            if res.url != url_actual and pagina > 1:
+                # A veces Magento agrega parametros de session, comparar path base
+                if res.url.split('?')[0] != url_actual.split('?')[0]:
+                    print("🏁 Redirección detectada (Fin).")
+                    break
+
             soup = BeautifulSoup(res.text, 'html.parser')
             
-            # Selector Robusto: Busca cualquier link que parezca producto (tenga .html y precio cerca)
-            # Ojo: Elektron mezcla productos y categorías en los listados
+            # 3. Mensaje "No encontramos productos"
+            mensaje_vacio = soup.select_one('.message.info.empty')
+            if mensaje_vacio:
+                print("🏁 Mensaje 'Sin productos' detectado.")
+                break
+
+            # Extracción de enlaces
             enlaces = []
+            # Selector Magento 2 estándar para items de grilla
+            items = soup.select('.product-item-info .product-item-link')
             
-            # Buscamos elementos de producto específicamente
-            product_items = soup.select('.product-item-info')
-            
-            for item in product_items:
-                link_tag = item.select_one('a.product-item-link')
-                if link_tag:
-                    href = link_tag.get('href')
-                    if href: enlaces.append(href)
+            for item in items:
+                href = item.get('href')
+                if href: enlaces.append(href)
 
             urls_productos = list(set(enlaces))
 
             if not urls_productos:
-                print("🏁 No se encontraron productos. Fin.")
+                print("🏁 No se detectaron productos en el listado.")
                 break
             
             print(f"   🎯 {len(urls_productos)} items detectados.")
             
+            count = 0
             for link in urls_productos:
-                if LIMIT_PRODUCTOS_PRUEBA > 0 and total_procesados >= LIMIT_PRODUCTOS_PRUEBA: return
+                if LIMIT_PRODUCTOS_PRUEBA > 0 and LIMIT_PRODUCTOS_PRUEBA < 100: pass
                 procesar_producto(link)
-                total_procesados += 1
+                count += 1
+                print(f"      [Progreso: {count}/{len(urls_productos)}]", end='\r')
             
-            pagina += 1 
+            pagina += 1
+            errores_consecutivos = 0
             
         except Exception as e:
-            print(f"❌ Error paginación: {e}")
-            time.sleep(60)
-            break
+            print(f"❌ Error crítico paginación: {e}")
+            errores_consecutivos += 1
+            time.sleep(10)
+            if errores_consecutivos > 3: break
 
+# --- MAIN ---
 if __name__ == "__main__":
+    print("🤖 SCRAPER ELEKTRON V2 - LETE SYSTEMS")
+    
+    # 1. Descubrimiento
+    lista_descubierta = descubrir_categorias()
+    
+    if not lista_descubierta:
+        print("⚠️ Fallo auto-descubrimiento. Usando Backup.")
+        lista_descubierta = [
+            "https://www.elektron.com.mx/conductores",
+            "https://www.elektron.com.mx/residencial/iluminacion-interior",
+            "https://www.elektron.com.mx/industrial/control-y-automatizacion"
+        ]
+
     while True:
-        # 1. Descubrir categorías dinámicamente cada vez que inicia el ciclo
-        cats = descubrir_categorias()
+        random.shuffle(lista_descubierta)
+        print(f"\n📋 Iniciando ciclo sobre {len(lista_descubierta)} categorías...")
         
-        # 2. Barrer cada una
-        for cat in cats:
+        for cat in lista_descubierta:
             barrer_paginacion(cat)
             
-        print("\n✅ CICLO ELEKTRON TERMINADO. Durmiendo 30 min...")
-        time.sleep(1800)
+        print("\n✅ CICLO TERMINADO. Durmiendo 45 min...")
+        time.sleep(2700)
