@@ -19,6 +19,7 @@ config_secret.php
 
 04_AGENDAMIENTO/easy_appointments_src/application/config/config.php
 04_AGENDAMIENTO/easy_appointments_src/config.php
+04_AGENDAMIENTO/easy_appointments_src/storage/sessions/*
 
 # Ignorar secretos de Arduino/ESP32
 **/secrets.h
