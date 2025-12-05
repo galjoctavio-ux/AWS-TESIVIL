@@ -4,15 +4,24 @@ import mysql.connector
 import json
 import time
 import os
+from dotenv import load_dotenv  # <--- NUEVO IMPORT
+
+# --- CARGAR VARIABLES DE ENTORNO ---
+load_dotenv()  # Esto lee el archivo .env
 
 # --- CONFIGURACIÓN ---
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'AIzaSyATSVujKqd85pQokMqZy69XUkHRc69sHiU')
+# Ahora si no encuentra la llave, lanzará un error o será None, pero ya no está escrita aquí
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
+if not GEMINI_API_KEY:
+    raise ValueError("❌ ERROR: No se encontró GEMINI_API_KEY en el archivo .env")
+
+# Configuración de BD desde variables de entorno (Más seguro)
 DB_CONFIG = {
-    'user': 'lete_scraper',
-    'password': 'Lete2025',
-    'host': 'localhost',
-    'database': 'coti_lete'
+    'user': os.getenv('DB_USER', 'lete_scraper'), # Mantiene default por si acaso
+    'password': os.getenv('DB_PASS', 'Lete2025'),
+    'host': os.getenv('DB_HOST', 'localhost'),
+    'database': os.getenv('DB_NAME', 'coti_lete')
 }
 
 # --- CONFIGURACIÓN DE GEMINI ---
@@ -74,9 +83,10 @@ def obtener_conexion():
 
 def obtener_lote_pendiente(limite=5):
     """Lotes pequeños para permitir búsquedas web"""
-    conn = obtener_conexion()
-    cursor = conn.cursor(dictionary=True)
+    conn = None
     try:
+        conn = obtener_conexion()
+        cursor = conn.cursor(dictionary=True)
         sql = """
             SELECT id, sku_detectado, descripcion_detectada, marca_detectada 
             FROM scraping_staging 
@@ -89,8 +99,9 @@ def obtener_lote_pendiente(limite=5):
         print(f"❌ Error DB: {e}")
         return []
     finally:
-        cursor.close()
-        conn.close()
+        if conn:
+            if 'cursor' in locals(): cursor.close()
+            conn.close()
 
 def guardar_resultados(resultados_json):
     conn = obtener_conexion()
@@ -136,11 +147,9 @@ def procesar_lote():
 
     print(f"⚡ Analizando {len(lote)} productos con Gemini 2.5 Flash + Google Search...")
     
-    # Construir el mensaje completo
     mensaje_completo = f"{PROMPT_SYSTEM}\n\nNormaliza estos productos:\n\n{json.dumps(lote, ensure_ascii=False, indent=2)}"
     
     try:
-        # Sintaxis correcta con la nueva librería google-genai
         response = client.models.generate_content(
             model='gemini-2.5-flash',
             contents=mensaje_completo,
@@ -152,16 +161,13 @@ def procesar_lote():
             )
         )
         
-        # Limpieza robusta de respuesta Markdown
         txt = response.text.strip()
         
-        # Remover bloques de código Markdown
         if "```json" in txt:
             txt = txt.split("```json")[1].split("```")[0].strip()
         elif "```" in txt:
             txt = txt.split("```")[1].split("```")[0].strip()
         
-        # Buscar el inicio del JSON
         for i, char in enumerate(txt):
             if char in '[{':
                 txt = txt[i:]
@@ -171,7 +177,6 @@ def procesar_lote():
         guardados = guardar_resultados(data)
         print(f"✅ Normalizados: {guardados}")
         
-        # Mostrar si usó grounding
         if any(item.get('grounding_usado', False) for item in (data if isinstance(data, list) else [data])):
             print("🔍 Búsqueda web utilizada para complementar datos")
         
@@ -179,7 +184,7 @@ def procesar_lote():
 
     except json.JSONDecodeError as e:
         print(f"🔥 Error parseando JSON: {e}")
-        print(f"Respuesta recibida: {txt[:500] if 'txt' in locals() else 'N/A'}")
+        # print(f"Respuesta recibida: {txt[:500]}") # Descomentar para debug
         time.sleep(10)
         return False
     except Exception as e:
@@ -190,8 +195,8 @@ def procesar_lote():
 if __name__ == "__main__":
     print("=" * 60)
     print("🚀 MOTOR IA INICIADO")
-    print("📦 Modelo: Gemini 2.5 Flash (estable)")
-    print("🔍 Google Search: ACTIVADO (nueva API)")
+    print("📦 Modelo: Gemini 2.5 Flash")
+    print("🔑 API Key: Cargada desde .env")
     print("=" * 60)
     
     while True:
@@ -202,7 +207,7 @@ if __name__ == "__main__":
             else:
                 print("😴 Sin trabajo pendiente. Durmiendo 2 min...")
                 time.sleep(120)
-        except KeyboardInterrupt:  # ✅ CORREGIDO: KeyboardInterrupt completo con :
+        except KeyboardInterrupt:
             print("\n👋 Deteniendo motor IA...")
             break
         except Exception as e:
