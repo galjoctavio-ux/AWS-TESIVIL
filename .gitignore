@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+.env.*
+.DS_Store
+*.log
+postgres_data/
+evolution-api/postgres_data/
+# Ignorar carpetas de datos de docker si las hay dentro de Evolution
+02_EVOLUTION_API/postgres_data/
