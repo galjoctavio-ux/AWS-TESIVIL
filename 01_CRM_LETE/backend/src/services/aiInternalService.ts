@@ -32,7 +32,7 @@ const getChatHistoryForSummary = async (conversationId: number) => {
         const res = await pool.query(
             `SELECT sender_type, content FROM messages 
              WHERE conversation_id = $1 
-             ORDER BY id ASC LIMIT 40`, 
+             ORDER BY id ASC LIMIT 40`,
             [conversationId]
         );
         return res.rows.map(msg => ({
@@ -50,7 +50,7 @@ export const generateTechSummary = async (conversationId: number): Promise<void>
     console.log(`👷 Generando resumen técnico interno para chat ${conversationId}...`);
     try {
         const history = await getChatHistoryForSummary(conversationId);
-        
+
         // Si hay muy pocos mensajes, no gastamos tokens ni generamos ruido
         if (history.length < 2) {
             console.log("⚠️ Historial muy corto, se omite resumen.");
@@ -58,11 +58,11 @@ export const generateTechSummary = async (conversationId: number): Promise<void>
         }
 
         // Usamos un modelo 'flash' simple
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-        
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
         // Aplanamos el chat a texto para que la IA lo lea como un documento
         const conversationText = history.map(h => `${h.role}: ${h.parts[0].text}`).join('\n');
-        
+
         const finalPrompt = `${TECH_SUMMARY_PROMPT}\n\n--- CONVERSACIÓN A ANALIZAR ---\n${conversationText}`;
 
         const result = await model.generateContent(finalPrompt);
