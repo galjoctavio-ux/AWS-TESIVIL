@@ -11,6 +11,10 @@ export const pool = new Pool({
   port: parseInt(process.env.DB_PORT || '5432'),
 });
 
-pool.on('connect', () => {
-  console.log('✅ Conexión a Base de Datos establecida');
+pool.on('connect', (client) => {
+  // ESTO ES VITAL: Forzamos la zona horaria a México en cada conexión
+  client.query("SET TIME ZONE 'America/Mexico_City'")
+    .catch(err => console.error('Error configurando TimeZone', err));
 });
+
+export const query = (text: string, params?: any[]) => pool.query(text, params);

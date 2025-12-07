@@ -36,3 +36,8 @@ CREATE TABLE IF NOT EXISTS messages (
 -- Índices para optimizar velocidad (Best Practice)
 CREATE INDEX IF NOT EXISTS idx_conversations_status ON conversations(status);
 CREATE INDEX IF NOT EXISTS idx_conversations_wa_id ON conversations(whatsapp_id);
+-- Actualización: Sistema de Recordatorios y Análisis IA (07/12/2025)
+ALTER TABLE conversations ADD COLUMN IF NOT EXISTS appointment_date TIMESTAMP WITH TIME ZONE NULL;
+ALTER TABLE conversations ADD COLUMN IF NOT EXISTS appointment_status VARCHAR(50) DEFAULT 'PENDING';
+ALTER TABLE conversations ADD COLUMN IF NOT EXISTS last_ai_analysis_at TIMESTAMP WITH TIME ZONE NULL;
+ALTER TABLE conversations ADD COLUMN IF NOT EXISTS last_message_analyzed_id VARCHAR(255) NULL;
