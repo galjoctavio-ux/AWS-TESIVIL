@@ -178,7 +178,7 @@ export const receiveWebhook = async (req: Request, res: Response) => {
                         console.log("📦 PAYLOAD LISTO PARA VM2:", payloadFinal);
 
                         await axios.post(
-                            'https://api.tesivil.com/lete/api/integracion/crear-caso-bot',
+                            'https://www.tesivil.com/lete/api/integracion/crear-caso-bot',
                             payloadFinal,
                             {
                                 headers: {
