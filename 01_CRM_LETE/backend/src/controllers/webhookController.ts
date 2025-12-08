@@ -177,10 +177,19 @@ export const receiveWebhook = async (req: Request, res: Response) => {
 
                         console.log("📦 PAYLOAD LISTO PARA VM2:", payloadFinal);
 
-                        // TODO: Descomentar cuando la VM 2 esté lista
-                        // const response = await axios.post('https://api.tesivil.com/api/integracion/agendar-bot', payloadFinal);
+                        await axios.post(
+                            'https://api.tesivil.com/lete/api/integracion/crear-caso-bot',
+                            payloadFinal,
+                            {
+                                headers: {
+                                    'x-app-key': 'Tesivil_Secret_Bot_2025_XYZ', // <--- ¡PON TU CLAVE AQUÍ!
+                                    'Content-Type': 'application/json'
+                                }
+                            }
+                        );
 
-                        await sendText(remoteJid, `✅ ¡PROCESO COMPLETADO!\nDatos preparados para: ${draft.cliente_nombre}`, 0);
+                        // 👇 Mensaje de éxito para ti
+                        await sendText(remoteJid, `✅ ¡PROCESO COMPLETADO!\nDatos enviados y agendados para: ${draft.cliente_nombre || 'Cliente'}`, 0);
                         agendaDrafts.delete(remoteJid);
 
                     } catch (error) {
