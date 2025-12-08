@@ -50,8 +50,9 @@ Si el cliente pregunta qué hacemos, costo o info, DEBES usar esta información 
 }
 `;
 
-const model = genAI.getGenerativeModel({ 
-    model: 'gemini-1.5-flash',
+// 🔴 CAMBIO 1: Agregamos 'export' y cambiamos el nombre a 'geminiModel'
+export const geminiModel = genAI.getGenerativeModel({
+    model: 'gemini-2.5-flash',
     systemInstruction: {
         role: 'system',
         parts: [{ text: SYSTEM_INSTRUCTION }]
@@ -69,7 +70,7 @@ const getChatHistory = async (conversationId: number) => {
         const res = await pool.query(
             `SELECT sender_type, content FROM messages 
              WHERE conversation_id = $1 
-             ORDER BY id ASC LIMIT 20`, 
+             ORDER BY id ASC LIMIT 20`,
             [conversationId]
         );
 
@@ -84,34 +85,34 @@ const getChatHistory = async (conversationId: number) => {
 };
 
 export const analyzeIntent = async (conversationId: number, currentMessage: string): Promise<AiDecision> => {
-  try {
-    // Obtenemos historial primero para saber el contexto
-    const history = await getChatHistory(conversationId);
+    try {
+        // Obtenemos historial primero para saber el contexto
+        const history = await getChatHistory(conversationId);
 
-    // 1. REGLA FACEBOOK / PRIMER CONTACTO
-    const lowerMsg = currentMessage.toLowerCase();
-    const isFbAd = lowerMsg.includes("quiero más información") || 
-                   lowerMsg.includes("facebook") || 
-                   lowerMsg.includes("cotizar");
+        // 1. REGLA FACEBOOK / PRIMER CONTACTO
+        const lowerMsg = currentMessage.toLowerCase();
+        const isFbAd = lowerMsg.includes("quiero más información") ||
+            lowerMsg.includes("facebook") ||
+            lowerMsg.includes("cotizar");
 
-    // CORRECCIÓN SENIOR:
-    // Si el historial es <= 1 (significa que solo contiene el mensaje actual que acabas de guardar 
-    // o está vacío), Y coincide con la frase de Facebook, mandamos el saludo estático.
-    if (history.length <= 1 && isFbAd) {
-        return { 
-            decision: 'REPLY', 
-            message: `Buen día ☀️\nMi nombre es *Mónica Hernández* de la empresa *Ingenieros Electricistas Luz en tu Espacio*. 💡\n\n¿Tienes problemas con recibos de luz muy altos o requieres algún otro servicio?`
-        };
-    }
+        // CORRECCIÓN SENIOR:
+        // Si el historial es <= 1 (significa que solo contiene el mensaje actual que acabas de guardar 
+        // o está vacío), Y coincide con la frase de Facebook, mandamos el saludo estático.
+        if (history.length <= 1 && isFbAd) {
+            return {
+                decision: 'REPLY',
+                message: `Buen día ☀️\nMi nombre es *Mónica Hernández* de la empresa *Ingenieros Electricistas Luz en tu Espacio*. 💡\n\n¿Tienes problemas con recibos de luz muy altos o requieres algún otro servicio?`
+            };
+        }
 
-    // 2. INICIAR CHAT CON MEMORIA
-    const chat = model.startChat({
-        history: history, // Le pasamos el historial real
-        generationConfig: { temperature: 0.3, responseMimeType: "application/json" }
-    });
+        // 2. INICIAR CHAT CON MEMORIA
+        const chat = geminiModel.startChat({
+            history: history, // Le pasamos el historial real
+            generationConfig: { temperature: 0.3, responseMimeType: "application/json" }
+        });
 
-    // 3. PROMPT DE TURNO (Contextualizado)
-    const turnPrompt = `
+        // 3. PROMPT DE TURNO (Contextualizado)
+        const turnPrompt = `
       Analiza el historial y el último mensaje: "${currentMessage}".
       
       VERIFICACIÓN DE SEGURIDAD PRIORITARIA:
@@ -127,15 +128,15 @@ export const analyzeIntent = async (conversationId: number, currentMessage: stri
       Genera solo el JSON.
     `;
 
-    const result = await chat.sendMessage(turnPrompt);
-    const responseText = result.response.text();
-    const cleanJson = responseText.replace(/```json|```/g, '').trim();
-    
-    return JSON.parse(cleanJson);
+        const result = await chat.sendMessage(turnPrompt);
+        const responseText = result.response.text();
+        const cleanJson = responseText.replace(/```json|```/g, '').trim();
 
-  } catch (error) {
-    console.error('❌ Error IA:', error);
-    // Fallback seguro: Si falla la IA, pasamos a humano
-    return { decision: 'HANDOFF_OTHER', reason: 'Error Técnico AI' }; 
-  }
+        return JSON.parse(cleanJson);
+
+    } catch (error) {
+        console.error('❌ Error IA:', error);
+        // Fallback seguro: Si falla la IA, pasamos a humano
+        return { decision: 'HANDOFF_OTHER', reason: 'Error Técnico AI' };
+    }
 };
