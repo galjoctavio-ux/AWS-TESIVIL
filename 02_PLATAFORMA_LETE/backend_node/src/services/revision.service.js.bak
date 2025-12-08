@@ -111,8 +111,8 @@ export const crearRegistroRevision = async (payload, tecnicoAuth) => {
   let corrienteFugaCalculada = 0;
 
   if (sePuedeApagar) {
-    // Si se apaga todo, usamos el valor de fuga directa (ingresado por el técnico)
-    corrienteFugaCalculada = iFugaPinza;
+    // Si se apaga todo, sumamos lo que marque la pinza en todas las fases
+    corrienteFugaCalculada = iFase1 + iFase2 + iFase3;
   } else {
     // Lógica por tipo de servicio
     switch (tipoServicio) {
@@ -167,10 +167,8 @@ export const crearRegistroRevision = async (payload, tecnicoAuth) => {
   // 2. Ineficiencia de Equipos (Suma total de consumo de equipos Malos o Regulares)
   let kwhIneficienciaEquipos = 0;
   equiposCalculados.forEach(eq => {
-    if (eq.estado_equipo === 'Malo') {
-      kwhIneficienciaEquipos += (eq.kwh_bimestre_calculado || 0) * 0.40;
-    } else if (eq.estado_equipo === 'Regular') {
-      kwhIneficienciaEquipos += (eq.kwh_bimestre_calculado || 0) * 0.20;
+    if (eq.estado_equipo === 'Malo' || eq.estado_equipo === 'Regular') {
+      kwhIneficienciaEquipos += (eq.kwh_bimestre_calculado || 0);
     }
   });
 
@@ -461,10 +459,8 @@ export const generarArtefactosYNotificar = async (dataContext, tecnicoAuth) => {
     // 2. Ineficiencia de Equipos (Suma total de consumo de equipos Malos o Regulares)
     let kwhIneficienciaEquipos = 0;
     equiposCalculados.forEach(eq => {
-      if (eq.estado_equipo === 'Malo') {
-        kwhIneficienciaEquipos += (eq.kwh_bimestre_calculado || 0) * 0.40;
-      } else if (eq.estado_equipo === 'Regular') {
-        kwhIneficienciaEquipos += (eq.kwh_bimestre_calculado || 0) * 0.20;
+      if (eq.estado_equipo === 'Malo' || eq.estado_equipo === 'Regular') {
+        kwhIneficienciaEquipos += (eq.kwh_bimestre_calculado || 0);
       }
     });
 
