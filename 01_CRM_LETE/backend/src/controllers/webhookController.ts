@@ -118,7 +118,7 @@ export const receiveWebhook = async (req: Request, res: Response) => {
             );
 
             if (respuestaConfirmacion) {
-                await sendText(remoteJid, respuestaConfirmacion);
+                await sendText(remoteJid, respuestaConfirmacion, 0);
                 return res.status(200).send('OK_AGENDA_CONFIRMACION');
             }
 
@@ -128,15 +128,25 @@ export const receiveWebhook = async (req: Request, res: Response) => {
 
                 if (draft.step === 'LISTO_PARA_ENVIAR') {
                     try {
-                        await sendText(remoteJid, "🚀 Enviando datos a TESIVIL (VM 2)...");
+                        await sendText(remoteJid, "🚀 Enviando datos a TESIVIL (VM 2)...", 0);
 
-                        // 1. MAPEO DE TÉCNICOS (IDs reales)
-                        let techIds = { ea: 23, supabase: "7561b141-93b8-4c8e-b8cc-05bb7658f152" }; // Default: Leonardo
+                        // --- 1. MAPEO DE TÉCNICOS REAL ---
 
-                        const nombreTech = (draft.tecnico_nombre || '').toLowerCase();
-                        if (nombreTech.includes('pedro')) techIds = { ea: 99, supabase: "uuid-de-pedro" };
-                        // ... agrega más técnicos ...
+                        // Opción Default: Ing. Gallardo (ID 23)
+                        let techIds = {
+                            ea: 23,
+                            supabase: "7561b141-93b8-4c8e-b8cc-05bb7658f152"
+                        };
 
+                        const nombreTech = (draft.tecnico_nombre_detectado || draft.tecnico_nombre || '').toLowerCase();
+
+                        // Override: Si la IA detectó a Leonardo
+                        if (nombreTech.includes('leonardo') || nombreTech.includes('leo')) {
+                            techIds = {
+                                ea: 25,
+                                supabase: "cb9fe9cc-9787-4a77-9185-d5af44a0da4e"
+                            };
+                        }
                         // 2. CONSTRUCCIÓN DEL PAYLOAD
                         const payloadFinal = {
                             cliente: {
@@ -163,12 +173,12 @@ export const receiveWebhook = async (req: Request, res: Response) => {
                         // TODO: Descomentar cuando la VM 2 esté lista
                         // const response = await axios.post('https://api.tesivil.com/api/integracion/agendar-bot', payloadFinal);
 
-                        await sendText(remoteJid, `✅ ¡PROCESO COMPLETADO!\nDatos preparados para: ${draft.cliente_nombre}`);
+                        await sendText(remoteJid, `✅ ¡PROCESO COMPLETADO!\nDatos preparados para: ${draft.cliente_nombre}`, 0);
                         agendaDrafts.delete(remoteJid);
 
                     } catch (error) {
                         console.error(error);
-                        await sendText(remoteJid, `❌ Error al enviar a VM 2: ${(error as any).message}`);
+                        await sendText(remoteJid, `❌ Error al enviar a VM 2: ${(error as any).message}`, 0);
                     }
                     return res.status(200).send('OK_AGENDA_ENVIADA');
                 }
@@ -188,7 +198,7 @@ export const receiveWebhook = async (req: Request, res: Response) => {
             if (esReenvio || esComando) {
                 // Asegúrate de importar geminiModel de tu servicio AI
                 const respuestaIA = await procesarSolicitudAgenda(content, remoteJid, geminiModel);
-                await sendText(remoteJid, respuestaIA);
+                await sendText(remoteJid, respuestaIA, 0);
                 return res.status(200).send('OK_AGENDA_INICIO');
             }
         }
