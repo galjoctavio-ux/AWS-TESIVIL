@@ -175,7 +175,14 @@ export const receiveWebhook = async (req: Request, res: Response) => {
             }
 
             // C. DETECTAR INTENCIÓN DE INICIO
-            const esReenvio = content.includes('YO:') || content.includes('Date:');
+            // Detectamos el patrón de fecha típico "[3/12" o "[12/03"
+            const regexFechaChat = /\[\d{1,2}\/\d{1,2}/;
+
+            const esReenvio =
+                content.includes('YO:') ||
+                content.includes('Date:') ||
+                regexFechaChat.test(content) || // <--- ESTO ES LO NUEVO
+                content.startsWith('/agendar'); // Agregamos flexibilidad
             const esComando = content.toLowerCase().startsWith('/agendar');
 
             if (esReenvio || esComando) {
