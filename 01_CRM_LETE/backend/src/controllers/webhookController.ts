@@ -105,7 +105,7 @@ export const receiveWebhook = async (req: Request, res: Response) => {
 
         // Identificar si eres TÚ (mensaje enviado desde el cel de la empresa o tu número personal)
         // Ajusta tu número aquí si envías desde tu personal
-        const isAdmin = isFromMe || remoteJid.includes('TU_NUMERO_PERSONAL');
+        const isAdmin = isFromMe || remoteJid.includes('+523326395038');
 
         if (isAdmin) {
 
