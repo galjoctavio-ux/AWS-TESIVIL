@@ -168,97 +168,96 @@ export const receiveWebhook = async (req: Request, res: Response) => {
 
                     } catch (error) {
                         console.error(error);
-                        await sendText(remoteJid, `❌ Error al enviar a VM 2: ${error.message}`);
+                        await sendText(remoteJid, `❌ Error al enviar a VM 2: ${(error as any).message}`);
+                        return res.status(200).send('OK_AGENDA_ENVIADA');
                     }
-                    return res.status(200).send('OK_AGENDA_ENVIADA');
+                }
+
+                // C. DETECTAR INTENCIÓN DE INICIO
+                const esReenvio = content.includes('YO:') || content.includes('Date:');
+                const esComando = content.toLowerCase().startsWith('/agendar');
+
+                if (esReenvio || esComando) {
+                    // Asegúrate de importar geminiModel de tu servicio AI
+                    const respuestaIA = await procesarSolicitudAgenda(content, remoteJid, geminiModel);
+                    await sendText(remoteJid, respuestaIA);
+                    return res.status(200).send('OK_AGENDA_INICIO');
                 }
             }
 
-            // C. DETECTAR INTENCIÓN DE INICIO
-            const esReenvio = content.includes('YO:') || content.includes('Date:');
-            const esComando = content.toLowerCase().startsWith('/agendar');
+            // =========================================================
+            // 🛑 MODO DEBUG ACTIVADO: DETENER AQUÍ
+            // =========================================================
+            console.log('🛑 DEBUG: Mensaje guardado. Respuesta automática bloqueada.');
+            res.status(200).json({ status: 'saved_debug_mode' });
+            return; // <--- EL BOT MUERE AQUÍ POR AHORA (CORRECTO PARA TU PRUEBA)
+            // =========================================================
 
-            if (esReenvio || esComando) {
-                // Asegúrate de importar geminiModel de tu servicio AI
-                const respuestaIA = await procesarSolicitudAgenda(content, remoteJid, geminiModel);
-                await sendText(remoteJid, respuestaIA);
-                return res.status(200).send('OK_AGENDA_INICIO');
+
+            // --- 4. DECISIÓN DEL CEREBRO (IA) ---
+
+            // Regla 1: Si el mensaje es mío, no hago nada más.
+            if (isFromMe) {
+                res.status(200).json({ status: 'saved_own' });
+                return;
             }
+
+            // Regla 2: Si el chat ya no es del BOT, no intervengo.
+            if (conversation.assigned_to_role !== 'BOT') {
+                console.log('🤫 Chat humano activo. IA en silencio.');
+                res.status(200).json({ status: 'saved_silent' });
+                return;
+            }
+
+            // Regla 3: Invocar a la IA con MEMORIA (pasando conversation.id)
+            // El servicio aiService se encargará de leer el historial previo.
+            const analysis = await analyzeIntent(conversation.id, content);
+
+            console.log(`🧠 Decisión IA: ${analysis.decision} | Razón: ${analysis.reason || 'N/A'}`);
+
+            // --- 5. EJECUCIÓN DE LA DECISIÓN ---
+
+            if (analysis.decision === 'REPLY' && analysis.message) {
+                // A) RESPONDER
+
+                // Avisamos a WhatsApp API que todo está bien antes de empezar el delay
+                res.status(200).json({ status: 'processing_reply' });
+
+                // La función sendText ya incluye:
+                // 1. "Escribiendo..."
+                // 2. Cálculo de delay humano
+                // 3. Envío final
+                await sendText(remoteJid, analysis.message || '');
+
+                // Guardar la respuesta de la IA en BD
+                await pool.query(
+                    `INSERT INTO messages (conversation_id, sender_type, message_type, content) VALUES ($1, 'BOT', 'TEXT', $2)`,
+                    [conversation.id, analysis.message]
+                );
+
+                // Actualizamos estado a CONTACTED (Ya hubo interacción)
+                await pool.query(
+                    `UPDATE conversations SET status = 'CONTACTED', unread_count = 0 WHERE id = $1`,
+                    [conversation.id]
+                );
+
+            } else {
+                // B) HANDOFF (HANDOFF_OTHER o HANDOFF_READY)
+                // Silencio estratégico + Transferencia a Mónica
+
+                console.log('🤐 IA transfiere el caso (Silencio).');
+
+                await pool.query(
+                    `UPDATE conversations SET status = 'OPEN', assigned_to_role = 'ADMIN', unread_count = unread_count + 1 WHERE id = $1`,
+                    [conversation.id]
+                );
+
+                res.status(200).json({ status: 'handed_off', reason: analysis.decision });
+            }
+
+        } catch (error) {
+            console.error('❌ Error crítico en webhook:', error);
+            // Siempre devolver 200 para evitar bucles de reintento de WhatsApp
+            res.status(200).json({ error: 'Internal Error Handled' });
         }
-
-        // =========================================================
-        // 🛑 MODO DEBUG ACTIVADO: DETENER AQUÍ
-        // =========================================================
-        console.log('🛑 DEBUG: Mensaje guardado. Respuesta automática bloqueada.');
-        res.status(200).json({ status: 'saved_debug_mode' });
-        return; // <--- EL BOT MUERE AQUÍ POR AHORA (CORRECTO PARA TU PRUEBA)
-        // =========================================================
-
-
-        // --- 4. DECISIÓN DEL CEREBRO (IA) ---
-
-        // Regla 1: Si el mensaje es mío, no hago nada más.
-        if (isFromMe) {
-            res.status(200).json({ status: 'saved_own' });
-            return;
-        }
-
-        // Regla 2: Si el chat ya no es del BOT, no intervengo.
-        if (conversation.assigned_to_role !== 'BOT') {
-            console.log('🤫 Chat humano activo. IA en silencio.');
-            res.status(200).json({ status: 'saved_silent' });
-            return;
-        }
-
-        // Regla 3: Invocar a la IA con MEMORIA (pasando conversation.id)
-        // El servicio aiService se encargará de leer el historial previo.
-        const analysis = await analyzeIntent(conversation.id, content);
-
-        console.log(`🧠 Decisión IA: ${analysis.decision} | Razón: ${analysis.reason || 'N/A'}`);
-
-        // --- 5. EJECUCIÓN DE LA DECISIÓN ---
-
-        if (analysis.decision === 'REPLY' && analysis.message) {
-            // A) RESPONDER
-
-            // Avisamos a WhatsApp API que todo está bien antes de empezar el delay
-            res.status(200).json({ status: 'processing_reply' });
-
-            // La función sendText ya incluye:
-            // 1. "Escribiendo..."
-            // 2. Cálculo de delay humano
-            // 3. Envío final
-            await sendText(remoteJid, analysis.message || '');
-
-            // Guardar la respuesta de la IA en BD
-            await pool.query(
-                `INSERT INTO messages (conversation_id, sender_type, message_type, content) VALUES ($1, 'BOT', 'TEXT', $2)`,
-                [conversation.id, analysis.message]
-            );
-
-            // Actualizamos estado a CONTACTED (Ya hubo interacción)
-            await pool.query(
-                `UPDATE conversations SET status = 'CONTACTED', unread_count = 0 WHERE id = $1`,
-                [conversation.id]
-            );
-
-        } else {
-            // B) HANDOFF (HANDOFF_OTHER o HANDOFF_READY)
-            // Silencio estratégico + Transferencia a Mónica
-
-            console.log('🤐 IA transfiere el caso (Silencio).');
-
-            await pool.query(
-                `UPDATE conversations SET status = 'OPEN', assigned_to_role = 'ADMIN', unread_count = unread_count + 1 WHERE id = $1`,
-                [conversation.id]
-            );
-
-            res.status(200).json({ status: 'handed_off', reason: analysis.decision });
-        }
-
-    } catch (error) {
-        console.error('❌ Error crítico en webhook:', error);
-        // Siempre devolver 200 para evitar bucles de reintento de WhatsApp
-        res.status(200).json({ error: 'Internal Error Handled' });
-    }
-};
+    };
