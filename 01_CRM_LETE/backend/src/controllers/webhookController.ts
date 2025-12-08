@@ -147,6 +147,12 @@ export const receiveWebhook = async (req: Request, res: Response) => {
                                 supabase: "cb9fe9cc-9787-4a77-9185-d5af44a0da4e"
                             };
                         }
+
+                        // PREPARAR NOTAS CON COSTO
+                        // Unimos las notas de la IA con el costo detectado
+                        const notasIA = draft.notas_adicionales || draft.notas || 'Sin notas';
+                        const costoTexto = draft.costo ? ` | Costo acordado: $${draft.costo}` : '';
+                        const notaFinal = `${notasIA}${costoTexto}`;
                         // 2. CONSTRUCCIÓN DEL PAYLOAD
                         const payloadFinal = {
                             cliente: {
@@ -157,14 +163,15 @@ export const receiveWebhook = async (req: Request, res: Response) => {
                             },
                             caso: {
                                 tipo: draft.tipo_caso || 'alto_consumo',
-                                comentarios: `Creado vía WhatsApp Bot.\nNotas: ${draft.notas_adicionales}`
+                                comentarios: `Creado vía WhatsApp Bot.\nDetalles: ${notaFinal}`
                             },
                             cita: {
                                 fecha: draft.fecha,
                                 hora: draft.hora,
                                 duracion: draft.duracion_horas || '1',
                                 tecnico_id_ea: techIds.ea,
-                                tecnico_id_supabase: techIds.supabase
+                                tecnico_id_supabase: techIds.supabase,
+                                notas_adicionales: notaFinal
                             }
                         };
 
