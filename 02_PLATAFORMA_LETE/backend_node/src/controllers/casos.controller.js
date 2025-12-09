@@ -512,3 +512,55 @@ export const getDetalleTecnico = async (req, res) => {
     res.status(500).json({ message: 'Error interno obteniendo expediente.' });
   }
 };
+
+// DELETE /casos/:id (Solo Admin y si no está cerrado)
+export const deleteCaso = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // 1. Verificar estado del caso
+    const { data: caso, error: findError } = await supabaseAdmin
+      .from('casos')
+      .select('status, id')
+      .eq('id', id)
+      .single();
+
+    if (findError || !caso) {
+      return res.status(404).json({ error: 'Caso no encontrado.' });
+    }
+
+    // REGLA DE NEGOCIO: No borrar si ya se cobró/cerró
+    if (caso.status === 'cerrado' || caso.status === 'completado') {
+      return res.status(403).json({
+        error: 'No se puede eliminar un caso CERRADO. Esto afectaría los reportes financieros.'
+      });
+    }
+
+    // 2. Borrar dependencias (Revisiones técnicas)
+    // Supabase no siempre tiene "Cascade Delete" activado por defecto, así que lo hacemos manual.
+    const { error: revError } = await supabaseAdmin
+      .from('revisiones')
+      .delete()
+      .eq('caso_id', id);
+
+    if (revError) {
+      throw new Error('Error al eliminar revisiones asociadas: ' + revError.message);
+    }
+
+    // 3. Borrar el Caso principal
+    const { error: deleteError } = await supabaseAdmin
+      .from('casos')
+      .delete()
+      .eq('id', id);
+
+    if (deleteError) {
+      throw deleteError;
+    }
+
+    res.status(200).json({ message: 'Caso y datos asociados eliminados correctamente.' });
+
+  } catch (error) {
+    console.error('Error eliminando caso:', error);
+    res.status(500).json({ error: error.message });
+  }
+};

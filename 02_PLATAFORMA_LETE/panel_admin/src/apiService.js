@@ -25,7 +25,7 @@ export default api;
 // =========================================================
 // --- NUEVO: API PHP (COTI-LETE / GESTIÓN DE XML) ---
 // =========================================================
-const PHP_API_URL = '/api'; 
+const PHP_API_URL = '/api';
 
 // AYUDA: Función para obtener headers con el token actual
 const getAuthHeaders = (isJson = true) => {
@@ -129,7 +129,7 @@ export const updateRecurso = async (id, datos) => {
   const response = await fetch(`${PHP_API_URL}/recursos/editar`, {
     method: 'POST',
     headers: getAuthHeaders(),
-    body: JSON.stringify({ id, ...datos }) 
+    body: JSON.stringify({ id, ...datos })
   });
   return await response.json();
 };
@@ -165,13 +165,13 @@ export const obtenerListadoCotizaciones = async () => {
   const response = await fetch(`${PHP_API_URL}/admin/cotizaciones`, {
     headers: getAuthHeaders() // Ahora sí enviamos el token
   });
-  
+
   if (response.status === 401) {
-      // Opcional: Manejar redirección si el token expiró, 
-      // aunque el AuthContext lo suele manejar al recargar.
-      console.error("Sesión expirada en PHP");
+    // Opcional: Manejar redirección si el token expiró, 
+    // aunque el AuthContext lo suele manejar al recargar.
+    console.error("Sesión expirada en PHP");
   }
-  
+
   return await response.json();
 };
 
@@ -181,12 +181,12 @@ export const aplicarDescuento = async (idCotizacion, porcentaje) => {
     headers: getAuthHeaders(),
     body: JSON.stringify({ id: idCotizacion, descuento_pct: porcentaje })
   });
-  
+
   if (!response.ok) {
     const err = await response.json();
     throw new Error(err.error || `Error del servidor: ${response.status}`);
   }
-  
+
   return await response.json();
 };
 
@@ -214,10 +214,10 @@ export const finalizarProyecto = async (id, gastoMaterial, gastoMo) => {
   const response = await fetch(`${PHP_API_URL}/admin/cotizacion/finalizar`, {
     method: 'POST',
     headers: getAuthHeaders(),
-    body: JSON.stringify({ 
-        id, 
-        gasto_material: gastoMaterial, 
-        gasto_mo: gastoMo 
+    body: JSON.stringify({
+      id,
+      gasto_material: gastoMaterial,
+      gasto_mo: gastoMo
     })
   });
   return await response.json();
@@ -280,8 +280,14 @@ export const agendarCotizacion = async (id) => {
   // CORRECCIÓN: Usamos PHP_API_URL y getAuthHeaders para mantener coherencia
   const response = await fetch(`${PHP_API_URL}/admin/cotizacion/agendar`, {
     method: 'POST',
-    headers: getAuthHeaders(), 
+    headers: getAuthHeaders(),
     body: JSON.stringify({ id })
   });
   return await response.json();
+};
+
+export const deleteCaso = async (id) => {
+  // Asegúrate de que tu api instance tenga el token de Admin
+  const response = await api.delete(`/casos/${id}`);
+  return response.data;
 };

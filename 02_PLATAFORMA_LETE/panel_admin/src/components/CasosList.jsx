@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import api from '../apiService';
-import EditarCasoModal from './EditarCasoModal';
+import api, { deleteCaso } from '../apiService'; // <--- 1. IMPORTAMOS deleteCaso
 
 const tableStyle = {
   width: '100%',
@@ -27,12 +26,10 @@ const tdStyle = {
   color: '#1E293B',
 };
 
-function CasosList() {
+function CasosList({ onDatosActualizados }) { // Agregamos prop para refrescar dashboard si es necesario
   const [casos, setCasos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCaso, setEditingCaso] = useState(null);
 
   const fetchCasos = async () => {
     setIsLoading(true);
@@ -52,32 +49,28 @@ function CasosList() {
     fetchCasos();
   }, []);
 
-  const handleEditClick = (caso) => {
-    setEditingCaso(caso);
-    setIsModalOpen(true);
-  };
+  // --- 2. LÓGICA DE BORRADO ---
+  const handleDelete = async (casoId, status) => {
+    if (status === 'cerrado' || status === 'completado') {
+      alert('🚫 No puedes borrar casos CERRADOS o COMPLETADOS porque afectan las finanzas.');
+      return;
+    }
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingCaso(null);
-  };
-
-  const handleSaveCaso = async (formData) => {
-    if (!editingCaso) return;
-    try {
-      await api.put(`/casos/${editingCaso.id}`, formData);
-      handleCloseModal();
-      fetchCasos(); // Recargar la lista
-    } catch (error) {
-      console.error("Error al guardar el caso:", error);
-      alert("Hubo un error al guardar los cambios.");
+    if (window.confirm('¿Estás seguro de eliminar este caso? Se borrarán las revisiones asociadas pero el cliente se conservará.')) {
+      try {
+        await deleteCaso(casoId);
+        alert('✅ Caso eliminado correctamente');
+        fetchCasos(); // Recargamos la lista local
+        if (onDatosActualizados) onDatosActualizados(); // Avisamos al padre si existe
+      } catch (error) {
+        console.error("Error al eliminar:", error);
+        alert('Error al eliminar: ' + (error.response?.data?.error || error.message));
+      }
     }
   };
 
   if (isLoading) { return <div>Cargando lista de casos...</div>; }
   if (error) { return <div style={{ color: 'red' }}>{error}</div>; }
-
-  const VITE_PHP_API_URL = import.meta.env.VITE_PHP_API_BASE_URL || '/api';
 
   return (
     <div>
@@ -101,41 +94,44 @@ function CasosList() {
             casos.map(caso => (
               <tr key={caso.id}>
                 <td style={tdStyle}>{caso.id}</td>
-
-                {/* --- CORRECCIÓN AQUÍ: Accedemos al objeto 'cliente' --- */}
-                <td style={tdStyle}>
-                  {caso.cliente?.nombre_completo || 'Cliente Desconocido'}
-                </td>
-                <td style={tdStyle}>
-                  {caso.cliente?.direccion_principal || 'Sin Dirección'}
-                </td>
-                {/* ----------------------------------------------------- */}
+                <td style={tdStyle}>{caso.cliente?.nombre_completo || 'Cliente Desconocido'}</td>
+                <td style={tdStyle}>{caso.cliente?.direccion_principal || 'Sin Dirección'}</td>
 
                 <td style={tdStyle}>
                   {caso.tipo_servicio
                     ? caso.tipo_servicio.replace('_', ' ').toUpperCase()
                     : 'DIAGNÓSTICO'}
                 </td>
-                <td style={tdStyle}>{caso.status}</td>
-                <td style={tdStyle}>{caso.tecnico?.nombre || 'Sin asignar'}</td>
-                <td style={tdStyle}>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <button onClick={() => handleEditClick(caso)} style={{ background: '#007bff', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}>✏️ Editar</button>
 
-                    {/* --- CORRECCIÓN ADICIONAL: El enlace a cotizaciones también estaba roto --- */}
+                <td style={tdStyle}>
+                  {/* Badge sencillo de estado */}
+                  <span style={{
+                    padding: '4px 8px',
+                    borderRadius: '12px',
+                    fontSize: '0.85rem',
+                    backgroundColor: (caso.status === 'cerrado' || caso.status === 'completado') ? '#dcfce7' : '#fff7ed',
+                    color: (caso.status === 'cerrado' || caso.status === 'completado') ? '#166534' : '#9a3412',
+                    fontWeight: 'bold'
+                  }}>
+                    {caso.status}
+                  </span>
+                </td>
+
+                <td style={tdStyle}>{caso.tecnico?.nombre || 'Sin asignar'}</td>
+
+                <td style={tdStyle}>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+
+                    {/* BOTÓN 1: COTIZACIONES */}
                     <Link
                       to={`/cotizaciones?search=${encodeURIComponent(caso.cliente?.nombre_completo || '')}`}
-                      style={{ background: '#28a745', color: 'white', textDecoration: 'none', padding: '5px 10px', borderRadius: '4px' }}
+                      style={{ background: '#28a745', color: 'white', textDecoration: 'none', padding: '6px 10px', borderRadius: '4px', fontSize: '14px' }}
                     >
-                      💰 Cotizaciones
+                      💰 Ver Cotizaciones
                     </Link>
-                    {/* ------------------------------------------------------------------------- */}
 
-                    {/* Nota: En tu código original usabas 'caso.tipo' aquí abajo, pero en el backend traes 'tipo_servicio'. 
-                        Si 'caso.tipo' no existe en la respuesta del backend, esto nunca se mostrará. 
-                        Asumiré que 'tipo_servicio' es lo correcto o que 'tipo' viene de otro lado no visto. 
-                        Por seguridad, usaré la lógica que ya tenías pero verifica si es 'tipo_servicio'. */}
-                    {(caso.tipo === 'alto_consumo' || caso.tipo_servicio === 'alto_consumo') && (
+                    {/* BOTÓN 2: PDF (Solo si aplica) */}
+                    {(caso.tipo_servicio === 'alto_consumo' || caso.tipo === 'alto_consumo') && (
                       <a
                         href={caso.revisiones?.[0]?.pdf_url || '#'}
                         target="_blank"
@@ -144,14 +140,35 @@ function CasosList() {
                           background: caso.revisiones?.[0]?.pdf_url ? '#dc3545' : '#6c757d',
                           color: 'white',
                           textDecoration: 'none',
-                          padding: '5px 10px',
+                          padding: '6px 10px',
                           borderRadius: '4px',
-                          pointerEvents: caso.revisiones?.[0]?.pdf_url ? 'auto' : 'none'
+                          fontSize: '14px',
+                          pointerEvents: caso.revisiones?.[0]?.pdf_url ? 'auto' : 'none',
+                          opacity: caso.revisiones?.[0]?.pdf_url ? 1 : 0.6
                         }}
                       >
                         📄 PDF
                       </a>
                     )}
+
+                    {/* --- 3. NUEVO BOTÓN DE ELIMINAR (Reemplaza al de Editar) --- */}
+                    <button
+                      onClick={() => handleDelete(caso.id, caso.status)}
+                      style={{
+                        background: 'none',
+                        border: '1px solid #fee2e2',
+                        backgroundColor: '#fef2f2',
+                        color: '#dc2626',
+                        padding: '6px 10px',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '14px'
+                      }}
+                      title="Eliminar Caso"
+                    >
+                      🗑️
+                    </button>
+
                   </div>
                 </td>
               </tr>
@@ -159,14 +176,6 @@ function CasosList() {
           )}
         </tbody>
       </table>
-      {editingCaso && (
-        <EditarCasoModal
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          caso={editingCaso}
-          onSave={handleSaveCaso}
-        />
-      )}
     </div>
   );
 }

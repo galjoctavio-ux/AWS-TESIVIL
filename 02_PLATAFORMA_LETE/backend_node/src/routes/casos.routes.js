@@ -9,7 +9,8 @@ import {
   createCasoFromCotizacion,
   cerrarCasoManualTecnico,
   cerrarCaso,
-  getDetalleTecnico // Asegúrate de que esto esté importado
+  getDetalleTecnico,
+  deleteCaso
 } from '../controllers/casos.controller.js';
 
 const router = Router();
@@ -37,5 +38,6 @@ router.post('/create-from-cotizacion', requireAuth, isAdmin, createCasoFromCotiz
 // Rutas de cierre
 router.patch('/:id/cerrar-manual', requireAuth, isTecnico, cerrarCasoManualTecnico);
 router.patch('/:id/cerrar', requireAuth, isTecnico, cerrarCaso);
-
+// DELETE /lete/api/casos/:id
+router.delete('/:id', requireAuth, isAdmin, deleteCaso);
 export default router;

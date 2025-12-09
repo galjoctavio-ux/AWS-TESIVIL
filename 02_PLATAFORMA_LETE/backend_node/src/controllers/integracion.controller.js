@@ -2,6 +2,7 @@
 import { randomBytes } from 'crypto';
 import { supabaseAdmin } from '../services/supabaseClient.js';
 import eaPool from '../services/eaDatabase.js';
+import { sendNotificationToUser } from './notifications.controller.js';
 
 export const agendarDesdeBot = async (req, res) => {
     const { cliente, caso, cita } = req.body;
@@ -15,7 +16,15 @@ export const agendarDesdeBot = async (req, res) => {
         // =================================================================
         // 1. GESTIÓN DEL CLIENTE (SUPABASE)
         // =================================================================
-        const telefonoLimpio = cliente.telefono.replace(/\D/g, ''); // Solo números
+        // 👇 2. LIMPIEZA DEL TELÉFONO (MEJORA SOLICITADA)
+        // Primero quitamos todo lo que no sea número
+        let telefonoLimpio = cliente.telefono.replace(/\D/g, '');
+
+        // Si tiene 12 dígitos y empieza con 52 (Ej: 523312345678), quitamos el 52.
+        // Si tiene 10 dígitos (Ej: 3312345678), lo dejamos igual.
+        if (telefonoLimpio.length === 12 && telefonoLimpio.startsWith('52')) {
+            telefonoLimpio = telefonoLimpio.substring(2);
+        }
 
         // A) Buscar si ya existe
         let { data: clienteDB, error: findError } = await supabaseAdmin
@@ -110,6 +119,26 @@ export const agendarDesdeBot = async (req, res) => {
         await eaPool.query(sql, values);
 
         console.log(`[BOT] Agenda completada. Caso ID: ${nuevoCaso.id}`);
+
+
+        // =================================================================
+        // 4. 👇 NUEVO: ENVIAR NOTIFICACIÓN PUSH AL TÉCNICO
+        // =================================================================
+        try {
+            const notifPayload = {
+                title: '🤖 Nuevo Caso Asignado (Bot)',
+                body: `📅 ${cita.fecha} ${cita.hora}\n📍 ${cliente.direccion}\nClic para ver detalles.`,
+                url: '/agenda' // O '/casos' según prefieras
+            };
+
+            // Usamos el ID numérico de E!A (cita.tecnico_id_ea) que es compatible con tu sistema de notificaciones
+            await sendNotificationToUser(cita.tecnico_id_ea, notifPayload);
+            console.log(`[BOT] Push enviada al técnico ID ${cita.tecnico_id_ea}`);
+
+        } catch (pushError) {
+            console.error('[BOT] Error al enviar push (No crítico):', pushError.message);
+            // No hacemos throw para no cancelar la respuesta exitosa si solo falla la notificación
+        }
 
         // Respuesta final al Bot
         res.status(201).json({
