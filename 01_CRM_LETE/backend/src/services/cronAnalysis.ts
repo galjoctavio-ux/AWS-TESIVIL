@@ -75,7 +75,7 @@ export const runNightlyAnalysis = async () => {
                     // Ghosting: Mandar mañana a las 9 AM
                     const tomorrow = new Date();
                     tomorrow.setDate(tomorrow.getDate() + 1);
-                    tomorrow.setHours(9, 0, 0, 0);
+                    tomorrow.setHours(15, 0, 0, 0);
                     followUpDate = tomorrow;
 
                 } else if (analysis.intent === 'SOFT_FOLLOWUP') {
