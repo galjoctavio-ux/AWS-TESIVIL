@@ -9,10 +9,12 @@ export const runNightlyAnalysis = async () => {
     try {
         // 1. Buscamos chats activos (excluimos bloqueados o cerrados)
         const result = await query(`
-            SELECT id, whatsapp_id, last_message_analyzed_id
-            FROM conversations 
-            WHERE status NOT IN ('CLOSED', 'BLOCKED')
-        `);
+    SELECT DISTINCT c.id, c.whatsapp_id, c.last_message_analyzed_id
+    FROM conversations c
+    JOIN messages m ON c.id = m.conversation_id
+    WHERE c.status NOT IN ('CLOSED', 'BLOCKED')
+    AND m.created_at >= NOW() - INTERVAL '2 days' 
+`);
 
         const candidates = result.rows;
         console.log(`🔎 Candidatos: ${candidates.length}`);
