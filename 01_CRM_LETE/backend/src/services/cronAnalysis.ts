@@ -116,13 +116,13 @@ export const runNightlyAnalysis = async () => {
                 if (followUpDate) {
                     await query(`
                         UPDATE conversations
-                        SET intent = $1,
-                            follow_up_date = $2,
+                        SET intent = $1::varchar,  -- <--- Casteo explícito
+                            follow_up_date = $2::timestamp, -- <--- Casteo explícito
                             follow_up_status = 'PENDING',
                             
-                            -- Mantenemos compatibilidad con el sistema anterior de citas
-                            appointment_date = CASE WHEN $1 = 'APPOINTMENT' THEN $2 ELSE appointment_date END,
-                            appointment_status = CASE WHEN $1 = 'APPOINTMENT' THEN 'PENDING' ELSE appointment_status END,
+                            -- Usamos ::varchar y ::timestamp para evitar el error "inconsistent types deduced"
+                            appointment_date = CASE WHEN $1::varchar = 'APPOINTMENT' THEN $2::timestamp ELSE appointment_date END,
+                            appointment_status = CASE WHEN $1::varchar = 'APPOINTMENT' THEN 'PENDING' ELSE appointment_status END,
 
                             last_ai_analysis_at = NOW(),
                             last_message_analyzed_id = $3
