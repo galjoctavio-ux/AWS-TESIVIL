@@ -265,22 +265,20 @@ const DiaTimeline = ({ date }) => {
                         </Link>
                       ) : (<div />)}
 
-                      {/* 5. COTIZAR */}
-                      {(cita.caso.tipo === 'alto_consumo' || cita.caso.tipo === 'DIAGNOSTICO') ? (
-                        <Link
-                          to="/cotizador"
-                          state={{
-                            casoId: cita.caso.id,
-                            clienteNombre: cita.caso.cliente?.nombre_completo || cita.caso.cliente_nombre,
-                            clienteDireccion: cita.caso.cliente?.direccion_principal || cita.caso.cliente_direccion
-                          }}
-                          className="cita-icon-button"
-                          title="Crear Cotización"
-                          style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-                        >
-                          ⚡
-                        </Link>
-                      ) : (<div />)}
+                      {/* 5. COTIZAR (Visible SIEMPRE) */}
+                      <Link
+                        to="/cotizador"
+                        state={{
+                          casoId: cita.caso.id,
+                          clienteNombre: cita.caso.cliente?.nombre_completo || cita.caso.cliente_nombre,
+                          clienteDireccion: cita.caso.cliente?.direccion_principal || cita.caso.cliente_direccion
+                        }}
+                        className="cita-icon-button"
+                        title="Crear Cotización"
+                        style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                      >
+                        ⚡
+                      </Link>
 
                       {/* 6. COBRAR */}
                       {isCasoActivo ? (
