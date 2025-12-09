@@ -17,7 +17,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({
-  origin: '*', 
+  origin: '*',
   methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-app-key']
 }));
@@ -45,7 +45,7 @@ app.get('/health', async (req, res) => {
 
 // --- 404 PARA API (DEBE IR DESPUÉS DE LAS RUTAS API, ANTES DEL FRONTEND) ---
 app.use('/api/*', (req, res) => {
-    res.status(404).json({ error: 'API endpoint not found' });
+  res.status(404).json({ error: 'API endpoint not found' });
 });
 
 // --- FRONTEND (DEBE IR AL FINAL) ---
@@ -64,19 +64,19 @@ app.get('*', (req, res) => {
 // 1. Análisis Nocturno de Chats (2:00 AM Hora CDMX)
 // Busca citas en chats recientes y guarda la fecha si la encuentra.
 cron.schedule('0 2 * * *', () => {
-    console.log('🌙 [CRON] Ejecutando análisis nocturno de citas...');
-    runNightlyAnalysis();
+  console.log('🌙 [CRON] Ejecutando análisis nocturno de citas...');
+  runNightlyAnalysis();
 }, {
-    timezone: "America/Mexico_City"
+  timezone: "America/Mexico_City"
 });
 
-// 2. Envío de Recordatorios (8:00 AM Hora CDMX)
-// Manda WhatsApps a citas de "Mañana" y "Hoy".
-cron.schedule('0 8 * * *', () => {
-    console.log('☀️ [CRON] Ejecutando envío de recordatorios...');
-    checkReminders();
+// 2. Ejecutor de Envíos (Cada hora, de 8 AM a 8 PM Hora CDMX)
+// Verifica citas, recordatorios y seguimientos programados.
+cron.schedule('0 8-20 * * *', () => {
+  console.log('⏰ [CRON] Ejecutando verificador de envíos (Horario Hábil)...');
+  checkReminders();
 }, {
-    timezone: "America/Mexico_City"
+  timezone: "America/Mexico_City"
 });
 
 app.listen(PORT, () => {
