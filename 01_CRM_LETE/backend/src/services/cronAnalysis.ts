@@ -73,10 +73,9 @@ export const runNightlyAnalysis = async () => {
 
                 } else if (analysis.intent === 'NO_REPLY') {
                     // Ghosting: Mandar mañana a las 9 AM
-                    const tomorrow = new Date();
-                    tomorrow.setDate(tomorrow.getDate() + 1);
-                    tomorrow.setHours(15, 0, 0, 0);
-                    followUpDate = tomorrow;
+                    const targetDate = new Date(); // Toma la hora actual (ej. 09/12 03:00 AM)
+                    targetDate.setHours(15, 0, 0, 0); // Fija a las 15:00 UTC (9:00 AM México)
+                    followUpDate = targetDate;
 
                 } else if (analysis.intent === 'SOFT_FOLLOWUP') {
                     // LÓGICA CORREGIDA DE 23 HORAS
