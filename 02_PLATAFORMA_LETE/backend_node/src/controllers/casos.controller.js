@@ -436,7 +436,8 @@ export const cerrarCasoManualTecnico = async (req, res) => {
   }
 };
 
-// --- NUEVA FUNCIÓN: VISTA SEGURA PARA TÉCNICOS ---
+// backend_node/src/controllers/casos.controller.js
+
 export const getDetalleTecnico = async (req, res) => {
   const { id: casoId } = req.params;
   const { id: tecnicoId } = req.user;
@@ -469,17 +470,19 @@ export const getDetalleTecnico = async (req, res) => {
         )
       `)
       .eq('id', casoId)
-      // Importante: Filtramos aquí también que sea SU caso
       .eq('tecnico_id', tecnicoId)
-      .single();
+      .maybeSingle(); // <--- CAMBIO CLAVE: Usamos maybeSingle() en vez de single()
 
     if (error) throw error;
+
+    // Si no encontró nada, respondemos 404 en lugar de explotar con 500
     if (!caso) {
-      return res.status(404).json({ message: 'Caso no encontrado o no asignado a ti.' });
+      return res.status(404).json({
+        message: 'No se encontró el caso o no está asignado a ti.'
+      });
     }
 
-    // SANITIZACIÓN FINAL (Doble seguridad)
-    // Aunque el select ya filtra, reestructuramos para evitar fugas accidentales
+    // SANITIZACIÓN (Igual que antes)
     const respuestaSegura = {
       id: caso.id,
       status: caso.status,
@@ -495,10 +498,8 @@ export const getDetalleTecnico = async (req, res) => {
           lat: caso.cliente?.ubicacion_lat,
           lng: caso.cliente?.ubicacion_lng
         },
-        // Muestra semáforo de saldo, pero NO datos bancarios ni historial
         tiene_deuda: (caso.cliente?.saldo_pendiente > 0)
       },
-      // Tomamos solo la revisión más reciente si existen varias
       ultima_revision: caso.revisiones?.length > 0
         ? caso.revisiones.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0]
         : null
@@ -508,6 +509,6 @@ export const getDetalleTecnico = async (req, res) => {
 
   } catch (error) {
     console.error('Error en getDetalleTecnico:', error);
-    res.status(500).json({ message: 'Error obteniendo expediente.' });
+    res.status(500).json({ message: 'Error interno obteniendo expediente.' });
   }
 };
