@@ -4,39 +4,42 @@ import { analyzeChatForAppointment } from './aiDateService';
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const runNightlyAnalysis = async () => {
-    console.log('🌙 [CRON] Iniciando Análisis Avanzado de Seguimiento...');
+    console.log('🌙 [CRON] Iniciando Análisis Avanzado (V2 Refinado)...');
 
     try {
-        // 1. Buscamos chats activos (excluimos bloqueados o cerrados)
+        // 1. Buscamos chats activos (excluimos bloqueados, cerrados Y GRUPOS)
         const result = await query(`
-    SELECT DISTINCT c.id, c.whatsapp_id, c.last_message_analyzed_id
-    FROM conversations c
-    JOIN messages m ON c.id = m.conversation_id
-    WHERE c.status NOT IN ('CLOSED', 'BLOCKED')
-    AND m.created_at >= NOW() - INTERVAL '2 days' 
-`);
+            SELECT DISTINCT c.id, c.whatsapp_id, c.last_message_analyzed_id
+            FROM conversations c
+            JOIN messages m ON c.id = m.conversation_id
+            WHERE c.status NOT IN ('CLOSED', 'BLOCKED')
+            AND c.whatsapp_id NOT LIKE '%@g.us' -- <--- FILTRO DE GRUPOS IMPORTANTE
+            AND m.created_at >= NOW() - INTERVAL '2 days' 
+        `);
 
         const candidates = result.rows;
-        console.log(`🔎 Candidatos: ${candidates.length}`);
+        console.log(`🔎 Candidatos reales: ${candidates.length}`);
 
         for (const chat of candidates) {
-            // 2. Obtener último mensaje para comparar marcas Y para calcular tiempos
-            const lastMsgResult = await query(`
-                SELECT id, whatsapp_message_id, content, created_at, is_internal
-                FROM messages
-                WHERE conversation_id = $1
-                ORDER BY created_at DESC
-                LIMIT 1
+            // 2. Obtener datos clave: Último mensaje general Y último mensaje del cliente
+            // Usamos subconsultas para tener precisión quirúrgica
+            const msgData = await query(`
+                SELECT 
+                    (SELECT created_at FROM messages WHERE conversation_id = $1 ORDER BY created_at DESC LIMIT 1) as last_msg_at,
+                    (SELECT whatsapp_message_id FROM messages WHERE conversation_id = $1 ORDER BY created_at DESC LIMIT 1) as last_msg_id,
+                    (SELECT id FROM messages WHERE conversation_id = $1 ORDER BY created_at DESC LIMIT 1) as last_db_id,
+                    
+                    -- Capturamos la hora del último mensaje DEL CLIENTE para la regla de 23h
+                    (SELECT created_at FROM messages WHERE conversation_id = $1 AND is_internal = false ORDER BY created_at DESC LIMIT 1) as last_client_at
+                
             `, [chat.id]);
 
-            if (lastMsgResult.rows.length === 0) continue;
+            if (msgData.rows.length === 0) continue;
+            const meta = msgData.rows[0];
 
-            const lastMsg = lastMsgResult.rows[0];
-            const lastRealId = lastMsg.whatsapp_message_id || lastMsg.id.toString();
+            const lastRealId = meta.last_msg_id || meta.last_db_id.toString();
 
             // Lógica de Marcas: Si ya analizamos este estado, saltar.
-            // EXCEPCIÓN: Si es un 'NO_REPLY' pendiente, quizás queramos reevaluar, 
-            // pero por eficiencia, asumimos que si no hay mensajes nuevos, la estrategia anterior sigue vigente.
             if (chat.last_message_analyzed_id === lastRealId) continue;
 
             console.log(`🧠 Analizando: ${chat.whatsapp_id}...`);
@@ -61,66 +64,47 @@ export const runNightlyAnalysis = async () => {
 
             if (analysis) {
                 let followUpDate: Date | null = null;
-                let status = 'PENDING';
-
-                // --- LÓGICA DE PROGRAMACIÓN DE FECHAS ---
 
                 if (analysis.intent === 'APPOINTMENT' && analysis.appointment_date_iso) {
-                    // Caso 1: Cita Firme
                     followUpDate = new Date(analysis.appointment_date_iso);
 
                 } else if (analysis.intent === 'FUTURE_CONTACT' && analysis.appointment_date_iso) {
-                    // Caso 2: "Háblame en Enero"
                     followUpDate = new Date(analysis.appointment_date_iso);
 
                 } else if (analysis.intent === 'NO_REPLY') {
-                    // Caso 3: Ghosting (Cliente no contestó)
-                    // Regla: Mandar mensaje Mañana a las 9:00 AM
+                    // Ghosting: Mandar mañana a las 9 AM
                     const tomorrow = new Date();
                     tomorrow.setDate(tomorrow.getDate() + 1);
-                    tomorrow.setHours(9, 0, 0, 0); // 9:00 AM
+                    tomorrow.setHours(9, 0, 0, 0);
                     followUpDate = tomorrow;
 
                 } else if (analysis.intent === 'SOFT_FOLLOWUP') {
-                    // Caso 4: "Déjame ver..." (Regla de las 23 horas)
-                    // Base: Hora del último mensaje DEL CLIENTE (o del chat si fue mixto, pero idealmente del cliente)
-                    // Si el último mensaje fue nuestro, la ventana de 24h cuenta desde NUESTRO mensaje? 
-                    // NO. La ventana de WhatsApp se abre cuando el CLIENTE escribe.
-                    // Por seguridad, usaremos la fecha del último mensaje registrado en la BD (created_at).
+                    // LÓGICA CORREGIDA DE 23 HORAS
+                    // Usamos la hora del CLIENTE (last_client_at) si existe, sino la general
+                    const baseTimeStr = meta.last_client_at || meta.last_msg_at;
+                    const baseTime = new Date(baseTimeStr);
 
-                    const lastMsgTime = new Date(lastMsg.created_at);
+                    // Sumamos 23h
+                    const deadline = new Date(baseTime.getTime() + (23 * 60 * 60 * 1000));
 
-                    // Calculamos: Hora mensaje + 23 horas
-                    const deadline = new Date(lastMsgTime.getTime() + (23 * 60 * 60 * 1000));
+                    // Ajuste a horario hábil (8am - 8pm)
+                    const businessStart = new Date(deadline); businessStart.setHours(8, 0, 0, 0);
+                    const businessEnd = new Date(deadline); businessEnd.setHours(20, 0, 0, 0);
 
-                    // Definimos límites hábiles para ESE día del deadline
-                    const businessStart = new Date(deadline);
-                    businessStart.setHours(8, 0, 0, 0); // 8 AM
-
-                    const businessEnd = new Date(deadline);
-                    businessEnd.setHours(20, 0, 0, 0); // 8 PM (20:00)
-
-                    if (deadline > businessEnd) {
-                        // Si las 23h caen a las 10 PM, lo bajamos a las 8 PM para alcanzar a enviar.
-                        followUpDate = businessEnd;
-                    } else if (deadline < businessStart) {
-                        // Si las 23h caen a las 4 AM (raro), lo movemos a las 8 AM.
-                        followUpDate = businessStart;
-                    } else {
-                        // Si cae dentro (ej. 4 PM), usamos esa hora exacta.
-                        followUpDate = deadline;
-                    }
+                    if (deadline > businessEnd) followUpDate = businessEnd;
+                    else if (deadline < businessStart) followUpDate = businessStart;
+                    else followUpDate = deadline;
                 }
 
                 // 5. Guardar en Base de Datos
                 if (followUpDate) {
                     await query(`
                         UPDATE conversations
-                        SET intent = $1::varchar,  -- <--- Casteo explícito
-                            follow_up_date = $2::timestamp, -- <--- Casteo explícito
+                        SET intent = $1::varchar,
+                            follow_up_date = $2::timestamp,
                             follow_up_status = 'PENDING',
                             
-                            -- Usamos ::varchar y ::timestamp para evitar el error "inconsistent types deduced"
+                            -- Compatibilidad con sistema de citas
                             appointment_date = CASE WHEN $1::varchar = 'APPOINTMENT' THEN $2::timestamp ELSE appointment_date END,
                             appointment_status = CASE WHEN $1::varchar = 'APPOINTMENT' THEN 'PENDING' ELSE appointment_status END,
 
@@ -131,11 +115,10 @@ export const runNightlyAnalysis = async () => {
 
                     console.log(`✅ ${analysis.intent} detectado. Programado para: ${followUpDate.toLocaleString('es-MX', { timeZone: 'America/Mexico_City' })}`);
                 } else {
-                    // Si es NONE o no hay fecha, solo actualizamos la marca
                     await query(`
                         UPDATE conversations
                         SET last_ai_analysis_at = NOW(),
-                            intent = $1,
+                            intent = $1::varchar,
                             last_message_analyzed_id = $2
                         WHERE id = $3
                     `, [analysis.intent, lastRealId, chat.id]);
@@ -144,7 +127,7 @@ export const runNightlyAnalysis = async () => {
             }
 
             // Delay anti-ban
-            await delay(5000);
+            await delay(4000);
         }
 
         console.log('💤 Análisis Finalizado.');

@@ -4,60 +4,56 @@ import { query } from '../config/db';
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-// Tipos de respuesta que esperamos de la IA
 interface AIAnalysisResult {
     intent: 'APPOINTMENT' | 'FUTURE_CONTACT' | 'SOFT_FOLLOWUP' | 'NO_REPLY' | 'NONE';
-    appointment_date_iso: string | null; // Para APPOINTMENT y FUTURE_CONTACT
+    appointment_date_iso: string | null;
     reasoning: string;
 }
 
 export const analyzeChatForAppointment = async (conversationId: string, historyText: string): Promise<AIAnalysisResult | null> => {
-    // Usamos hora de México para que la IA entienda "mañana", "hoy", "enero"
-    const today = new Date().toLocaleString('es-MX', {
-        timeZone: 'America/Mexico_City',
-        dateStyle: 'full',
-        timeStyle: 'short'
-    });
+    const today = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City', dateStyle: 'full', timeStyle: 'short' });
 
     const prompt = `
-    Actúa como un Asistente Comercial experto en cierre de ventas. Hoy es: ${today}.
-    Tu misión es analizar el chat y determinar CUÁL es el siguiente paso lógico con este cliente.
-
-    CLASIFICACIÓN DE INTENCIONES (Elige UNA):
+    Eres el asistente IA del CRM de "Luz en tu Espacio" (Ingenieros Electricistas).
+    Hoy es: ${today}.
     
-    1. "APPOINTMENT": El cliente YA confirmó explícitamente una fecha y hora para la visita.
-       - Ejemplo: "Sí, ven el martes a las 4", "Quedamos para el 10 de diciembre", "Quedo correctamente agendado".
-       - Acción: Extrae la fecha exacta en formato ISO.
+    Analiza el chat y define la PRÓXIMA ACCIÓN.
+    
+    REGLAS CRÍTICAS (PRIORIDAD ALTA):
+    1. SI EL ÚLTIMO MENSAJE ES DEL CLIENTE y es una pregunta, saludo, o solicitud de info que NO hemos respondido -> TU RESPUESTA DEBE SER "NONE". (El humano debe contestar primero).
+    2. SI SE HABLA DE PAGOS/ANTICIPOS/DINERO en los últimos mensajes -> TU RESPUESTA DEBE SER "NONE". (Delicado, lo maneja el humano).
+    3. TEMAS IRRELEVANTES (SEO, Marketing, Google Links) -> "NONE".
+    
+    SI NO APLICA NINGUNA REGLA ANTERIOR, CLASIFICA ASÍ:
 
-    2. "FUTURE_CONTACT": El cliente pide que lo busquemos en una fecha futura específica o vaga.
-       - Ejemplo: "Búscame en Enero", "Háblame el próximo mes", "Regreso de vacaciones el lunes".
-       - Acción: Calcula la fecha aproximada. 
-         * Si dice "Enero", pon el primer día hábil de Enero a las 10:00 AM.
-         * Si dice "Lunes", pon ese lunes a las 10:00 AM.
-         * Si dice una fecha exacta, úsala.
+    [APPOINTMENT]
+    El cliente confirmó explícitamente fecha y hora.
+    - OJO CON LA HORA: "11" suele ser 11:00 AM. "3" o "5" suele ser PM (15:00, 17:00). Usa lógica de horario laboral (9am-7pm).
+    - Formato Salida: ISO estricto.
 
-    3. "SOFT_FOLLOWUP": El cliente está indeciso, pide tiempo o permiso, pero hay interés. (Ventana de 24h).
-       - Ejemplo: "Déjame preguntar a mi esposo", "Yo te aviso mañana", "Estoy revisando horarios", "Ok", "Gracias".
-       - Nota: Si el cliente solo dice "Gracias" o "Ok" después de recibir info, entra aquí para seguimiento rápido.
-       - Acción: No necesitas calcular fecha, pon null en date (el sistema lo hará).
+    [NO_REPLY] (Ghosting)
+    El ÚLTIMO mensaje es de "Soporte/Técnico" (nosotros) y el cliente NO ha respondido en absoluto.
+    - Si el cliente mostró interés antes pero nos dejó en visto -> NO_REPLY.
+    
+    [SOFT_FOLLOWUP] (Seguimiento Suave 23h)
+    El cliente respondió, pero pidió tiempo o quedó en avisar.
+    - Ejemplos: "Déjame ver", "Le pregunto a mi esposo", "Yo les aviso".
+    - Si el cliente dijo solo "Ok" o "Gracias" y nosotros ya dimos toda la info -> SOFT_FOLLOWUP (para reactivar venta).
 
-    4. "NO_REPLY": El cliente NO contestó al último mensaje que envió el TÉCNICO o SOPORTE. 
-       - Condición: El último mensaje del chat es de "Soporte/Técnico" y ya pasó tiempo. El cliente nos dejó en "Visto" o ignoró nuestra info.
-       - Acción: Pon null en date (el sistema agendará para mañana a las 9 AM).
+    [FUTURE_CONTACT]
+    El cliente pide explícitamente que lo busquemos en el futuro.
+    - "Enero", "La próxima semana", "El lunes".
 
-    5. "NONE": El cliente ya no está interesado, ya se realizó el servicio, o la conversación no requiere acción.
-       - Ejemplo: "Ya vinieron, gracias", "No me interesa", "Equivocado".
-
-    Historial del chat:
+    Historial:
     ---
     ${historyText}
     ---
     
-    Responde SOLO con este JSON:
+    Responde SOLO JSON:
     {
       "intent": "APPOINTMENT" | "FUTURE_CONTACT" | "SOFT_FOLLOWUP" | "NO_REPLY" | "NONE",
-      "appointment_date_iso": "YYYY-MM-DD HH:mm:00" (Solo para APPOINTMENT o FUTURE_CONTACT, si no null),
-      "reasoning": "Breve explicación"
+      "appointment_date_iso": "YYYY-MM-DD HH:mm:00" (o null),
+      "reasoning": "Por qué elegiste esto y por qué esa hora"
     }
     `;
 
@@ -65,11 +61,9 @@ export const analyzeChatForAppointment = async (conversationId: string, historyT
         const result = await model.generateContent(prompt);
         const responseText = result.response.text();
         const cleanJson = responseText.replace(/```json|```/g, '').trim();
-        const analysis: AIAnalysisResult = JSON.parse(cleanJson);
-
-        return analysis;
+        return JSON.parse(cleanJson);
     } catch (error) {
-        console.error(`[AI Service Error] Falló análisis para chat ${conversationId}:`, error);
+        console.error(`[AI Error] ${conversationId}:`, error);
         return null;
     }
 };
