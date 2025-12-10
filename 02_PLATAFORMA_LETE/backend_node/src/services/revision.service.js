@@ -7,7 +7,7 @@ import {
   verificarSolar
 } from './calculos.service.js';
 import { enviarReportePorEmail } from './email.service.js';
-import { generarPDF } from './pdf.service.js';
+import { generarPDF, generarDiagnosticoIA } from './pdf.service.js';
 // Importamos la función para notificar al técnico
 import { sendNotificationToEmail } from '../controllers/notifications.controller.js';
 /**
@@ -346,6 +346,7 @@ export const crearRegistroRevision = async (payload, tecnicoAuth) => {
  * Genera PDF, consulta IA, envía Email y Notifica vía Push
  * ==================================================================
  */
+const delay = ms => new Promise(res => setTimeout(res, ms));
 export const generarArtefactosYNotificar = async (dataContext, tecnicoAuth) => {
   const { revisionId, revisionData, equiposCalculados, firmaBase64, datosOriginales } = dataContext;
 
@@ -493,10 +494,13 @@ export const generarArtefactosYNotificar = async (dataContext, tecnicoAuth) => {
     const alertaFuga = porcentajeFuga >= 15;
 
     // -----------------------
-    // E. Generación de PDF
+    // E. Generación de PDF CON REINTENTOS
     // -----------------------
     let pdfUrl = null;
+    let errorCritico = null;
+    const MAX_RETRIES = 3;
 
+    // Preparamos los datos UNA sola vez antes del bucle
     const datosParaPdf = {
       header: {
         id: revisionId,
@@ -510,19 +514,16 @@ export const generarArtefactosYNotificar = async (dataContext, tecnicoAuth) => {
         condicion_infra: revisionData.condicion_infraestructura
       },
       mediciones: {
-        ...datosOriginales, // Pasamos todos los datos crudos para visualización en tabla
+        ...datosOriginales,
         corriente_fuga_f1: corrienteFuga
       },
       finanzas: {
         kwh_recibo: kwhRecibo,
         kwh_auditado: totalAuditadoAjustado,
         kwh_desperdicio_total: kwhDesperdicioTotal,
-
-        // Desglose Gráfica
         kwh_eficiente: kwhEficiente,
         kwh_ineficiencia: kwhIneficienciaEquipos,
         kwh_fuga_real: kwhFugaReal,
-
         porcentaje_desperdicio: porcentajeFuga,
         alerta_fuga: alertaFuga
       },
@@ -538,31 +539,56 @@ export const generarArtefactosYNotificar = async (dataContext, tecnicoAuth) => {
       firma_cliente_url: firmaClienteUrl
     };
 
-    try {
-      console.log('Generando PDF...');
-      const pdfBuffer = await generarPDF(datosParaPdf);
+    // BUCLE DE REINTENTOS
+    for (let intento = 1; intento <= MAX_RETRIES; intento++) {
+      try {
+        console.log(`[Intento ${intento}/${MAX_RETRIES}] Iniciando generación de IA y PDF...`);
 
-      if (pdfBuffer) {
-        // Ruta ajustada a tu imagen: bucket 'reportes', carpeta 'reportes'
-        const pdfPath = `reportes/reporte-revision-${revisionId}.pdf`;
+        // 1. OBTENER DIAGNÓSTICO IA (Independiente del PDF)
+        let textoIA = "Análisis IA no disponible temporalmente.";
+        try {
+          textoIA = await generarDiagnosticoIA(datosParaPdf);
+        } catch (errIA) {
+          console.warn(`[Intento ${intento}] Falló IA, usando texto fallback.`, errIA.message);
+        }
+
+        // 2. GENERAR PDF (Puppeteer)
+        const pdfBuffer = await generarPDF(datosParaPdf, textoIA);
+
+        if (!pdfBuffer) throw new Error("Puppeteer retornó buffer nulo.");
+
+        // 3. SUBIR A STORAGE
+        const pdfPath = `reportes/reporte-revision-${revisionId}_${Date.now()}.pdf`;
         const publicPdfUrl = await uploadBufferToStorage('reportes', pdfPath, pdfBuffer, 'application/pdf');
 
-        if (publicPdfUrl) {
-          pdfUrl = publicPdfUrl;
-          await supabaseAdmin.from('revisiones')
-            .update({ pdf_url: pdfUrl, proceso_status: 'completado' })
-            .eq('id', revisionId);
-          console.log('PDF generado y subido correctamente:', pdfUrl);
-        } else {
-          throw new Error('No se pudo obtener URL pública del PDF subido.');
+        if (!publicPdfUrl) throw new Error("Fallo al subir PDF a Storage.");
+
+        pdfUrl = publicPdfUrl;
+
+        // ACTUALIZAR BASE DE DATOS
+        await supabaseAdmin.from('revisiones')
+          .update({ pdf_url: pdfUrl, proceso_status: 'completado' })
+          .eq('id', revisionId);
+
+        console.log(`[Éxito] PDF generado y subido en el intento ${intento}`);
+        break; // Rompemos el bucle si todo salió bien
+
+      } catch (errIntento) {
+        console.error(`[Error Intento ${intento}] Falló generación: ${errIntento.message}`);
+        errorCritico = errIntento;
+
+        if (intento < MAX_RETRIES) {
+          console.log(`Esperando 5 segundos antes de reintentar...`);
+          await delay(5000);
         }
-      } else {
-        throw new Error("Puppeteer no retornó un buffer válido.");
       }
-    } catch (pdfError) {
-      console.error('Error crítico en proceso de PDF:', pdfError);
-      throw pdfError; // Relanzamos para caer en el catch principal y notificar error
     }
+
+    if (!pdfUrl) {
+      throw new Error(`Fallaron los ${MAX_RETRIES} intentos de generación de PDF. Último error: ${errorCritico?.message}`);
+    }
+
+    // AQUI CONTINÚA LA SECCIÓN F (Envío de correo) normalmente...
 
     // -----------------------
     // F. Envío de correo

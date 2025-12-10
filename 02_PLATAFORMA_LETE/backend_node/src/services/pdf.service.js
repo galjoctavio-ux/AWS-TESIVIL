@@ -111,7 +111,7 @@ const styles = `
 // ---------------------------------------------------------
 // 2. IA GENERATIVA (Punto 3: Distinción Fuga vs Ineficiencia)
 // ---------------------------------------------------------
-const generarDiagnosticoIA = async (datos) => {
+export const generarDiagnosticoIA = async (datos) => {
   const apiKey = process.env.GEMINI_API_KEY;
 
   // Pasamos los datos desglosados para que la IA entienda qué es qué
@@ -426,23 +426,30 @@ const getHtmlReporte = (datos, textoIA) => {
 // ---------------------------------------------------------
 // 4. FUNCIÓN PRINCIPAL (EXPORT)
 // ---------------------------------------------------------
-export const generarPDF = async (datos) => {
+export const generarPDF = async (datos, textoIA) => { // <--- AHORA RECIBE textoIA
   try {
-    console.log('[PDF Service] Solicitando análisis a Gemini...');
-    const textoIA = await generarDiagnosticoIA(datos);
+    console.log('[PDF Service] Generando HTML con texto IA provisto...');
+
+    // Ya no llamamos a generarDiagnosticoIA aquí dentro.
     const html = getHtmlReporte(datos, textoIA);
 
     const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage', // Vital para Docker/VMs
+        '--disable-gpu'
+      ],
       headless: 'new'
     });
 
     const page = await browser.newPage();
 
-    // Aumentamos el timeout a 60 segundos (60000ms) para que no se cuelgue si QuickChart o el logo tardan
+    // Optimizaciones de tiempo de espera y red
+    await page.emulateMediaType('screen');
     await page.setContent(html, {
-      waitUntil: 'networkidle0',
-      timeout: 120000
+      waitUntil: ['load', 'networkidle2'], // Menos estricto que networkidle0
+      timeout: 180000 // 3 Minutos de tolerancia máxima
     });
 
     const pdfBuffer = await page.pdf({
@@ -455,7 +462,7 @@ export const generarPDF = async (datos) => {
     return pdfBuffer;
 
   } catch (error) {
-    console.error("Error generando PDF:", error);
-    return null;
+    console.error("Error generando PDF (Puppeteer):", error);
+    throw error; // Lanzamos el error para que el reintento funcione
   }
 };
