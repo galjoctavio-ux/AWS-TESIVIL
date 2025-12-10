@@ -103,22 +103,26 @@ function App() {
         </button>
       </footer>
 
-      {/* 4. MODAL DE DETALLES */}
+      {/* 4. MODAL DE DETALLES (Actualizado) */}
       {selectedCita && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
 
             <div className="modal-header">
               <div className="modal-title">
+                {/* Título: Nombre del Cliente */}
                 <h3>{selectedCita.title}</h3>
+
+                {/* Badge: Tipo de Servicio */}
                 {selectedCita.details?.tipoServicio && (
                   <span className="modal-badge">{selectedCita.details.tipoServicio}</span>
                 )}
               </div>
-              <button className="btn-close" onClick={closeModal}>&times;</button>
+              <button className="btn-close" onClick={closeModal}>×</button>
             </div>
 
             <div className="modal-body">
+              {/* Fila 1: Horario */}
               <div className="info-row">
                 <span className="icon">🕒</span>
                 <div>
@@ -127,6 +131,23 @@ function App() {
                 </div>
               </div>
 
+              {/* Fila 2: Celular (¡AQUÍ ESTÁ LO NUEVO!) */}
+              {selectedCita.details?.celular && (
+                <div className="info-row">
+                  <span className="icon">📱</span>
+                  <div>
+                    <strong>Celular:</strong><br />
+                    <a
+                      href={`tel:${selectedCita.details.celular}`}
+                      style={{ color: '#0369a1', fontWeight: 'bold', textDecoration: 'none' }}
+                    >
+                      {selectedCita.details.celular}
+                    </a>
+                  </div>
+                </div>
+              )}
+
+              {/* Fila 3: Dirección */}
               {selectedCita.details?.direccion && (
                 <div className="info-row">
                   <span className="icon">📍</span>
@@ -137,12 +158,13 @@ function App() {
                 </div>
               )}
 
-              {selectedCita.details?.celular && (
-                <div className="info-row">
-                  <span className="icon">📞</span>
+              {/* Fila 4: Notas (Si las hay) */}
+              {selectedCita.details?.notas && (
+                <div className="info-row" style={{ background: '#fff3cd', padding: '8px', borderRadius: '5px' }}>
+                  <span className="icon">📝</span>
                   <div>
-                    <strong>Contacto:</strong><br />
-                    {selectedCita.details.celular}
+                    <strong>Notas:</strong><br />
+                    <span style={{ fontSize: '0.85rem' }}>{selectedCita.details.notas}</span>
                   </div>
                 </div>
               )}
