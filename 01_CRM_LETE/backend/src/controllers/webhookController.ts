@@ -9,6 +9,94 @@ import {
     agendaDrafts
 } from '../services/smartAgendaService';
 
+// =========================================================================
+// 🚀 FUNCIÓN HELPER: Ejecuta el Agendamiento y Envía a VM2
+// Esta función encapsula la lógica que estaba duplicada en el bloque 'AGENDAR'
+// =========================================================================
+const ejecutarAgendamiento = async (remoteJid: string, draft: any) => {
+    try {
+        await sendText(remoteJid, "🚀 Enviando datos a TESIVIL (VM 2)...", 0);
+
+        // --- 1. MAPEO DE TÉCNICOS REAL (Lógica original preservada) ---
+
+        // Opción Default: Ing. Gallardo (ID 23)
+        let techIds = {
+            ea: 23,
+            supabase: "7561b141-93b8-4c8e-b8cc-05bb7658f152"
+        };
+
+        const nombreTech = (draft.tecnico_nombre_detectado || draft.tecnico_nombre || '').toLowerCase();
+
+        // Override: Si la IA detectó a Leonardo
+        if (nombreTech.includes('leonardo') || nombreTech.includes('leo')) {
+            techIds = {
+                ea: 25,
+                supabase: "cb9fe9cc-9787-4a77-9185-d5af44a0da4e"
+            };
+        }
+
+        // --- 2. PREPARAR NOTAS CON COSTO (Lógica original preservada) ---
+
+        // Unimos las notas de la IA con el costo detectado
+        const notasIA = draft.notas_adicionales || draft.notas || 'Sin notas';
+        const costoTexto = draft.costo ? ` | Costo acordado: $${draft.costo}` : '';
+        const notaFinal = `${notasIA}${costoTexto}`;
+
+        // --- 3. CONSTRUCCIÓN DEL PAYLOAD (¡GPS AGREGADO!) ---
+        const payloadFinal = {
+            cliente: {
+                nombre: draft.cliente_nombre,
+                telefono: draft.cliente_telefono,
+                // Usamos la dirección final confirmada/geocodificada
+                direccion: draft.direccion_final || draft.direccion_texto,
+                // Usamos el link directo a coordenadas (si disponible) o el de búsqueda
+                google_maps_link: draft.link_gmaps_generado || draft.link_gmaps_final,
+                // CAMPOS DE COORDENADAS PRECISO PARA SUPABASE
+                latitud: draft.ubicacion_lat || null,
+                longitud: draft.ubicacion_lng || null
+            },
+            caso: {
+                tipo: draft.tipo_caso || 'alto_consumo',
+                comentarios: `Creado vía WhatsApp Bot.\nDetalles: ${notaFinal}`
+            },
+            cita: {
+                fecha: draft.fecha,
+                hora: draft.hora,
+                duracion: draft.duracion_horas || '1',
+                tecnico_id_ea: techIds.ea,
+                tecnico_id_supabase: techIds.supabase,
+                notas_adicionales: notaFinal
+            }
+        };
+
+        console.log("📦 PAYLOAD GPS LISTO PARA VM2:", payloadFinal);
+
+        // --- 4. ENVÍO A API ---
+        await axios.post(
+            'https://www.tesivil.com/lete/api/integracion/crear-caso-bot',
+            payloadFinal,
+            {
+                headers: {
+                    'x-app-key': 'Tesivil_Secret_Bot_2025_XYZ', // <--- ¡PON TU CLAVE AQUÍ!
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        // --- 5. CONFIRMACIÓN FINAL ---
+        await sendText(remoteJid, `✅ ¡PROCESO COMPLETADO!\nDatos enviados y agendados para: ${draft.cliente_nombre || 'Cliente'}`, 0);
+        agendaDrafts.delete(remoteJid);
+        return true;
+
+    } catch (error) {
+        console.error("Error al enviar a VM 2:", error);
+        await sendText(remoteJid, `❌ Error técnico al guardar: ${(error as any).message}`, 0);
+        // Si hay error, no borramos el draft para que se pueda intentar de nuevo manualmente
+        return false;
+    }
+};
+// =========================================================================
+
 export const receiveWebhook = async (req: Request, res: Response) => {
     try {
         const body = req.body;
@@ -104,7 +192,6 @@ export const receiveWebhook = async (req: Request, res: Response) => {
         // =========================================================================
 
         // Identificar si eres TÚ (mensaje enviado desde el cel de la empresa o tu número personal)
-        // Ajusta tu número aquí si envías desde tu personal
         const isAdmin = isFromMe || remoteJid.includes('+523326395038');
 
         if (isAdmin) {
@@ -117,102 +204,45 @@ export const receiveWebhook = async (req: Request, res: Response) => {
                 remoteJid
             );
 
+            // Verificamos si hubo interacción de confirmación
             if (respuestaConfirmacion) {
+                const draft = agendaDrafts.get(remoteJid);
+
+                // 🛑 PUNTO 5: ELIMINAR PASO REDUNDANTE
+                // Si la respuesta fue un "SI" y el smartAgendaService lo marcó como listo para agendar
+                if (draft && draft.step === 'AGENDAR_AHORA') {
+                    // Si ya está listo, ¡lo agendamos automáticamente!
+                    await ejecutarAgendamiento(remoteJid, draft);
+                    return res.status(200).send('OK_AGENDA_AUTOMATICA');
+                }
+
+                // Si no es el paso final, enviamos la respuesta de interacción normal
                 await sendText(remoteJid, respuestaConfirmacion, 0);
                 return res.status(200).send('OK_AGENDA_CONFIRMACION');
             }
 
-            // B. COMANDO FINAL: "AGENDAR" (Envío a VM 2)
+            // B. COMANDO FINAL: "AGENDAR" (Como fallback manual)
+            // Se mantiene el comando 'AGENDAR' por si acaso, usando la nueva función helper.
             if (content.trim().toUpperCase() === 'AGENDAR' && agendaDrafts.has(remoteJid)) {
                 const draft = agendaDrafts.get(remoteJid);
 
-                if (draft.step === 'LISTO_PARA_ENVIAR') {
-                    try {
-                        await sendText(remoteJid, "🚀 Enviando datos a TESIVIL (VM 2)...", 0);
-
-                        // --- 1. MAPEO DE TÉCNICOS REAL ---
-
-                        // Opción Default: Ing. Gallardo (ID 23)
-                        let techIds = {
-                            ea: 23,
-                            supabase: "7561b141-93b8-4c8e-b8cc-05bb7658f152"
-                        };
-
-                        const nombreTech = (draft.tecnico_nombre_detectado || draft.tecnico_nombre || '').toLowerCase();
-
-                        // Override: Si la IA detectó a Leonardo
-                        if (nombreTech.includes('leonardo') || nombreTech.includes('leo')) {
-                            techIds = {
-                                ea: 25,
-                                supabase: "cb9fe9cc-9787-4a77-9185-d5af44a0da4e"
-                            };
-                        }
-
-                        // PREPARAR NOTAS CON COSTO
-                        // Unimos las notas de la IA con el costo detectado
-                        const notasIA = draft.notas_adicionales || draft.notas || 'Sin notas';
-                        const costoTexto = draft.costo ? ` | Costo acordado: $${draft.costo}` : '';
-                        const notaFinal = `${notasIA}${costoTexto}`;
-                        // 2. CONSTRUCCIÓN DEL PAYLOAD
-                        const payloadFinal = {
-                            cliente: {
-                                nombre: draft.cliente_nombre,
-                                telefono: draft.cliente_telefono,
-                                direccion: draft.direccion_final,
-                                google_maps_link: draft.link_gmaps_final
-                            },
-                            caso: {
-                                tipo: draft.tipo_caso || 'alto_consumo',
-                                comentarios: `Creado vía WhatsApp Bot.\nDetalles: ${notaFinal}`
-                            },
-                            cita: {
-                                fecha: draft.fecha,
-                                hora: draft.hora,
-                                duracion: draft.duracion_horas || '1',
-                                tecnico_id_ea: techIds.ea,
-                                tecnico_id_supabase: techIds.supabase,
-                                notas_adicionales: notaFinal
-                            }
-                        };
-
-                        console.log("📦 PAYLOAD LISTO PARA VM2:", payloadFinal);
-
-                        await axios.post(
-                            'https://www.tesivil.com/lete/api/integracion/crear-caso-bot',
-                            payloadFinal,
-                            {
-                                headers: {
-                                    'x-app-key': 'Tesivil_Secret_Bot_2025_XYZ', // <--- ¡PON TU CLAVE AQUÍ!
-                                    'Content-Type': 'application/json'
-                                }
-                            }
-                        );
-
-                        // 👇 Mensaje de éxito para ti
-                        await sendText(remoteJid, `✅ ¡PROCESO COMPLETADO!\nDatos enviados y agendados para: ${draft.cliente_nombre || 'Cliente'}`, 0);
-                        agendaDrafts.delete(remoteJid);
-
-                    } catch (error) {
-                        console.error(error);
-                        await sendText(remoteJid, `❌ Error al enviar a VM 2: ${(error as any).message}`, 0);
-                    }
-                    return res.status(200).send('OK_AGENDA_ENVIADA');
+                // El nuevo estado de éxito es AGENDAR_AHORA, el viejo era LISTO_PARA_ENVIAR
+                if (draft.step === 'LISTO_PARA_ENVIAR' || draft.step === 'AGENDAR_AHORA') {
+                    await ejecutarAgendamiento(remoteJid, draft);
+                    return res.status(200).send('OK_AGENDA_MANUAL');
                 }
             }
 
             // C. DETECTAR INTENCIÓN DE INICIO
-            // Detectamos el patrón de fecha típico "[3/12" o "[12/03"
             const regexFechaChat = /\[\d{1,2}\/\d{1,2}/;
-
             const esReenvio =
                 content.includes('YO:') ||
                 content.includes('Date:') ||
-                regexFechaChat.test(content) || // <--- ESTO ES LO NUEVO
-                content.startsWith('/agendar'); // Agregamos flexibilidad
+                regexFechaChat.test(content) ||
+                content.startsWith('/agendar');
             const esComando = content.toLowerCase().startsWith('/agendar');
 
             if (esReenvio || esComando) {
-                // Asegúrate de importar geminiModel de tu servicio AI
                 const respuestaIA = await procesarSolicitudAgenda(content, remoteJid, geminiModel);
                 await sendText(remoteJid, respuestaIA, 0);
                 return res.status(200).send('OK_AGENDA_INICIO');
@@ -220,15 +250,15 @@ export const receiveWebhook = async (req: Request, res: Response) => {
         }
 
         // =========================================================
-        // 🛑 MODO DEBUG ACTIVADO: DETENER AQUÍ
+        // 🛑 MODO DEBUG ACTIVADO: DETENER AQUÍ (PRESERVADO)
         // =========================================================
         console.log('🛑 DEBUG: Mensaje guardado. Respuesta automática bloqueada.');
         res.status(200).json({ status: 'saved_debug_mode' });
-        return; // <--- EL BOT MUERE AQUÍ POR AHORA (CORRECTO PARA TU PRUEBA)
+        return;
         // =========================================================
 
 
-        // --- 4. DECISIÓN DEL CEREBRO (IA) ---
+        // --- 4. DECISIÓN DEL CEREBRO (IA) --- (PRESERVADO)
 
         // Regla 1: Si el mensaje es mío, no hago nada más.
         if (isFromMe) {
@@ -244,12 +274,11 @@ export const receiveWebhook = async (req: Request, res: Response) => {
         }
 
         // Regla 3: Invocar a la IA con MEMORIA (pasando conversation.id)
-        // El servicio aiService se encargará de leer el historial previo.
         const analysis = await analyzeIntent(conversation.id, content);
 
         console.log(`🧠 Decisión IA: ${analysis.decision} | Razón: ${analysis.reason || 'N/A'}`);
 
-        // --- 5. EJECUCIÓN DE LA DECISIÓN ---
+        // --- 5. EJECUCIÓN DE LA DECISIÓN --- (PRESERVADO)
 
         if (analysis.decision === 'REPLY' && analysis.message) {
             // A) RESPONDER
@@ -257,10 +286,6 @@ export const receiveWebhook = async (req: Request, res: Response) => {
             // Avisamos a WhatsApp API que todo está bien antes de empezar el delay
             res.status(200).json({ status: 'processing_reply' });
 
-            // La función sendText ya incluye:
-            // 1. "Escribiendo..."
-            // 2. Cálculo de delay humano
-            // 3. Envío final
             await sendText(remoteJid, analysis.message || '');
 
             // Guardar la respuesta de la IA en BD

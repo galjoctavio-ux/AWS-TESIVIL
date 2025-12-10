@@ -15,7 +15,7 @@ Objetivo:
 Crear un resumen operativo para el técnico SIN mostrar información sensible (Teléfono) y SIN copiar conversaciones de precios o ventas.
 
 Formato del resumen:
-Domicilio: (calle, número, colonia, referencias exactas).
+Domicilio: (calle, número exterior e interior, colonia, referencias exactas).
 Problema reportado: (explica la falla eléctrica técnica).
 Detalles importantes: (puntos clave, horarios, advertencias).
 Archivos/Fotos relevantes: (describe brevemente si se mencionan fotos).
