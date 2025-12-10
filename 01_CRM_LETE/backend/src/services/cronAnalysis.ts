@@ -40,8 +40,11 @@ export const runNightlyAnalysis = async () => {
             const lastRealId = meta.last_msg_id || meta.last_db_id.toString();
 
             // Lógica de Marcas: Si ya analizamos este estado, saltar.
-            if (chat.last_message_analyzed_id === lastRealId) continue;
-
+            if (chat.last_message_analyzed_id === lastRealId) {
+                // AGREGA ESTO PARA VER LOS SALTOS:
+                console.log(`⏩ Saltando ${chat.whatsapp_id} (Sin mensajes nuevos)`);
+                continue;
+            }
             console.log(`🧠 Analizando: ${chat.whatsapp_id}...`);
 
             // 3. Obtener Historial
