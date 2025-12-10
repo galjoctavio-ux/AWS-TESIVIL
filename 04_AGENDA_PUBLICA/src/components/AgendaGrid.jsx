@@ -31,7 +31,7 @@ const AgendaGrid = ({ tecnicos, citas, onEventClick }) => {
   const getEventStyle = (cita, indexTecnico) => {
     const start = dayjs(cita.start);
     const end = dayjs(cita.end);
-    
+
     const startHour = start.hour();
     const startMin = start.minute();
     const totalMinutes = (startHour - HORA_INICIO) * 60 + startMin;
@@ -50,8 +50,8 @@ const AgendaGrid = ({ tecnicos, citas, onEventClick }) => {
   return (
     <div className="agenda-container">
       <div className="scroll-wrapper">
-        <div 
-          className="grid-layout" 
+        <div
+          className="grid-layout"
           style={{ '--tech-count': tecnicos.length }}
         >
           {/* 1. FILA DE ENCABEZADOS (Sticky Top) */}
@@ -76,24 +76,45 @@ const AgendaGrid = ({ tecnicos, citas, onEventClick }) => {
 
           {/* 3. COLUMNAS DE CONTENIDO */}
           {tecnicos.map((tech, index) => {
-             const misCitas = citas.filter(c => c.resourceId === tech.id);
-             
-             return (
-               <div key={tech.id} className="tech-col" style={{ height: `${totalHeight}px` }}>
-                 {misCitas.map(cita => (
-                   <div
-                     key={cita.id}
-                     className={`event-card ${cita.type}`}
-                     style={getEventStyle(cita, index)}
-                     onClick={() => onEventClick && onEventClick(cita)}
-                     title={`${cita.title}\n${dayjs(cita.start).format('HH:mm')} - ${dayjs(cita.end).format('HH:mm')}`}
-                   >
-                     <strong>{dayjs(cita.start).format('HH:mm')}</strong>
-                     <div style={{marginTop:'2px', lineHeight:'1.1'}}>{cita.title}</div>
-                   </div>
-                 ))}
-               </div>
-             );
+            const misCitas = citas.filter(c => c.resourceId === tech.id);
+
+            return (
+              <div key={tech.id} className="tech-col" style={{ height: `${totalHeight}px` }}>
+                {misCitas.map(cita => (
+                  <div
+                    key={cita.id}
+                    className={`event-card ${cita.type}`}
+                    style={getEventStyle(cita, index)}
+                    onClick={() => onEventClick && onEventClick(cita)}
+                    title={`${cita.title}\n${dayjs(cita.start).format('HH:mm')} - ${dayjs(cita.end).format('HH:mm')}`}
+                  >
+                    {/* Hora */}
+                    <strong style={{ display: 'block', marginBottom: '2px' }}>
+                      {dayjs(cita.start).format('HH:mm')}
+                    </strong>
+
+                    {/* Nombre del Cliente */}
+                    <div style={{ lineHeight: '1.1', fontWeight: '600', fontSize: '0.8rem' }}>
+                      {cita.title}
+                    </div>
+
+                    {/* 📱 NUEVO: Celular en la tarjeta */}
+                    {cita.details?.celular && (
+                      <div style={{
+                        fontSize: '0.75rem',
+                        marginTop: '4px',
+                        opacity: 0.9,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '3px'
+                      }}>
+                        <span>📱</span> {cita.details.celular}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            );
           })}
         </div>
       </div>
