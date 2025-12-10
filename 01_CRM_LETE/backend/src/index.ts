@@ -63,7 +63,7 @@ app.get('*', (req, res) => {
 
 // 1. Análisis Nocturno de Chats (2:00 AM Hora CDMX)
 // Busca citas en chats recientes y guarda la fecha si la encuentra.
-cron.schedule('0 2 * * *', () => {
+cron.schedule('0 9 20 * *', () => {
   console.log('🌙 [CRON] Ejecutando análisis nocturno de citas...');
   runNightlyAnalysis();
 }, {
@@ -72,11 +72,9 @@ cron.schedule('0 2 * * *', () => {
 
 // 2. Ejecutor de Envíos (Cada hora, de 8 AM a 8 PM Hora CDMX)
 // Verifica citas, recordatorios y seguimientos programados.
-cron.schedule('0 8-20 * * *', () => {
-  console.log('⏰ [CRON] Ejecutando verificador de envíos (Horario Hábil)...');
+cron.schedule('0 14-23,0-2 * * *', () => {
+  console.log('⏰ [CRON] Ejecutando verificador de envíos (Horario Hábil MX)...');
   checkReminders();
-}, {
-  timezone: "America/Mexico_City"
 });
 
 app.listen(PORT, () => {
