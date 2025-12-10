@@ -59,7 +59,7 @@ app.get('*', (req, res) => {
 
 // MODO PRUEBA: Ejecutar cada minuto para verificar que funciona
 // Una vez que veas el log "🌙 [CRON]...", cambia esto de nuevo a '22 9 * * *'
-cron.schedule('* * * * *', () => {
+cron.schedule('34 9 * * *', () => {
   console.log('🌙 [CRON TEST] Ejecutando análisis nocturno (PRUEBA)...');
   runNightlyAnalysis();
 });
