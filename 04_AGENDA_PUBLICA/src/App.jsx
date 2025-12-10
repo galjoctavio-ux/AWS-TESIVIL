@@ -1,9 +1,13 @@
 // src/App.jsx
 import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
+import 'dayjs/locale/es'; // Importar español
 import { getTecnicos, getCitas } from './api';
 import AgendaGrid from './components/AgendaGrid';
 import './App.css';
+
+// Configurar Dayjs globalmente
+dayjs.locale('es');
 
 function App() {
   const [tecnicos, setTecnicos] = useState([]);
@@ -11,85 +15,169 @@ function App() {
   const [fecha, setFecha] = useState(dayjs().format('YYYY-MM-DD'));
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
-  // Extraer token de la URL (?token=...)
+  const [selectedCita, setSelectedCita] = useState(null); // Estado para el Popup
+
   const searchParams = new URLSearchParams(window.location.search);
   const token = searchParams.get('token');
 
-  // 1. Cargar Técnicos al inicio
+  // Cargar Técnicos
   useEffect(() => {
     if (!token) {
-      setError('Acceso denegado: Falta el token de seguridad.');
+      setError('Falta token de seguridad.');
       setLoading(false);
       return;
     }
-
-    const loadTecnicos = async () => {
-      try {
-        const data = await getTecnicos(token);
-        setTecnicos(data);
-      } catch (err) {
-        setError('Error cargando técnicos.');
-      }
-    };
-    loadTecnicos();
+    getTecnicos(token).then(setTecnicos).catch(() => setError('Error técnicos'));
   }, [token]);
 
-  // 2. Cargar Citas cada vez que cambia la fecha o ya tenemos técnicos
+  // Cargar Citas
   useEffect(() => {
     if (!token || tecnicos.length === 0) return;
-
     const loadCitas = async () => {
       setLoading(true);
       try {
         const data = await getCitas(fecha, token);
         setCitas(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
+      } catch (err) { console.error(err); }
+      finally { setLoading(false); }
     };
     loadCitas();
   }, [fecha, tecnicos, token]);
 
-  // Manejadores de cambio de fecha
   const cambiarDia = (dias) => {
     setFecha(dayjs(fecha).add(dias, 'day').format('YYYY-MM-DD'));
   };
 
-  if (error) return <div className="error-screen">{error}</div>;
+  // Manejo del Modal
+  const handleEventClick = (cita) => {
+    // Si es un bloqueo (sin datos de cliente), tal vez no quieras abrir modal
+    // Pero si quieres ver detalles aunque sea bloqueo, quita el if.
+    if (cita.type === 'blocked' && !cita.details?.cliente) return;
+    setSelectedCita(cita);
+  };
+
+  const closeModal = () => setSelectedCita(null);
+
+  if (error) return <div style={{ padding: 20, color: 'red' }}>{error}</div>;
 
   return (
     <div className="app-container">
-      {/* Barra Superior de Control */}
-      <header className="control-bar">
-        <h3>Luz en tu Espacio</h3>
-        <div className="date-controls">
-          <button onClick={() => cambiarDia(-1)}>◀</button>
-          <input 
-            type="date" 
-            value={fecha} 
-            onChange={(e) => setFecha(e.target.value)} 
-          />
-          <button onClick={() => cambiarDia(1)}>▶</button>
-          <button onClick={() => setFecha(dayjs().format('YYYY-MM-DD'))} className="today-btn">
-            Hoy
-          </button>
-        </div>
+      {/* 1. CABECERA: Día de la semana */}
+      <header className="top-header">
+        <h2>{dayjs(fecha).format('dddd D')}</h2>
+        <span>{dayjs(fecha).format('MMMM YYYY')}</span>
       </header>
 
-      {/* Área del Calendario */}
+      {/* 2. ÁREA CENTRAL: Calendario */}
       <div className="grid-wrapper">
-        {loading && <div className="loading-overlay">Cargando...</div>}
-        
+        {loading && <div style={{ padding: 20, textAlign: 'center' }}>Cargando agenda...</div>}
+
         {tecnicos.length > 0 && (
-          <AgendaGrid 
-            tecnicos={tecnicos} 
-            citas={citas} 
+          <AgendaGrid
+            tecnicos={tecnicos}
+            citas={citas}
+            onEventClick={handleEventClick}
           />
         )}
       </div>
+
+      {/* 3. BARRA INFERIOR: Navegación */}
+      <footer className="bottom-nav">
+        <div className="nav-group">
+          <button className="btn-nav" onClick={() => cambiarDia(-1)}>◀</button>
+          <button className="btn-nav" onClick={() => cambiarDia(1)}>▶</button>
+        </div>
+
+        <input
+          type="date"
+          className="date-picker-trigger"
+          value={fecha}
+          onChange={(e) => setFecha(e.target.value)}
+        />
+
+        <button
+          className="btn-nav btn-today"
+          onClick={() => setFecha(dayjs().format('YYYY-MM-DD'))}
+        >
+          Hoy
+        </button>
+      </footer>
+
+      {/* 4. MODAL DE DETALLES */}
+      {selectedCita && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+
+            <div className="modal-header">
+              <div className="modal-title">
+                <h3>{selectedCita.title}</h3>
+                {selectedCita.details?.tipoServicio && (
+                  <span className="modal-badge">{selectedCita.details.tipoServicio}</span>
+                )}
+              </div>
+              <button className="btn-close" onClick={closeModal}>&times;</button>
+            </div>
+
+            <div className="modal-body">
+              <div className="info-row">
+                <span className="icon">🕒</span>
+                <div>
+                  <strong>Horario:</strong><br />
+                  {dayjs(selectedCita.start).format('h:mm A')} - {dayjs(selectedCita.end).format('h:mm A')}
+                </div>
+              </div>
+
+              {selectedCita.details?.direccion && (
+                <div className="info-row">
+                  <span className="icon">📍</span>
+                  <div>
+                    <strong>Dirección:</strong><br />
+                    {selectedCita.details.direccion}
+                  </div>
+                </div>
+              )}
+
+              {selectedCita.details?.celular && (
+                <div className="info-row">
+                  <span className="icon">📞</span>
+                  <div>
+                    <strong>Contacto:</strong><br />
+                    {selectedCita.details.celular}
+                  </div>
+                </div>
+              )}
+
+              {/* Botones de Acción */}
+              <div className="actions-row">
+                {selectedCita.details?.celular && (
+                  <a href={`tel:${selectedCita.details.celular}`} className="btn-action btn-call">
+                    📞 Llamar
+                  </a>
+                )}
+
+                {selectedCita.details?.mapsLink ? (
+                  <a href={selectedCita.details.mapsLink} target="_blank" rel="noreferrer" className="btn-action btn-map">
+                    🗺️ Ir a Maps
+                  </a>
+                ) : (
+                  /* Fallback si no hay link pero hay dirección */
+                  selectedCita.details?.direccion && (
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedCita.details.direccion)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn-action btn-map"
+                    >
+                      🗺️ Ir a Maps
+                    </a>
+                  )
+                )}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }

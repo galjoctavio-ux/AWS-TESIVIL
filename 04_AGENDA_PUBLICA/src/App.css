@@ -1,6 +1,7 @@
 /* src/App.css */
 #root {
   width: 100%;
+  height: 100%;
   margin: 0;
   padding: 0;
 }
@@ -9,73 +10,212 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+  /* Altura total de la pantalla */
   background-color: #fff;
+  overflow: hidden;
+  /* Evitar scroll en el cuerpo principal */
 }
 
-.control-bar {
-  padding: 10px;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #ddd;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: center;
+/* --- CABECERA SUPERIOR --- */
+.top-header {
+  padding: 15px;
+  background-color: #fff;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  z-index: 10;
 }
 
-.control-bar h3 {
+.top-header h2 {
   margin: 0;
   font-size: 1.2rem;
   color: #333;
+  text-transform: capitalize;
+  /* "martes" -> "Martes" */
 }
 
-.date-controls {
-  display: flex;
-  gap: 10px;
-  align-items: center;
+.top-header span {
+  font-size: 0.9rem;
+  color: #666;
 }
 
-.date-controls button {
-  padding: 8px 15px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-.date-controls button.today-btn {
-  background-color: #28a745;
-}
-
-.date-controls input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 1rem;
-}
-
+/* --- ÁREA CENTRAL (GRID) --- */
 .grid-wrapper {
   flex: 1;
-  overflow: hidden; /* El scroll lo maneja el componente AgendaGrid */
+  /* Ocupa todo el espacio disponible */
+  overflow: hidden;
+  /* El scroll lo maneja el componente interno */
   position: relative;
 }
 
-.loading-overlay {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(255,255,255,0.8);
+/* --- BARRA INFERIOR DE NAVEGACIÓN --- */
+.bottom-nav {
+  background-color: #fff;
+  border-top: 1px solid #ddd;
+  padding: 10px 15px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  z-index: 50;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  z-index: 20;
+  padding-bottom: env(safe-area-inset-bottom);
+  /* Respetar iPhone X+ */
+}
+
+.nav-group {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-nav {
+  background: #f3f4f6;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #374151;
+  touch-action: manipulation;
+  /* Mejor respuesta táctil */
+}
+
+.btn-nav:active {
+  background: #e5e7eb;
+}
+
+.btn-today {
+  background: #2563eb;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.date-picker-trigger {
+  border: 1px solid #ddd;
+  padding: 8px;
+  border-radius: 8px;
+  background: white;
   color: #333;
 }
 
-.error-screen {
-  padding: 20px;
-  color: red;
-  text-align: center;
-  margin-top: 50px;
+/* --- MODAL / POPUP --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  /* Mobile sheet style (abajo) */
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(2px);
+}
+
+.modal-content {
+  background: white;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 20px 20px 0 0;
+  /* Bordes redondos solo arriba */
+  padding: 25px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 20px;
+}
+
+.modal-title h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #111;
+}
+
+.modal-badge {
+  display: inline-block;
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  margin-top: 5px;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #999;
+  cursor: pointer;
+  padding: 0 10px;
+}
+
+.info-row {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.icon {
+  font-size: 1.2rem;
+}
+
+.actions-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.btn-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.btn-call {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.btn-map {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+/* Pantalla Grande adjustments */
+@media (min-width: 768px) {
+  .modal-overlay {
+    align-items: center;
+  }
+
+  .modal-content {
+    border-radius: 20px;
+    width: 400px;
+  }
 }
