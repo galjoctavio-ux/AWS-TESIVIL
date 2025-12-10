@@ -1,0 +1,111 @@
+/* src/components/AgendaGrid.css */
+.agenda-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Ocupa el espacio disponible del padre */
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: white;
+}
+
+/* El truco para que encabezado y cuerpo se muevan juntos:
+   Un contenedor con scroll que envuelve a ambos */
+.scroll-wrapper {
+  flex: 1;
+  overflow: auto; /* Scroll en ambas direcciones si hace falta */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.grid-layout {
+  display: grid;
+  /* La primera columna es la hora (50px), el resto son automáticas por técnico (min 140px) */
+  grid-template-columns: 50px repeat(var(--tech-count), minmax(140px, 1fr));
+  position: relative;
+}
+
+/* Encabezados Sticky arriba */
+.header-row {
+  display: contents; /* Para que los hijos sean parte del grid principal */
+}
+
+.corner-cell {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 30;
+  background: white;
+  border-bottom: 2px solid #eee;
+  border-right: 1px solid #eee;
+}
+
+.header-cell {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: white;
+  border-bottom: 2px solid #eee;
+  border-right: 1px solid #f0f0f0;
+  padding: 12px 5px;
+  text-align: center;
+  font-weight: 600;
+  color: #444;
+  font-size: 0.9rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* Columna de Hora Sticky a la izquierda */
+.time-col {
+  grid-column: 1;
+  border-right: 1px solid #eee;
+  background: #fafafa;
+  position: sticky;
+  left: 0;
+  z-index: 10;
+}
+
+.time-slot {
+  height: 60px;
+  border-bottom: 1px solid #f5f5f5;
+  font-size: 0.75rem;
+  color: #999;
+  display: flex;
+  justify-content: center;
+  transform: translateY(-50%); /* Alinear texto con la línea */
+}
+
+/* Columnas de los Técnicos */
+.tech-col {
+  position: relative;
+  border-right: 1px solid #f5f5f5;
+  background-image: linear-gradient(#fcfcfc 1px, transparent 1px);
+  background-size: 100% 60px; /* Líneas guía */
+}
+
+/* Tarjetas de Citas */
+.event-card {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  cursor: pointer;
+  z-index: 5;
+  border-left: 3px solid rgba(0,0,0,0.2);
+  transition: transform 0.1s;
+}
+
+.event-card:active {
+  transform: scale(0.98);
+}
+
+.event-card.blocked {
+  background: #f3f4f6 !important;
+  color: #9ca3af !important;
+  border-left-color: #d1d5db !important;
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, #e5e7eb 5px, #e5e7eb 10px) !important;
+}
