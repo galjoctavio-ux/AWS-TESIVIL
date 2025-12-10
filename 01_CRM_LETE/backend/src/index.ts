@@ -5,7 +5,7 @@ import path from 'path';
 import { pool } from './config/db';
 import webhookRoutes from './routes/webhookRoutes';
 import conversationRoutes from './routes/conversationRoutes';
-import { initCronJobs } from './services/cronService';
+// import { initCronJobs } from './services/cronService'; // Ya no se usa la antigua
 import { requireAuth } from './middleware/security';
 import cron from 'node-cron';
 import { runNightlyAnalysis } from './services/cronAnalysis';
@@ -25,11 +25,8 @@ app.use(cors({
 app.use(express.json());
 
 // --- RUTAS DE API ---
-// 1. Webhook (sin autenticación)
 app.use('/api/webhook', webhookRoutes);
 app.use('/webhook', webhookRoutes);
-
-// 2. Conversaciones (CON autenticación)
 app.use('/api/conversations', requireAuth, conversationRoutes);
 app.use('/conversations', requireAuth, conversationRoutes);
 
@@ -43,33 +40,32 @@ app.get('/health', async (req, res) => {
   }
 });
 
-// --- 404 PARA API (DEBE IR DESPUÉS DE LAS RUTAS API, ANTES DEL FRONTEND) ---
 app.use('/api/*', (req, res) => {
   res.status(404).json({ error: 'API endpoint not found' });
 });
 
-// --- FRONTEND (DEBE IR AL FINAL) ---
-app.use(express.static(path.join(__dirname, '../../crm-luz-frontend/dist')));
+// --- CORRECCIÓN DEL FRONTEND ---
+// Tu carpeta en el árbol se llama 'frontend', no 'crm-luz-frontend'
+const frontendPath = path.join(__dirname, '../../frontend/dist');
 
-// Frontend catch-all (SIEMPRE AL FINAL)
+app.use(express.static(frontendPath));
+
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../crm-luz-frontend/dist/index.html'));
+  res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
-// Iniciar cron
-//initCronJobs();
 
 // --- TAREAS PROGRAMADAS (CRON JOBS) ---
 
-// 1. Análisis Nocturno de Chats (2:00 AM Hora CDMX)
-// Busca citas en chats recientes y guarda la fecha si la encuentra.
-cron.schedule('22 9 * * *', () => {
-  console.log('🌙 [CRON] Ejecutando análisis nocturno de citas (3:20 AM MX / 9:20 UTC)...');
+// MODO PRUEBA: Ejecutar cada minuto para verificar que funciona
+// Una vez que veas el log "🌙 [CRON]...", cambia esto de nuevo a '22 9 * * *'
+cron.schedule('* * * * *', () => {
+  console.log('🌙 [CRON TEST] Ejecutando análisis nocturno (PRUEBA)...');
   runNightlyAnalysis();
 });
 
 // 2. Ejecutor de Envíos (Cada hora, de 8 AM a 8 PM Hora CDMX)
-// Verifica citas, recordatorios y seguimientos programados.
+// 14 UTC = 8 AM MX.  02 UTC = 8 PM MX.
 cron.schedule('0 14-23,0-2 * * *', () => {
   console.log('⏰ [CRON] Ejecutando verificador de envíos (Horario Hábil MX)...');
   checkReminders();
@@ -77,4 +73,5 @@ cron.schedule('0 14-23,0-2 * * *', () => {
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
+  console.log(`📂 Sirviendo frontend desde: ${frontendPath}`);
 });
