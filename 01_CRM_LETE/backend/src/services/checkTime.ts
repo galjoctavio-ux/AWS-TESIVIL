@@ -1,7 +1,10 @@
-// checkTime.ts
-import { query } from './config/db'; // Asegúrate de importar tu conexión real
+// src/services/checkTime.ts
+
+// CAMBIO AQUÍ: Usa '../config/db' para salir de la carpeta services
+import { query } from '../config/db';
 
 const runAudit = async () => {
+    // ... (el resto del código sigue igual)
     console.log('--- 🕵️ AUDITORÍA DE TIEMPO ---');
 
     // 1. Hora del Servidor (Node.js / V8 Engine)
@@ -13,7 +16,7 @@ const runAudit = async () => {
     console.log('   > UTC Hours:     ', now.getUTCHours());
     console.log('------------------------------------------------');
 
-    // 2. Hora del Sistema Operativo (Intento de ejecutar comando date)
+    // 2. Hora del Sistema Operativo
     try {
         const { execSync } = require('child_process');
         const osDate = execSync('date').toString().trim();
@@ -34,7 +37,7 @@ const runAudit = async () => {
         `);
         const row = res.rows[0];
         console.log('3. PostgreSQL Info:');
-        console.log('   > NOW():      ', row.db_now); // Fíjate si tiene +00 o -06 al final
+        console.log('   > NOW():      ', row.db_now);
         console.log('   > Timezone:   ', row.db_timezone);
         console.log('   > Hora pura:  ', row.db_hour_extracted);
     } catch (e) {
