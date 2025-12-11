@@ -78,12 +78,16 @@ const geocodeAddress = async (address: string) => {
     }
 };
 
-// --- HELPER LINK MAPAS ---
-const generateNavigationLink = (lat: number, lng: number, query: string) => {
+// Reemplaza tu función actual con esta versión corregida:
+
+const generateNavigationLink = (lat: number | null, lng: number | null, query: string) => {
+    // Si tenemos coordenadas, generamos link directo al punto
     if (lat && lng) {
         return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
     }
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    // Si no, buscamos por texto (encodeURIComponent es vital)
+    const cleanQuery = query ? encodeURIComponent(query.trim()) : "";
+    return `https://www.google.com/maps/search/?api=1&query=${cleanQuery}`;
 };
 
 // --- FUNCIÓN PRINCIPAL DE PROCESAMIENTO ---
@@ -233,9 +237,9 @@ export const manejarConfirmacionAgenda = async (
         draft.ubicacion_lng = nuevasCoords.lng;
         draft.direccion_texto = nuevoTexto || draft.direccion_texto;
 
-        if (!draft.link_gmaps_generado.includes('http')) {
-            draft.link_gmaps_generado = generateNavigationLink(nuevasCoords.lat, nuevasCoords.lng, "");
-        }
+        // ✅ CORRECCIÓN: Forzamos la regeneración del link siempre que haya nuevas coordenadas
+        // Eliminamos el if (!draft.link_gmaps_generado.includes('http'))
+        draft.link_gmaps_generado = generateNavigationLink(nuevasCoords.lat, nuevasCoords.lng, "");
 
         agendaDrafts.set(remoteJid, draft);
         return `✅ Ubicación GPS detectada (${nuevasCoords.lat}, ${nuevasCoords.lng}).\nResponde *SI* para finalizar.`;

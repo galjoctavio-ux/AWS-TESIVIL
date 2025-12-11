@@ -1,11 +1,10 @@
 // src/api.js
 import dayjs from 'dayjs';
 
-// ⚠️ IMPORTANTE: Aquí debes poner la IP PÚBLICA o Dominio de tu VM de Google Cloud (donde está el backend).
-// Ejemplo: 'http://34.12.123.45:3000/api/global-agenda'
-// Si tienes HTTPS configurado, úsalo.
+// URL base de tu API
 export const BACKEND_URL = 'http://34.53.115.235:3010/api/global-agenda';
 
+// 1. Obtener Técnicos
 export const getTecnicos = async (token) => {
   try {
     const res = await fetch(`${BACKEND_URL}/tecnicos?token=${token}`);
@@ -17,6 +16,7 @@ export const getTecnicos = async (token) => {
   }
 };
 
+// 2. Obtener Citas
 export const getCitas = async (fecha, token) => {
   try {
     // Aseguramos formato YYYY-MM-DD
@@ -27,5 +27,31 @@ export const getCitas = async (fecha, token) => {
   } catch (error) {
     console.error(error);
     return [];
+  }
+};
+
+// 3. (NUEVO) Actualizar Ubicación de Cita
+// Esta función conecta con el botón "Guardar" de tu modal de emergencia
+export const updateCitaLocation = async (idCita, nuevaDireccion, token) => {
+  try {
+    // Nota: Usamos PUT y pasamos el token en la URL como en tus otras funciones
+    const res = await fetch(`${BACKEND_URL}/citas/${idCita}/location?token=${token}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ direccion: nuevaDireccion }),
+    });
+
+    if (!res.ok) {
+      // Intentamos leer el mensaje de error del backend, si existe
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Error al actualizar la ubicación');
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Error en updateCitaLocation:", error);
+    throw error; // Lanzamos el error para que el App.jsx muestre el alert
   }
 };
