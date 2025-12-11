@@ -7,16 +7,16 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 interface AIAnalysisResult {
-    intent: 'APPOINTMENT' | 'FUTURE_CONTACT' | 'SOFT_FOLLOWUP' | 'NO_REPLY' | 'QUOTE_FOLLOWUP' | 'NONE';
-    appointment_date_iso: string | null;
-    reasoning: string;
+   intent: 'APPOINTMENT' | 'FUTURE_CONTACT' | 'NO_REPLY' | 'QUOTE_FOLLOWUP' | 'NONE';
+   appointment_date_iso: string | null;
+   reasoning: string;
 }
 
 export const analyzeChatForAppointment = async (conversationId: string, historyText: string): Promise<AIAnalysisResult | null> => {
-    // Fecha actual formateada para México (La IA necesita contexto temporal)
-    const today = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City', dateStyle: 'full', timeStyle: 'short' });
+   // Fecha actual formateada para México (La IA necesita contexto temporal)
+   const today = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City', dateStyle: 'full', timeStyle: 'short' });
 
-    const prompt = `
+   const prompt = `
     Eres el asistente IA de ventas de "Luz en tu Espacio". Hoy es: ${today}.
     Tu objetivo es definir la PRÓXIMA ACCIÓN basándote en el historial.
 
@@ -59,10 +59,6 @@ export const analyzeChatForAppointment = async (conversationId: string, historyT
     - Úsalo cuando el cliente se quedó callado justo después de darle info inicial.
     - Si Soporte envió el saludo estándar ("Buen día... Qué servicio te podemos ofrecer?") y nadie contestó -> ES NO_REPLY.
 
-    [SOFT_FOLLOWUP] 
-    El cliente respondió pero pidió tiempo corto ("Déjame ver", "Le pregunto a mi esposo", "Yo les aviso en la semana").
-    - Aquí el cliente SÍ contestó el último mensaje, pero postergó la decisión.
-
     [FUTURE_CONTACT] (FUSIÓN: Fechas Específicas + Esperas Vagas)
     Úsalo en DOS casos:
     1. FECHA CLARA: El cliente dice "búscame en enero", "el lunes", "la próxima semana".
@@ -84,13 +80,13 @@ export const analyzeChatForAppointment = async (conversationId: string, historyT
     }
     `;
 
-    try {
-        const result = await model.generateContent(prompt);
-        const responseText = result.response.text();
-        const cleanJson = responseText.replace(/```json|```/g, '').trim();
-        return JSON.parse(cleanJson);
-    } catch (error) {
-        console.error(`[AI Error] ${conversationId}:`, error);
-        return null;
-    }
+   try {
+      const result = await model.generateContent(prompt);
+      const responseText = result.response.text();
+      const cleanJson = responseText.replace(/```json|```/g, '').trim();
+      return JSON.parse(cleanJson);
+   } catch (error) {
+      console.error(`[AI Error] ${conversationId}:`, error);
+      return null;
+   }
 };
