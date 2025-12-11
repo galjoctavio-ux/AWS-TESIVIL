@@ -2,20 +2,25 @@ import { query } from '../config/db';
 import { sendText as sendWhatsAppMessage } from './whatsappService';
 
 export const checkReminders = async () => {
-    console.log('⏰ [CRON] Verificando envíos programados...');
+    console.log('⏰ [CRON] Verificando envíos programados (Lógica Timezone Robusta)...');
 
     try {
-        // ==========================================
-        // 1. LÓGICA CLÁSICA: RECORDATORIOS DE CITAS
-        // ==========================================
+        // =====================================================================
+        // 1. RECORDATORIOS DE CITAS (Usando PostgreSQL Timezone Logic)
+        // =====================================================================
 
         // A) Citas para MAÑANA
+        // "Mañana" se define como: La fecha en MX de (NOW) + 1 día.
         const tomorrowClients = await query(`
             SELECT id, whatsapp_id, appointment_date 
             FROM conversations 
-            WHERE appointment_date::date = CURRENT_DATE + INTERVAL '1 day'
+            WHERE 
+                -- Convertimos la fecha guardada a Fecha MX y comparamos
+                (appointment_date AT TIME ZONE 'UTC' AT TIME ZONE 'America/Mexico_City')::date 
+                = 
+                (NOW() AT TIME ZONE 'America/Mexico_City' + INTERVAL '1 day')::date
             AND appointment_status = 'PENDING'
-            AND intent = 'APPOINTMENT' -- Aseguramos que sea una cita firme
+            AND intent = 'APPOINTMENT'
         `);
 
         for (const client of tomorrowClients.rows) {
@@ -34,16 +39,20 @@ export const checkReminders = async () => {
         }
 
         // B) Citas para HOY (Confirmación)
-        // Solo enviamos si son después de las 8am para no despertar gente, aunque el cron controla eso.
+        // "Hoy" se define como: La fecha en MX de (NOW).
         const todayClients = await query(`
             SELECT id, whatsapp_id, appointment_date 
             FROM conversations 
-            WHERE appointment_date::date = CURRENT_DATE
+            WHERE 
+                (appointment_date AT TIME ZONE 'UTC' AT TIME ZONE 'America/Mexico_City')::date 
+                = 
+                (NOW() AT TIME ZONE 'America/Mexico_City')::date
             AND (appointment_status = 'PENDING' OR appointment_status = 'REMINDED_TOMORROW')
             AND intent = 'APPOINTMENT'
         `);
 
         for (const client of todayClients.rows) {
+            // Formateamos la hora para que se vea bien en el mensaje (ej. 04:00 PM)
             const dateObj = new Date(client.appointment_date);
             const timeString = dateObj.toLocaleTimeString('es-MX', {
                 timeZone: 'America/Mexico_City', hour: '2-digit', minute: '2-digit', hour12: true
@@ -68,32 +77,52 @@ export const checkReminders = async () => {
         // (Ghosting, Soft Followup, Future Contact)
         // ==========================================
 
-        // Buscamos tareas programadas cuya hora YA LLEGÓ (<= NOW()) y siguen PENDING
         const followUps = await query(`
-            SELECT id, whatsapp_id, intent, follow_up_date
+            SELECT id, whatsapp_id, intent, follow_up_date, last_message_analyzed_id
             FROM conversations 
             WHERE follow_up_status = 'PENDING'
-            AND follow_up_date <= NOW() -- Ya llegó la hora
+            AND follow_up_date <= NOW() 
             AND intent IN ('NO_REPLY', 'SOFT_FOLLOWUP', 'FUTURE_CONTACT')
         `);
 
         for (const task of followUps.rows) {
+
+            // --- 🛑 FRENO DE MANO (JUST-IN-TIME CHECK) 🛑 ---
+            // Antes de abrir la boca, verificamos si la situación cambió desde el análisis de anoche.
+            const lastMsgCheck = await query(`
+                SELECT is_internal, created_at, content 
+                FROM messages 
+                WHERE conversation_id = $1 
+                ORDER BY created_at DESC 
+                LIMIT 1
+            `, [task.id]);
+
+            if (lastMsgCheck.rows.length > 0) {
+                const lastMsg = lastMsgCheck.rows[0];
+
+                // REGLA 1: Si el último mensaje es NUESTRO (Internal = true), 
+                // significa que un humano (o el bot en otro proceso) ya contestó.
+                // ¡ABORTAR MISIÓN!
+                if (lastMsg.is_internal) {
+                    console.log(`✋ Cancelando envío a ${task.whatsapp_id}: Humano ya intervino ("${lastMsg.content.substring(0, 20)}...").`);
+
+                    // Marcamos como cancelado para que no lo intente de nuevo en 1 hora
+                    await query(`UPDATE conversations SET follow_up_status = 'CANCELLED_BY_USER' WHERE id = $1`, [task.id]);
+                    continue;
+                }
+            }
+            // ---------------------------------------------------
+
             let message = '';
 
-            // Definimos el mensaje según la intención
+            // Definimos el mensaje según la intención (Esto sigue igual)
             if (task.intent === 'NO_REPLY') {
-                // Ghosting (Cliente dejó de contestar)
-                // Estrategia: "Soft Close" - Preguntar si cerramos expediente o siguen interesados.
                 message = `Hola, buen día. 👋 Notamos que quedó pendiente tu reporte. ¿Aún tienes problemas con tu instalación o prefieres que cerremos tu expediente por ahora? Quedamos atentos.`;
 
             } else if (task.intent === 'SOFT_FOLLOWUP') {
-                // 23 Horas (El cliente dijo "déjame ver")
-                // Estrategia: Recordatorio suave y servicial.
                 message = `Hola! Solo para dar seguimiento a lo que platicamos previamente. ¿Pudiste revisarlo o tienes alguna duda adicional en la que te pueda apoyar?`;
 
             } else if (task.intent === 'FUTURE_CONTACT') {
-                // Enero / Futuro
-                // Estrategia: Retomar contexto.
                 message = `Hola! ⚡ Como acordamos, te contacto para retomar el tema de tu revisión eléctrica. ¿Te gustaría que agendemos una visita para esta semana?`;
             }
 
@@ -105,17 +134,12 @@ export const checkReminders = async () => {
                     await query(`
                         UPDATE conversations 
                         SET follow_up_status = 'SENT',
-                            intent = 'AWAITING_REPLY', -- Cambiamos intención a esperar respuesta
+                            intent = 'AWAITING_REPLY', -- IMPORTANTE: Cambiamos estado para no re-analizar mañana
                             last_ai_analysis_at = NOW(), 
                             last_message_analyzed_id = $1 
                         WHERE id = $2
                     `, [sentId, task.id]);
-                    console.log(` -> 🚀 Seguimiento Dinámico (${task.intent}) enviado a ${task.whatsapp_id}`);
+                    console.log(` -> 🚀 Seguimiento enviado a ${task.whatsapp_id}`);
                 }
             }
         }
-
-    } catch (error) {
-        console.error('Error en checkReminders:', error);
-    }
-};

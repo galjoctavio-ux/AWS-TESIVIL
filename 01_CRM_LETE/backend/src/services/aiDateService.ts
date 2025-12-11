@@ -1,50 +1,75 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { query } from '../config/db';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 interface AIAnalysisResult {
-    intent: 'APPOINTMENT' | 'FUTURE_CONTACT' | 'SOFT_FOLLOWUP' | 'NO_REPLY' | 'NONE';
+    intent: 'APPOINTMENT' | 'FUTURE_CONTACT' | 'SOFT_FOLLOWUP' | 'NO_REPLY' | 'QUOTE_FOLLOWUP' | 'NONE';
     appointment_date_iso: string | null;
     reasoning: string;
 }
 
 export const analyzeChatForAppointment = async (conversationId: string, historyText: string): Promise<AIAnalysisResult | null> => {
-    // Fecha actual formateada
+    // Fecha actual formateada para México (La IA necesita contexto temporal)
     const today = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City', dateStyle: 'full', timeStyle: 'short' });
 
     const prompt = `
     Eres el asistente IA de ventas de "Luz en tu Espacio". Hoy es: ${today}.
-    Tu objetivo es definir la PRÓXIMA ACCIÓN.
+    Tu objetivo es definir la PRÓXIMA ACCIÓN basándote en el historial.
 
-    --- REGLAS DE ORO (PRIORIDAD MÁXIMA) ---
-    1. CLIENTE "GUARDARROPA": Si dice "Solo para tener el dato", "Los contacto cuando se ofrezca", "Tenerlos presente" -> INTENT: "NONE". (No molestar).
-    2. INTERRUPCIÓN: Si el cliente hizo una pregunta y NOSOTROS NO HEMOS RESPONDIDO -> INTENT: "NONE". (El humano debe responder primero).
-    3. TEMAS AJENOS: Si el chat es sobre SEO, Marketing, o temas no eléctricos -> INTENT: "NONE".
+    --- 🛡️ REGLAS DE SEGURIDAD ANTI-SPAM (PRIORIDAD ABSOLUTA) 🛡️ ---
     
-    --- CLASIFICACIÓN DE INTENCIONES ---
+    1. LEY DEL "YA INTENTÉ" (Evitar Bucle Infinito): 
+       - Mira el ÚLTIMO mensaje del historial.
+       - Si es de "Soporte/Técnico" (nosotros) y es un mensaje de SEGUIMIENTO (ej: "¿Aún tienes problemas?", "¿Cerramos tu expediente?", "¿Sigues interesado?", "¿Pudiste revisar?", "Quedo atento").
+       - Y el cliente NO ha respondido a ese mensaje específico...
+       - ENTONCES LA INTENCIÓN ES: "NONE".
+       - (Razón: Ya le mandamos el seguimiento ayer. No le mandes otro hoy. Esperamos su respuesta).
+
+    2. LEY DE LAS "LLAVES / TRÁMITE":
+       - Si el cliente dice: "Me entregan las llaves tal día", "Estoy esperando terminar trámite", "Apenas voy a recibir la casa", "Me avisan cuando escriture"...
+       - ENTONCES LA INTENCIÓN ES: "FUTURE_CONTACT".
+       - Calcula una fecha prudente (ej. 15 días después) para preguntar: "¿Cómo te fue con la entrega?".
+       - NO uses "SOFT_FOLLOWUP" ni "NO_REPLY" aquí. Déjalos respirar.
+
+    3. CLIENTE "GUARDARROPA" O INTERRUPCIÓN:
+       - Si dice "Solo para tener el dato" -> INTENT: "NONE".
+       - Si el cliente hizo una pregunta y NOSOTROS NO HEMOS RESPONDIDO -> INTENT: "NONE" (Toca responder manual).
+       - Temas ajenos (Marketing, SEO) -> INTENT: "NONE".
+
+    --- CLASIFICACIÓN DE INTENCIONES (Si pasa las reglas anteriores) ---
+
+    [QUOTE_FOLLOWUP] (Seguimiento de Cotización)
+    Los últimos mensajes hablan explícitamente de haber enviado:
+    - "Cotización", "Presupuesto", "Propuesta", "Costo final", "Archivo adjunto" o "PDF".
+    - Y el cliente NO respondió o dijo "lo reviso", "dejame consultarlo".
+    - PRIORIDAD ALTA: Úsalo sobre [NO_REPLY] si hay una propuesta económica sobre la mesa.
 
     [APPOINTMENT]
-    El cliente confirmó fecha y hora.
-    - IMPORTANTE: Debes devolver la fecha en formato ISO con OFFSET DE +6 horas (+06:00).
+    El cliente confirmó fecha y hora explícitamente para la visita.
+    - IMPORTANTE: Debes devolver la fecha en formato ISO con OFFSET DE +6 horas (+06:00) o en UTC correcto.
     - Ejemplo: Si es a las 11am, devuelve "...T17:00:00".
-    - Si el cliente dice solo "a las 5", asume 17:00 (5 PM) a menos que especifique "mañana".
 
-    [NO_REPLY] (Recuperación de Venta)
-    El ÚLTIMO mensaje es de "Soporte/Técnico" (nosotros) y el cliente NO respondió.
-    - CASO CLAVE: Si nosotros dimos PRECIO o INFO COMPLETA y el cliente ya no dijo nada -> ES NO_REPLY (Debemos preguntar si le interesa).
-    - Si el cliente mostró interés inicial y luego silencio -> ES NO_REPLY.
-    - Normalmente Soporte/Técnico siempre envía el mensaje "Buen día Mi nombre es Monica Hernández de la empresa Ingenieros Electricistas Luz en tu Espacio Qué servicio te podemos ofrecer?" , Si el cliente no responde este mensaje es -> NO_REPLY.
+    [NO_REPLY] (Recuperación de Venta / Ghosting)
+    El cliente mostró interés, nosotros dimos información general o precio base ($400), y luego hubo SILENCIO.
+    - Condición: El último mensaje NO debe ser un intento de recuperación nuestro (ver Regla 1).
+    - Úsalo cuando el cliente se quedó callado justo después de darle info inicial.
+    - Si Soporte envió el saludo estándar ("Buen día... Qué servicio te podemos ofrecer?") y nadie contestó -> ES NO_REPLY.
 
     [SOFT_FOLLOWUP] 
-    El cliente respondió pero pidió tiempo ("Déjame ver", "Le pregunto a mi esposo").
-    - OJO: Si el cliente dice "Primero me programo y les digo" -> SOFT_FOLLOWUP.
+    El cliente respondió pero pidió tiempo corto ("Déjame ver", "Le pregunto a mi esposo", "Yo les aviso en la semana").
+    - Aquí el cliente SÍ contestó el último mensaje, pero postergó la decisión.
 
-    [FUTURE_CONTACT]
-    El cliente da una fecha futura vaga o específica ("En enero", "La próxima semana").
-    - Calcula la fecha estimada (ej. Primer lunes de Enero a las 10:00 AM).
-    - Formato ISO con offset +06:00.
+    [FUTURE_CONTACT] (FUSIÓN: Fechas Específicas + Esperas Vagas)
+    Úsalo en DOS casos:
+    1. FECHA CLARA: El cliente dice "búscame en enero", "el lunes", "la próxima semana".
+       -> Calcula la fecha exacta solicitada.
+    2. ESPERA VAGA ("SOFT"): El cliente pide tiempo sin fecha ("Déjame ver", "Lo checo con mi esposo", "Yo les aviso", "Estoy revisando números").
+       -> REGLA DE ESTIMACIÓN: En estos casos vagos, programa para dentro de **2 a 3 DÍAS** a las 11:00 AM o 5:00 PM.
+       -> NO uses fecha de mañana (muy pronto), dales espacio.
 
     Historial del chat:
     ---
@@ -53,9 +78,9 @@ export const analyzeChatForAppointment = async (conversationId: string, historyT
     
     Responde SOLO JSON:
     {
-      "intent": "APPOINTMENT" | "FUTURE_CONTACT" | "SOFT_FOLLOWUP" | "NO_REPLY" | "NONE",
-      "appointment_date_iso": "YYYY-MM-DDTHH:mm:00-06:00" (Asegúrate de poner -06:00 al final),
-      "reasoning": "Breve explicación"
+      "intent": "APPOINTMENT" | "FUTURE_CONTACT" | "NO_REPLY" | "QUOTE_FOLLOWUP" | "NONE",
+      "appointment_date_iso": "YYYY-MM-DDTHH:mm:00-06:00" (Asegúrate de poner el offset correcto o UTC),
+      "reasoning": "Breve explicación de por qué aplicaste la regla"
     }
     `;
 
