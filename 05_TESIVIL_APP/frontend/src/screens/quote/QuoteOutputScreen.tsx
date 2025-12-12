@@ -6,8 +6,7 @@ import { useAuth } from '../../auth/AuthProvider';
 import * as Crypto from 'expo-crypto';
 import * as Sharing from 'expo-sharing';
 import { generateQuotePdf } from '../../services/PdfService';
-import * as Sharing from 'expo-sharing';
-import { generateQuotePdf } from '../../services/PdfService';
+
 
 export const QuoteOutputScreen = ({ navigation }: any) => {
     const { items, totalMaterialCost, totalLaborCost, logisticsTier, obstructionFactor, isUrgent } = useQuoteState();
