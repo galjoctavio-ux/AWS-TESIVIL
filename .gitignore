@@ -23,7 +23,7 @@ node_modules/
 *.env
 
 # Ignorar dumps de bases de datos
-*.sql
+# *.sql
 *.sqlite
 
 # Ignorar archivos compilados de Python
