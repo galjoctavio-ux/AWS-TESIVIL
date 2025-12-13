@@ -9,6 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@journeyapps/react-native-quick-sqlite": "^2.5.0",
     "@powersync/react-native": "^1.28.0",
     "@react-navigation/material-top-tabs": "^7.4.9",
     "@react-navigation/native": "^7.1.25",
