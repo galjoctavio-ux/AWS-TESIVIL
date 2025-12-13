@@ -291,3 +291,14 @@ export const deleteCaso = async (id) => {
   const response = await api.delete(`/casos/${id}`);
   return response.data;
 };
+
+// ... al final del archivo, junto a las funciones de Node
+export const getCrmDashboard = async () => {
+  const response = await api.get('/clientes/admin-dashboard');
+  return response.data;
+};
+
+export const forceAnalyze = async (clientId) => {
+  const response = await api.patch(`/clientes/${clientId}/force-analyze`);
+  return response.data;
+};

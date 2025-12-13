@@ -10,6 +10,7 @@ import EditarCotizacion from './pages/EditarCotizacion'; // <--- IMPORTACIÓN CO
 import ProtectedRoute from './components/ProtectedRoute';
 import ConfiguracionPagos from './pages/ConfiguracionPagos';
 import GestionFinanciera from './pages/GestionFinanciera';
+import CrmDashboard from './pages/CrmDashboard';
 import './App.css';
 import './responsive.css';
 
@@ -66,6 +67,15 @@ function App() {
         element={
           <ProtectedRoute allowedRoles={['admin', 'superadmin']}>
             <ConfiguracionPagos />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/crm"
+        element={
+          <ProtectedRoute allowedRoles={['admin', 'superadmin']}>
+            <CrmDashboard />
           </ProtectedRoute>
         }
       />
