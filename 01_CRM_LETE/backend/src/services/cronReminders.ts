@@ -1,142 +1,160 @@
-import { query } from '../config/db';
-import { sendText as sendWhatsAppMessage } from './whatsappService';
+import { supabaseAdmin } from '../services/supabaseClient';
+import { sendText } from './whatsappService';
+
+// Helper para calcular rangos de fecha en Zona Horaria México
+const getMexicoDateRange = (offsetDays: number) => {
+    const now = new Date();
+    // Ajustamos a hora México (UTC-6 aprox, pero mejor usar la librería o cálculo manual simple)
+    // Para simplificar: Creamos una fecha en UTC y le restamos 6 horas visualmente para "pensar" en MX
+    const mxDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Mexico_City' }));
+
+    mxDate.setDate(mxDate.getDate() + offsetDays);
+    mxDate.setHours(0, 0, 0, 0); // Inicio del día MX
+
+    const start = new Date(mxDate);
+
+    const end = new Date(mxDate);
+    end.setHours(23, 59, 59, 999); // Fin del día MX
+
+    return { start, end };
+};
 
 export const checkReminders = async () => {
-    console.log('⏰ [CRON] Verificando envíos programados (Lógica Timezone Robusta)...');
+    console.log('⏰ [CRON] Verificando envíos programados (Supabase Edition)...');
 
     try {
         // =====================================================================
-        // 1. RECORDATORIOS DE CITAS (Usando PostgreSQL Timezone Logic)
+        // 1. RECORDATORIOS DE CITAS (MAÑANA)
         // =====================================================================
+        const tomorrow = getMexicoDateRange(1);
 
-        // A) Citas para MAÑANA
-        const tomorrowClients = await query(`
-            SELECT id, whatsapp_id, appointment_date 
-            FROM conversations 
-            WHERE 
-                (appointment_date AT TIME ZONE 'UTC' AT TIME ZONE 'America/Mexico_City')::date 
-                = 
-                (NOW() AT TIME ZONE 'America/Mexico_City' + INTERVAL '1 day')::date
-            AND appointment_status = 'PENDING'
-            AND intent = 'APPOINTMENT'
-            AND whatsapp_id NOT LIKE '%@g.us'
-        `);
+        const { data: tomorrowClients } = await supabaseAdmin
+            .from('clientes')
+            .select('id, whatsapp_id, appointment_date, nombre_completo')
+            .eq('appointment_status', 'PENDIENTE')
+            .gte('appointment_date', tomorrow.start.toISOString())
+            .lte('appointment_date', tomorrow.end.toISOString());
 
-        for (const client of tomorrowClients.rows) {
-            const message = `Hola! 👋 Te recordamos que el día de *mañana* tenemos agendada tu revisión técnica.`;
-            const sentId = await sendWhatsAppMessage(client.whatsapp_id, message);
-
-            if (sentId) {
-                await query(`
-                    UPDATE conversations 
-                    SET appointment_status = 'REMINDED_TOMORROW',
-                        last_ai_analysis_at = NOW(), last_message_analyzed_id = $1 
-                    WHERE id = $2
-                `, [sentId, client.id]);
-                console.log(` -> 📅 Recordatorio Mañana enviado a ${client.whatsapp_id}`);
-            }
-        }
-
-        // B) Citas para HOY (Confirmación)
-        const todayClients = await query(`
-            SELECT id, whatsapp_id, appointment_date 
-            FROM conversations 
-            WHERE 
-                (appointment_date AT TIME ZONE 'UTC' AT TIME ZONE 'America/Mexico_City')::date 
-                = 
-                (NOW() AT TIME ZONE 'America/Mexico_City')::date
-            AND (appointment_status = 'PENDING' OR appointment_status = 'REMINDED_TOMORROW')
-            AND intent = 'APPOINTMENT'
-            AND whatsapp_id NOT LIKE '%@g.us'
-        `);
-
-        for (const client of todayClients.rows) {
-            const dateObj = new Date(client.appointment_date);
-            const timeString = dateObj.toLocaleTimeString('es-MX', {
-                timeZone: 'America/Mexico_City', hour: '2-digit', minute: '2-digit', hour12: true
-            });
-
-            const message = `Buen día! ☀️ Te recordamos que tu visita es el día de *hoy a las ${timeString}*.`;
-            const sentId = await sendWhatsAppMessage(client.whatsapp_id, message);
-
-            if (sentId) {
-                await query(`
-                    UPDATE conversations 
-                    SET appointment_status = 'REMINDED_TODAY', assigned_to_role = 'TECH',
-                        last_ai_analysis_at = NOW(), last_message_analyzed_id = $1
-                    WHERE id = $2
-                `, [sentId, client.id]);
-                console.log(` -> 📅 Recordatorio HOY enviado a ${client.whatsapp_id}`);
-            }
-        }
-
-        // =====================================================================
-        // 2. SEGUIMIENTOS DINÁMICOS (Ghosting, Future Contact, Cotizaciones)
-        // =====================================================================
-
-        const followUps = await query(`
-            SELECT id, whatsapp_id, intent, follow_up_date
-            FROM conversations 
-            WHERE follow_up_status = 'PENDING'
-            AND follow_up_date <= NOW() 
-            AND intent IN ('NO_REPLY', 'FUTURE_CONTACT', 'QUOTE_FOLLOWUP')
-            AND whatsapp_id NOT LIKE '%@g.us'
-        `);
-
-        for (const task of followUps.rows) {
-
-            // --- 🛑 FRENO DE MANO (JUST-IN-TIME CHECK) 🛑 ---
-            const lastMsgCheck = await query(`
-                SELECT is_internal, created_at, content 
-                FROM messages 
-                WHERE conversation_id = $1 
-                ORDER BY created_at DESC 
-                LIMIT 1
-            `, [task.id]);
-
-            if (lastMsgCheck.rows.length > 0) {
-                const lastMsg = lastMsgCheck.rows[0];
-                if (lastMsg.is_internal) {
-                    console.log(`✋ Cancelando envío auto a ${task.whatsapp_id}: Humano ya intervino.`);
-                    await query(`UPDATE conversations SET follow_up_status = 'CANCELLED_BY_USER' WHERE id = $1`, [task.id]);
-                    continue;
-                }
-            }
-
-            let message = '';
-
-            // 1. GHOSTING CLÁSICO
-            if (task.intent === 'NO_REPLY') {
-                message = `Hola, buen día. 👋 Notamos que quedó pendiente tu reporte. ¿Aún tienes problemas con tu instalación o prefieres que cerremos tu expediente por ahora? Quedamos atentos.`;
-
-                // 2. SEGUIMIENTO DE COTIZACIÓN (Precios subiendo)
-            } else if (task.intent === 'QUOTE_FOLLOWUP') {
-                message = `Hola, buen día. 👋\n\nSolo para confirmar si pudiste revisar la propuesta que te enviamos anteriormente.\n\nTe comento que nuestros presupuestos tienen una vigencia corta debido a la variación constante en los precios del material eléctrico (cobre y componentes). 📉\n\n¿Te gustaría que procedamos para congelar el precio o tienes alguna duda técnica que podamos resolver?`;
-
-                // 3. CONTACTO FUTURO (Incluye Soft Followup fusionado)
-            } else if (task.intent === 'FUTURE_CONTACT') {
-                message = `Hola! ⚡ Como acordamos, te contacto para retomar el tema de tu revisión eléctrica. ¿Te gustaría que agendemos una visita para esta semana?`;
-            }
-
-            // Enviamos el mensaje
-            if (message) {
-                const sentId = await sendWhatsAppMessage(task.whatsapp_id, message);
+        if (tomorrowClients && tomorrowClients.length > 0) {
+            console.log(`📅 Recordatorios Mañana: ${tomorrowClients.length}`);
+            for (const client of tomorrowClients) {
+                const message = `Hola ${client.nombre_completo || ''}! 👋 Te recordamos que el día de *mañana* tenemos agendada tu revisión técnica.`;
+                const sentId = await sendText(client.whatsapp_id + '@s.whatsapp.net', message);
 
                 if (sentId) {
-                    await query(`
-                        UPDATE conversations 
-                        SET follow_up_status = 'SENT',
-                            intent = 'AWAITING_REPLY', 
-                            last_ai_analysis_at = NOW(), 
-                            last_message_analyzed_id = $1 
-                        WHERE id = $2
-                    `, [sentId, task.id]);
-                    console.log(` -> 🚀 Seguimiento Dinámico (${task.intent}) enviado a ${task.whatsapp_id}`);
+                    await supabaseAdmin
+                        .from('clientes')
+                        .update({ appointment_status: 'REMINDED_TOMORROW' })
+                        .eq('id', client.id);
                 }
             }
-        } // Fin del for (followUps)
+        }
+
+        // =====================================================================
+        // 2. RECORDATORIOS DE CITAS (HOY)
+        // =====================================================================
+        const today = getMexicoDateRange(0);
+
+        const { data: todayClients } = await supabaseAdmin
+            .from('clientes')
+            .select('id, whatsapp_id, appointment_date, nombre_completo')
+            .in('appointment_status', ['PENDIENTE', 'REMINDED_TOMORROW']) // Si se agendó hoy mismo o ya se avisó ayer
+            .gte('appointment_date', today.start.toISOString())
+            .lte('appointment_date', today.end.toISOString());
+
+        if (todayClients && todayClients.length > 0) {
+            console.log(`📅 Recordatorios HOY: ${todayClients.length}`);
+            for (const client of todayClients) {
+                const dateObj = new Date(client.appointment_date);
+                const timeString = dateObj.toLocaleTimeString('es-MX', {
+                    timeZone: 'America/Mexico_City', hour: '2-digit', minute: '2-digit', hour12: true
+                });
+
+                const message = `Buen día! ☀️ Te recordamos que tu visita es el día de *hoy a las ${timeString}*.`;
+                const sentId = await sendText(client.whatsapp_id + '@s.whatsapp.net', message);
+
+                if (sentId) {
+                    await supabaseAdmin
+                        .from('clientes')
+                        .update({ appointment_status: 'REMINDED_TODAY' })
+                        .eq('id', client.id);
+                }
+            }
+        }
+
+        // =====================================================================
+        // 3. SEGUIMIENTOS DINÁMICOS (GHOSTING, PROPUESTAS, ETC)
+        // =====================================================================
+
+        // Buscamos clientes que tengan una fecha de seguimiento vencida (o sea, ya toca enviar)
+        const nowISO = new Date().toISOString();
+
+        const { data: followUps } = await supabaseAdmin
+            .from('clientes')
+            .select('id, whatsapp_id, crm_intent, next_follow_up_date, last_interaction, nombre_completo')
+            .not('crm_intent', 'in', '("NONE","AWAITING_REPLY")') // Solo intenciones activas
+            .lte('next_follow_up_date', nowISO) // Que ya haya pasado la hora de envío
+            .order('next_follow_up_date', { ascending: true }); // Los más atrasados primero
+
+        if (followUps && followUps.length > 0) {
+            console.log(`🚀 Seguimientos pendientes: ${followUps.length}`);
+
+            for (const task of followUps) {
+
+                // --- 🛑 FRENO DE MANO (JUST-IN-TIME CHECK) 🛑 ---
+                // Verificamos si hubo interacción REAL después de que la IA programó esto.
+                // Si el cliente habló hace menos de 12 horas, abortamos para no ser molestos.
+                const lastMsgTime = new Date(task.last_interaction).getTime();
+                const scheduledTime = new Date(task.next_follow_up_date).getTime();
+                const diffHours = (new Date().getTime() - lastMsgTime) / (1000 * 60 * 60);
+
+                // Si el cliente habló DESPUÉS de lo programado o hace menos de 2 horas
+                if (lastMsgTime > scheduledTime || diffHours < 2) {
+                    console.log(`✋ Cancelando envío a ${task.nombre_completo}: Interacción reciente detectada.`);
+                    // Limpiamos la tarea para que no se quede atorada
+                    await supabaseAdmin
+                        .from('clientes')
+                        .update({
+                            crm_intent: 'NONE',
+                            next_follow_up_date: null
+                        })
+                        .eq('id', task.id);
+                    continue;
+                }
+
+                let message = '';
+
+                if (task.crm_intent === 'NO_REPLY') {
+                    message = `Hola ${task.nombre_completo || ''}, buen día. 👋 Notamos que quedó pendiente tu reporte. ¿Aún tienes problemas con tu instalación o prefieres que cerremos tu expediente por ahora? Quedamos atentos.`;
+                } else if (task.crm_intent === 'QUOTE_FOLLOWUP') {
+                    message = `Hola ${task.nombre_completo || ''}, buen día. 👋\nSolo para confirmar si pudiste revisar la propuesta que te enviamos.\n¿Te gustaría que procedamos para congelar el precio o tienes alguna duda técnica?`;
+                } else if (task.crm_intent === 'FUTURE_CONTACT') {
+                    message = `Hola! ⚡ Como acordamos, te contacto para retomar el tema de tu revisión eléctrica. ¿Te gustaría que agendemos una visita para esta semana?`;
+                }
+
+                if (message) {
+                    const sentId = await sendText(task.whatsapp_id + '@s.whatsapp.net', message);
+
+                    if (sentId) {
+                        // Marcamos como enviado y esperamos respuesta
+                        await supabaseAdmin
+                            .from('clientes')
+                            .update({
+                                crm_intent: 'AWAITING_REPLY',
+                                next_follow_up_date: null, // Limpiamos fecha para no repetir
+                                last_ai_analysis_at: new Date() // Actualizamos para que no se analice inmediatamente
+                            })
+                            .eq('id', task.id);
+
+                        console.log(`✅ Mensaje enviado a ${task.whatsapp_id} (${task.crm_intent})`);
+                    }
+                }
+            }
+        } else {
+            console.log('✅ No hay seguimientos pendientes por ahora.');
+        }
 
     } catch (error) {
-        console.error('Error en checkReminders:', error);
-    } // Fin del catch
-}; // Fin de la función checkReminders
+        console.error('❌ Error en checkReminders:', error);
+    }
+};
