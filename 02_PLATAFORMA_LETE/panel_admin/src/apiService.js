@@ -302,3 +302,8 @@ export const forceAnalyze = async (clientId) => {
   const response = await api.patch(`/clientes/${clientId}/force-analyze`);
   return response.data;
 };
+
+export const getChatHistory = async (clientId) => {
+  const response = await api.get(`/clientes/${clientId}/chat`);
+  return response.data;
+};
