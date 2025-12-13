@@ -75,8 +75,8 @@ class CotizacionController {
                 'telefono' => $input['cliente_telefono'] ?? null
             ];
 
-            $nombreAsesorDesdeBD = $this->calculosService->obtenerNombreUsuarioPorId($input['tecnico_id']);
-            $tecnicoNombreFinal = $nombreAsesorDesdeBD ?? $input['tecnico_nombre'] ?? 'Asesor de Servicio';
+            //$nombreAsesorDesdeBD = $this->calculosService->obtenerNombreUsuarioPorId($input['tecnico_id']);
+           $tecnicoNombreFinal = $input['tecnico_nombre'] ?? 'Asesor de Servicio'; // <-- USAR DIRECTO EL INPUT
             
             $guardadoResult = $this->calculosService->guardarCotizacion(
                 $resultado,
@@ -123,7 +123,8 @@ class CotizacionController {
 
             if ($estado === 'ENVIADA') {
                 $resendService = new ResendService();
-                $resendService->enviarCotizacion($uuid, $input['cliente_email'], $clienteData['nombre'], $cotizacionId);
+                $idParaEnvio = $cotizacionId ? (int)$cotizacionId : null; // Aseguramos que sea int o null
+                $resendService->enviarCotizacion($uuid, $input['cliente_email'], $clienteData['nombre'], $idParaEnvio);
                 $mensajeRespuesta = 'Cotización enviada correctamente al cliente.';
             } else {
                 $mensajeRespuesta = '🛑 Cotización DETENIDA para revisión administrativa. Razón: ' . $razonDetencion;
