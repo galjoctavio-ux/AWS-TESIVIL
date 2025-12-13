@@ -5,7 +5,7 @@ import path from 'path';
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-// CONFIGURACIÓN
+// TUS CREDENCIALES
 const EVO_URL = 'http://172.17.0.1:8080';
 const EVO_APIKEY = 'B6D711FCDE4D4FD5936544120E713976';
 const EVO_INSTANCE = 'LuzEnTuEspacio';
@@ -18,54 +18,71 @@ const api = axios.create({
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 const importHistoryFinal = async () => {
-    console.log("🚀 Iniciando Importación ROBUSTA (Estrategia 1-a-1)...");
+    console.log("🚀 Iniciando Importación (Estrategia: CONTACTOS)...");
 
     try {
         // ==========================================
-        // PASO 1: OBTENER LISTA DE CONTACTOS/CHATS
+        // PASO 1: OBTENER LISTA DE JIDs (SOLO CONTACTOS)
         // ==========================================
-        // Usamos /chat/find (singular) porque suele ser metadata ligera y no explota
-        console.log("📋 Obteniendo lista de chats activos...");
+        // Usamos findContacts (Plural) que es más estable en V2 y no carga mensajes
+        console.log("📋 Intentando descargar agenda de contactos...");
         let targets = [];
 
         try {
-            const res = await api.post(`/chat/find/${EVO_INSTANCE}`, {});
+            // INTENTO 1: Endpoint estándar V2 para contactos
+            const res = await api.post(`/contact/findContacts/${EVO_INSTANCE}`, {
+                where: {}
+            });
             targets = Array.isArray(res.data) ? res.data : [];
-            console.log(`✅ Se encontraron ${targets.length} chats vía /chat/find`);
-        } catch (e) {
-            console.warn("⚠️ Falló /chat/find, intentando /contact/find...");
+            console.log(`✅ ¡ÉXITO! Se encontraron ${targets.length} contactos en la agenda.`);
+
+        } catch (e: any) {
+            console.error(`❌ Falló findContacts: ${e.message}`);
+            if (e.response) console.error(`   Status: ${e.response.status} - ${JSON.stringify(e.response.data)}`);
+
+            // INTENTO 2: Si falla contactos, intentamos chats una vez más pero con where vacío
+            console.log("⚠️ Intentando fallback con findChats...");
             try {
-                const resContact = await api.post(`/contact/find/${EVO_INSTANCE}`, {});
-                targets = Array.isArray(resContact.data) ? resContact.data : [];
-                console.log(`✅ Se encontraron ${targets.length} contactos vía /contact/find`);
-            } catch (errContact) {
-                console.error("❌ Fatal: No se pudo obtener la lista de nadie.");
+                const resChat = await api.post(`/chat/findChats/${EVO_INSTANCE}`, { where: {} });
+                targets = Array.isArray(resChat.data) ? resChat.data : [];
+            } catch (errChat) {
+                console.error("❌ Fatal: No se pudo obtener ni contactos ni chats.");
                 return;
             }
+        }
+
+        if (targets.length === 0) {
+            console.log("⚠️ La lista está vacía. Evolution aún no ha sincronizado la agenda o la base de datos está limpia.");
+            return;
         }
 
         // ==========================================
         // PASO 2: PROCESAR UNO POR UNO
         // ==========================================
-        console.log(`📥 Procesando ${targets.length} registros uno por uno...`);
+        console.log(`📥 Procesando ${targets.length} registros...`);
 
         for (const item of targets) {
             // Normalización de ID
             const rawId = item.id || item.remoteJid || item.key?.remoteJid;
-            if (!rawId || rawId.includes('@g.us') || rawId.includes('@broadcast') || rawId === 'status@broadcast') continue;
+
+            // Filtros de seguridad
+            if (!rawId) continue;
+            if (rawId.includes('@g.us')) continue; // Ignorar Grupos
+            if (rawId.includes('@broadcast')) continue; // Ignorar Listas de difusión/Estados
+            if (rawId === 'status@broadcast') continue;
 
             let whatsappId = rawId.split('@')[0];
-            // Fix México
+            // Fix México (521 -> 52)
             if (whatsappId.startsWith('521') && whatsappId.length === 13) whatsappId = whatsappId.substring(3);
 
             // Nombre
             const nombre = item.pushName || item.name || item.notify || item.verifiedName || whatsappId;
 
-            process.stdout.write(`🔹 Procesando ${whatsappId} (${nombre})... `);
+            process.stdout.write(`🔹 ${whatsappId}... `);
 
             // 1. UPSERT CLIENTE EN SUPABASE
             let clienteId = null;
-            const { data: clientData, error: clientError } = await supabaseAdmin
+            const { data: clientData } = await supabaseAdmin
                 .from('clientes')
                 .select('id')
                 .or(`whatsapp_id.eq.${whatsappId},telefono.eq.${whatsappId}`)
@@ -89,12 +106,11 @@ const importHistoryFinal = async () => {
             }
 
             if (!clienteId) {
-                console.log("❌ Error gestionando cliente.");
+                console.log("❌ (Error Cliente)");
                 continue;
             }
 
             // 2. OBTENER MENSAJES INDIVIDUALMENTE
-            // Aquí es donde evitamos el error 500 global. Si este falla, solo falla este usuario.
             try {
                 const resMsgs = await api.post(`/chat/findMessages/${EVO_INSTANCE}`, {
                     where: { key: { remoteJid: rawId } },
@@ -118,7 +134,7 @@ const importHistoryFinal = async () => {
                         if (!content) continue;
 
                         let timestamp = msg.messageTimestamp;
-                        if (timestamp < 10000000000) timestamp *= 1000;
+                        if (typeof timestamp === 'number' && timestamp < 10000000000) timestamp *= 1000;
 
                         msjsParaGuardar.push({
                             cliente_id: clienteId,
@@ -133,19 +149,20 @@ const importHistoryFinal = async () => {
                     if (msjsParaGuardar.length > 0) {
                         await supabaseAdmin.from('mensajes_whatsapp')
                             .upsert(msjsParaGuardar, { onConflict: 'whatsapp_message_id', ignoreDuplicates: true });
-                        console.log(`✅ ${msjsParaGuardar.length} msjs guardados.`);
+                        console.log(`✅ ${msjsParaGuardar.length} msjs`);
                     } else {
-                        console.log("⚠️ Sin mensajes de texto.");
+                        console.log("⚠️ (Sin texto)");
                     }
                 } else {
-                    console.log("⚠️ Chat vacío.");
+                    console.log("💤 (Vacío)");
                 }
-            } catch (msgError) {
-                // AQUÍ ATRAPAMOS EL ERROR DEL MEDIA URL SI SUCEDE EN ESTE CHAT ESPECÍFICO
-                console.log(`❌ Error al leer mensajes: ${(msgError as any).message}`);
+            } catch (msgError: any) {
+                // Si falla un chat específico, no detenemos el script
+                console.log(`❌ (Error API: ${msgError.response?.status || msgError.message})`);
             }
 
-            await delay(200); // Respiro
+            // Pequeña pausa para no saturar
+            await delay(100);
         }
 
         console.log("\n🎉 IMPORTACIÓN FINALIZADA.");
