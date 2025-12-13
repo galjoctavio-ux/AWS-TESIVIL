@@ -1,464 +1,345 @@
-.crm-container {
-    padding: 20px;
-    background: #f4f6f8;
-    min-height: 100vh;
+/* src/pages/CrmDashboard.css */
+:root {
+    --primary-color: #2563eb;
+    --bg-light: #f8fafc;
+    --border-color: #e2e8f0;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+
+    /* Semáforos y Estados */
+    --color-success: #22c55e;
+    /* Verde */
+    --color-warning: #f59e0b;
+    /* Amarillo/Naranja */
+    --color-danger: #ef4444;
+    /* Rojo */
+    --color-info: #3b82f6;
+    /* Azul */
+    --color-gray: #94a3b8;
 }
 
+.crm-container {
+    padding: 20px;
+    background-color: var(--bg-light);
+    min-height: 100vh;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* HEADER */
 .crm-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-}
-
-.crm-controls button {
-    padding: 8px 16px;
-    border: 1px solid #ddd;
     background: white;
-    cursor: pointer;
-    margin-right: 5px;
-    border-radius: 4px;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.crm-controls button.active {
-    background: #007bff;
-    color: white;
-    border-color: #007bff;
+.crm-header h1 {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin: 0;
 }
 
-.crm-table-wrapper {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow-x: auto;
-}
-
-.crm-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.crm-table th,
-.crm-table td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #eee;
-}
-
-.crm-table th {
-    background: #f8f9fa;
-    font-weight: 600;
-    color: #333;
-}
-
-/* Badges */
-.badge {
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-.badge-cita {
-    background: #d4edda;
-    color: #155724;
-}
-
-/* Verde */
-.badge-atencion {
-    background: #fff3cd;
-    color: #856404;
-}
-
-/* Amarillo */
-.badge-seguimiento {
-    background: #d1ecf1;
-    color: #0c5460;
-}
-
-/* Azul */
-.badge-ghost {
-    background: #e2e3e5;
-    color: #383d41;
-}
-
-/* Gris */
-.badge-normal {
-    background: #f8f9fa;
-    color: #6c757d;
-}
-
-.client-info {
-    display: flex;
-    flex-direction: column;
-}
-
-.phone {
+.crm-stats {
     font-size: 0.85rem;
-    color: #666;
+    color: var(--text-secondary);
 }
 
-.debt-badge {
-    font-size: 0.75rem;
-    color: white;
-    background: #dc3545;
-    padding: 2px 5px;
-    border-radius: 4px;
-    margin-top: 4px;
-    width: fit-content;
-}
-
-.msg-cell {
-    max-width: 300px;
-}
-
-.msg-bubble {
-    background: #f1f0f0;
-    padding: 8px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.msg-bubble.assistant {
-    background: #e3f2fd;
-    color: #0d47a1;
-    border-left: 3px solid #2196f3;
-}
-
-.time {
-    font-size: 0.75rem;
-    color: #999;
-    margin-top: 4px;
-}
-
-.action-btn {
-    padding: 5px 10px;
-    background: #6f42c1;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.action-btn:hover {
-    background: #5a32a3;
-}
-
-/* Botón de Alerta (Parpadeante o Rojo Fuerte) */
-.btn-alert {
-    background-color: #ffebee;
-    color: #d32f2f;
-    border: 1px solid #d32f2f;
-    font-weight: bold;
-}
-
-.btn-alert.active {
-    background-color: #d32f2f !important;
-    color: white !important;
-}
-
-/* Divisor en el header */
-.divider-vertical {
-    width: 1px;
-    height: 24px;
-    background-color: #ddd;
-    margin: 0 10px;
-}
-
-/* Badges Nuevos */
-.badge-alert {
-    background-color: #ffebee;
-    color: #c62828;
-    border: 1px solid #ffcdd2;
-}
-
-.badge-admin {
-    background-color: #fff8e1;
-    color: #f57f17;
-    border: 1px solid #ffecb3;
-}
-
-/* Resaltar toda la fila si es alerta operativa */
-.row-alert {
-    background-color: #fff5f5;
-    /* Fondo rojo muy suave */
-    border-left: 4px solid #c62828;
-}
-
-/* Ajustes generales */
-.chat-btn {
-    background-color: #25D366;
-    color: white;
-    border: none;
-}
-
-.chat-btn:hover {
-    background-color: #128C7E;
-}
-
-/* --- NUEVOS ESTILOS PARA LA BARRA SUPERIOR --- */
+/* CONTROLES Y FILTROS */
 .crm-controls-group {
     display: flex;
-    gap: 10px;
+    gap: 15px;
     align-items: center;
 }
 
 .search-box input {
     padding: 8px 12px;
+    border: 1px solid var(--border-color);
     border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 0.9rem;
     width: 250px;
-    transition: all 0.2s;
+    font-size: 0.9rem;
 }
 
-.search-box input:focus {
-    border-color: #007bff;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
-}
-
-/* --- TABS MEJORADOS --- */
 .crm-tabs {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
-    overflow-x: auto;
+    flex-wrap: wrap;
 }
 
 .tab-btn {
-    padding: 6px 12px;
-    border: none;
-    background: #f0f0f0;
+    padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    background: white;
     border-radius: 20px;
     cursor: pointer;
     font-size: 0.85rem;
     font-weight: 500;
-    white-space: nowrap;
+    color: var(--text-secondary);
     transition: all 0.2s;
 }
 
 .tab-btn:hover {
-    background: #e0e0e0;
+    background-color: #f1f5f9;
 }
 
 .tab-btn.active {
-    background: #333;
+    background-color: var(--primary-color);
     color: white;
+    border-color: var(--primary-color);
 }
 
 .tab-btn.alert.active {
-    background: #d32f2f;
-    color: white;
+    background-color: var(--color-danger);
+    border-color: var(--color-danger);
 }
 
 .tab-btn.admin.active {
-    background: #1976d2;
-    color: white;
+    background-color: var(--color-info);
+    border-color: var(--color-info);
 }
 
-/* --- TABLA ORDENABLE --- */
-th.sortable {
-    cursor: pointer;
-    user-select: none;
+/* TABLA */
+.crm-table-wrapper {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
 }
 
-th.sortable:hover {
-    background-color: #f8f9fa;
-    color: #000;
-}
-
-/* --- PAGINACIÓN --- */
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    padding: 20px 0;
-    background: #fff;
-    border-top: 1px solid #eee;
-}
-
-.pagination button {
-    padding: 8px 16px;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.pagination button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.pagination button:hover:not(:disabled) {
-    background: #f5f5f5;
-}
-
-/* --- TEXTOS --- */
-.ai-summary {
-    margin: 0;
-    font-size: 0.8rem;
-    color: #444;
-    line-height: 1.3;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.dash {
-    color: #ccc;
-    font-weight: bold;
-}
-
-/* src/pages/CrmDashboard.css */
-
-/* --- Colores de la Fuente de la Verdad (CSS Variables) --- */
-:root {
-    --red-500: #ef4444;
-    --green-500: #22c55e;
-    --blue-500: #3b82f6;
-    --yellow-500: #f59e0b;
-    --gray-400: #9ca3af;
-    --gray-600: #4b5563;
-}
-
-/* Base de la tabla (ajustar si es necesario) */
 .crm-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 1rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.crm-table th,
-.crm-table td {
-    padding: 12px 15px;
-    border: 1px solid #e5e7eb;
-    text-align: left;
-    vertical-align: top;
+    min-width: 1000px;
 }
 
 .crm-table th {
-    background-color: #f3f4f6;
+    background-color: #f8fafc;
+    color: var(--text-secondary);
     font-weight: 600;
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--border-color);
+    font-size: 0.85rem;
     cursor: pointer;
-    user-select: none;
 }
 
-.crm-table tr:nth-child(even) {
-    background-color: #f9fafb;
+.crm-table td {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: top;
+    color: var(--text-primary);
+    font-size: 0.9rem;
 }
 
-/* Estilo para el resumen de la IA */
-.ai-summary-text {
-    font-size: 0.85em;
-    color: var(--gray-600);
-    max-width: 250px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.crm-table tr:hover {
+    background-color: #f8fafc;
 }
 
-/* Badges de CRM Status */
-.crm-status-badge {
+.row-alert {
+    background-color: #fef2f2;
+}
+
+/* Rojo muy suave para alertas */
+
+/* COLUMNA: CLIENTE */
+.client-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.client-name {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.client-meta {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.client-address a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.client-email {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* BADGES Y SEMÁFOROS */
+.badge {
     display: inline-block;
     padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.75em;
-    font-weight: bold;
-    color: white;
-    margin-bottom: 5px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
 }
 
-/* Colores para los CRM Status */
-.status-LEAD {
-    background-color: var(--blue-500);
+.badge-alert {
+    background-color: #fee2e2;
+    color: #991b1b;
 }
 
-.status-QUOTE_FOLLOWUP {
-    background-color: var(--yellow-500);
+.badge-admin {
+    background-color: #dbeafe;
+    color: #1e40af;
 }
 
-.status-PENDIENTE {
-    background-color: var(--red-500);
+.badge-cita {
+    background-color: #dcfce7;
+    color: #166534;
 }
 
-.status-CERRADO {
-    background-color: var(--green-500);
+.badge-normal {
+    background-color: #f1f5f9;
+    color: #475569;
 }
 
-/* Agrega más status si los tienes */
-.status-IMPORTED_HISTORY {
-    background-color: var(--gray-400);
-}
-
-.status-NONE {
-    background-color: var(--gray-600);
-}
-
-
-/* Contador de mensajes no leídos */
-.unread-count-badge {
-    background-color: var(--red-500);
-    color: white;
-    border-radius: 50%;
-    padding: 5px 10px;
-    font-weight: bold;
+/* Semáforo Calificación */
+.score-indicator {
     display: inline-block;
-    min-width: 30px;
-    text-align: center;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
 }
 
-/* Botones de acción */
-.action-button {
-    margin-right: 5px;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9em;
-    transition: background-color 0.2s;
-}
-
-.chat-button {
-    background-color: #4ade80;
-    /* Verde de WhatsApp */
-    color: white;
-}
-
-.analyze-button {
-    background-color: #8b5cf6;
-    /* Morado para IA */
-    color: white;
-}
-
-/* Pestañas de Filtro */
-.filter-tabs {
-    margin-bottom: 1rem;
+/* Status Operativo (Círculos) */
+.sync-status-container {
     display: flex;
-    gap: 10px;
+    gap: 8px;
+    align-items: center;
+    margin-top: 5px;
+    font-size: 0.75rem;
+    font-weight: 600;
 }
 
-.filter-tabs button {
-    padding: 8px 15px;
-    border: 1px solid var(--gray-400);
-    background-color: white;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: all 0.2s;
+/* COLUMNA: INTERACCIÓN (Chat Bubble) */
+.msg-cell {
+    min-width: 200px;
 }
 
-.filter-tabs button.active {
-    background-color: var(--blue-500);
+.msg-bubble {
+    background-color: #f1f5f9;
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+    border-top-left-radius: 2px;
+    max-width: 90%;
+}
+
+.msg-bubble.assistant {
+    background-color: #e0f2fe;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 2px;
+    margin-left: auto;
+}
+
+.msg-meta {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.unread-badge {
+    background-color: var(--color-danger);
     color: white;
-    border-color: var(--blue-500);
-    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+}
+
+/* COLUMNA: IA & NOTAS */
+.ai-cell {
+    max-width: 250px;
+}
+
+.ai-summary {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+
+.internal-note {
+    background: #fffbeb;
+    padding: 6px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    border-left: 3px solid var(--color-warning);
+}
+
+/* COLUMNA: ACCIONES Y FINANZAS */
+.finance-cell {
+    min-width: 120px;
+}
+
+.debt-text {
+    color: var(--color-danger);
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.next-action {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.btn-icon {
+    border: none;
+    padding: 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: transform 0.1s;
+}
+
+.btn-chat {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+.btn-ai {
+    background-color: #f3e8ff;
+    color: #7e22ce;
+}
+
+.btn-ea {
+    background-color: #e0f2fe;
+    color: #0369a1;
+}
+
+/* Botón crear EA */
+.btn-icon:hover {
+    transform: scale(1.1);
+}
+
+/* PAGINACIÓN */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 20px;
+    align-items: center;
 }

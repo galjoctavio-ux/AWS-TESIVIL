@@ -3,77 +3,6 @@ import { getCrmDashboard, forceAnalyze } from '../apiService';
 import ChatModal from '../components/ChatModal';
 import './CrmDashboard.css';
 
-// --- FUNCIONES DE AYUDA VISUAL ---
-
-// Función para el semáforo de Calificación del Cliente
-const getStatusColor = (calificacion) => {
-    switch (calificacion) {
-        case 'SOSPECHOSO': return 'var(--red-500)';
-        case 'HOSTIL': return 'var(--red-500)';
-        case 'NEUTRO': return 'var(--yellow-500)';
-        case 'AMABLE': return 'var(--green-500)';
-        default: return 'var(--gray-400)';
-    }
-};
-
-// Componente para los círculos de sincronización y alertas
-const renderSyncStatus = (cliente) => {
-    const status = [];
-
-    // 1. Estado MariaDB (Easy!Appointments)
-    const mariaDBColor = cliente.sync_mariadb ? 'var(--green-500)' : 'var(--red-500)';
-    status.push(
-        <span key="ea" title={cliente.sync_mariadb ? "Usuario en Easy!Appointments" : "Falta crear en EA"} style={{ color: mariaDBColor }}>
-            ● EA
-        </span>
-    );
-
-    // 2. Estado Evolution (WhatsApp/CRM)
-    const evolutionColor = cliente.sync_evolution ? 'var(--green-500)' : 'var(--gray-400)';
-    status.push(
-        <span key="ev" title={cliente.sync_evolution ? "Sincronizado con WhatsApp (Evolution)" : "Sin historial de Evolution"} style={{ color: evolutionColor }}>
-            ● WA
-        </span>
-    );
-
-    // 3. Alerta de Cita Desincronizada (Si IA dijo CITA pero no hay registro en EA)
-    if (cliente.alerta_cita_desincronizada) {
-        status.push(
-            <span key="cita" title="¡ALERTA! Cliente con intención de CITA pero no agendado en EA." style={{ color: 'var(--red-500)', fontWeight: 'bold' }}>
-                ⚠️ CITA
-            </span>
-        );
-    }
-
-    // 4. Bandera de Cotización Pendiente
-    if (cliente.debe_cotizacion) {
-        status.push(
-            <span key="cotiz" title="Requiere cotización pendiente de generar o enviar." style={{ color: 'var(--blue-500)', fontWeight: 'bold' }}>
-                💰 COT. PENDIENTE
-            </span>
-        );
-    }
-
-    return status.map((s, index) => (
-        <React.Fragment key={index}>
-            {s}{index < status.length - 1 && ' | '}
-        </React.Fragment>
-    ));
-};
-
-/**
- * Función de seguridad para manejar textos que pueden ser nulos y cortarlos.
- */
-const safeText = (text, limit = 100) => {
-    if (!text) return '...';
-    // Nos aseguramos que sea un string antes de cortar
-    const str = String(text);
-    return str.length > limit ? str.substring(0, limit) + '...' : str;
-};
-
-
-// --- COMPONENTE PRINCIPAL ---
-
 const CrmDashboard = () => {
     // --- ESTADOS DE DATOS ---
     const [clientes, setClientes] = useState([]);
@@ -88,11 +17,11 @@ const CrmDashboard = () => {
 
     const [selectedClientForChat, setSelectedClientForChat] = useState(null);
 
+    // --- CARGA DE DATOS ---
     const cargarDatos = async () => {
         setLoading(true);
         try {
             const data = await getCrmDashboard();
-            // Manejamos el caso de que data no sea un array
             setClientes(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error("Error cargando CRM:", error);
@@ -106,209 +35,314 @@ const CrmDashboard = () => {
         cargarDatos();
     }, []);
 
-    // --- LÓGICA DE FILTRADO Y ORDENAMIENTO (useMemo) ---
-    const clientesFiltrados = useMemo(() => {
-        let resultados = [...clientes]; // Usar copia segura
+    // Resetear paginación al filtrar
+    useEffect(() => { setPaginaActual(1); }, [filtro, busqueda]);
 
-        // 1. Aplicar filtro de búsqueda de texto
-        if (busqueda) {
-            const lowerBusqueda = busqueda.toLowerCase();
-            resultados = resultados.filter(cliente =>
-                (cliente.nombre_completo || '').toLowerCase().includes(lowerBusqueda) ||
-                (cliente.telefono || '').includes(lowerBusqueda) ||
-                (cliente.ai_summary || '').toLowerCase().includes(lowerBusqueda) ||
-                (cliente.crm_status || '').toLowerCase().includes(lowerBusqueda)
-            );
+    // --- ACCIONES ---
+    const handleAnalizar = async (id) => {
+        if (!window.confirm("¿Forzar análisis de IA para este cliente? Esto pondrá al cliente en cola de procesamiento.")) return;
+        try {
+            await forceAnalyze(id);
+            alert("Solicitud enviada. Recargando datos en 3s...");
+            setTimeout(cargarDatos, 3000);
+        } catch (error) {
+            alert("Error al solicitar análisis.");
         }
+    };
 
-        // 2. Aplicar filtro de pestaña (TODOS, ALERTA, etc.)
+    const handleSort = (key) => {
+        setOrden(prev => ({
+            key,
+            direction: prev.key === key && prev.direction === 'desc' ? 'asc' : 'desc'
+        }));
+    };
+
+    // --- CALCULOS DE CONTADORES (RESTAURADO) ---
+    const counts = useMemo(() => {
+        return {
+            alertas: clientes.filter(c => c.crm_intent === 'OPERATIONAL_ALERT' || c.alerta_cita_desincronizada || c.debe_cotizacion).length,
+            admin: clientes.filter(c => c.crm_intent === 'ADMIN_TASK').length,
+            sinEa: clientes.filter(c => !c.sync_mariadb).length
+        };
+    }, [clientes]);
+
+    // --- LÓGICA DE FILTRADO Y ORDENAMIENTO ---
+    const datosProcesados = useMemo(() => {
+        let data = [...clientes];
+
+        // 1. Filtro por Pestañas
         if (filtro === 'ALERTA') {
-            resultados = resultados.filter(cliente =>
-                cliente.debe_cotizacion ||
-                cliente.alerta_cita_desincronizada ||
-                cliente.crm_intent === 'QUOTE_FOLLOWUP'
-            );
+            data = data.filter(c => c.crm_intent === 'OPERATIONAL_ALERT' || c.alerta_cita_desincronizada || c.debe_cotizacion);
+        } else if (filtro === 'ADMIN') {
+            data = data.filter(c => c.crm_intent === 'ADMIN_TASK');
+        } else if (filtro === 'SIN_EA') {
+            data = data.filter(c => !c.sync_mariadb); // Nueva pestaña solicitada
         } else if (filtro !== 'TODOS') {
-            // Se puede agregar lógica para otros filtros si se definen más pestañas
+            data = data.filter(c => c.prioridad_visual === filtro || c.crm_intent === filtro);
         }
 
+        // 2. Búsqueda
+        if (busqueda) {
+            const lowerTerm = busqueda.toLowerCase();
+            data = data.filter(c =>
+                (c.nombre_completo || '').toLowerCase().includes(lowerTerm) ||
+                (c.telefono || '').includes(lowerTerm) ||
+                (c.email || '').toLowerCase().includes(lowerTerm) ||
+                (c.ai_summary || '').toLowerCase().includes(lowerTerm)
+            );
+        }
 
-        // 3. Aplicar ordenamiento
-        resultados.sort((a, b) => {
-            const aVal = a[orden.key];
-            const bVal = b[orden.key];
+        // 3. Ordenamiento
+        data.sort((a, b) => {
+            let valA = a[orden.key];
+            let valB = b[orden.key];
 
-            // Manejo de valores nulos o indefinidos
-            if (aVal === undefined || aVal === null) return orden.direction === 'asc' ? -1 : 1;
-            if (bVal === undefined || bVal === null) return orden.direction === 'asc' ? 1 : -1;
+            // Manejo de fechas
+            if (['last_interaction', 'next_follow_up_date'].includes(orden.key)) {
+                valA = valA ? new Date(valA).getTime() : 0;
+                valB = valB ? new Date(valB).getTime() : 0;
+            }
+            // Manejo strings nulos
+            else {
+                valA = valA ? String(valA).toLowerCase() : '';
+                valB = valB ? String(valB).toLowerCase() : '';
+            }
 
-            // Comparación de fechas o strings
-            if (aVal < bVal) return orden.direction === 'asc' ? -1 : 1;
-            if (aVal > bVal) return orden.direction === 'asc' ? 1 : -1;
+            if (valA < valB) return orden.direction === 'asc' ? -1 : 1;
+            if (valA > valB) return orden.direction === 'asc' ? 1 : -1;
             return 0;
         });
 
-        return resultados;
-    }, [clientes, busqueda, orden, filtro]);
+        return data;
+    }, [clientes, filtro, busqueda, orden]);
 
-    // --- LÓGICA DE PAGINACIÓN ---
-    const totalPaginas = Math.ceil(clientesFiltrados.length / itemsPorPagina);
-    const clientesPaginados = useMemo(() => {
-        const inicio = (paginaActual - 1) * itemsPorPagina;
-        const fin = inicio + itemsPorPagina;
-        return clientesFiltrados.slice(inicio, fin);
-    }, [clientesFiltrados, paginaActual, itemsPorPagina]);
+    // Paginación
+    const totalPaginas = Math.ceil(datosProcesados.length / itemsPorPagina);
+    const datosPaginados = datosProcesados.slice((paginaActual - 1) * itemsPorPagina, paginaActual * itemsPorPagina);
 
-    useEffect(() => {
-        setPaginaActual(1);
-    }, [filtro, busqueda]);
+    // --- HELPERS VISUALES (RESTAURADOS Y MEJORADOS) ---
 
-
-    // Función de encabezado de tabla para manejar el ordenamiento
-    const handleSort = (key) => {
-        if (orden.key === key) {
-            setOrden(prev => ({
-                key,
-                direction: prev.direction === 'asc' ? 'desc' : 'asc'
-            }));
-        } else {
-            setOrden({ key, direction: 'desc' });
+    // Semáforo de Calificación
+    const getScoreColor = (calif) => {
+        switch (calif) {
+            case 'AMABLE': return 'var(--color-success)';
+            case 'NEUTRO': return 'var(--color-warning)';
+            case 'HOSTIL': return 'var(--color-danger)';
+            case 'SOSPECHOSO': return 'var(--color-danger)';
+            default: return 'var(--color-gray)';
         }
     };
 
-    // Renderiza el ícono de ordenamiento
-    const renderSortIndicator = (key) => {
-        if (orden.key === key) {
-            return orden.direction === 'asc' ? '▲' : '▼';
+    // Texto seguro
+    const safeText = (text, limit = 80) => {
+        if (!text) return '';
+        const str = String(text);
+        return str.length > limit ? str.substring(0, limit) + '...' : str;
+    };
+
+    // Badge Principal (Restaurado getBadgeInfo con lógica nueva)
+    const getBadgeInfo = (cliente) => {
+        // Prioridad 1: Alertas Críticas
+        if (cliente.alerta_cita_desincronizada) return { class: 'badge-alert', label: '⚠️ CITA NO AGENDADA' };
+        if (cliente.debe_cotizacion) return { class: 'badge-alert', label: '💰 COTIZAR' };
+        if (cliente.crm_intent === 'OPERATIONAL_ALERT') return { class: 'badge-alert', label: '🚨 ALERTA' };
+
+        // Prioridad 2: Trámites Admin
+        if (cliente.crm_intent === 'ADMIN_TASK') return { class: 'badge-admin', label: '📄 TRAMITE' };
+
+        // Prioridad 3: Estados Visuales Normales
+        const status = cliente.prioridad_visual || cliente.crm_intent || 'NONE';
+        switch (status) {
+            case 'CITA': return { class: 'badge-cita', label: '📅 CITA' };
+            case 'ATENCION': return { class: 'badge-alert', label: '🔥 ATENCION' };
+            default: return { class: 'badge-normal', label: status };
         }
-        return '';
     };
 
     return (
-        <div className="crm-dashboard">
-            <h2>📊 CRM: Fuente de la Verdad</h2>
-            <p>Datos en tiempo real cruzados entre WhatsApp (Evolution), Supabase y Agenda (MariaDB).</p>
-
-            <div className="controls">
-                {/* PESTAÑAS DE FILTRO */}
-                <div className="filter-tabs">
-                    {['TODOS', 'ALERTA', 'PENDIENTE', 'FOLLOWUP'].map(f => (
-                        <button
-                            key={f}
-                            className={filtro === f ? 'active' : ''}
-                            onClick={() => setFiltro(f)}
-                        >
-                            {f}
-                        </button>
-                    ))}
+        <div className="crm-container">
+            {/* HEADER */}
+            <header className="crm-header">
+                <div>
+                    <h1>🧠 CRM: Fuente de la Verdad</h1>
+                    <div className="crm-stats">
+                        {clientes.length} Clientes Total | {counts.alertas} Alertas | {counts.sinEa} Sin Agenda
+                    </div>
                 </div>
 
-                {/* BUSCADOR */}
-                <input
-                    type="text"
-                    placeholder="Buscar por Nombre, Teléfono o Resumen..."
-                    value={busqueda}
-                    onChange={(e) => setBusqueda(e.target.value)}
-                    className="search-input"
-                />
+                <div className="crm-controls-group">
+                    <div className="search-box">
+                        <input
+                            type="text"
+                            placeholder="🔍 Buscar nombre, tel, notas..."
+                            value={busqueda}
+                            onChange={(e) => setBusqueda(e.target.value)}
+                        />
+                    </div>
+                    <button onClick={cargarDatos} className="refresh-btn" title="Recargar">🔄</button>
+                </div>
+            </header>
+
+            {/* BARRA DE FILTROS */}
+            <div className="crm-tabs">
+                <button onClick={() => setFiltro('ALERTA')} className={`tab-btn alert ${filtro === 'ALERTA' ? 'active' : ''}`}>
+                    🚨 ALERTAS ({counts.alertas})
+                </button>
+                <button onClick={() => setFiltro('SIN_EA')} className={`tab-btn ${filtro === 'SIN_EA' ? 'active' : ''}`}>
+                    📅 Sin Agenda ({counts.sinEa})
+                </button>
+                <button onClick={() => setFiltro('ADMIN')} className={`tab-btn admin ${filtro === 'ADMIN' ? 'active' : ''}`}>
+                    📄 Tramites ({counts.admin})
+                </button>
+                <div style={{ width: '1px', background: '#e2e8f0', margin: '0 5px' }}></div>
+                <button onClick={() => setFiltro('TODOS')} className={`tab-btn ${filtro === 'TODOS' ? 'active' : ''}`}>Todos</button>
+                <button onClick={() => setFiltro('CITA')} className={`tab-btn ${filtro === 'CITA' ? 'active' : ''}`}>Citas</button>
+                <button onClick={() => setFiltro('LEAD')} className={`tab-btn ${filtro === 'LEAD' ? 'active' : ''}`}>Leads</button>
             </div>
 
-            {loading ? (
-                <div className="loading-spinner">Cargando datos...</div>
-            ) : (
-                <div className="table-wrapper">
+            {/* TABLA PRINCIPAL */}
+            {loading ? <div className="loading-state">Analizando ecosistema de datos...</div> : (
+                <div className="crm-table-wrapper">
                     <table className="crm-table">
                         <thead>
                             <tr>
-                                <th onClick={() => handleSort('last_interaction')}>
-                                    Última Interacción {renderSortIndicator('last_interaction')}
-                                </th>
-                                <th>Datos del Cliente</th>
-                                <th>AI Summary (Intent)</th>
-                                <th>Status Operativo</th>
-                                <th onClick={() => handleSort('unread_count')}>
-                                    No Leídos {renderSortIndicator('unread_count')}
-                                </th>
+                                <th onClick={() => handleSort('nombre_completo')}>Cliente ↕</th>
+                                <th>Estado & Sync</th>
+                                <th onClick={() => handleSort('last_interaction')}>Interacción ↕</th>
+                                <th>Análisis IA & Notas</th>
+                                <th onClick={() => handleSort('saldo_pendiente')}>Finanzas & Acción ↕</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {clientesPaginados.length > 0 ? clientesPaginados.map(cliente => (
-                                <tr key={cliente.id}>
-                                    {/* 1. Última Interacción */}
-                                    <td>
-                                        {cliente.last_interaction ? new Date(cliente.last_interaction).toLocaleString('es-MX', {
-                                            day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
-                                        }) : '-'}
-                                        <div style={{ fontSize: '0.8em', color: getStatusColor(cliente.calificacion_semaforo) }}>
-                                            ● {cliente.calificacion_semaforo || 'N/A'}
-                                        </div>
-                                    </td>
+                            {datosPaginados.map(cliente => {
+                                const badge = getBadgeInfo(cliente);
+                                const scoreColor = getScoreColor(cliente.calificacion_semaforo || cliente.calificacion);
 
-                                    {/* 2. Datos del Cliente */}
-                                    <td>
-                                        <strong>{cliente.nombre_completo || 'N/A'}</strong><br />
-                                        <span style={{ color: 'var(--gray-600)' }}>Tel: {cliente.telefono || 'N/A'}</span>
-                                        {cliente.direccion_real && (
-                                            <div style={{ marginTop: '0.25rem' }}>
-                                                {cliente.direccion_real}
-                                                {cliente.mapa_link && (
-                                                    <a href={cliente.mapa_link} target="_blank" rel="noopener noreferrer"
-                                                        title="Ver en Google Maps" style={{ marginLeft: '0.5rem', color: 'var(--blue-500)' }}>
-                                                        (Mapa 🗺️)
-                                                    </a>
+                                return (
+                                    <tr key={cliente.id || cliente.cliente_id} className={badge.class === 'badge-alert' ? 'row-alert' : ''}>
+
+                                        {/* COL 1: CLIENTE (Enriquecido) */}
+                                        <td>
+                                            <div className="client-info">
+                                                <div className="client-name">
+                                                    <span className="score-indicator" style={{ backgroundColor: scoreColor }} title={`Calificación: ${cliente.calificacion_semaforo}`}></span>
+                                                    {cliente.nombre_completo || 'Desconocido'}
+                                                </div>
+                                                <div className="client-meta">
+                                                    <span>📞 {cliente.telefono}</span>
+                                                    {cliente.email && <span className="client-email">✉️ {cliente.email}</span>}
+                                                    {cliente.direccion_principal && (
+                                                        <span className="client-address">
+                                                            📍 {safeText(cliente.direccion_principal, 30)}
+                                                            {cliente.google_maps_link && (
+                                                                <a href={cliente.google_maps_link} target="_blank" rel="noopener noreferrer"> (Mapa)</a>
+                                                            )}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        {/* COL 2: ESTADO & SYNC (Fuente de la Verdad) */}
+                                        <td>
+                                            <span className={`badge ${badge.class}`}>{badge.label}</span>
+
+                                            <div className="sync-status-container">
+                                                <span style={{ color: cliente.sync_mariadb ? 'var(--color-success)' : 'var(--color-danger)' }} title="Base de Datos Agenda (EA)">
+                                                    ● EA
+                                                </span>
+                                                <span style={{ color: cliente.sync_evolution ? 'var(--color-success)' : 'var(--color-gray)' }} title="WhatsApp / Evolution">
+                                                    ● WA
+                                                </span>
+                                                {cliente.cita_realizada && (
+                                                    <span style={{ color: 'var(--color-info)' }} title="Tiene citas pasadas en EA">
+                                                        ● Historic
+                                                    </span>
                                                 )}
                                             </div>
-                                        )}
-                                        {(cliente.saldo_pendiente > 0) && (
-                                            <div style={{ color: 'var(--red-500)', fontWeight: 'bold' }}>
-                                                Saldo Pndte: ${Number(cliente.saldo_pendiente).toFixed(2)}
+                                        </td>
+
+                                        {/* COL 3: INTERACCIÓN (Restaurada) */}
+                                        <td className="msg-cell">
+                                            <div className={`msg-bubble ${cliente.ultimo_mensaje_rol === 'assistant' ? 'assistant' : 'user'}`}>
+                                                {safeText(cliente.ultimo_mensaje_texto || '(Sin mensajes)', 60)}
                                             </div>
-                                        )}
-                                    </td>
+                                            <div className="msg-meta">
+                                                <span>
+                                                    {cliente.last_interaction
+                                                        ? new Date(cliente.last_interaction).toLocaleString('es-MX', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                                                        : '-'}
+                                                </span>
+                                                {cliente.unread_count > 0 && (
+                                                    <span className="unread-badge">{cliente.unread_count} new</span>
+                                                )}
+                                            </div>
+                                        </td>
 
-                                    {/* 3. AI Summary (Intent) - CORREGIDO */}
-                                    <td>
-                                        <div className={`crm-status-badge status-${cliente.crm_status || 'NONE'}`}>
-                                            {cliente.crm_status || 'NONE'}
-                                        </div>
-                                        <div className="ai-summary-text" title={safeText(cliente.ai_summary, 500)}>
-                                            {safeText(cliente.ai_summary)}
-                                        </div>
-                                    </td>
+                                        {/* COL 4: IA & NOTAS (Combinadas) */}
+                                        <td className="ai-cell">
+                                            <div className="ai-summary" title={cliente.ai_summary}>
+                                                {safeText(cliente.ai_summary, 90)}
+                                            </div>
+                                            {cliente.notas_internas && (
+                                                <div className="internal-note" title="Nota Interna">
+                                                    📝 {safeText(cliente.notas_internas, 50)}
+                                                </div>
+                                            )}
+                                        </td>
 
-                                    {/* 4. STATUS OPERATIVO (Nuevo) */}
-                                    <td>
-                                        {renderSyncStatus(cliente)}
-                                    </td>
+                                        {/* COL 5: FINANZAS & ACCIÓN (Restaurada Next Follow Up) */}
+                                        <td className="finance-cell">
+                                            {cliente.saldo_pendiente > 0 ? (
+                                                <div className="debt-text">Debe: ${Number(cliente.saldo_pendiente).toFixed(2)}</div>
+                                            ) : (
+                                                <span style={{ color: 'var(--color-success)', fontSize: '0.8rem' }}>Al corriente</span>
+                                            )}
 
-                                    {/* 5. No Leídos */}
-                                    <td style={{ textAlign: 'center' }}>
-                                        {cliente.unread_count > 0 ? (
-                                            <span className="unread-count-badge">{cliente.unread_count}</span>
-                                        ) : ('0')}
-                                    </td>
+                                            {cliente.next_follow_up_date && (
+                                                <div className="next-action">
+                                                    ⏰ {new Date(cliente.next_follow_up_date).toLocaleDateString()}
+                                                </div>
+                                            )}
+                                        </td>
 
-                                    {/* 6. Acciones */}
-                                    <td>
-                                        <button
-                                            className="action-button chat-button"
-                                            onClick={() => setSelectedClientForChat(cliente)}
-                                        >
-                                            Chat 💬
-                                        </button>
-                                        <button
-                                            className="action-button analyze-button"
-                                            onClick={() => forceAnalyze(cliente.id).then(cargarDatos)}
-                                        >
-                                            Force AI 🤖
-                                        </button>
-                                    </td>
-                                </tr>
-                            )) : (
+                                        {/* COL 6: BOTONES ACCIÓN */}
+                                        <td>
+                                            <div className="action-buttons">
+                                                <button
+                                                    className="btn-icon btn-chat"
+                                                    onClick={() => setSelectedClientForChat(cliente)}
+                                                    title="Abrir Chat"
+                                                >
+                                                    💬
+                                                </button>
+                                                <button
+                                                    className="btn-icon btn-ai"
+                                                    onClick={() => handleAnalizar(cliente.id || cliente.cliente_id)}
+                                                    title="Forzar Análisis IA"
+                                                >
+                                                    ⚡
+                                                </button>
+                                                {!cliente.sync_mariadb && (
+                                                    <button
+                                                        className="btn-icon btn-ea"
+                                                        onClick={() => alert("Próximamente: Crear en Easy!Appointments")}
+                                                        title="Crear Cliente en Agenda (Faltante)"
+                                                    >
+                                                        👤
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </td>
+
+                                    </tr>
+                                );
+                            })}
+                            {datosPaginados.length === 0 && (
                                 <tr>
-                                    <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
-                                        No se encontraron resultados para "{busqueda}"
+                                    <td colSpan="6" style={{ textAlign: 'center', padding: '30px', color: '#64748b' }}>
+                                        No se encontraron resultados para los filtros actuales.
                                     </td>
                                 </tr>
                             )}
@@ -320,19 +354,9 @@ const CrmDashboard = () => {
             {/* PAGINACIÓN */}
             {!loading && (
                 <div className="pagination">
-                    <button
-                        disabled={paginaActual === 1}
-                        onClick={() => setPaginaActual(p => p - 1)}
-                    >
-                        ◀ Anterior
-                    </button>
-                    <span>Página {paginaActual} de {totalPaginas || 1}</span>
-                    <button
-                        disabled={paginaActual === totalPaginas || totalPaginas === 0}
-                        onClick={() => setPaginaActual(p => p + 1)}
-                    >
-                        Siguiente ▶
-                    </button>
+                    <button disabled={paginaActual === 1} onClick={() => setPaginaActual(p => p - 1)} className="tab-btn">◀ Anterior</button>
+                    <span style={{ margin: '0 10px', color: 'var(--text-secondary)' }}>Página {paginaActual} de {totalPaginas || 1}</span>
+                    <button disabled={paginaActual === totalPaginas || totalPaginas === 0} onClick={() => setPaginaActual(p => p + 1)} className="tab-btn">Siguiente ▶</button>
                 </div>
             )}
 
