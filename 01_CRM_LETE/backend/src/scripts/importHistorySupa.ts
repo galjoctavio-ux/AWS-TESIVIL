@@ -145,7 +145,7 @@ const importHistoryViaApi = async () => {
                 }
 
             } catch (err) {
-                console.error(`   ❌ Error obteniendo mensajes de ${remoteJid}:`, err.message);
+                console.error(`   ❌ Error obteniendo mensajes de ${remoteJid}:`, (err as any).message);
             }
 
             // Pequeña pausa para no saturar la API
