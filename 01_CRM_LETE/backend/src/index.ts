@@ -33,7 +33,7 @@ app.use('/conversations', requireAuth, conversationRoutes); // Alias
 app.get('/health', async (req, res) => {
   try {
     // Consultamos la hora de la BD para asegurar que la conexión está viva
-    const result = await pool.query("SELECT NOW()::timestamp AT TIME ZONE 'UTC' AT TIME ZONE 'America/Mexico_City' as mx_time");
+    const result = await pool.query("SELECT NOW() as mx_time");
     res.json({
       status: 'OK',
       server_uptime: process.uptime(),
