@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import api from '../apiService';
+// import api from '../apiService'; // Ya no se usa directamente aquí
+
+// --- NUEVOS IMPORTS PARA OFFLINE FIRST ---
+import { guardarBorrador, obtenerBorrador, encolarParaEnvio } from '../db';
+import { syncManager } from '../services/SyncManager';
+// ------------------------------------------
 
 // Importar los pasos reales
 import Step1_Generales from '../components/wizard/steps/Step1_Generales';
@@ -35,19 +40,21 @@ const ProgressBar = ({ current, total }) => {
 
 const RevisionWizard = () => {
   const navigate = useNavigate();
-  const { casoId } = useParams(); // Capturamos el ID de la URL
+  const { casoId } = useParams();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Nuevo estado para indicar si la data ya cargó desde IndexedDB
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   const [formData, setFormData] = useState({
     caso_id: casoId || null,
 
-    // --- NUEVOS CAMPOS V2.0 (INICIO) ---
-    tarifa_cfe: '01',                 // Por defecto Tarifa doméstica básica
-    condicion_infraestructura: 'Regular', // Por defecto Regular
-    kwh_recibo_cfe: 0,                // Consumo del recibo
-    se_midieron_cargas_menores: false, // Para el cálculo de holgura
-    // --- NUEVOS CAMPOS V2.0 (FIN) ---
+    // --- CAMPOS INICIALES (TU ESTRUCTURA ORIGINAL) ---
+    tarifa_cfe: '01',
+    condicion_infraestructura: 'Regular',
+    kwh_recibo_cfe: 0,
+    se_midieron_cargas_menores: false,
 
     // Step 1: Generales
     cliente_email: '',
@@ -88,7 +95,50 @@ const RevisionWizard = () => {
     firmaBase64: null,
   });
 
-  // Efecto de seguridad: si el casoId cambia o tarda en llegar, actualizamos el estado
+  // --- NUEVA LÓGICA DE PERSISTENCIA ---
+
+  // 1. Efecto de Carga Inicial (IndexedDB)
+  useEffect(() => {
+    const loadDraft = async () => {
+      if (!casoId) {
+        setIsDataLoaded(true); // Permitir que la UI inicie si no hay casoId
+        return;
+      }
+
+      try {
+        const borrador = await obtenerBorrador(casoId);
+        if (borrador && borrador.data) {
+          // Restauramos los datos del borrador guardado localmente
+          setFormData(prev => ({ ...prev, ...borrador.data }));
+          console.log(`✅ Borrador para Caso ${casoId} recuperado de IndexedDB.`);
+        }
+      } catch (e) {
+        console.error("Error leyendo borrador local", e);
+        // Podríamos alertar si hay un error grave de IDB
+      } finally {
+        setIsDataLoaded(true);
+      }
+    };
+    loadDraft();
+  }, [casoId]);
+
+  // 2. Efecto de Autoguardado (Debounced Save)
+  useEffect(() => {
+    // Solo guardar si los datos ya cargaron inicialmente y tenemos un casoId
+    if (!isDataLoaded || !formData.caso_id) return;
+
+    // Usamos un debounce (retardo) para evitar escribir en disco local a cada tecla
+    const timer = setTimeout(() => {
+      guardarBorrador(formData.caso_id, formData);
+      console.log(`Borrador Caso ${formData.caso_id} autoguardado.`);
+    }, 1000); // 1 segundo de espera
+
+    return () => clearTimeout(timer); // Limpieza del timer
+  }, [formData, isDataLoaded]);
+
+  // ------------------------------------------
+
+  // Efecto de seguridad original (mantenido)
   useEffect(() => {
     if (casoId) {
       setFormData(prev => ({ ...prev, caso_id: casoId }));
@@ -108,11 +158,13 @@ const RevisionWizard = () => {
   };
 
   const updateFormData = (newData) => {
+    // Se combina el nuevo dato con el estado actual, lo que disparará el Autoguardado
     setFormData(prev => ({ ...prev, ...newData }));
   };
 
+  // --- NUEVA LÓGICA DE SUBMIT (Offline Queue) ---
   const handleSubmit = async () => {
-    // 1. Validaciones de seguridad (Igual que antes)
+    // 1. Validaciones de seguridad
     if (!formData.caso_id) {
       alert("Error: No se ha detectado el ID del caso. Vuelva a la agenda e intente de nuevo.");
       return;
@@ -120,44 +172,45 @@ const RevisionWizard = () => {
 
     if (!formData.cliente_email) {
       alert("El correo del cliente es obligatorio para enviar el reporte.");
-      setCurrentStepIndex(0); // Regresamos al paso 1 si falta el correo
+      setCurrentStepIndex(0);
       return;
     }
 
     setIsSubmitting(true);
 
-    // 2. Preparar el Payload (Igual que antes)
-    const { equiposData, firmaBase64, ...revisionData } = formData;
-    const payload = {
-      revisionData,
-      equiposData: equiposData || [],
-      firmaBase64,
-    };
-
     try {
-      // 3. Petición al Backend
-      // Ahora esta línea tardará menos de 1 segundo en responder
-      await api.post('/revisiones', payload);
+      // 2. ENCOLAR: En lugar de enviar a la API, lo guardamos en la cola local
+      await encolarParaEnvio(formData.caso_id, formData);
+
+      // 3. DISPARAR SINCRONIZACIÓN: Intentamos subirlo inmediatamente, pero no esperamos
+      // La respuesta del servidor la manejará el SyncManager en segundo plano
+      syncManager.procesarCola();
 
       // 4. Feedback Inmediato al Técnico
-      // Le explicamos que ya puede irse, el servidor seguirá trabajando.
-      alert('✅ Revisión guardada correctamente.\n\nEl sistema generará el PDF y lo enviará al cliente en unos momentos.\n\nRecibirás una notificación en tu celular cuando el proceso termine.');
+      // Ahora la respuesta es casi instantánea, eliminando la excusa de "está cargando"
+      alert('✅ Reporte Finalizado y GUARDADO LOCALMENTE.\n\nSe subirá automáticamente al servidor cuando detectemos una conexión estable.\n\nPuedes cerrar la aplicación.');
 
       // 5. Salir a la Agenda
       navigate('/');
 
     } catch (error) {
-      console.error('Error al enviar la revisión:', error);
-      // Mensaje de error más claro
-      alert('Hubo un error al guardar los datos de la revisión. Por favor, verifica tu conexión e inténtalo de nuevo.');
+      console.error('Error al guardar en la cola local (IndexedDB):', error);
+      // Este es un error MUY raro, pero es la última línea de defensa.
+      alert('⚠️ Error crítico. No se pudo guardar la revisión ni siquiera localmente. Contacta a soporte.');
     } finally {
       setIsSubmitting(false);
     }
   };
+  // ------------------------------------------
 
   const CurrentStepComponent = steps[currentStepIndex].component;
   const currentStepTitle = steps[currentStepIndex].title;
   const isLastStep = currentStepIndex === steps.length - 1;
+
+  // Si los datos aún no cargan de IndexedDB, mostramos un loading para evitar parpadeos
+  if (!isDataLoaded) {
+    return <div className="text-center p-8">Cargando datos locales...</div>;
+  }
 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
@@ -205,7 +258,7 @@ const RevisionWizard = () => {
             disabled={isSubmitting}
             className="w-full bg-blue-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transform transition-transform duration-200 active:scale-95 disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? 'Enviando...' : (isLastStep ? 'Finalizar Revisión' : 'Siguiente')}
+            {isSubmitting ? 'Guardando en local...' : (isLastStep ? 'Finalizar Revisión' : 'Siguiente')}
           </button>
         </div>
       </footer>
