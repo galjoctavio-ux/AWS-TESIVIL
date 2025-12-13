@@ -12,7 +12,7 @@ const runManualAnalysis = async () => {
 
     // Calculamos la fecha límite (Hace 7 días exactos)
     const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 14);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 60);
     console.log(`📅 Ignorando mensajes anteriores al: ${sevenDaysAgo.toLocaleString('es-MX')}`);
 
     try {
