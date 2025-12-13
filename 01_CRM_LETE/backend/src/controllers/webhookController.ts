@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { pool } from '../config/db';
-import { analyzeIntent, geminiModel } from '../services/aiService'; // ⚠️ ASEGÚRATE DE EXPORTAR geminiModel en aiService
+//import { pool } from '../config/db';
+import { supabaseAdmin } from '../services/supabaseClient'; // 👈 NUEVO
+import { geminiModel } from '../services/aiService'; // ⚠️ ASEGÚRATE DE EXPORTAR geminiModel en aiService
 import { sendText } from '../services/whatsappService';
 import axios from 'axios';
 import {
@@ -100,8 +101,6 @@ const ejecutarAgendamiento = async (remoteJid: string, draft: any) => {
 export const receiveWebhook = async (req: Request, res: Response) => {
     try {
         const body = req.body;
-
-        // --- 1. EXTRACCIÓN Y LIMPIEZA DE DATOS ---
         let event = '';
         let messageData: any = null;
 
@@ -114,31 +113,38 @@ export const receiveWebhook = async (req: Request, res: Response) => {
         }
         event = event ? event.toUpperCase().replace('.', '_') : '';
 
-        // Validar que sea mensaje nuevo y tenga datos
+        // 1. FILTROS BÁSICOS
         if (event !== 'MESSAGES_UPSERT' || !messageData || !messageData.key) {
             res.status(200).json({ status: 'ignored' });
             return;
         }
 
-        // --- 2. DEDUPLICACIÓN ---
-        const messageId = messageData.key.id;
-        const existingCheck = await pool.query('SELECT id FROM messages WHERE whatsapp_message_id = $1', [messageId]);
+        const remoteJid = messageData.key.remoteJid;
 
-        if (existingCheck.rows.length > 0) {
+        // 🚨 Filtro Anti-Grupos y Status
+        if (remoteJid.includes('@g.us') || remoteJid === 'status@broadcast') {
+            res.status(200).json({ status: 'ignored_group_or_status' });
+            return;
+        }
+
+        const messageId = messageData.key.id;
+
+        // 2. DEDUPLICACIÓN CON SUPABASE
+        const { data: existingMsg } = await supabaseAdmin
+            .from('mensajes_whatsapp')
+            .select('id')
+            .eq('whatsapp_message_id', messageId)
+            .maybeSingle();
+
+        if (existingMsg) {
             res.status(200).json({ status: 'duplicate_ignored' });
             return;
         }
 
-        // Datos del remitente
         const isFromMe = messageData.key.fromMe;
-        let remoteJid = messageData.key.remoteJid;
-        if (remoteJid.includes('@lid') && messageData.key.remoteJidAlt) {
-            remoteJid = messageData.key.remoteJidAlt;
-        }
-
         const pushName = isFromMe ? 'Agente' : (messageData.pushName || 'Cliente');
+        const whatsappId = remoteJid.replace('@s.whatsapp.net', '');
 
-        // Extraer contenido de texto
         let content = '';
         if (messageData.messageType === 'conversation') {
             content = messageData.message.conversation;
@@ -150,53 +156,58 @@ export const receiveWebhook = async (req: Request, res: Response) => {
 
         console.log(`📨 ${isFromMe ? 'YO' : 'CLIENTE'}: ${content}`);
 
-        // --- 3. GESTIÓN DE CONVERSACIÓN (UPSERT) ---
-        let userQuery = '';
-        let params: any[] = [];
+        // 3. UPSERT CLIENTE EN SUPABASE
+        let { data: cliente } = await supabaseAdmin
+            .from('clientes')
+            .select('*')
+            .eq('whatsapp_id', whatsappId)
+            .maybeSingle();
 
-        if (isFromMe) {
-            // Si escribo yo, asumo que atiendo el caso (OPEN/ADMIN)
-            userQuery = `
-          INSERT INTO conversations (whatsapp_id, client_name, last_interaction, status, assigned_to_role)
-          VALUES ($1, $2, NOW(), 'OPEN', 'ADMIN')
-          ON CONFLICT (whatsapp_id) DO UPDATE SET last_interaction = NOW()
-          RETURNING id, status, assigned_to_role;
-        `;
-            params = [remoteJid, 'Cliente Nuevo'];
+        if (cliente) {
+            await supabaseAdmin
+                .from('clientes')
+                .update({
+                    last_interaction: new Date(),
+                    nombre_completo: (cliente.nombre_completo === 'Cliente Nuevo' && pushName) ? pushName : cliente.nombre_completo,
+                    unread_count: isFromMe ? 0 : (cliente.unread_count || 0) + 1
+                })
+                .eq('id', cliente.id);
         } else {
-            // Si escribe cliente
-            userQuery = `
-          INSERT INTO conversations (whatsapp_id, client_name, last_interaction, status, assigned_to_role)
-          VALUES ($1, $2, NOW(), 'NEW', 'BOT')
-          ON CONFLICT (whatsapp_id) DO UPDATE SET 
-            last_interaction = NOW(), 
-            client_name = EXCLUDED.client_name,
-            unread_count = conversations.unread_count + 1
-          RETURNING id, status, assigned_to_role;
-        `;
-            params = [remoteJid, pushName];
+            const { data: newClient, error: createError } = await supabaseAdmin
+                .from('clientes')
+                .insert({
+                    whatsapp_id: whatsappId,
+                    telefono: whatsappId,
+                    nombre_completo: pushName || 'Cliente Nuevo',
+                    crm_status: isFromMe ? 'CONTACTED' : 'LEAD',
+                    crm_intent: 'NONE',
+                    unread_count: isFromMe ? 0 : 1
+                })
+                .select()
+                .single();
+
+            if (createError) {
+                console.error("Error creando cliente Supabase:", createError);
+                throw createError;
+            }
+            cliente = newClient;
         }
 
-        const userResult = await pool.query(userQuery, params);
-        const conversation = userResult.rows[0];
-
-        // Guardar el mensaje entrante en BD
-        await pool.query(
-            `INSERT INTO messages (conversation_id, sender_type, message_type, content, whatsapp_message_id) 
-       VALUES ($1, $2, 'TEXT', $3, $4)`,
-            [conversation.id, isFromMe ? 'AGENT' : 'CLIENT', content, messageId]
-        );
+        // 4. GUARDAR MENSAJE EN SUPABASE
+        await supabaseAdmin.from('mensajes_whatsapp').insert({
+            cliente_id: cliente.id,
+            whatsapp_message_id: messageId,
+            role: isFromMe ? 'assistant' : 'user',
+            content: content,
+            status: 'delivered'
+        });
 
         // =========================================================================
         // 🚧 ZONA DE INTERCEPCIÓN: AGENDA INTELIGENTE (SOLO ADMIN)
         // =========================================================================
-
-        // Identificar si eres TÚ (mensaje enviado desde el cel de la empresa o tu número personal)
         const isAdmin = isFromMe || remoteJid.includes('+523326395038');
 
         if (isAdmin) {
-
-            // A. FLUJO DE CONFIRMACIÓN (Responder SI, Mandar Ubicación, o Corregir)
             const respuestaConfirmacion = await manejarConfirmacionAgenda(
                 content,
                 messageData.messageType,
@@ -204,42 +215,26 @@ export const receiveWebhook = async (req: Request, res: Response) => {
                 remoteJid
             );
 
-            // Verificamos si hubo interacción de confirmación
             if (respuestaConfirmacion) {
                 const draft = agendaDrafts.get(remoteJid);
-
-                // 🛑 PUNTO 5: ELIMINAR PASO REDUNDANTE
-                // Si la respuesta fue un "SI" y el smartAgendaService lo marcó como listo para agendar
                 if (draft && draft.step === 'AGENDAR_AHORA') {
-                    // Si ya está listo, ¡lo agendamos automáticamente!
                     await ejecutarAgendamiento(remoteJid, draft);
                     return res.status(200).send('OK_AGENDA_AUTOMATICA');
                 }
-
-                // Si no es el paso final, enviamos la respuesta de interacción normal
                 await sendText(remoteJid, respuestaConfirmacion, 0);
                 return res.status(200).send('OK_AGENDA_CONFIRMACION');
             }
 
-            // B. COMANDO FINAL: "AGENDAR" (Como fallback manual)
-            // Se mantiene el comando 'AGENDAR' por si acaso, usando la nueva función helper.
             if (content.trim().toUpperCase() === 'AGENDAR' && agendaDrafts.has(remoteJid)) {
                 const draft = agendaDrafts.get(remoteJid);
-
-                // El nuevo estado de éxito es AGENDAR_AHORA, el viejo era LISTO_PARA_ENVIAR
                 if (draft.step === 'LISTO_PARA_ENVIAR' || draft.step === 'AGENDAR_AHORA') {
                     await ejecutarAgendamiento(remoteJid, draft);
                     return res.status(200).send('OK_AGENDA_MANUAL');
                 }
             }
 
-            // C. DETECTAR INTENCIÓN DE INICIO
             const regexFechaChat = /\[\d{1,2}\/\d{1,2}/;
-            const esReenvio =
-                content.includes('YO:') ||
-                content.includes('Date:') ||
-                regexFechaChat.test(content) ||
-                content.startsWith('/agendar');
+            const esReenvio = content.includes('YO:') || content.includes('Date:') || regexFechaChat.test(content) || content.startsWith('/agendar');
             const esComando = content.toLowerCase().startsWith('/agendar');
 
             if (esReenvio || esComando) {
@@ -252,7 +247,7 @@ export const receiveWebhook = async (req: Request, res: Response) => {
         // =========================================================
         // 🛑 MODO DEBUG ACTIVADO: DETENER AQUÍ (PRESERVADO)
         // =========================================================
-        console.log('🛑 DEBUG: Mensaje guardado. Respuesta automática bloqueada.');
+        console.log('🛑 DEBUG: Mensaje guardado en Supabase.');
         res.status(200).json({ status: 'saved_debug_mode' });
         return;
         // =========================================================
