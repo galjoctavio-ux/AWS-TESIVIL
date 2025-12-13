@@ -147,3 +147,55 @@
 .action-btn:hover {
     background: #5a32a3;
 }
+
+/* Botón de Alerta (Parpadeante o Rojo Fuerte) */
+.btn-alert {
+    background-color: #ffebee;
+    color: #d32f2f;
+    border: 1px solid #d32f2f;
+    font-weight: bold;
+}
+
+.btn-alert.active {
+    background-color: #d32f2f !important;
+    color: white !important;
+}
+
+/* Divisor en el header */
+.divider-vertical {
+    width: 1px;
+    height: 24px;
+    background-color: #ddd;
+    margin: 0 10px;
+}
+
+/* Badges Nuevos */
+.badge-alert {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+.badge-admin {
+    background-color: #fff8e1;
+    color: #f57f17;
+    border: 1px solid #ffecb3;
+}
+
+/* Resaltar toda la fila si es alerta operativa */
+.row-alert {
+    background-color: #fff5f5;
+    /* Fondo rojo muy suave */
+    border-left: 4px solid #c62828;
+}
+
+/* Ajustes generales */
+.chat-btn {
+    background-color: #25D366;
+    color: white;
+    border: none;
+}
+
+.chat-btn:hover {
+    background-color: #128C7E;
+}
