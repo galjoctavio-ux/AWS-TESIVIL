@@ -65,7 +65,7 @@ export const getAdminDashboard = async (req, res) => {
 
 // PATCH /api/clientes/:id/force-analyze
 // Para el botón "Analizar Ahora" que pondremos en el frontend
-import { runNightlyAnalysis } from '../services/cronAnalysis.js'; // Asegúrate de importar esto
+//import { runNightlyAnalysis } from '../services/cronAnalysis.js'; // Asegúrate de importar esto
 
 export const forceAnalyzeClient = async (req, res) => {
     const { id } = req.params;
