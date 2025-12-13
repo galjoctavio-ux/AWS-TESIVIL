@@ -5,27 +5,27 @@ import path from 'path';
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-// CREDENCIALES
+// --- CREDENCIALES DB EVOLUTION (Las que funcionaron) ---
 const pool = new Pool({
     user: 'evolution',
-    host: '172.19.0.2',
+    host: '172.19.0.2', // IP interna de Docker que descubrimos
     database: 'evolution',
     password: 'evolution',
     port: 5432,
 });
 
-// ¡EL ID REAL QUE ENCONTRAMOS!
+// TU INSTANCE UUID (El que descubrimos en el script "chismoso")
 const INSTANCE_UUID = '952f8c1c-99c9-46d3-982b-d6704972b01d';
 
 const importDirectDb = async () => {
-    console.log("🐘 INICIANDO IMPORTACIÓN FINAL...");
+    console.log("🐘 INICIANDO IMPORTACIÓN MASIVA (CREANDO FALTANTES)...");
 
     try {
-        // 1. OBTENER CONTACTOS DESDE LA TABLA 'Chat'
-        console.log("📋 Leyendo tabla 'Chat'...");
+        // 1. LEER CHATS DESDE POSTGRES
+        console.log("📋 Leyendo tabla 'Chat' de Evolution...");
 
         const queryChats = `
-            SELECT "remoteJid", "name"
+            SELECT "remoteJid", "name", "pushName"
             FROM "Chat"
             WHERE "instanceId" = $1
             AND "remoteJid" NOT LIKE '%@g.us' 
@@ -36,22 +36,30 @@ const importDirectDb = async () => {
         const resChats = await pool.query(queryChats, [INSTANCE_UUID]);
         const chats = resChats.rows;
 
-        console.log(`📥 Se encontraron ${chats.length} conversaciones.`);
+        console.log(`📥 Se encontraron ${chats.length} conversaciones en total.`);
+
+        let creados = 0;
+        let actualizados = 0;
 
         for (const c of chats) {
             const rawId = c.remoteJid;
             if (!rawId) continue;
 
-            // Normalización
+            // Limpieza del número
             let whatsappId = rawId.split('@')[0];
             if (whatsappId.startsWith('521') && whatsappId.length === 13) whatsappId = whatsappId.substring(3);
 
-            const nombre = c.name || whatsappId;
+            // Intentamos conseguir un nombre, si no, usamos el número
+            const nombre = c.name || c.pushName || `Cliente ${whatsappId}`;
 
             process.stdout.write(`🔹 ${whatsappId}... `);
 
-            // A. UPSERT CLIENTE EN SUPABASE
+            // ============================================================
+            // A. GESTIÓN DEL CLIENTE (CREAR SI NO EXISTE)
+            // ============================================================
             let clienteId = null;
+
+            // 1. Buscar si ya existe
             const { data: clientData } = await supabaseAdmin
                 .from('clientes')
                 .select('id')
@@ -61,27 +69,38 @@ const importDirectDb = async () => {
             if (clientData) {
                 clienteId = clientData.id;
             } else {
-                const { data: newClient } = await supabaseAdmin
+                // 2. NO EXISTE -> ¡LO CREAMOS! (Aquí estaba el cambio clave)
+                const { data: newClient, error: insertError } = await supabaseAdmin
                     .from('clientes')
                     .insert({
                         whatsapp_id: whatsappId,
                         telefono: whatsappId,
                         nombre_completo: nombre,
-                        crm_status: 'IMPORTED_DB',
+                        crm_status: 'IMPORTED_HISTORY', // Estado especial para identificarlos
                         crm_intent: 'NONE'
+                        // Los demás campos se llenan solos con NULL o defaults
                     })
                     .select('id')
                     .single();
-                if (newClient) clienteId = newClient.id;
+
+                if (insertError) {
+                    console.log(`❌ Error creando: ${insertError.message}`);
+                    continue;
+                }
+
+                if (newClient) {
+                    clienteId = newClient.id;
+                    process.stdout.write(" ✨ CREADO ");
+                    creados++;
+                }
             }
 
-            if (!clienteId) {
-                console.log("❌ (Skip Cliente)");
-                continue;
-            }
+            if (!clienteId) continue;
 
-            // B. OBTENER MENSAJES
-            // Buscamos dentro del JSON 'key' donde remoteJid coincida
+            // ============================================================
+            // B. IMPORTAR MENSAJES (POSTGRES -> SUPABASE)
+            // ============================================================
+            // Buscamos mensajes asociados a este JID en el JSON 'key'
             const queryMsgs = `
                 SELECT "key", "message", "messageType", "messageTimestamp"
                 FROM "Message"
@@ -103,7 +122,7 @@ const importDirectDb = async () => {
 
                     if (!msgContent) continue;
 
-                    // Extracción de contenido
+                    // Extracción de contenido según el tipo
                     if (msg.messageType === 'conversation') {
                         contentText = msgContent.conversation;
                     } else if (msg.messageType === 'extendedTextMessage') {
@@ -114,27 +133,25 @@ const importDirectDb = async () => {
                         contentText = '🎤 [Audio]';
                     } else if (msgContent.videoMessage) {
                         contentText = '🎥 [Video]';
+                    } else if (msgContent.documentMessage) {
+                        contentText = `📄 [Archivo]: ${msgContent.documentMessage.fileName || 'Doc'}`;
                     } else {
-                        // Intento seguro de stringify para otros tipos
+                        // Fallback seguro
                         try {
-                            contentText = JSON.stringify(msgContent).substring(0, 50);
+                            const jsonStr = JSON.stringify(msgContent);
+                            if (jsonStr.length > 5) contentText = jsonStr.substring(0, 100);
                         } catch { contentText = '[Media/Otro]'; }
                     }
 
                     if (!contentText) continue;
 
                     // Rol
-                    let isFromMe = false;
-                    if (msg.key && typeof msg.key === 'object') {
-                        isFromMe = msg.key.fromMe === true;
-                    }
+                    const isFromMe = msg.key?.fromMe === true;
 
-                    // Fecha (Manejo de segundos vs ms)
+                    // Fecha (Manejo de timestamps en segundos vs ms)
                     let ts = parseInt(msg.messageTimestamp);
                     if (ts < 10000000000) ts *= 1000;
-                    const createdAt = new Date(ts);
 
-                    // ID
                     const msgId = msg.key?.id || `db_${Date.now()}_${Math.random()}`;
 
                     msjsParaGuardar.push({
@@ -142,7 +159,7 @@ const importDirectDb = async () => {
                         whatsapp_message_id: msgId,
                         role: isFromMe ? 'assistant' : 'user',
                         content: contentText,
-                        created_at: createdAt.toISOString(),
+                        created_at: new Date(ts).toISOString(),
                         status: 'read'
                     });
                 }
@@ -152,18 +169,22 @@ const importDirectDb = async () => {
                         .from('mensajes_whatsapp')
                         .upsert(msjsParaGuardar, { onConflict: 'whatsapp_message_id', ignoreDuplicates: true });
 
-                    if (error) console.log(`⚠️ ${error.message}`);
-                    else console.log(`✅ ${msjsParaGuardar.length} msjs`);
+                    if (!error) {
+                        console.log(`✅ ${msjsParaGuardar.length} msjs`);
+                        actualizados++;
+                    }
                 }
             } else {
-                console.log("💤 (Sin mensajes)");
+                console.log("💤 (Vacío)");
             }
         }
 
-        console.log("\n🎉 IMPORTACIÓN DIRECTA FINALIZADA.");
+        console.log("\n🎉 IMPORTACIÓN FINALIZADA.");
+        console.log(`🆕 Clientes Nuevos: ${creados}`);
+        console.log(`💬 Chats Procesados: ${actualizados}`);
 
     } catch (error) {
-        console.error("\n❌ ERROR:", error);
+        console.error("\n❌ ERROR CRÍTICO:", error);
     } finally {
         await pool.end();
     }
