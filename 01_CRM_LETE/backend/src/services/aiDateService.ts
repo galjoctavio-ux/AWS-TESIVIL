@@ -25,48 +25,54 @@ export const analyzeChatForAppointment = async (conversationId: string, historyT
    const today = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City', dateStyle: 'full', timeStyle: 'short' });
 
    const prompt = `
-    Eres el Auditor de Calidad y Asistente IA de "Luz en tu Espacio". Hoy es: ${today}.
-    Analiza el historial y clasifica el estado actual del cliente.
-
-    --- 🚨 CATEGORÍA 1: ALERTAS INTERNAS (PRIORIDAD MÁXIMA) 🚨 ---
-    Usa estas categorías si detectas que NOSOTROS tenemos una tarea pendiente o fallamos.
+    Eres el Auditor de Calidad y Asistente IA de "Luz en tu Espacio". 
+    Hoy es: ${today}.
     
-    1. [OPERATIONAL_ALERT] (Fallo Operativo / Queja)
-       - Detectas que el equipo de Soporte prometió una visita o llamada y NO hay evidencia posterior de que ocurrió.
-       - Ejemplo: Soporte dice "El técnico va en camino", "Te aviso en 1 hora", "Pasamos el lunes"... y luego SILENCIO total.
-       - Ejemplo: Cliente reclama: "¿Van a venir?", "Sigo esperando", "No quedó bien".
+    Tu objetivo es filtrar qué chats requieren atención INMEDIATA y cuáles ya caducaron.
     
-    2. [ADMIN_TASK] (Temas Administrativos)
-       - El cliente está pidiendo explícitamente: Factura, Datos Bancarios, Recibo de pago, Dudas sobre el contrato.
-       - Y NO se le ha dado respuesta final a eso.
-       - (Aquí NO se debe enviar mensaje automático de venta, requiere humano).
-
-    --- 🤖 CATEGORÍA 2: AUTOMATIZACIÓN DE VENTAS ---
-    Usa esto solo si NO hay alertas internas pendientes.
-
-    3. [APPOINTMENT]
-       - El cliente confirmó fecha y hora explícitamente para una visita FUTURA.
-       - Devuelve fecha ISO correcta.
-
-    4. [QUOTE_FOLLOWUP]
-       - Se envió cotización/precio hace menos de 10 días.
-       - Cliente dijo "lo reviso" o no contestó.
-       - NO usar si el cliente ya rechazó o si pasaron >15 días.
-
-    5. [NO_REPLY] (Ghosting reciente)
-       - Cliente pidió info, se la dimos, y se calló (hace 1-7 días).
-       - NO usar si el último mensaje ya es nuestro seguimiento ("¿Sigues ahí?").
-
-    6. [FUTURE_CONTACT]
-       - Cliente pide que lo busquen en fecha específica o "la próxima semana".
-
-    --- 🗑️ CATEGORÍA 3: DESCARTAR ---
+    --- 🛑 REGLAS DE ORO: CUÁNDO RESPONDER "NONE" 🛑 ---
+    Si se cumple CUALQUIERA de estas condiciones, tu respuesta debe ser "NONE".
     
-    7. [NONE]
-       - Citas que YA ocurrieron en el pasado (sin quejas posteriores).
-       - Conversaciones cerradas exitosamente ("Gracias, quedó bien").
-       - Conversaciones muy antiguas (>20 días sin actividad).
-       - Cliente dice "No me interesa", "Ya contraté a otro".
+    1. LEY DEL SILENCIO POSITIVO (Post-Cita):
+       - Si el último mensaje es sobre una cita/visita que YA PASÓ (según la fecha y hora).
+       - Ejemplos: "Ahí nos vemos", "Estoy esperando", "Técnico en camino", "Ubicación enviada".
+       - Y NO hay mensajes posteriores de reclamo ("Oye no llegaron").
+       - ENTONCES: Asume que el servicio se realizó con éxito. El silencio es éxito. -> NONE.
+
+    2. LEY DEL CONFLICTO ENFRIADO (Quejas Viejas):
+       - Si hubo una discusión, queja, "mal servicio", o problema técnico.
+       - PERO la última interacción tiene MÁS DE 24 HORAS de antigüedad.
+       - ENTONCES: El conflicto ya se cerró operativa o administrativamente. No reabrir heridas. -> NONE.
+       
+    3. LEY DE LA DUDA RESUELTA:
+       - Si hubo confusión interna ("no aparece en calendario", "ubicación mal").
+       - Y han pasado más de 24 horas sin nuevos mensajes.
+       - ENTONCES: Se resolvió por otro medio. -> NONE.
+
+    4. CADUCIDAD GENERAL:
+       - Si el último mensaje del cliente tiene más de 15 DÍAS y no dejó una fecha futura explícita. -> NONE.
+
+    --- 🚨 SOLO SI NO APLICA LO ANTERIOR: CLASIFICACIÓN ---
+
+    [OPERATIONAL_ALERT] (Fuego Activo 🔥)
+    - Úsalo SOLO si el problema es RECIENTE (Menos de 24 horas) y SIN RESOLVER.
+    - El cliente está preguntando AHORA MISMO: "¿Van a venir?", "Sigo esperando", "No ha llegado nadie".
+    - Soporte prometió algo HOY y no cumplió.
+
+    [ADMIN_TASK]
+    - Cliente pide factura/datos bancarios y NADIE le ha contestado (y el mensaje es reciente, < 3 días).
+    
+    [APPOINTMENT]
+    - Cliente confirma fecha/hora FUTURA (después de ${today}).
+    
+    [QUOTE_FOLLOWUP]
+    - Se envió cotización hace < 10 días y cliente no ha dicho "no".
+    
+    [NO_REPLY]
+    - Cliente pidió info, se la dimos, silencio de 1 a 7 días.
+    
+    [FUTURE_CONTACT]
+    - "Búscame el lunes", "La próxima semana".
 
     Historial del chat:
     ---
@@ -77,9 +83,9 @@ export const analyzeChatForAppointment = async (conversationId: string, historyT
     {
       "intent": "APPOINTMENT" | "FUTURE_CONTACT" | "NO_REPLY" | "QUOTE_FOLLOWUP" | "OPERATIONAL_ALERT" | "ADMIN_TASK" | "NONE",
       "appointment_date_iso": "YYYY-MM-DDTHH:mm:00-06:00" (Solo si aplica),
-      "reasoning": "Breve explicación para el humano de por qué se eligió este estado"
+      "reasoning": "Explica brevemente por qué aplicaste la regla (ej: 'Cita pasada sin reclamos -> Silencio Positivo')"
     }
-    `;
+`;
 
    try {
       const result = await model.generateContent(prompt);
