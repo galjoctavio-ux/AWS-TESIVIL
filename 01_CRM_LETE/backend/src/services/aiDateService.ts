@@ -5,85 +5,74 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+// Usamos flash para rapidez y bajo costo, es suficiente para lógica de fechas
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-// 🆕 NUEVOS ESTADOS DE AUDITORÍA
 export interface AIAnalysisResult {
    intent:
-   | 'APPOINTMENT'       // Agendó cita
-   | 'FUTURE_CONTACT'    // Pide que le hablemos luego
-   | 'NO_REPLY'          // Interesado que dejó de contestar
-   | 'QUOTE_FOLLOWUP'    // Ya tiene precio, falta cierre
-   | 'OPERATIONAL_ALERT' // 🚨 PELIGRO: Prometimos algo y fallamos (Técnico no llegó, sin respuesta nuestra)
-   | 'ADMIN_TASK'        // 📄 TRAMITE: Pide factura, cuenta bancaria, dudas de pago
-   | 'NONE';             // Todo en orden / No molestar
-   appointment_date_iso: string | null;
+   | 'APPOINTMENT'       // Agendó cita (Fecha va en appointment_date_iso)
+   | 'FUTURE_CONTACT'    // "Búscame el lunes" (Fecha va en follow_up_date_iso)
+   | 'NO_REPLY'          // Interesado mudo (Fecha sugerida +2 días en follow_up_date_iso)
+   | 'QUOTE_FOLLOWUP'    // Ya tiene precio (Fecha sugerida +2 días en follow_up_date_iso)
+   | 'OPERATIONAL_ALERT' // 🚨 PELIGRO
+   | 'ADMIN_TASK'        // 📄 TRAMITE
+   | 'NONE';             // Todo cerrado
+
+   appointment_date_iso: string | null; // Para CITAS firmes
+   follow_up_date_iso: string | null;   // Para RECORDATORIOS (Cron)
    reasoning: string;
 }
 
 export const analyzeChatForAppointment = async (conversationId: string, historyText: string): Promise<AIAnalysisResult | null> => {
+   // Fecha actual precisa para que la IA calcule "el próximo lunes" correctamente
    const today = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City', dateStyle: 'full', timeStyle: 'short' });
 
    const prompt = `
     Eres el Auditor de Calidad y Asistente IA de "Luz en tu Espacio". 
     Hoy es: ${today}.
     
-    Tu objetivo es filtrar qué chats requieren atención INMEDIATA y cuáles ya caducaron.
+    Tu objetivo es clasificar el chat y EXTRACTAR FECHAS para el calendario o para el sistema de recordatorios (Cron).
     
     --- 🛑 REGLAS DE ORO: CUÁNDO RESPONDER "NONE" 🛑 ---
-    Si se cumple CUALQUIERA de estas condiciones, tu respuesta debe ser "NONE".
+    Prioridad 1: Si se cumple esto, ignora lo demás y responde "NONE".
     
-    1. LEY DEL SILENCIO POSITIVO (Post-Cita):
-       - Si el último mensaje es sobre una cita/visita que YA PASÓ (según la fecha y hora).
-       - Ejemplos: "Ahí nos vemos", "Estoy esperando", "Técnico en camino", "Ubicación enviada".
-       - Y NO hay mensajes posteriores de reclamo ("Oye no llegaron").
-       - ENTONCES: Asume que el servicio se realizó con éxito. El silencio es éxito. -> NONE.
+    1. SILENCIO POSITIVO (Post-Cita): Si el último mensaje es sobre una cita YA PASADA ("Ahí nos vemos", "Ubicación enviada") y no hay quejas posteriores -> ÉXITO -> NONE.
+    2. CONFLICTO ENFRIADO: Si hubo queja/problema pero el último mensaje tiene > 24 HORAS -> NONE.
+    3. DUDA RESUELTA: Confusión interna resuelta hace > 24 HORAS -> NONE.
+    4. CADUCIDAD: Último mensaje del cliente tiene > 15 DÍAS y no hay fecha futura -> NONE.
 
-    2. LEY DEL CONFLICTO ENFRIADO (Quejas Viejas):
-       - Si hubo una discusión, queja, "mal servicio", o problema técnico.
-       - PERO la última interacción tiene MÁS DE 24 HORAS de antigüedad.
-       - ENTONCES: El conflicto ya se cerró operativa o administrativamente. No reabrir heridas. -> NONE.
-       
-    3. LEY DE LA DUDA RESUELTA:
-       - Si hubo confusión interna ("no aparece en calendario", "ubicación mal").
-       - Y han pasado más de 24 horas sin nuevos mensajes.
-       - ENTONCES: Se resolvió por otro medio. -> NONE.
+    --- 🚨 CLASIFICACIÓN Y EXTRACCIÓN DE FECHAS ---
+    Si no es NONE, clasifica así:
 
-    4. CADUCIDAD GENERAL:
-       - Si el último mensaje del cliente tiene más de 15 DÍAS y no dejó una fecha futura explícita. -> NONE.
-
-    --- 🚨 SOLO SI NO APLICA LO ANTERIOR: CLASIFICACIÓN ---
-
-    [OPERATIONAL_ALERT] (Fuego Activo 🔥)
-    - Úsalo SOLO si el problema es RECIENTE (Menos de 24 horas) y SIN RESOLVER.
-    - El cliente está preguntando AHORA MISMO: "¿Van a venir?", "Sigo esperando", "No ha llegado nadie".
-    - Soporte prometió algo HOY y no cumplió.
-
+    [OPERATIONAL_ALERT] (Prioridad Máxima 🔥)
+    - Problema reciente (< 24h) SIN resolver: "¿Vienen?", "Sigo esperando".
+    
     [ADMIN_TASK]
-    - Cliente pide factura/datos bancarios y NADIE le ha contestado (y el mensaje es reciente, < 3 días).
+    - Pide factura/datos bancarios reciente (< 3 días) y nadie contestó.
     
     [APPOINTMENT]
-    - Cliente confirma fecha/hora FUTURA (después de ${today}).
-    
-    [QUOTE_FOLLOWUP]
-    - Se envió cotización hace < 10 días y cliente no ha dicho "no".
-    
-    [NO_REPLY]
-    - Cliente pidió info, se la dimos, silencio de 1 a 7 días.
+    - Cliente confirma fecha/hora FUTURA para el servicio.
+    - ACCIÓN: Pon la fecha exacta en "appointment_date_iso".
     
     [FUTURE_CONTACT]
-    - "Búscame el lunes", "La próxima semana".
+    - Cliente dice: "Búscame el lunes", "Escríbeme en la quincena", "Mañana te digo".
+    - ACCIÓN: Calcula la fecha futura mencionada y ponla en "follow_up_date_iso".
+    
+    [NO_REPLY] o [QUOTE_FOLLOWUP]
+    - Cliente pidió info o recibió precio y dejó de contestar (hace 1-7 días).
+    - ACCIÓN: Sugiere una fecha de seguimiento (Hoy + 2 días) en "follow_up_date_iso".
 
     Historial del chat:
     ---
     ${historyText}
     ---
     
-    Responde SOLO JSON:
+    Responde SOLO este JSON:
     {
-      "intent": "APPOINTMENT" | "FUTURE_CONTACT" | "NO_REPLY" | "QUOTE_FOLLOWUP" | "OPERATIONAL_ALERT" | "ADMIN_TASK" | "NONE",
-      "appointment_date_iso": "YYYY-MM-DDTHH:mm:00-06:00" (Solo si aplica),
-      "reasoning": "Explica brevemente por qué aplicaste la regla (ej: 'Cita pasada sin reclamos -> Silencio Positivo')"
+      "intent": "IntentType",
+      "appointment_date_iso": "YYYY-MM-DDTHH:mm:00-06:00" (Solo si es APPOINTMENT),
+      "follow_up_date_iso": "YYYY-MM-DDTHH:mm:00-06:00" (Si es FUTURE_CONTACT, NO_REPLY o QUOTE_FOLLOWUP),
+      "reasoning": "Breve explicación"
     }
 `;
 
