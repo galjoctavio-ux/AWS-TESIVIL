@@ -7,6 +7,7 @@ const CrmDashboard = () => {
     // --- ESTADOS DE DATOS ---
     const [clientes, setClientes] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [expandedRow, setExpandedRow] = useState(null); // Estado para manejar la fila expandida
 
     // --- ESTADOS DE INTERFAZ ---
     const [filtro, setFiltro] = useState('TODOS');
@@ -39,8 +40,13 @@ const CrmDashboard = () => {
     useEffect(() => { setPaginaActual(1); }, [filtro, busqueda]);
 
     // --- ACCIONES ---
-    const handleAnalizar = async (id) => {
-        if (!window.confirm("¿Forzar análisis de IA para este cliente? Esto pondrá al cliente en cola de procesamiento.")) return;
+    const toggleRow = (id) => {
+        setExpandedRow(expandedRow === id ? null : id);
+    };
+
+    const handleAnalizar = async (e, id) => {
+        e.stopPropagation(); // Evitar abrir/cerrar la fila al hacer click
+        if (!window.confirm("¿Forzar análisis de IA para este cliente?")) return;
         try {
             await forceAnalyze(id);
             alert("Solicitud enviada. Recargando datos en 3s...");
@@ -50,6 +56,11 @@ const CrmDashboard = () => {
         }
     };
 
+    const handleChatOpen = (e, cliente) => {
+        e.stopPropagation();
+        setSelectedClientForChat(cliente);
+    };
+
     const handleSort = (key) => {
         setOrden(prev => ({
             key,
@@ -57,7 +68,7 @@ const CrmDashboard = () => {
         }));
     };
 
-    // --- CALCULOS DE CONTADORES (RESTAURADO) ---
+    // --- CALCULOS DE CONTADORES ---
     const counts = useMemo(() => {
         return {
             alertas: clientes.filter(c => c.crm_intent === 'OPERATIONAL_ALERT' || c.alerta_cita_desincronizada || c.debe_cotizacion).length,
@@ -76,7 +87,7 @@ const CrmDashboard = () => {
         } else if (filtro === 'ADMIN') {
             data = data.filter(c => c.crm_intent === 'ADMIN_TASK');
         } else if (filtro === 'SIN_EA') {
-            data = data.filter(c => !c.sync_mariadb); // Nueva pestaña solicitada
+            data = data.filter(c => !c.sync_mariadb);
         } else if (filtro !== 'TODOS') {
             data = data.filter(c => c.prioridad_visual === filtro || c.crm_intent === filtro);
         }
@@ -88,7 +99,8 @@ const CrmDashboard = () => {
                 (c.nombre_completo || '').toLowerCase().includes(lowerTerm) ||
                 (c.telefono || '').includes(lowerTerm) ||
                 (c.email || '').toLowerCase().includes(lowerTerm) ||
-                (c.ai_summary || '').toLowerCase().includes(lowerTerm)
+                (c.ai_summary || '').toLowerCase().includes(lowerTerm) ||
+                (c.notas_internas || '').toLowerCase().includes(lowerTerm)
             );
         }
 
@@ -97,13 +109,10 @@ const CrmDashboard = () => {
             let valA = a[orden.key];
             let valB = b[orden.key];
 
-            // Manejo de fechas
             if (['last_interaction', 'next_follow_up_date'].includes(orden.key)) {
                 valA = valA ? new Date(valA).getTime() : 0;
                 valB = valB ? new Date(valB).getTime() : 0;
-            }
-            // Manejo strings nulos
-            else {
+            } else {
                 valA = valA ? String(valA).toLowerCase() : '';
                 valB = valB ? String(valB).toLowerCase() : '';
             }
@@ -120,9 +129,7 @@ const CrmDashboard = () => {
     const totalPaginas = Math.ceil(datosProcesados.length / itemsPorPagina);
     const datosPaginados = datosProcesados.slice((paginaActual - 1) * itemsPorPagina, paginaActual * itemsPorPagina);
 
-    // --- HELPERS VISUALES (RESTAURADOS Y MEJORADOS) ---
-
-    // Semáforo de Calificación
+    // --- HELPERS VISUALES ---
     const getScoreColor = (calif) => {
         switch (calif) {
             case 'AMABLE': return 'var(--color-success)';
@@ -133,40 +140,34 @@ const CrmDashboard = () => {
         }
     };
 
-    // Texto seguro
-    const safeText = (text, limit = 80) => {
+    const getIntentBadge = (cliente) => {
+        if (cliente.alerta_cita_desincronizada) return { label: '⚠️ CITA SIN AGENDAR', class: 'bg-red' };
+        if (cliente.debe_cotizacion) return { label: '💰 COTIZAR', class: 'bg-blue' };
+
+        const intent = cliente.crm_intent || 'NONE';
+        if (intent === 'OPERATIONAL_ALERT') return { label: '🚨 ALERTA', class: 'bg-red' };
+        if (intent === 'ADMIN_TASK') return { label: '📄 TRAMITE', class: 'bg-blue' };
+        if (intent === 'QUOTE_FOLLOWUP') return { label: '⏳ SEGUIMIENTO', class: 'bg-orange' };
+
+        return { label: intent.replace('_', ' '), class: 'bg-gray' };
+    };
+
+    const safeText = (text, limit) => {
         if (!text) return '';
         const str = String(text);
+        if (!limit) return str;
         return str.length > limit ? str.substring(0, limit) + '...' : str;
     };
 
-    // Badge Principal (Restaurado getBadgeInfo con lógica nueva)
-    const getBadgeInfo = (cliente) => {
-        // Prioridad 1: Alertas Críticas
-        if (cliente.alerta_cita_desincronizada) return { class: 'badge-alert', label: '⚠️ CITA NO AGENDADA' };
-        if (cliente.debe_cotizacion) return { class: 'badge-alert', label: '💰 COTIZAR' };
-        if (cliente.crm_intent === 'OPERATIONAL_ALERT') return { class: 'badge-alert', label: '🚨 ALERTA' };
-
-        // Prioridad 2: Trámites Admin
-        if (cliente.crm_intent === 'ADMIN_TASK') return { class: 'badge-admin', label: '📄 TRAMITE' };
-
-        // Prioridad 3: Estados Visuales Normales
-        const status = cliente.prioridad_visual || cliente.crm_intent || 'NONE';
-        switch (status) {
-            case 'CITA': return { class: 'badge-cita', label: '📅 CITA' };
-            case 'ATENCION': return { class: 'badge-alert', label: '🔥 ATENCION' };
-            default: return { class: 'badge-normal', label: status };
-        }
-    };
-
+    // --- RENDERIZADO ---
     return (
         <div className="crm-container">
             {/* HEADER */}
             <header className="crm-header">
                 <div>
-                    <h1>🧠 CRM: Fuente de la Verdad</h1>
+                    <h1>🧠 Cerebro CRM</h1>
                     <div className="crm-stats">
-                        {clientes.length} Clientes Total | {counts.alertas} Alertas | {counts.sinEa} Sin Agenda
+                        Total: {clientes.length} | Alertas: {counts.alertas} | Sin Agenda: {counts.sinEa}
                     </div>
                 </div>
 
@@ -174,7 +175,7 @@ const CrmDashboard = () => {
                     <div className="search-box">
                         <input
                             type="text"
-                            placeholder="🔍 Buscar nombre, tel, notas..."
+                            placeholder="🔍 Buscar..."
                             value={busqueda}
                             onChange={(e) => setBusqueda(e.target.value)}
                         />
@@ -196,8 +197,6 @@ const CrmDashboard = () => {
                 </button>
                 <div style={{ width: '1px', background: '#e2e8f0', margin: '0 5px' }}></div>
                 <button onClick={() => setFiltro('TODOS')} className={`tab-btn ${filtro === 'TODOS' ? 'active' : ''}`}>Todos</button>
-                <button onClick={() => setFiltro('CITA')} className={`tab-btn ${filtro === 'CITA' ? 'active' : ''}`}>Citas</button>
-                <button onClick={() => setFiltro('LEAD')} className={`tab-btn ${filtro === 'LEAD' ? 'active' : ''}`}>Leads</button>
             </div>
 
             {/* TABLA PRINCIPAL */}
@@ -206,142 +205,199 @@ const CrmDashboard = () => {
                     <table className="crm-table">
                         <thead>
                             <tr>
+                                <th style={{ width: '50px' }}>Ver</th>
                                 <th onClick={() => handleSort('nombre_completo')}>Cliente ↕</th>
-                                <th>Estado & Sync</th>
+                                <th>Status & Sync</th>
+                                <th>Resumen IA (Preview)</th>
+                                <th onClick={() => handleSort('saldo_pendiente')}>Finanzas ↕</th>
                                 <th onClick={() => handleSort('last_interaction')}>Interacción ↕</th>
-                                <th>Análisis IA & Notas</th>
-                                <th onClick={() => handleSort('saldo_pendiente')}>Finanzas & Acción ↕</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             {datosPaginados.map(cliente => {
-                                const badge = getBadgeInfo(cliente);
+                                const isExpanded = expandedRow === (cliente.id || cliente.cliente_id);
                                 const scoreColor = getScoreColor(cliente.calificacion_semaforo || cliente.calificacion);
+                                const intentBadge = getIntentBadge(cliente);
 
                                 return (
-                                    <tr key={cliente.id || cliente.cliente_id} className={badge.class === 'badge-alert' ? 'row-alert' : ''}>
+                                    <React.Fragment key={cliente.id || cliente.cliente_id}>
+                                        {/* FILA PRINCIPAL (RESUMEN) */}
+                                        <tr
+                                            className={`main-row ${cliente.alerta_cita_desincronizada ? 'row-alert' : ''}`}
+                                            onClick={() => toggleRow(cliente.id || cliente.cliente_id)}
+                                        >
+                                            <td style={{ textAlign: 'center' }}>
+                                                <button className={`btn-expand ${isExpanded ? 'open' : ''}`}>▼</button>
+                                            </td>
 
-                                        {/* COL 1: CLIENTE (Enriquecido) */}
-                                        <td>
-                                            <div className="client-info">
-                                                <div className="client-name">
+                                            {/* Cliente */}
+                                            <td>
+                                                <div style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '5px' }}>
                                                     <span className="score-indicator" style={{ backgroundColor: scoreColor }} title={`Calificación: ${cliente.calificacion_semaforo}`}></span>
                                                     {cliente.nombre_completo || 'Desconocido'}
                                                 </div>
-                                                <div className="client-meta">
-                                                    <span>📞 {cliente.telefono}</span>
-                                                    {cliente.email && <span className="client-email">✉️ {cliente.email}</span>}
-                                                    {cliente.direccion_principal && (
-                                                        <span className="client-address">
-                                                            📍 {safeText(cliente.direccion_principal, 30)}
-                                                            {cliente.google_maps_link && (
-                                                                <a href={cliente.google_maps_link} target="_blank" rel="noopener noreferrer"> (Mapa)</a>
-                                                            )}
-                                                        </span>
-                                                    )}
+                                                <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{cliente.telefono}</div>
+                                            </td>
+
+                                            {/* Status & Sync */}
+                                            <td>
+                                                <span className={`mini-badge ${intentBadge.class}`}>{intentBadge.label}</span>
+                                                <div style={{ fontSize: '0.75rem', marginTop: '4px' }}>
+                                                    <span style={{ color: cliente.sync_mariadb ? 'green' : 'red', fontWeight: 'bold' }} title="Existe en Easy!Appointments">
+                                                        ● EA
+                                                    </span>
+                                                    <span style={{ color: '#ccc', margin: '0 4px' }}>|</span>
+                                                    <span style={{ color: cliente.sync_evolution ? 'green' : 'gray', fontWeight: 'bold' }} title="Conectado a WhatsApp">
+                                                        ● WA
+                                                    </span>
                                                 </div>
-                                            </div>
-                                        </td>
+                                            </td>
 
-                                        {/* COL 2: ESTADO & SYNC (Fuente de la Verdad) */}
-                                        <td>
-                                            <span className={`badge ${badge.class}`}>{badge.label}</span>
+                                            {/* Resumen IA (Corto) */}
+                                            <td>
+                                                <div style={{ fontSize: '0.85rem', color: '#334155' }}>
+                                                    {safeText(cliente.ai_summary, 70)}
+                                                </div>
+                                            </td>
 
-                                            <div className="sync-status-container">
-                                                <span style={{ color: cliente.sync_mariadb ? 'var(--color-success)' : 'var(--color-danger)' }} title="Base de Datos Agenda (EA)">
-                                                    ● EA
-                                                </span>
-                                                <span style={{ color: cliente.sync_evolution ? 'var(--color-success)' : 'var(--color-gray)' }} title="WhatsApp / Evolution">
-                                                    ● WA
-                                                </span>
-                                                {cliente.cita_realizada && (
-                                                    <span style={{ color: 'var(--color-info)' }} title="Tiene citas pasadas en EA">
-                                                        ● Historic
+                                            {/* Finanzas */}
+                                            <td>
+                                                {cliente.saldo_pendiente > 0 ? (
+                                                    <span style={{ color: 'var(--color-danger)', fontWeight: 'bold' }}>
+                                                        Debe: ${Number(cliente.saldo_pendiente).toFixed(2)}
+                                                    </span>
+                                                ) : (
+                                                    <span style={{ color: 'var(--color-success)', fontSize: '0.8rem' }}>Al corriente</span>
+                                                )}
+                                            </td>
+
+                                            {/* Interacción */}
+                                            <td>
+                                                <div style={{ fontSize: '0.8rem' }}>
+                                                    {cliente.last_interaction
+                                                        ? new Date(cliente.last_interaction).toLocaleDateString('es-MX', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                                                        : '-'}
+                                                </div>
+                                                {cliente.unread_count > 0 && (
+                                                    <span className="mini-badge bg-red" style={{ marginTop: '3px', display: 'inline-block' }}>
+                                                        {cliente.unread_count} nuevos
                                                     </span>
                                                 )}
-                                            </div>
-                                        </td>
+                                            </td>
 
-                                        {/* COL 3: INTERACCIÓN (Restaurada) */}
-                                        <td className="msg-cell">
-                                            <div className={`msg-bubble ${cliente.ultimo_mensaje_rol === 'assistant' ? 'assistant' : 'user'}`}>
-                                                {safeText(cliente.ultimo_mensaje_texto || '(Sin mensajes)', 60)}
-                                            </div>
-                                            <div className="msg-meta">
-                                                <span>
-                                                    {cliente.last_interaction
-                                                        ? new Date(cliente.last_interaction).toLocaleString('es-MX', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
-                                                        : '-'}
-                                                </span>
-                                                {cliente.unread_count > 0 && (
-                                                    <span className="unread-badge">{cliente.unread_count} new</span>
-                                                )}
-                                            </div>
-                                        </td>
-
-                                        {/* COL 4: IA & NOTAS (Combinadas) */}
-                                        <td className="ai-cell">
-                                            <div className="ai-summary" title={cliente.ai_summary}>
-                                                {safeText(cliente.ai_summary, 90)}
-                                            </div>
-                                            {cliente.notas_internas && (
-                                                <div className="internal-note" title="Nota Interna">
-                                                    📝 {safeText(cliente.notas_internas, 50)}
+                                            {/* Acciones Rápidas */}
+                                            <td onClick={e => e.stopPropagation()}>
+                                                <div className="action-buttons">
+                                                    <button className="btn-icon btn-chat" onClick={(e) => handleChatOpen(e, cliente)} title="Chat">💬</button>
+                                                    <button className="btn-icon btn-ai" onClick={(e) => handleAnalizar(e, cliente.id || cliente.cliente_id)} title="Forzar IA">⚡</button>
                                                 </div>
-                                            )}
-                                        </td>
+                                            </td>
+                                        </tr>
 
-                                        {/* COL 5: FINANZAS & ACCIÓN (Restaurada Next Follow Up) */}
-                                        <td className="finance-cell">
-                                            {cliente.saldo_pendiente > 0 ? (
-                                                <div className="debt-text">Debe: ${Number(cliente.saldo_pendiente).toFixed(2)}</div>
-                                            ) : (
-                                                <span style={{ color: 'var(--color-success)', fontSize: '0.8rem' }}>Al corriente</span>
-                                            )}
+                                        {/* FILA EXPANDIBLE (DETALLES COMPLETOS) */}
+                                        {isExpanded && (
+                                            <tr className="row-expanded-bg">
+                                                <td colSpan="7">
+                                                    <div className="details-panel">
 
-                                            {cliente.next_follow_up_date && (
-                                                <div className="next-action">
-                                                    ⏰ {new Date(cliente.next_follow_up_date).toLocaleDateString()}
-                                                </div>
-                                            )}
-                                        </td>
+                                                        {/* CARD 1: ANÁLISIS IA & NOTAS */}
+                                                        <div className="detail-card">
+                                                            <h4>🤖 Análisis IA Completo</h4>
+                                                            <div className="full-text">
+                                                                {cliente.ai_summary || "No hay análisis de IA disponible."}
+                                                            </div>
 
-                                        {/* COL 6: BOTONES ACCIÓN */}
-                                        <td>
-                                            <div className="action-buttons">
-                                                <button
-                                                    className="btn-icon btn-chat"
-                                                    onClick={() => setSelectedClientForChat(cliente)}
-                                                    title="Abrir Chat"
-                                                >
-                                                    💬
-                                                </button>
-                                                <button
-                                                    className="btn-icon btn-ai"
-                                                    onClick={() => handleAnalizar(cliente.id || cliente.cliente_id)}
-                                                    title="Forzar Análisis IA"
-                                                >
-                                                    ⚡
-                                                </button>
-                                                {!cliente.sync_mariadb && (
-                                                    <button
-                                                        className="btn-icon btn-ea"
-                                                        onClick={() => alert("Próximamente: Crear en Easy!Appointments")}
-                                                        title="Crear Cliente en Agenda (Faltante)"
-                                                    >
-                                                        👤
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </td>
+                                                            {cliente.notas_internas && (
+                                                                <div style={{ marginTop: '15px', padding: '10px', backgroundColor: '#fffbeb', borderLeft: '3px solid #f59e0b', borderRadius: '4px' }}>
+                                                                    <strong>📝 Nota Interna:</strong>
+                                                                    <div style={{ marginTop: '5px', fontSize: '0.9rem' }}>{cliente.notas_internas}</div>
+                                                                </div>
+                                                            )}
+                                                        </div>
 
-                                    </tr>
+                                                        {/* CARD 2: DATOS DE CONTACTO */}
+                                                        <div className="detail-card">
+                                                            <h4>📍 Datos de Contacto</h4>
+                                                            <div className="info-row">
+                                                                <span className="info-label">Nombre:</span>
+                                                                <span className="info-value">{cliente.nombre_completo}</span>
+                                                            </div>
+                                                            <div className="info-row">
+                                                                <span className="info-label">Teléfono:</span>
+                                                                <span className="info-value">{cliente.telefono}</span>
+                                                            </div>
+                                                            <div className="info-row">
+                                                                <span className="info-label">Email:</span>
+                                                                <span className="info-value">{cliente.email || '-'}</span>
+                                                            </div>
+
+                                                            <div style={{ marginTop: '15px' }}>
+                                                                <div className="info-label" style={{ marginBottom: '5px' }}>Dirección:</div>
+                                                                <div style={{ color: '#334155', fontStyle: 'italic', marginBottom: '8px' }}>
+                                                                    {cliente.direccion_real || cliente.direccion_principal || "Sin dirección registrada"}
+                                                                </div>
+                                                                {cliente.google_maps_link && (
+                                                                    <a href={cliente.google_maps_link} target="_blank" rel="noopener noreferrer" className="map-link-btn">
+                                                                        🗺️ Abrir en Google Maps
+                                                                    </a>
+                                                                )}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* CARD 3: OPERACIONES & ACCIONES */}
+                                                        <div className="detail-card">
+                                                            <h4>⚙️ Estado Operativo</h4>
+
+                                                            <div className="info-row">
+                                                                <span className="info-label">Sincronizado EA:</span>
+                                                                <span className="info-value" style={{ fontWeight: 'bold', color: cliente.sync_mariadb ? 'green' : 'red' }}>
+                                                                    {cliente.sync_mariadb ? 'SI' : 'NO'}
+                                                                </span>
+                                                            </div>
+                                                            <div className="info-row">
+                                                                <span className="info-label">Cotización Pendiente:</span>
+                                                                <span className="info-value" style={{ fontWeight: 'bold', color: cliente.debe_cotizacion ? 'blue' : '#64748b' }}>
+                                                                    {cliente.debe_cotizacion ? 'SI' : 'NO'}
+                                                                </span>
+                                                            </div>
+                                                            <div className="info-row">
+                                                                <span className="info-label">Historial Citas:</span>
+                                                                <span className="info-value">{cliente.cita_realizada ? 'SI' : 'NO'}</span>
+                                                            </div>
+
+                                                            <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                                                {!cliente.sync_mariadb && (
+                                                                    <button
+                                                                        className="tab-btn alert"
+                                                                        style={{ width: '100%', textAlign: 'center', justifyContent: 'center' }}
+                                                                        onClick={() => alert("Próximamente: Creación automática en EA")}
+                                                                    >
+                                                                        👤 Crear Cliente en Agenda
+                                                                    </button>
+                                                                )}
+                                                                {cliente.debe_cotizacion && (
+                                                                    <button
+                                                                        className="tab-btn admin"
+                                                                        style={{ width: '100%', textAlign: 'center', justifyContent: 'center' }}
+                                                                        onClick={() => alert("Próximamente: Ir a cotizador")}
+                                                                    >
+                                                                        💰 Generar Cotización
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </React.Fragment>
                                 );
                             })}
                             {datosPaginados.length === 0 && (
                                 <tr>
-                                    <td colSpan="6" style={{ textAlign: 'center', padding: '30px', color: '#64748b' }}>
+                                    <td colSpan="7" style={{ textAlign: 'center', padding: '30px', color: '#64748b' }}>
                                         No se encontraron resultados para los filtros actuales.
                                     </td>
                                 </tr>

@@ -343,3 +343,166 @@
     padding: 20px;
     align-items: center;
 }
+
+/* src/pages/CrmDashboard.css */
+
+/* ... (MANTENER TUS VARIABLES Y ESTILOS DE HEADER/CONTROLES QUE YA TENÍAS) ... */
+
+:root {
+    --primary-color: #2563eb;
+    --bg-light: #f8fafc;
+    --border-color: #e2e8f0;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --color-success: #22c55e;
+    --color-warning: #f59e0b;
+    --color-danger: #ef4444;
+    --color-info: #3b82f6;
+    --color-gray: #94a3b8;
+}
+
+/* ... ESTILOS DE TABLA BASE ... */
+
+/* FILA EXPANDIBLE */
+.row-expanded-bg {
+    background-color: #f8fafc;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.details-panel {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    /* 3 Columnas */
+    gap: 20px;
+    font-size: 0.9rem;
+}
+
+/* Tarjetas dentro del detalle */
+.detail-card {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.detail-card h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 5px;
+    font-weight: 700;
+}
+
+/* Estilos de Texto dentro de las tarjetas */
+.full-text {
+    white-space: pre-wrap;
+    /* Respeta saltos de línea */
+    line-height: 1.5;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    border-bottom: 1px dashed #f1f5f9;
+    padding-bottom: 4px;
+}
+
+.info-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.info-value {
+    color: var(--text-primary);
+    text-align: right;
+}
+
+/* Botón de expandir */
+.btn-expand {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+}
+
+.btn-expand:hover {
+    background-color: var(--bg-light);
+    color: var(--primary-color);
+}
+
+.btn-expand.open {
+    transform: rotate(180deg);
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Ajustes visuales fila principal */
+.main-row {
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.main-row:hover {
+    background-color: #f1f5f9;
+}
+
+/* Badges pequeños para la tabla principal */
+.mini-badge {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-right: 4px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: white;
+}
+
+.bg-blue {
+    background-color: var(--color-info);
+}
+
+.bg-orange {
+    background-color: var(--color-warning);
+}
+
+.bg-red {
+    background-color: var(--color-danger);
+}
+
+.bg-green {
+    background-color: var(--color-success);
+}
+
+.bg-gray {
+    background-color: var(--color-gray);
+}
+
+/* Link de mapa bonito */
+.map-link-btn {
+    display: inline-block;
+    margin-top: 5px;
+    color: var(--color-info);
+    font-size: 0.85rem;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.map-link-btn:hover {
+    text-decoration: underline;
+}
