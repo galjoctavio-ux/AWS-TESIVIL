@@ -1,87 +1,65 @@
-import axios from 'axios';
+import { Pool } from 'pg';
 import { supabaseAdmin } from '../services/supabaseClient';
 import dotenv from 'dotenv';
 import path from 'path';
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-// TUS CREDENCIALES
-const EVO_URL = 'http://172.17.0.1:8080';
-const EVO_APIKEY = 'B6D711FCDE4D4FD5936544120E713976';
-const EVO_INSTANCE = 'LuzEnTuEspacio';
-
-const api = axios.create({
-    baseURL: EVO_URL,
-    headers: { 'apikey': EVO_APIKEY }
+// CREDENCIALES EVOLUTION (POSTGRES)
+const pool = new Pool({
+    user: 'evolution',
+    host: '172.19.0.2', // La IP interna del Docker que ya funcionó
+    database: 'evolution',
+    password: 'evolution',
+    port: 5432,
 });
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+// TU INSTANCE ID (El que encontramos antes)
+const INSTANCE_UUID = '952f8c1c-99c9-46d3-982b-d6704972b01d';
 
-const importHistoryFinal = async () => {
-    console.log("🚀 Iniciando Importación (Estrategia: CONTACTOS)...");
+const importDirectDb = async () => {
+    console.log("🐘 INICIANDO IMPORTACIÓN MASIVA (CREANDO FALTANTES)...");
 
     try {
-        // ==========================================
-        // PASO 1: OBTENER LISTA DE JIDs (SOLO CONTACTOS)
-        // ==========================================
-        // Usamos findContacts (Plural) que es más estable en V2 y no carga mensajes
-        console.log("📋 Intentando descargar agenda de contactos...");
-        let targets = [];
+        // 1. OBTENER LISTA DE CHATS DESDE EVOLUTION
+        console.log("📋 Leyendo tabla 'Chat'...");
 
-        try {
-            // INTENTO 1: Endpoint estándar V2 para contactos
-            const res = await api.post(`/contact/findContacts/${EVO_INSTANCE}`, {
-                where: {}
-            });
-            targets = Array.isArray(res.data) ? res.data : [];
-            console.log(`✅ ¡ÉXITO! Se encontraron ${targets.length} contactos en la agenda.`);
+        const queryChats = `
+            SELECT "remoteJid", "name", "pushName"
+            FROM "Chat"
+            WHERE "instanceId" = $1
+            AND "remoteJid" NOT LIKE '%@g.us' 
+            AND "remoteJid" NOT LIKE '%@broadcast'
+            AND "remoteJid" != 'status@broadcast'
+        `;
 
-        } catch (e: any) {
-            console.error(`❌ Falló findContacts: ${e.message}`);
-            if (e.response) console.error(`   Status: ${e.response.status} - ${JSON.stringify(e.response.data)}`);
+        const resChats = await pool.query(queryChats, [INSTANCE_UUID]);
+        const chats = resChats.rows;
 
-            // INTENTO 2: Si falla contactos, intentamos chats una vez más pero con where vacío
-            console.log("⚠️ Intentando fallback con findChats...");
-            try {
-                const resChat = await api.post(`/chat/findChats/${EVO_INSTANCE}`, { where: {} });
-                targets = Array.isArray(resChat.data) ? resChat.data : [];
-            } catch (errChat) {
-                console.error("❌ Fatal: No se pudo obtener ni contactos ni chats.");
-                return;
-            }
-        }
+        console.log(`📥 Se procesarán ${chats.length} conversaciones.`);
 
-        if (targets.length === 0) {
-            console.log("⚠️ La lista está vacía. Evolution aún no ha sincronizado la agenda o la base de datos está limpia.");
-            return;
-        }
+        let creados = 0;
+        let actualizados = 0;
 
-        // ==========================================
-        // PASO 2: PROCESAR UNO POR UNO
-        // ==========================================
-        console.log(`📥 Procesando ${targets.length} registros...`);
-
-        for (const item of targets) {
-            // Normalización de ID
-            const rawId = item.id || item.remoteJid || item.key?.remoteJid;
-
-            // Filtros de seguridad
+        for (const c of chats) {
+            const rawId = c.remoteJid;
             if (!rawId) continue;
-            if (rawId.includes('@g.us')) continue; // Ignorar Grupos
-            if (rawId.includes('@broadcast')) continue; // Ignorar Listas de difusión/Estados
-            if (rawId === 'status@broadcast') continue;
 
+            // Normalización (Quitar @s.whatsapp.net y prefijos de MX)
             let whatsappId = rawId.split('@')[0];
-            // Fix México (521 -> 52)
             if (whatsappId.startsWith('521') && whatsappId.length === 13) whatsappId = whatsappId.substring(3);
 
-            // Nombre
-            const nombre = item.pushName || item.name || item.notify || item.verifiedName || whatsappId;
+            // Intentar obtener el mejor nombre posible
+            const nombre = c.name || c.pushName || `Cliente ${whatsappId}`;
 
-            process.stdout.write(`🔹 ${whatsappId}... `);
+            process.stdout.write(`🔹 ${whatsappId} (${nombre.substring(0, 10)})... `);
 
-            // 1. UPSERT CLIENTE EN SUPABASE
+            // ============================================================
+            // A. OBTENER O CREAR CLIENTE (UPSERT LOGIC)
+            // ============================================================
             let clienteId = null;
+
+            // 1. Buscamos si ya existe
             const { data: clientData } = await supabaseAdmin
                 .from('clientes')
                 .select('id')
@@ -89,87 +67,141 @@ const importHistoryFinal = async () => {
                 .maybeSingle();
 
             if (clientData) {
+                // YA EXISTE
                 clienteId = clientData.id;
+                // process.stdout.write(" (Existe) ");
             } else {
-                const { data: newClient } = await supabaseAdmin
+                // NO EXISTE -> LO CREAMOS
+                const { data: newClient, error: insertError } = await supabaseAdmin
                     .from('clientes')
                     .insert({
                         whatsapp_id: whatsappId,
                         telefono: whatsappId,
-                        nombre_completo: nombre,
+                        nombre_completo: nombre, // Si es null, Supabase puede quejarse si es required, pero pusimos fallback arriba
                         crm_status: 'IMPORTED_HISTORY',
-                        crm_intent: 'NONE'
+                        crm_intent: 'NONE',
+                        // Los demás campos (saldo, citas) se crearán como NULL por defecto
                     })
                     .select('id')
                     .single();
-                if (newClient) clienteId = newClient.id;
+
+                if (insertError) {
+                    console.log(`❌ Error creando cliente: ${insertError.message}`);
+                    continue; // Si falla la creación, saltamos al siguiente
+                }
+
+                if (newClient) {
+                    clienteId = newClient.id;
+                    process.stdout.write(" ✨ NUEVO ");
+                    creados++;
+                }
             }
 
-            if (!clienteId) {
-                console.log("❌ (Error Cliente)");
-                continue;
-            }
+            if (!clienteId) continue;
 
-            // 2. OBTENER MENSAJES INDIVIDUALMENTE
-            try {
-                const resMsgs = await api.post(`/chat/findMessages/${EVO_INSTANCE}`, {
-                    where: { key: { remoteJid: rawId } },
-                    options: { limit: 15, sort: { order: 'DESC' } }
-                });
+            // ============================================================
+            // B. OBTENER MENSAJES (Extracción del JSON 'key')
+            // ============================================================
+            const queryMsgs = `
+                SELECT "key", "message", "messageType", "messageTimestamp"
+                FROM "Message"
+                WHERE "instanceId" = $1
+                AND "key"->>'remoteJid' = $2
+                ORDER BY "messageTimestamp" DESC
+                LIMIT 30
+            `;
 
-                const messages = resMsgs.data;
-                if (messages && Array.isArray(messages) && messages.length > 0) {
-                    const msjsParaGuardar = [];
-                    for (const msg of messages) {
-                        let content = '';
-                        const type = msg.messageType;
+            const resMsgs = await pool.query(queryMsgs, [INSTANCE_UUID, rawId]);
+            const messages = resMsgs.rows;
 
-                        // Extracción segura
-                        if (type === 'conversation') content = msg.message?.conversation;
-                        else if (type === 'extendedTextMessage') content = msg.message?.extendedTextMessage?.text;
-                        else if (msg.message?.imageMessage) content = '📸 [Imagen]';
-                        else if (msg.message?.audioMessage) content = '🎤 [Audio]';
-                        else content = `[${type}]`;
+            if (messages.length > 0) {
+                const msjsParaGuardar = [];
 
-                        if (!content) continue;
+                for (const msg of messages) {
+                    let contentText = '';
+                    const msgContent = msg.message;
 
-                        let timestamp = msg.messageTimestamp;
-                        if (typeof timestamp === 'number' && timestamp < 10000000000) timestamp *= 1000;
+                    if (!msgContent) continue;
 
-                        msjsParaGuardar.push({
-                            cliente_id: clienteId,
-                            whatsapp_message_id: msg.key?.id || `hist_${Date.now()}_${Math.random()}`,
-                            role: msg.key?.fromMe ? 'assistant' : 'user',
-                            content: content,
-                            created_at: new Date(timestamp).toISOString(),
-                            status: 'read'
-                        });
+                    // Extracción de contenido (Texto, Imagen, Audio)
+                    if (msg.messageType === 'conversation') {
+                        contentText = msgContent.conversation;
+                    } else if (msg.messageType === 'extendedTextMessage') {
+                        contentText = msgContent.extendedTextMessage?.text || msgContent.text;
+                    } else if (msgContent.imageMessage) {
+                        contentText = '📸 [Imagen]';
+                    } else if (msgContent.audioMessage) {
+                        contentText = '🎤 [Audio]';
+                    } else if (msgContent.videoMessage) {
+                        contentText = '🎥 [Video]';
+                    } else if (msgContent.documentMessage) {
+                        contentText = `📄 [Archivo]: ${msgContent.documentMessage.fileName || 'Documento'}`;
+                    } else {
+                        try {
+                            // Si es algo raro, lo convertimos a texto plano
+                            const jsonStr = JSON.stringify(msgContent);
+                            // Evitamos guardar JSONs gigantes vacíos
+                            if (jsonStr.length < 5) continue;
+                            contentText = jsonStr.substring(0, 100);
+                        } catch { contentText = '[Media/Otro]'; }
                     }
 
-                    if (msjsParaGuardar.length > 0) {
-                        await supabaseAdmin.from('mensajes_whatsapp')
-                            .upsert(msjsParaGuardar, { onConflict: 'whatsapp_message_id', ignoreDuplicates: true });
+                    if (!contentText) continue;
+
+                    // Rol (fromMe)
+                    let isFromMe = false;
+                    if (msg.key && typeof msg.key === 'object') {
+                        isFromMe = msg.key.fromMe === true;
+                    }
+
+                    // Fecha
+                    let ts = parseInt(msg.messageTimestamp);
+                    if (ts < 10000000000) ts *= 1000;
+                    const createdAt = new Date(ts);
+
+                    // ID Único del mensaje
+                    const msgId = msg.key?.id || `db_${Date.now()}_${Math.random()}`;
+
+                    msjsParaGuardar.push({
+                        cliente_id: clienteId,
+                        whatsapp_message_id: msgId,
+                        role: isFromMe ? 'assistant' : 'user',
+                        content: contentText,
+                        created_at: createdAt.toISOString(),
+                        status: 'read'
+                    });
+                }
+
+                if (msjsParaGuardar.length > 0) {
+                    const { error } = await supabaseAdmin
+                        .from('mensajes_whatsapp')
+                        .upsert(msjsParaGuardar, { onConflict: 'whatsapp_message_id', ignoreDuplicates: true });
+
+                    if (error) console.log(`⚠️ Err Msjs: ${error.message}`);
+                    else {
                         console.log(`✅ ${msjsParaGuardar.length} msjs`);
-                    } else {
-                        console.log("⚠️ (Sin texto)");
+                        actualizados++;
                     }
                 } else {
-                    console.log("💤 (Vacío)");
+                    console.log("⚠️ (Sin contenido legible)");
                 }
-            } catch (msgError: any) {
-                // Si falla un chat específico, no detenemos el script
-                console.log(`❌ (Error API: ${msgError.response?.status || msgError.message})`);
+            } else {
+                console.log("💤 (Chat vacío)");
             }
 
-            // Pequeña pausa para no saturar
-            await delay(100);
+            // Pausa minúscula para no saturar CPU
+            // await new Promise(r => setTimeout(r, 10)); 
         }
 
         console.log("\n🎉 IMPORTACIÓN FINALIZADA.");
+        console.log(`🆕 Clientes Nuevos Creados: ${creados}`);
+        console.log(`💬 Chats Importados/Actualizados: ${actualizados}`);
 
     } catch (error) {
-        console.error("❌ Error General:", error);
+        console.error("\n❌ ERROR GENERAL:", error);
+    } finally {
+        await pool.end();
     }
 };
 
-importHistoryFinal();
+importDirectDb();
