@@ -5,27 +5,27 @@ import path from 'path';
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-// --- CREDENCIALES DB EVOLUTION (Las que funcionaron) ---
+// CREDENCIALES DB EVOLUTION (Las que funcionan)
 const pool = new Pool({
     user: 'evolution',
-    host: '172.19.0.2', // IP interna de Docker que descubrimos
+    host: '172.19.0.2',
     database: 'evolution',
     password: 'evolution',
     port: 5432,
 });
 
-// TU INSTANCE UUID (El que descubrimos en el script "chismoso")
+// TU INSTANCE UUID
 const INSTANCE_UUID = '952f8c1c-99c9-46d3-982b-d6704972b01d';
 
 const importDirectDb = async () => {
-    console.log("🐘 INICIANDO IMPORTACIÓN MASIVA (CREANDO FALTANTES)...");
+    console.log("🐘 INICIANDO IMPORTACIÓN MASIVA (Corregido: Solo columnas existentes)...");
 
     try {
-        // 1. LEER CHATS DESDE POSTGRES
+        // 1. LEER CHATS (Quitamos pushName porque no existe en esta tabla)
         console.log("📋 Leyendo tabla 'Chat' de Evolution...");
 
         const queryChats = `
-            SELECT "remoteJid", "name", "pushName"
+            SELECT "remoteJid", "name"
             FROM "Chat"
             WHERE "instanceId" = $1
             AND "remoteJid" NOT LIKE '%@g.us' 
@@ -36,7 +36,7 @@ const importDirectDb = async () => {
         const resChats = await pool.query(queryChats, [INSTANCE_UUID]);
         const chats = resChats.rows;
 
-        console.log(`📥 Se encontraron ${chats.length} conversaciones en total.`);
+        console.log(`📥 Se encontraron ${chats.length} conversaciones.`);
 
         let creados = 0;
         let actualizados = 0;
@@ -49,8 +49,8 @@ const importDirectDb = async () => {
             let whatsappId = rawId.split('@')[0];
             if (whatsappId.startsWith('521') && whatsappId.length === 13) whatsappId = whatsappId.substring(3);
 
-            // Intentamos conseguir un nombre, si no, usamos el número
-            const nombre = c.name || c.pushName || `Cliente ${whatsappId}`;
+            // Intentamos conseguir un nombre, si es null usamos el número
+            const nombre = c.name || `Cliente ${whatsappId}`;
 
             process.stdout.write(`🔹 ${whatsappId}... `);
 
@@ -69,16 +69,15 @@ const importDirectDb = async () => {
             if (clientData) {
                 clienteId = clientData.id;
             } else {
-                // 2. NO EXISTE -> ¡LO CREAMOS! (Aquí estaba el cambio clave)
+                // 2. CREAR (Si no existe)
                 const { data: newClient, error: insertError } = await supabaseAdmin
                     .from('clientes')
                     .insert({
                         whatsapp_id: whatsappId,
                         telefono: whatsappId,
                         nombre_completo: nombre,
-                        crm_status: 'IMPORTED_HISTORY', // Estado especial para identificarlos
+                        crm_status: 'IMPORTED_HISTORY',
                         crm_intent: 'NONE'
-                        // Los demás campos se llenan solos con NULL o defaults
                     })
                     .select('id')
                     .single();
@@ -100,7 +99,6 @@ const importDirectDb = async () => {
             // ============================================================
             // B. IMPORTAR MENSAJES (POSTGRES -> SUPABASE)
             // ============================================================
-            // Buscamos mensajes asociados a este JID en el JSON 'key'
             const queryMsgs = `
                 SELECT "key", "message", "messageType", "messageTimestamp"
                 FROM "Message"
@@ -122,7 +120,7 @@ const importDirectDb = async () => {
 
                     if (!msgContent) continue;
 
-                    // Extracción de contenido según el tipo
+                    // Extracción de contenido
                     if (msg.messageType === 'conversation') {
                         contentText = msgContent.conversation;
                     } else if (msg.messageType === 'extendedTextMessage') {
@@ -136,7 +134,6 @@ const importDirectDb = async () => {
                     } else if (msgContent.documentMessage) {
                         contentText = `📄 [Archivo]: ${msgContent.documentMessage.fileName || 'Doc'}`;
                     } else {
-                        // Fallback seguro
                         try {
                             const jsonStr = JSON.stringify(msgContent);
                             if (jsonStr.length > 5) contentText = jsonStr.substring(0, 100);
@@ -148,7 +145,7 @@ const importDirectDb = async () => {
                     // Rol
                     const isFromMe = msg.key?.fromMe === true;
 
-                    // Fecha (Manejo de timestamps en segundos vs ms)
+                    // Fecha
                     let ts = parseInt(msg.messageTimestamp);
                     if (ts < 10000000000) ts *= 1000;
 
