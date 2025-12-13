@@ -110,10 +110,6 @@ export const receiveWebhook = async (req: Request, res: Response) => {
             return;
         }
 
-        // 👇 AGREGA ESTO TEMPORALMENTE 👇
-        console.log("🕵️ DEBUG PAYLOAD COMPLETO:", JSON.stringify(messageData, null, 2));
-        // 👆 -------------------------- 👆
-
         const remoteJid = messageData.key.remoteJid;
 
         // 🚨 Filtro Anti-Grupos y Status
@@ -138,11 +134,14 @@ export const receiveWebhook = async (req: Request, res: Response) => {
 
         const isFromMe = messageData.key.fromMe;
         const pushName = isFromMe ? 'Agente' : (messageData.pushName || 'Cliente');
-        const rawJid = messageData.key.participant || messageData.key.remoteJid;
-        const whatsappId = rawJid.split('@')[0];
+        let rawId = messageData.key.remoteJidAlt || messageData.key.remoteJid;
+        let whatsappId = rawId.split('@')[0];
+        if (whatsappId.startsWith('521') && whatsappId.length === 13) {
+            whatsappId = whatsappId.substring(3);
+        }
 
-        // DEBUG EXTRA: Ver qué está llegando realmente
-        console.log(`🕵️ ID Detectado -> Raw: ${rawJid} | Limpio: ${whatsappId}`);
+        console.log(`🕵️ ID Final Detectado: ${whatsappId} (Original: ${rawId})`);
+        // 👆👆 FIN DEL CAMBIO 👆👆
 
         let content = '';
         if (messageData.messageType === 'conversation') {
