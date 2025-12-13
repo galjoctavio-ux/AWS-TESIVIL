@@ -5,7 +5,7 @@ import path from 'path';
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-// CREDENCIALES VERIFICADAS (IP DOCKER + USR/PASS EVOLUTION)
+// CREDENCIALES
 const pool = new Pool({
     user: 'evolution',
     host: '172.19.0.2',
@@ -14,14 +14,14 @@ const pool = new Pool({
     port: 5432,
 });
 
-const INSTANCE_NAME = 'LuzEnTuEspacio'; // Para filtrar solo tu instancia
+// ¡EL ID REAL QUE ENCONTRAMOS!
+const INSTANCE_UUID = '952f8c1c-99c9-46d3-982b-d6704972b01d';
 
 const importDirectDb = async () => {
-    console.log("🐘 INICIANDO IMPORTACIÓN FINAL (SCHEMA ADAPTADO)...");
+    console.log("🐘 INICIANDO IMPORTACIÓN FINAL...");
 
     try {
         // 1. OBTENER CONTACTOS DESDE LA TABLA 'Chat'
-        // Esta tabla ya tiene el resumen perfecto
         console.log("📋 Leyendo tabla 'Chat'...");
 
         const queryChats = `
@@ -30,12 +30,13 @@ const importDirectDb = async () => {
             WHERE "instanceId" = $1
             AND "remoteJid" NOT LIKE '%@g.us' 
             AND "remoteJid" NOT LIKE '%@broadcast'
+            AND "remoteJid" != 'status@broadcast'
         `;
 
-        const resChats = await pool.query(queryChats, [INSTANCE_NAME]);
+        const resChats = await pool.query(queryChats, [INSTANCE_UUID]);
         const chats = resChats.rows;
 
-        console.log(`📥 Se encontraron ${chats.length} conversaciones activas.`);
+        console.log(`📥 Se encontraron ${chats.length} conversaciones.`);
 
         for (const c of chats) {
             const rawId = c.remoteJid;
@@ -79,10 +80,10 @@ const importDirectDb = async () => {
                 continue;
             }
 
-            // B. OBTENER MENSAJES (Extrayendo remoteJid del JSON 'key')
-            // OJO: Postgres usa ->> para extraer texto de JSONB
+            // B. OBTENER MENSAJES
+            // Buscamos dentro del JSON 'key' donde remoteJid coincida
             const queryMsgs = `
-                SELECT "key", "message", "messageType", "messageTimestamp", "pushName"
+                SELECT "key", "message", "messageType", "messageTimestamp"
                 FROM "Message"
                 WHERE "instanceId" = $1
                 AND "key"->>'remoteJid' = $2
@@ -90,7 +91,7 @@ const importDirectDb = async () => {
                 LIMIT 30
             `;
 
-            const resMsgs = await pool.query(queryMsgs, [INSTANCE_NAME, rawId]);
+            const resMsgs = await pool.query(queryMsgs, [INSTANCE_UUID, rawId]);
             const messages = resMsgs.rows;
 
             if (messages.length > 0) {
@@ -98,13 +99,11 @@ const importDirectDb = async () => {
 
                 for (const msg of messages) {
                     let contentText = '';
-
-                    // msg.message ya viene como objeto gracias a 'pg'
                     const msgContent = msg.message;
 
-                    // Extracción robusta del contenido
                     if (!msgContent) continue;
 
+                    // Extracción de contenido
                     if (msg.messageType === 'conversation') {
                         contentText = msgContent.conversation;
                     } else if (msg.messageType === 'extendedTextMessage') {
@@ -115,22 +114,22 @@ const importDirectDb = async () => {
                         contentText = '🎤 [Audio]';
                     } else if (msgContent.videoMessage) {
                         contentText = '🎥 [Video]';
-                    } else if (msgContent.documentMessage) {
-                        contentText = '📄 [Documento]';
                     } else {
-                        // Último recurso: stringify
-                        contentText = typeof msgContent === 'string' ? msgContent : JSON.stringify(msgContent).substring(0, 50);
+                        // Intento seguro de stringify para otros tipos
+                        try {
+                            contentText = JSON.stringify(msgContent).substring(0, 50);
+                        } catch { contentText = '[Media/Otro]'; }
                     }
 
                     if (!contentText) continue;
 
-                    // Determinar rol (fromMe)
+                    // Rol
                     let isFromMe = false;
                     if (msg.key && typeof msg.key === 'object') {
                         isFromMe = msg.key.fromMe === true;
                     }
 
-                    // Fecha (messageTimestamp suele ser SEGUNDOS en Baileys, JS usa MS)
+                    // Fecha (Manejo de segundos vs ms)
                     let ts = parseInt(msg.messageTimestamp);
                     if (ts < 10000000000) ts *= 1000;
                     const createdAt = new Date(ts);
@@ -153,7 +152,7 @@ const importDirectDb = async () => {
                         .from('mensajes_whatsapp')
                         .upsert(msjsParaGuardar, { onConflict: 'whatsapp_message_id', ignoreDuplicates: true });
 
-                    if (error) console.log(`⚠️ Err: ${error.message}`);
+                    if (error) console.log(`⚠️ ${error.message}`);
                     else console.log(`✅ ${msjsParaGuardar.length} msjs`);
                 }
             } else {
