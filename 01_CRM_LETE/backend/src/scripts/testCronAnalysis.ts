@@ -111,7 +111,7 @@ const runManualAnalysis = async () => {
                 procesados++;
             }
 
-            await delay(1500);
+            await delay(15000);
         }
 
         console.log(`\n🧪 FINALIZADO:`);
