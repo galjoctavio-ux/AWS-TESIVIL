@@ -134,7 +134,7 @@ export const receiveWebhook = async (req: Request, res: Response) => {
 
         const isFromMe = messageData.key.fromMe;
         const pushName = isFromMe ? 'Agente' : (messageData.pushName || 'Cliente');
-        const whatsappId = remoteJid.replace('@s.whatsapp.net', '');
+        const whatsappId = remoteJid.split('@')[0];
 
         let content = '';
         if (messageData.messageType === 'conversation') {

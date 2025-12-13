@@ -11,7 +11,7 @@ const INSTANCE = process.env.EVOLUTION_INSTANCE || 'LuzEnTuEspacio';
 // --- HELPER: Guardar mensaje saliente en Supabase ---
 const logOutgoingMessageToSupabase = async (remoteJid: string, content: string, messageId: string) => {
   try {
-    const whatsappId = remoteJid.replace('@s.whatsapp.net', '');
+    const whatsappId = remoteJid.split('@')[0];
 
     // 1. Buscamos al cliente para obtener su UUID
     let { data: cliente } = await supabaseAdmin
@@ -67,7 +67,7 @@ const sendPresence = async (number: string, state: 'composing' | 'available', du
 // MANTENEMOS EL NOMBRE "sendText" PARA NO ROMPER NADA
 export const sendText = async (remoteJid: string, text: string, forceDelay?: number) => {
   try {
-    const number = remoteJid.replace('@s.whatsapp.net', '');
+    const number = remoteJid.split('@')[0];
 
     // 1. Calcular Delay
     // Si forceDelay viene definido (ej: 0), lo usamos. Si no, calculamos el humano.
