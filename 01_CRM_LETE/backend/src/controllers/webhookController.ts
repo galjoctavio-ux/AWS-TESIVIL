@@ -310,7 +310,7 @@ export const receiveWebhook = async (req: Request, res: Response) => {
         }
 
     } catch (error) {
-        console.error('❌ Error crítico en webhook:', error);
+        console.error('❌ Error crítico en webhook:..', error);
         // Siempre devolver 200 para evitar bucles de reintento de WhatsApp
         res.status(200).json({ error: 'Internal Error Handled' });
     }
