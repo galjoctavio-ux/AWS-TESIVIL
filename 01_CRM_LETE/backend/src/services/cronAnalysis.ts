@@ -1,145 +1,133 @@
-import { query } from '../config/db';
+import { supabaseAdmin } from '../services/supabaseClient';
 import { analyzeChatForAppointment } from './aiDateService';
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-// 👇 ¡AQUÍ ESTÁ LA CLAVE! Asegúrate de que diga 'export const'
 export const runNightlyAnalysis = async () => {
-    console.log('🌙 [CRON] Iniciando Análisis Nocturno (V4 - Full Logic)...');
+    console.log('🌙 [CRON] Iniciando Análisis Nocturno (V5 - Supabase Edition)...');
 
     try {
-        // 1. Buscamos chats activos
-        // FILTROS:
-        // - No Bloqueados/Cerrados.
-        // - No Grupos (@g.us).
-        // - Mensajes recientes (2 días).
-        // - ANTI-SPAM: Si el estado es 'AWAITING_REPLY' (ya le escribimos), 
-        //   SOLO analizamos si hay un mensaje nuevo posterior a nuestro último análisis.
-        const result = await query(`
-            SELECT DISTINCT c.id, c.whatsapp_id, c.last_message_analyzed_id, c.last_ai_analysis_at
-            FROM conversations c
-            JOIN messages m ON c.id = m.conversation_id
-            WHERE c.status NOT IN ('CLOSED', 'BLOCKED')
-            AND c.whatsapp_id NOT LIKE '%@g.us'
-            AND (
-                c.intent != 'AWAITING_REPLY' 
-                OR 
-                m.created_at > c.last_ai_analysis_at
-            )
-            AND m.created_at >= NOW() - INTERVAL '2 days' 
-        `);
+        // 1. OBTENER CANDIDATOS
+        // Buscamos clientes activos (No bloqueados, No cerrados)
+        // Y que hayan tenido interacción reciente (últimos 3 días) para ahorrar tokens
+        const { data: candidates, error } = await supabaseAdmin
+            .from('clientes')
+            .select('id, whatsapp_id, nombre_completo, last_message_analyzed_id, last_interaction, crm_status')
+            .not('crm_status', 'in', '("CLOSED","BLOCKED")') // Excluir cerrados
+            .gt('last_interaction', new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()) // Últimos 3 días
+            .order('last_interaction', { ascending: false });
 
-        const candidates = result.rows;
-        console.log(`🔎 Candidatos reales: ${candidates.length}`);
+        if (error) throw error;
+        if (!candidates || candidates.length === 0) {
+            console.log('🌙 Nadie para analizar hoy.');
+            return;
+        }
 
-        for (const chat of candidates) {
-            // 2. Obtener datos clave: Último mensaje general
-            const msgData = await query(`
-                SELECT 
-                    (SELECT created_at FROM messages WHERE conversation_id = $1 ORDER BY created_at DESC LIMIT 1) as last_msg_at,
-                    (SELECT whatsapp_message_id FROM messages WHERE conversation_id = $1 ORDER BY created_at DESC LIMIT 1) as last_msg_id,
-                    (SELECT id FROM messages WHERE conversation_id = $1 ORDER BY created_at DESC LIMIT 1) as last_db_id
-            `, [chat.id]);
+        console.log(`🔎 Candidatos activos recientes: ${candidates.length}`);
 
-            if (msgData.rows.length === 0) continue;
-            const meta = msgData.rows[0];
-            const lastRealId = meta.last_msg_id || meta.last_db_id.toString();
+        for (const cliente of candidates) {
+            // 2. OBTENER EL ÚLTIMO MENSAJE REAL DEL CHAT
+            const { data: lastMsgData } = await supabaseAdmin
+                .from('mensajes_whatsapp')
+                .select('whatsapp_message_id, created_at, content')
+                .eq('cliente_id', cliente.id)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .maybeSingle();
 
-            // Lógica de Marcas: Si ya analizamos este ID exacto, saltar.
-            if (chat.last_message_analyzed_id === lastRealId) {
-                console.log(`⏩ Saltando ${chat.whatsapp_id} (Sin cambios desde ayer)`);
+            if (!lastMsgData) continue; // Cliente sin mensajes
+
+            // 🛑 FILTRO DE EFICIENCIA:
+            // Si el ID del último mensaje es IGUAL al que ya analizamos la vez pasada, NO GASTES DINERO EN IA.
+            if (cliente.last_message_analyzed_id === lastMsgData.whatsapp_message_id) {
+                // console.log(`⏩ Saltando ${cliente.whatsapp_id} (Sin mensajes nuevos)`);
                 continue;
             }
-            console.log(`🧠 Analizando: ${chat.whatsapp_id}...`);
 
-            // 3. Obtener Historial
-            const historyResult = await query(`
-                SELECT content, is_internal, created_at
-                FROM messages
-                WHERE conversation_id = $1
-                ORDER BY created_at ASC
-                LIMIT 50
-            `, [chat.id]);
+            console.log(`🧠 Analizando a: ${cliente.nombre_completo || cliente.whatsapp_id}...`);
 
-            const historyText = historyResult.rows.map((m: any) => {
-                const role = m.is_internal ? 'Soporte/Técnico' : 'Cliente';
+            // 3. OBTENER HISTORIAL (Últimos 30 mensajes para contexto)
+            const { data: historyData } = await supabaseAdmin
+                .from('mensajes_whatsapp')
+                .select('role, content, created_at')
+                .eq('cliente_id', cliente.id)
+                .order('created_at', { ascending: true }) // Importante: Cronológico para la IA
+                .limit(30);
+
+            if (!historyData) continue;
+
+            // Formatear para Gemini
+            const historyText = historyData.map(m => {
+                const role = m.role === 'assistant' ? 'Soporte/Técnico' : 'Cliente';
                 const date = new Date(m.created_at).toLocaleString('es-MX', { timeZone: 'America/Mexico_City' });
                 return `[${date}] ${role}: ${m.content}`;
             }).join('\n');
 
-            // 4. Consultar a Gemini
-            const analysis = await analyzeChatForAppointment(chat.id.toString(), historyText);
+            // 4. CONSULTAR A GEMINI (Usamos tu servicio existente aiDateService)
+            // Nota: analyzeChatForAppointment no necesita cambios, solo recibe texto.
+            const analysis = await analyzeChatForAppointment(cliente.id, historyText);
 
             if (analysis) {
                 let followUpDate: Date | null = null;
-                const now = new Date(); // Hora Servidor (UTC)
+                const now = new Date();
 
-                // CASO A: CITA AGENDADA O CONTACTO FUTURO (Incluye el "Déjame ver" fusionado)
+                // LÓGICA DE FECHAS (Idéntica a tu V4 original)
                 if ((analysis.intent === 'APPOINTMENT' || analysis.intent === 'FUTURE_CONTACT') && analysis.appointment_date_iso) {
-
                     followUpDate = new Date(analysis.appointment_date_iso);
-
-                    // Validación de seguridad: Si la IA alucinó una fecha en el pasado, la movemos a mañana
+                    // Seguridad: Si es pasado, mover a mañana 5 PM
                     if (followUpDate <= now) {
                         followUpDate = new Date();
                         followUpDate.setDate(followUpDate.getDate() + 1);
-                        followUpDate.setUTCHours(17, 0, 0, 0);
+                        followUpDate.setUTCHours(23, 0, 0, 0); // ~5-6 PM MX
                     }
-
-                    // CASO B: GHOSTING (No Reply)
                 } else if (analysis.intent === 'NO_REPLY') {
-                    // Mandar MAÑANA a las 9 AM Hora México (15:00 UTC)
+                    // Mañana a las 9 AM MX (~15:00 UTC)
                     const target = new Date();
+                    target.setDate(target.getDate() + 1);
                     target.setUTCHours(15, 0, 0, 0);
-                    target.setDate(target.getDate() + 1); // +1 día por seguridad
                     followUpDate = target;
-
-                    // CASO C: SEGUIMIENTO DE COTIZACIÓN (+3 Días)
                 } else if (analysis.intent === 'QUOTE_FOLLOWUP') {
+                    // +3 Días
                     const target = new Date();
                     target.setDate(target.getDate() + 3);
-                    target.setUTCHours(17, 0, 0, 0); // 11 AM MX
-
-                    if (target.getDay() === 0) {
-                        target.setDate(target.getDate() + 1);
-                    }
+                    target.setUTCHours(17, 0, 0, 0);
+                    if (target.getDay() === 0) target.setDate(target.getDate() + 1); // No domingo
                     followUpDate = target;
                 }
 
-                // 5. Guardar en Base de Datos
-                if (followUpDate) {
-                    await query(`
-                        UPDATE conversations
-                        SET intent = $1::varchar,
-                            follow_up_date = $2::timestamp,
-                            follow_up_status = 'PENDING',
-                            appointment_date = CASE WHEN $1::varchar = 'APPOINTMENT' THEN $2::timestamp ELSE appointment_date END,
-                            appointment_status = CASE WHEN $1::varchar = 'APPOINTMENT' THEN 'PENDING' ELSE appointment_status END,
-                            last_ai_analysis_at = NOW(),
-                            last_message_analyzed_id = $3
-                        WHERE id = $4
-                    `, [analysis.intent, followUpDate.toISOString(), lastRealId, chat.id]);
+                // 5. GUARDAR RESULTADO EN SUPABASE (CLIENTES)
+                const updates: any = {
+                    last_ai_analysis_at: new Date(),
+                    last_message_analyzed_id: lastMsgData.whatsapp_message_id,
+                    crm_intent: analysis.intent,
+                    ai_summary: analysis.reasoning // Guardamos el razonamiento para verlo en el Admin
+                };
 
-                    console.log(`✅ ${analysis.intent} detectado. Programado para: ${followUpDate.toISOString()} (UTC)`);
-                } else {
-                    await query(`
-                        UPDATE conversations
-                        SET last_ai_analysis_at = NOW(),
-                            intent = $1::varchar,
-                            last_message_analyzed_id = $2
-                        WHERE id = $3
-                    `, [analysis.intent, lastRealId, chat.id]);
-                    console.log(`Thinking: ${analysis.intent} (Sin acción programada)`);
+                if (followUpDate) {
+                    updates.next_follow_up_date = followUpDate.toISOString();
                 }
+
+                // Si detectó cita, actualizamos campos de cita
+                if (analysis.intent === 'APPOINTMENT' && followUpDate) {
+                    updates.appointment_date = followUpDate.toISOString();
+                    updates.appointment_status = 'PENDIENTE';
+                }
+
+                await supabaseAdmin
+                    .from('clientes')
+                    .update(updates)
+                    .eq('id', cliente.id);
+
+                console.log(`✅ Resultado: ${analysis.intent} -> Seguimiento: ${followUpDate ? followUpDate.toISOString() : 'N/A'}`);
             }
 
-            // Delay anti-ban
-            await delay(4000);
+            // Delay anti-ban / rate limit
+            await delay(2000);
         }
 
-        console.log('💤 Análisis Finalizado.');
+        console.log('💤 Análisis Nocturno Finalizado.');
 
     } catch (error) {
-        console.error('Error en runNightlyAnalysis:', error);
+        console.error('❌ Error en runNightlyAnalysis:', error);
     }
 };
