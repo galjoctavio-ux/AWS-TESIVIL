@@ -8,10 +8,10 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 // CONFIGURACIÓN DATABASE EVOLUTION
 // Usamos 'localhost' asumiendo que el puerto 5432 está expuesto en el Docker
 const pool = new Pool({
-    user: 'postgres',
-    host: '172.19.0.2',
-    database: 'evolution',
-    password: 'pass1234',
+    user: 'evolution',      // <--- VERIFICADO
+    host: '172.19.0.2',     // <--- MANTÉN LA IP QUE YA FUNCIONÓ
+    database: 'evolution',  // <--- VERIFICADO
+    password: 'evolution',  // <--- LA CLAVE CORRECTA
     port: 5432,
 });
 
