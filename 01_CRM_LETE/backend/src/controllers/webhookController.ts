@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-//import { pool } from '../config/db';
-import { supabaseAdmin } from '../services/supabaseClient'; // 👈 NUEVO
-import { geminiModel } from '../services/aiService'; // ⚠️ ASEGÚRATE DE EXPORTAR geminiModel en aiService
+// import { pool } from '../config/db'; // ELIMINADO: Ya no usamos DB local
+import { supabaseAdmin } from '../services/supabaseClient';
+import { geminiModel } from '../services/aiService'; // Solo importamos el modelo, no analyzeIntent aún
 import { sendText } from '../services/whatsappService';
 import axios from 'axios';
 import {
@@ -12,23 +12,18 @@ import {
 
 // =========================================================================
 // 🚀 FUNCIÓN HELPER: Ejecuta el Agendamiento y Envía a VM2
-// Esta función encapsula la lógica que estaba duplicada en el bloque 'AGENDAR'
 // =========================================================================
 const ejecutarAgendamiento = async (remoteJid: string, draft: any) => {
     try {
         await sendText(remoteJid, "🚀 Enviando datos a TESIVIL (VM 2)...", 0);
 
-        // --- 1. MAPEO DE TÉCNICOS REAL (Lógica original preservada) ---
-
-        // Opción Default: Ing. Gallardo (ID 23)
+        // --- 1. MAPEO DE TÉCNICOS ---
         let techIds = {
             ea: 23,
             supabase: "7561b141-93b8-4c8e-b8cc-05bb7658f152"
         };
-
         const nombreTech = (draft.tecnico_nombre_detectado || draft.tecnico_nombre || '').toLowerCase();
 
-        // Override: Si la IA detectó a Leonardo
         if (nombreTech.includes('leonardo') || nombreTech.includes('leo')) {
             techIds = {
                 ea: 25,
@@ -36,23 +31,18 @@ const ejecutarAgendamiento = async (remoteJid: string, draft: any) => {
             };
         }
 
-        // --- 2. PREPARAR NOTAS CON COSTO (Lógica original preservada) ---
-
-        // Unimos las notas de la IA con el costo detectado
+        // --- 2. PREPARAR NOTAS ---
         const notasIA = draft.notas_adicionales || draft.notas || 'Sin notas';
         const costoTexto = draft.costo ? ` | Costo acordado: $${draft.costo}` : '';
         const notaFinal = `${notasIA}${costoTexto}`;
 
-        // --- 3. CONSTRUCCIÓN DEL PAYLOAD (¡GPS AGREGADO!) ---
+        // --- 3. PAYLOAD ---
         const payloadFinal = {
             cliente: {
                 nombre: draft.cliente_nombre,
                 telefono: draft.cliente_telefono,
-                // Usamos la dirección final confirmada/geocodificada
                 direccion: draft.direccion_final || draft.direccion_texto,
-                // Usamos el link directo a coordenadas (si disponible) o el de búsqueda
                 google_maps_link: draft.link_gmaps_generado || draft.link_gmaps_final,
-                // CAMPOS DE COORDENADAS PRECISO PARA SUPABASE
                 latitud: draft.ubicacion_lat || null,
                 longitud: draft.ubicacion_lng || null
             },
@@ -78,7 +68,7 @@ const ejecutarAgendamiento = async (remoteJid: string, draft: any) => {
             payloadFinal,
             {
                 headers: {
-                    'x-app-key': 'Tesivil_Secret_Bot_2025_XYZ', // <--- ¡PON TU CLAVE AQUÍ!
+                    'x-app-key': 'Tesivil_Secret_Bot_2025_XYZ',
                     'Content-Type': 'application/json'
                 }
             }
@@ -92,12 +82,13 @@ const ejecutarAgendamiento = async (remoteJid: string, draft: any) => {
     } catch (error) {
         console.error("Error al enviar a VM 2:", error);
         await sendText(remoteJid, `❌ Error técnico al guardar: ${(error as any).message}`, 0);
-        // Si hay error, no borramos el draft para que se pueda intentar de nuevo manualmente
         return false;
     }
 };
-// =========================================================================
 
+// =========================================================================
+// MAIN WEBHOOK CONTROLLER
+// =========================================================================
 export const receiveWebhook = async (req: Request, res: Response) => {
     try {
         const body = req.body;
@@ -245,73 +236,13 @@ export const receiveWebhook = async (req: Request, res: Response) => {
         }
 
         // =========================================================
-        // 🛑 MODO DEBUG ACTIVADO: DETENER AQUÍ (PRESERVADO)
+        // 🛑 PUNTO FINAL DEL WEBHOOK
         // =========================================================
-        console.log('🛑 DEBUG: Mensaje guardado en Supabase.');
-        res.status(200).json({ status: 'saved_debug_mode' });
-        return;
-        // =========================================================
-
-
-        // --- 4. DECISIÓN DEL CEREBRO (IA) --- (PRESERVADO)
-
-        // Regla 1: Si el mensaje es mío, no hago nada más.
-        if (isFromMe) {
-            res.status(200).json({ status: 'saved_own' });
-            return;
-        }
-
-        // Regla 2: Si el chat ya no es del BOT, no intervengo.
-        if (conversation.assigned_to_role !== 'BOT') {
-            console.log('🤫 Chat humano activo. IA en silencio.');
-            res.status(200).json({ status: 'saved_silent' });
-            return;
-        }
-
-        // Regla 3: Invocar a la IA con MEMORIA (pasando conversation.id)
-        const analysis = await analyzeIntent(conversation.id, content);
-
-        console.log(`🧠 Decisión IA: ${analysis.decision} | Razón: ${analysis.reason || 'N/A'}`);
-
-        // --- 5. EJECUCIÓN DE LA DECISIÓN --- (PRESERVADO)
-
-        if (analysis.decision === 'REPLY' && analysis.message) {
-            // A) RESPONDER
-
-            // Avisamos a WhatsApp API que todo está bien antes de empezar el delay
-            res.status(200).json({ status: 'processing_reply' });
-
-            await sendText(remoteJid, analysis.message || '');
-
-            // Guardar la respuesta de la IA en BD
-            await pool.query(
-                `INSERT INTO messages (conversation_id, sender_type, message_type, content) VALUES ($1, 'BOT', 'TEXT', $2)`,
-                [conversation.id, analysis.message]
-            );
-
-            // Actualizamos estado a CONTACTED (Ya hubo interacción)
-            await pool.query(
-                `UPDATE conversations SET status = 'CONTACTED', unread_count = 0 WHERE id = $1`,
-                [conversation.id]
-            );
-
-        } else {
-            // B) HANDOFF (HANDOFF_OTHER o HANDOFF_READY)
-            // Silencio estratégico + Transferencia a Mónica
-
-            console.log('🤐 IA transfiere el caso (Silencio).');
-
-            await pool.query(
-                `UPDATE conversations SET status = 'OPEN', assigned_to_role = 'ADMIN', unread_count = unread_count + 1 WHERE id = $1`,
-                [conversation.id]
-            );
-
-            res.status(200).json({ status: 'handed_off', reason: analysis.decision });
-        }
+        console.log('🛑 DEBUG: Mensaje guardado en Supabase. Fin del proceso.');
+        res.status(200).json({ status: 'saved_supabase' });
 
     } catch (error) {
-        console.error('❌ Error crítico en webhook:..', error);
-        // Siempre devolver 200 para evitar bucles de reintento de WhatsApp
+        console.error('❌ Error crítico en webhook:', error);
         res.status(200).json({ error: 'Internal Error Handled' });
     }
 };
