@@ -1,3 +1,4 @@
+// aiDateService.ts
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from 'dotenv';
 
@@ -6,66 +7,66 @@ dotenv.config();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-interface AIAnalysisResult {
-   intent: 'APPOINTMENT' | 'FUTURE_CONTACT' | 'NO_REPLY' | 'QUOTE_FOLLOWUP' | 'NONE';
+// 🆕 NUEVOS ESTADOS DE AUDITORÍA
+export interface AIAnalysisResult {
+   intent:
+   | 'APPOINTMENT'       // Agendó cita
+   | 'FUTURE_CONTACT'    // Pide que le hablemos luego
+   | 'NO_REPLY'          // Interesado que dejó de contestar
+   | 'QUOTE_FOLLOWUP'    // Ya tiene precio, falta cierre
+   | 'OPERATIONAL_ALERT' // 🚨 PELIGRO: Prometimos algo y fallamos (Técnico no llegó, sin respuesta nuestra)
+   | 'ADMIN_TASK'        // 📄 TRAMITE: Pide factura, cuenta bancaria, dudas de pago
+   | 'NONE';             // Todo en orden / No molestar
    appointment_date_iso: string | null;
    reasoning: string;
 }
 
 export const analyzeChatForAppointment = async (conversationId: string, historyText: string): Promise<AIAnalysisResult | null> => {
-   // Fecha actual formateada para México (La IA necesita contexto temporal)
    const today = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City', dateStyle: 'full', timeStyle: 'short' });
 
    const prompt = `
-    Eres el asistente IA de ventas de "Luz en tu Espacio". Hoy es: ${today}.
-    Tu objetivo es definir la PRÓXIMA ACCIÓN basándote en el historial.
+    Eres el Auditor de Calidad y Asistente IA de "Luz en tu Espacio". Hoy es: ${today}.
+    Analiza el historial y clasifica el estado actual del cliente.
 
-    --- 🛡️ REGLAS DE SEGURIDAD ANTI-SPAM (PRIORIDAD ABSOLUTA) 🛡️ ---
+    --- 🚨 CATEGORÍA 1: ALERTAS INTERNAS (PRIORIDAD MÁXIMA) 🚨 ---
+    Usa estas categorías si detectas que NOSOTROS tenemos una tarea pendiente o fallamos.
     
-    1. LEY DEL "YA INTENTÉ" (Evitar Bucle Infinito): 
-       - Mira el ÚLTIMO mensaje del historial.
-       - Si es de "Soporte/Técnico" (nosotros) y es un mensaje de SEGUIMIENTO (ej: "¿Aún tienes problemas?", "¿Cerramos tu expediente?", "¿Sigues interesado?", "¿Pudiste revisar?", "Quedo atento").
-       - Y el cliente NO ha respondido a ese mensaje específico...
-       - ENTONCES LA INTENCIÓN ES: "NONE".
-       - (Razón: Ya le mandamos el seguimiento ayer. No le mandes otro hoy. Esperamos su respuesta).
+    1. [OPERATIONAL_ALERT] (Fallo Operativo / Queja)
+       - Detectas que el equipo de Soporte prometió una visita o llamada y NO hay evidencia posterior de que ocurrió.
+       - Ejemplo: Soporte dice "El técnico va en camino", "Te aviso en 1 hora", "Pasamos el lunes"... y luego SILENCIO total.
+       - Ejemplo: Cliente reclama: "¿Van a venir?", "Sigo esperando", "No quedó bien".
+    
+    2. [ADMIN_TASK] (Temas Administrativos)
+       - El cliente está pidiendo explícitamente: Factura, Datos Bancarios, Recibo de pago, Dudas sobre el contrato.
+       - Y NO se le ha dado respuesta final a eso.
+       - (Aquí NO se debe enviar mensaje automático de venta, requiere humano).
 
-    2. LEY DE LAS "LLAVES / TRÁMITE":
-       - Si el cliente dice: "Me entregan las llaves tal día", "Estoy esperando terminar trámite", "Apenas voy a recibir la casa", "Me avisan cuando escriture"...
-       - ENTONCES LA INTENCIÓN ES: "FUTURE_CONTACT".
-       - Calcula una fecha prudente (ej. 15 días después) para preguntar: "¿Cómo te fue con la entrega?".
-       - NO uses "SOFT_FOLLOWUP" ni "NO_REPLY" aquí. Déjalos respirar.
+    --- 🤖 CATEGORÍA 2: AUTOMATIZACIÓN DE VENTAS ---
+    Usa esto solo si NO hay alertas internas pendientes.
 
-    3. CLIENTE "GUARDARROPA" O INTERRUPCIÓN:
-       - Si dice "Solo para tener el dato" -> INTENT: "NONE".
-       - Si el cliente hizo una pregunta y NOSOTROS NO HEMOS RESPONDIDO -> INTENT: "NONE" (Toca responder manual).
-       - Temas ajenos (Marketing, SEO) -> INTENT: "NONE".
+    3. [APPOINTMENT]
+       - El cliente confirmó fecha y hora explícitamente para una visita FUTURA.
+       - Devuelve fecha ISO correcta.
 
-    --- CLASIFICACIÓN DE INTENCIONES (Si pasa las reglas anteriores) ---
+    4. [QUOTE_FOLLOWUP]
+       - Se envió cotización/precio hace menos de 10 días.
+       - Cliente dijo "lo reviso" o no contestó.
+       - NO usar si el cliente ya rechazó o si pasaron >15 días.
 
-    [QUOTE_FOLLOWUP] (Seguimiento de Cotización)
-    Los últimos mensajes hablan explícitamente de haber enviado:
-    - "Cotización", "Presupuesto", "Propuesta", "Costo final", "Archivo adjunto" o "PDF".
-    - Y el cliente NO respondió o dijo "lo reviso", "dejame consultarlo".
-    - PRIORIDAD ALTA: Úsalo sobre [NO_REPLY] si hay una propuesta económica sobre la mesa.
+    5. [NO_REPLY] (Ghosting reciente)
+       - Cliente pidió info, se la dimos, y se calló (hace 1-7 días).
+       - NO usar si el último mensaje ya es nuestro seguimiento ("¿Sigues ahí?").
 
-    [APPOINTMENT]
-    El cliente confirmó fecha y hora explícitamente para la visita.
-    - IMPORTANTE: Debes devolver la fecha en formato ISO con OFFSET DE +6 horas (+06:00) o en UTC correcto.
-    - Ejemplo: Si es a las 11am, devuelve "...T17:00:00".
+    6. [FUTURE_CONTACT]
+       - Cliente pide que lo busquen en fecha específica o "la próxima semana".
 
-    [NO_REPLY] (Recuperación de Venta / Ghosting)
-    El cliente mostró interés, nosotros dimos información general o precio base ($400), y luego hubo SILENCIO.
-    - Condición: El último mensaje NO debe ser un intento de recuperación nuestro (ver Regla 1).
-    - Úsalo cuando el cliente se quedó callado justo después de darle info inicial.
-    - Si Soporte envió el saludo estándar ("Buen día... Qué servicio te podemos ofrecer?") y nadie contestó -> ES NO_REPLY.
-
-    [FUTURE_CONTACT] (FUSIÓN: Fechas Específicas + Esperas Vagas)
-    Úsalo en DOS casos:
-    1. FECHA CLARA: El cliente dice "búscame en enero", "el lunes", "la próxima semana".
-       -> Calcula la fecha exacta solicitada.
-    2. ESPERA VAGA ("SOFT"): El cliente pide tiempo sin fecha ("Déjame ver", "Lo checo con mi esposo", "Yo les aviso", "Estoy revisando números").
-       -> REGLA DE ESTIMACIÓN: En estos casos vagos, programa para dentro de **2 a 3 DÍAS** a las 11:00 AM o 5:00 PM.
-       -> NO uses fecha de mañana (muy pronto), dales espacio.
+    --- 🗑️ CATEGORÍA 3: DESCARTAR ---
+    
+    7. [NONE]
+       - Citas que YA ocurrieron en el pasado (sin quejas posteriores).
+       - Conversaciones cerradas exitosamente ("Gracias, quedó bien").
+       - Conversaciones muy antiguas (>20 días sin actividad).
+       - Cliente dice "No me interesa", "Ya contraté a otro".
 
     Historial del chat:
     ---
@@ -74,16 +75,15 @@ export const analyzeChatForAppointment = async (conversationId: string, historyT
     
     Responde SOLO JSON:
     {
-      "intent": "APPOINTMENT" | "FUTURE_CONTACT" | "NO_REPLY" | "QUOTE_FOLLOWUP" | "NONE",
-      "appointment_date_iso": "YYYY-MM-DDTHH:mm:00-06:00" (Asegúrate de poner el offset correcto o UTC),
-      "reasoning": "Breve explicación de por qué aplicaste la regla"
+      "intent": "APPOINTMENT" | "FUTURE_CONTACT" | "NO_REPLY" | "QUOTE_FOLLOWUP" | "OPERATIONAL_ALERT" | "ADMIN_TASK" | "NONE",
+      "appointment_date_iso": "YYYY-MM-DDTHH:mm:00-06:00" (Solo si aplica),
+      "reasoning": "Breve explicación para el humano de por qué se eligió este estado"
     }
     `;
 
    try {
       const result = await model.generateContent(prompt);
-      const responseText = result.response.text();
-      const cleanJson = responseText.replace(/```json|```/g, '').trim();
+      const cleanJson = result.response.text().replace(/```json|```/g, '').trim();
       return JSON.parse(cleanJson);
    } catch (error) {
       console.error(`[AI Error] ${conversationId}:`, error);

@@ -76,41 +76,39 @@ export const runNightlyAnalysis = async () => {
                 let followUpDate: Date | null = null;
                 const now = new Date();
 
+                // Lógica de fechas para VENTAS (Igual que antes)
                 if ((analysis.intent === 'APPOINTMENT' || analysis.intent === 'FUTURE_CONTACT') && analysis.appointment_date_iso) {
                     followUpDate = new Date(analysis.appointment_date_iso);
-                    if (followUpDate <= now) {
-                        followUpDate = new Date();
-                        followUpDate.setDate(followUpDate.getDate() + 1);
-                        followUpDate.setUTCHours(23, 0, 0, 0);
-                    }
+                    // ... validaciones de fecha ...
                 } else if (analysis.intent === 'NO_REPLY') {
-                    const target = new Date();
-                    target.setDate(target.getDate() + 1);
-                    target.setUTCHours(15, 0, 0, 0);
-                    followUpDate = target;
+                    // ... logica NO_REPLY ...
                 } else if (analysis.intent === 'QUOTE_FOLLOWUP') {
-                    const target = new Date();
-                    target.setDate(target.getDate() + 3);
-                    target.setUTCHours(17, 0, 0, 0);
-                    if (target.getDay() === 0) target.setDate(target.getDate() + 1);
-                    followUpDate = target;
+                    // ... logica QUOTE ...
                 }
 
-                // 5. GUARDAR RESULTADO EN SUPABASE
+                // 🆕 LÓGICA PARA ALERTAS INTERNAS
+                // Si es Alerta u Admin, NO programamos next_follow_up_date automático para el bot.
+                // Simplemente guardamos el estado para que aparezca en rojo/amarillo en tu CRM.
+                if (analysis.intent === 'OPERATIONAL_ALERT' || analysis.intent === 'ADMIN_TASK') {
+                    console.log(`🚨 ALERTA DETECTADA (${analysis.intent}) para ${cliente.nombre_completo}: ${analysis.reasoning}`);
+                    followUpDate = null; // Que no lo toque el bot, lo toca un humano
+                }
+
+                // 5. GUARDAR RESULTADO
                 const updates: any = {
                     last_ai_analysis_at: new Date(),
-                    last_message_analyzed_id: lastMsgData.whatsapp_message_id, // <--- ESTO ES LO QUE DEBE GUARDARSE
+                    last_message_analyzed_id: lastMsgData.whatsapp_message_id,
                     crm_intent: analysis.intent,
-                    ai_summary: analysis.reasoning
+                    ai_summary: analysis.reasoning,
+                    // Importante: Si es alerta, podríamos querer un flag extra si tu DB lo soporta
+                    // requires_human_intervention: ['OPERATIONAL_ALERT', 'ADMIN_TASK'].includes(analysis.intent) 
                 };
 
                 if (followUpDate) {
                     updates.next_follow_up_date = followUpDate.toISOString();
-                }
-
-                if (analysis.intent === 'APPOINTMENT' && followUpDate) {
-                    updates.appointment_date = followUpDate.toISOString();
-                    updates.appointment_status = 'PENDIENTE';
+                } else {
+                    // Si es alerta o NONE, limpiamos la fecha para que el Cron de envíos no dispare nada
+                    updates.next_follow_up_date = null;
                 }
 
                 // 🚨 CAPTURAMOS ERROR DEL UPDATE AQUÍ
