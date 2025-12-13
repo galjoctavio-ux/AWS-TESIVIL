@@ -1,7 +1,7 @@
 // Archivo: routes/notifications.routes.js
 import { Router } from 'express';
 // Asegúrate que la ruta al controlador sea correcta según tu estructura
-import { sendNotificationToEmail, subscribeUser } from '../notifications.controller.js';
+import { sendNotificationToEmail, subscribeUser } from '../controllers/notifications.controller.js';
 
 const router = Router();
 
