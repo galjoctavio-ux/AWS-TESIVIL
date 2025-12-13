@@ -110,6 +110,10 @@ export const receiveWebhook = async (req: Request, res: Response) => {
             return;
         }
 
+        // 👇 AGREGA ESTO TEMPORALMENTE 👇
+        console.log("🕵️ DEBUG PAYLOAD COMPLETO:", JSON.stringify(messageData, null, 2));
+        // 👆 -------------------------- 👆
+
         const remoteJid = messageData.key.remoteJid;
 
         // 🚨 Filtro Anti-Grupos y Status
