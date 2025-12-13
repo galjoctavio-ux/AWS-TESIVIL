@@ -9,7 +9,7 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 // Usamos 'localhost' asumiendo que el puerto 5432 está expuesto en el Docker
 const pool = new Pool({
     user: 'evolution',
-    host: 'localhost',
+    host: '172.19.0.2',
     database: 'evolution',
     password: 'pass1234',
     port: 5432,
