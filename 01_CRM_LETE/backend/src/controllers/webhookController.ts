@@ -154,23 +154,62 @@ export const receiveWebhook = async (req: Request, res: Response) => {
 
         console.log(`📨 ${isFromMe ? 'YO' : 'CLIENTE'}: ${content}`);
 
-        // 3. UPSERT CLIENTE EN SUPABASE
-        let { data: cliente } = await supabaseAdmin
+        // 3. LOGICA INTELIGENTE DE CLIENTE (BUSCAR -> VINCULAR -> CREAR)
+        let cliente = null;
+
+        // A. Búsqueda Primaria: Por whatsapp_id
+        const { data: byWaId } = await supabaseAdmin
             .from('clientes')
             .select('*')
             .eq('whatsapp_id', whatsappId)
             .maybeSingle();
 
+        if (byWaId) {
+            cliente = byWaId;
+        } else {
+            // B. Búsqueda Secundaria: Por Teléfono (Para evitar duplicados)
+            const { data: byPhone } = await supabaseAdmin
+                .from('clientes')
+                .select('*')
+                .eq('telefono', whatsappId)
+                .maybeSingle();
+
+            if (byPhone) {
+                // ¡EUREKA! El cliente ya existía, solo le faltaba el whatsapp_id.
+                console.log(`🔗 Vinculando cliente existente (DB ID: ${byPhone.id}) con WhatsApp ID: ${whatsappId}`);
+
+                // Actualizamos el registro existente para ponerle el ID
+                const { data: linkedClient, error: linkError } = await supabaseAdmin
+                    .from('clientes')
+                    .update({ whatsapp_id: whatsappId })
+                    .eq('id', byPhone.id)
+                    .select()
+                    .single();
+
+                if (linkError) {
+                    console.error("Error al vincular cliente:", linkError);
+                    // Si falla la vinculación, usamos el original, aunque puede fallar luego si intentamos algo más.
+                    cliente = byPhone;
+                } else {
+                    cliente = linkedClient;
+                }
+            }
+        }
+
+        // C. Acciones Finales (Actualizar o Crear)
         if (cliente) {
+            // Si ya lo tenemos (encontrado o vinculado), actualizamos metadatos
             await supabaseAdmin
                 .from('clientes')
                 .update({
                     last_interaction: new Date(),
+                    // Solo actualizamos nombre si el actual es genérico y tenemos uno mejor
                     nombre_completo: (cliente.nombre_completo === 'Cliente Nuevo' && pushName) ? pushName : cliente.nombre_completo,
                     unread_count: isFromMe ? 0 : (cliente.unread_count || 0) + 1
                 })
                 .eq('id', cliente.id);
         } else {
+            // D. Si no existía por ningún lado, CREAMOS uno nuevo
             const { data: newClient, error: createError } = await supabaseAdmin
                 .from('clientes')
                 .insert({
