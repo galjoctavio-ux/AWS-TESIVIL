@@ -3,15 +3,80 @@ import { getCrmDashboard, forceAnalyze } from '../apiService';
 import ChatModal from '../components/ChatModal';
 import './CrmDashboard.css';
 
+// --- FUNCIONES DE AYUDA VISUAL ---
+
+// Función para el semáforo de Calificación del Cliente
+const getStatusColor = (calificacion) => {
+    switch (calificacion) {
+        case 'SOSPECHOSO':
+            return 'var(--red-500)'; // Rojo
+        case 'HOSTIL':
+            return 'var(--red-500)'; // Rojo
+        case 'NEUTRO':
+            return 'var(--yellow-500)'; // Amarillo
+        case 'AMABLE':
+            return 'var(--green-500)'; // Verde
+        default:
+            return 'var(--gray-400)'; // Gris para desconocido
+    }
+};
+
+// Componente para los círculos de sincronización y alertas
+const renderSyncStatus = (cliente) => {
+    const status = [];
+
+    // 1. Estado MariaDB (Easy!Appointments)
+    const mariaDBColor = cliente.sync_mariadb ? 'var(--green-500)' : 'var(--red-500)';
+    status.push(
+        <span key="ea" title={cliente.sync_mariadb ? "Usuario en Easy!Appointments" : "Falta crear en EA"} style={{ color: mariaDBColor }}>
+            ● EA
+        </span>
+    );
+
+    // 2. Estado Evolution (WhatsApp/CRM)
+    const evolutionColor = cliente.sync_evolution ? 'var(--green-500)' : 'var(--gray-400)';
+    status.push(
+        <span key="ev" title={cliente.sync_evolution ? "Sincronizado con WhatsApp (Evolution)" : "Sin historial de Evolution"} style={{ color: evolutionColor }}>
+            ● WA
+        </span>
+    );
+
+    // 3. Alerta de Cita Desincronizada (Si IA dijo CITA pero no hay registro en EA)
+    if (cliente.alerta_cita_desincronizada) {
+        status.push(
+            <span key="cita" title="¡ALERTA! Cliente con intención de CITA pero no agendado en EA." style={{ color: 'var(--red-500)', fontWeight: 'bold' }}>
+                ⚠️ CITA
+            </span>
+        );
+    }
+
+    // 4. Bandera de Cotización Pendiente
+    if (cliente.debe_cotizacion) {
+        status.push(
+            <span key="cotiz" title="Requiere cotización pendiente de generar o enviar." style={{ color: 'var(--blue-500)', fontWeight: 'bold' }}>
+                💰 COT. PENDIENTE
+            </span>
+        );
+    }
+
+    return status.map((s, index) => (
+        <React.Fragment key={index}>
+            {s}{index < status.length - 1 && ' | '}
+        </React.Fragment>
+    ));
+};
+
+// --- COMPONENTE PRINCIPAL ---
+
 const CrmDashboard = () => {
     // --- ESTADOS DE DATOS ---
     const [clientes, setClientes] = useState([]);
     const [loading, setLoading] = useState(true);
 
     // --- ESTADOS DE INTERFAZ ---
-    const [filtro, setFiltro] = useState('TODOS'); // Pestañas: TODOS, ALERTA, ADMIN...
-    const [busqueda, setBusqueda] = useState('');  // Buscador de texto
-    const [orden, setOrden] = useState({ key: 'last_interaction', direction: 'desc' }); // Ordenamiento
+    const [filtro, setFiltro] = useState('TODOS');
+    const [busqueda, setBusqueda] = useState('');
+    const [orden, setOrden] = useState({ key: 'last_interaction', direction: 'desc' });
     const [paginaActual, setPaginaActual] = useState(1);
     const itemsPorPagina = 20;
 
@@ -20,6 +85,7 @@ const CrmDashboard = () => {
     const cargarDatos = async () => {
         setLoading(true);
         try {
+            // El backend ahora devuelve los datos enriquecidos (cruzados con MariaDB y lógica)
             const data = await getCrmDashboard();
             setClientes(data);
         } catch (error) {
@@ -33,223 +99,212 @@ const CrmDashboard = () => {
         cargarDatos();
     }, []);
 
-    // Resetear a página 1 si cambia el filtro o la búsqueda
-    useEffect(() => {
-        setPaginaActual(1);
-    }, [filtro, busqueda]);
+    // --- LÓGICA DE FILTRADO Y ORDENAMIENTO (useMemo) ---
+    const clientesFiltrados = useMemo(() => {
+        let resultados = clientes;
 
-    const handleAnalizar = async (id) => {
-        if (!confirm("¿Forzar análisis de IA para este cliente?")) return;
-        await forceAnalyze(id);
-        alert("Solicitud enviada. Recargando en 3s...");
-        setTimeout(cargarDatos, 3000);
-    };
-
-    const handleSort = (key) => {
-        let direction = 'asc';
-        if (orden.key === key && orden.direction === 'asc') {
-            direction = 'desc';
-        }
-        setOrden({ key, direction });
-    };
-
-    // --- LÓGICA DE FILTRADO, ORDENAMIENTO Y PAGINACIÓN (MEMORIZADA) ---
-    const datosProcesados = useMemo(() => {
-        let data = [...clientes];
-
-        // 1. FILTRO POR PESTAÑA
-        if (filtro !== 'TODOS') {
-            if (filtro === 'ALERTA') data = data.filter(c => c.crm_intent === 'OPERATIONAL_ALERT');
-            else if (filtro === 'ADMIN') data = data.filter(c => c.crm_intent === 'ADMIN_TASK');
-            else data = data.filter(c => c.prioridad_visual === filtro);
-        }
-
-        // 2. FILTRO POR BÚSQUEDA (Nombre o Teléfono)
+        // 1. Aplicar filtro de búsqueda de texto
         if (busqueda) {
-            const lowerTerm = busqueda.toLowerCase();
-            data = data.filter(c =>
-                (c.nombre_completo && c.nombre_completo.toLowerCase().includes(lowerTerm)) ||
-                (c.telefono && c.telefono.includes(lowerTerm))
+            const lowerBusqueda = busqueda.toLowerCase();
+            resultados = resultados.filter(cliente =>
+                cliente.nombre_completo?.toLowerCase().includes(lowerBusqueda) ||
+                cliente.telefono?.includes(lowerBusqueda) ||
+                cliente.ai_summary?.toLowerCase().includes(lowerBusqueda) ||
+                cliente.crm_status?.toLowerCase().includes(lowerBusqueda)
             );
         }
 
-        // 3. ORDENAMIENTO
-        data.sort((a, b) => {
-            let valA = a[orden.key];
-            let valB = b[orden.key];
+        // 2. Aplicar filtro de pestaña (TODOS, ALERTA, etc.)
+        if (filtro === 'ALERTA') {
+            // Un cliente tiene ALERTA si:
+            // 1. Debe Cotización
+            // 2. O si la IA detectó CITA pero no hay registro en EA
+            // 3. O si el status del CRM es 'QUOTE_FOLLOWUP' (Seguimiento de Cotización)
+            resultados = resultados.filter(cliente =>
+                cliente.debe_cotizacion ||
+                cliente.alerta_cita_desincronizada ||
+                cliente.crm_intent === 'QUOTE_FOLLOWUP'
+            );
+        } else if (filtro !== 'TODOS') {
+            // Aquí puedes agregar otros filtros si es necesario (ej. SOLO_TECNICOS, SOLO_ADMIN)
+            // Por ahora, solo tenemos TODOS y ALERTA
+        }
 
-            // Manejo de nulos
-            if (!valA) valA = '';
-            if (!valB) valB = '';
 
-            // Manejo de fechas para ordenamiento correcto
-            if (['last_interaction', 'next_follow_up_date'].includes(orden.key)) {
-                valA = new Date(valA || 0).getTime();
-                valB = new Date(valB || 0).getTime();
-            }
+        // 3. Aplicar ordenamiento
+        resultados.sort((a, b) => {
+            const aVal = a[orden.key];
+            const bVal = b[orden.key];
 
-            if (valA < valB) return orden.direction === 'asc' ? -1 : 1;
-            if (valA > valB) return orden.direction === 'asc' ? 1 : -1;
+            // Manejo de valores nulos o indefinidos
+            if (aVal === undefined || aVal === null) return orden.direction === 'asc' ? -1 : 1;
+            if (bVal === undefined || bVal === null) return orden.direction === 'asc' ? 1 : -1;
+
+            // Comparación de fechas o strings
+            if (aVal < bVal) return orden.direction === 'asc' ? -1 : 1;
+            if (aVal > bVal) return orden.direction === 'asc' ? 1 : -1;
             return 0;
         });
 
-        return data;
-    }, [clientes, filtro, busqueda, orden]);
+        return resultados;
+    }, [clientes, busqueda, orden, filtro]);
 
-    // 4. PAGINACIÓN
-    const totalPaginas = Math.ceil(datosProcesados.length / itemsPorPagina);
-    const datosPaginados = datosProcesados.slice(
-        (paginaActual - 1) * itemsPorPagina,
-        paginaActual * itemsPorPagina
-    );
+    // --- LÓGICA DE PAGINACIÓN ---
+    const totalPaginas = Math.ceil(clientesFiltrados.length / itemsPorPagina);
+    const clientesPaginados = useMemo(() => {
+        const inicio = (paginaActual - 1) * itemsPorPagina;
+        const fin = inicio + itemsPorPagina;
+        return clientesFiltrados.slice(inicio, fin);
+    }, [clientesFiltrados, paginaActual, itemsPorPagina]);
 
-    // --- HELPERS VISUALES ---
-    const getBadgeInfo = (intent, prioridadVisual) => {
-        switch (intent) {
-            case 'OPERATIONAL_ALERT': return { class: 'badge-alert', label: '🚨 ALERTA' };
-            case 'ADMIN_TASK': return { class: 'badge-admin', label: '📄 TRAMITE' };
-            default:
-                switch (prioridadVisual) {
-                    case 'CITA': return { class: 'badge-cita', label: intent };
-                    case 'ATENCION': return { class: 'badge-atencion', label: intent };
-                    case 'SEGUIMIENTO': return { class: 'badge-seguimiento', label: intent };
-                    case 'GHOST': return { class: 'badge-ghost', label: 'GHOST' };
-                    default: return { class: 'badge-normal', label: intent || 'NONE' };
-                }
+    useEffect(() => {
+        // Aseguramos que si cambia el filtro o búsqueda, volvemos a la pág. 1
+        setPaginaActual(1);
+    }, [filtro, busqueda]);
+
+
+    // Función de encabezado de tabla para manejar el ordenamiento
+    const handleSort = (key) => {
+        if (orden.key === key) {
+            setOrden(prev => ({
+                key,
+                direction: prev.direction === 'asc' ? 'desc' : 'asc'
+            }));
+        } else {
+            setOrden({ key, direction: 'desc' }); // Por defecto, ordenar descendente
         }
     };
 
-    const countAlerts = clientes.filter(c => c.crm_intent === 'OPERATIONAL_ALERT').length;
-    const countAdmin = clientes.filter(c => c.crm_intent === 'ADMIN_TASK').length;
-
-    // Icono de ordenamiento
-    const SortIcon = ({ column }) => {
-        if (orden.key !== column) return <span style={{ opacity: 0.3 }}>↕</span>;
-        return orden.direction === 'asc' ? '⬆' : '⬇';
+    // Renderiza el ícono de ordenamiento
+    const renderSortIndicator = (key) => {
+        if (orden.key === key) {
+            return orden.direction === 'asc' ? '▲' : '▼';
+        }
+        return '';
     };
 
     return (
-        <div className="crm-container">
-            {/* HEADER */}
-            <header className="crm-header">
-                <div>
-                    <h1>🧠 Cerebro CRM</h1>
-                    <p style={{ fontSize: '0.8rem', color: '#666', margin: 0 }}>
-                        {clientes.length} Clientes Totales | Mostrando {datosProcesados.length}
-                    </p>
+        <div className="crm-dashboard">
+            <h2>📊 CRM: Fuente de la Verdad</h2>
+            <p>Datos en tiempo real cruzados entre WhatsApp (Evolution), Supabase y Agenda (MariaDB).</p>
+
+            <div className="controls">
+                {/* PESTAÑAS DE FILTRO */}
+                <div className="filter-tabs">
+                    {['TODOS', 'ALERTA', 'PENDIENTE', 'FOLLOWUP'].map(f => (
+                        <button
+                            key={f}
+                            className={filtro === f ? 'active' : ''}
+                            onClick={() => setFiltro(f)}
+                        >
+                            {f}
+                        </button>
+                    ))}
                 </div>
 
-                <div className="crm-controls-group">
-                    <div className="search-box">
-                        <input
-                            type="text"
-                            placeholder="🔍 Buscar nombre o teléfono..."
-                            value={busqueda}
-                            onChange={(e) => setBusqueda(e.target.value)}
-                        />
-                    </div>
-                    <button onClick={cargarDatos} className="refresh-btn" title="Recargar Datos">🔄</button>
-                </div>
-            </header>
-
-            {/* BARRA DE FILTROS (TABS) */}
-            <div className="crm-tabs">
-                {countAlerts > 0 && (
-                    <button onClick={() => setFiltro('ALERTA')} className={`tab-btn alert ${filtro === 'ALERTA' ? 'active' : ''}`}>
-                        🚨 ALERTAS ({countAlerts})
-                    </button>
-                )}
-                <button onClick={() => setFiltro('ADMIN')} className={`tab-btn admin ${filtro === 'ADMIN' ? 'active' : ''}`}>
-                    📄 Tramites ({countAdmin})
-                </button>
-                <div className="divider-vertical"></div>
-                <button onClick={() => setFiltro('TODOS')} className={`tab-btn ${filtro === 'TODOS' ? 'active' : ''}`}>Todos</button>
-                <button onClick={() => setFiltro('CITA')} className={`tab-btn ${filtro === 'CITA' ? 'active' : ''}`}>📅 Citas</button>
-                <button onClick={() => setFiltro('ATENCION')} className={`tab-btn ${filtro === 'ATENCION' ? 'active' : ''}`}>🔥 Atención</button>
+                {/* BUSCADOR */}
+                <input
+                    type="text"
+                    placeholder="Buscar por Nombre, Teléfono o Resumen..."
+                    value={busqueda}
+                    onChange={(e) => setBusqueda(e.target.value)}
+                    className="search-input"
+                />
             </div>
 
-            {/* TABLA */}
-            {loading ? <div className="loading-state">Analizando base de datos...</div> : (
-                <div className="crm-table-wrapper">
+            {loading ? (
+                <div className="loading-spinner">Cargando datos...</div>
+            ) : (
+                <div className="table-wrapper">
                     <table className="crm-table">
                         <thead>
                             <tr>
-                                <th onClick={() => handleSort('nombre_completo')} className="sortable">
-                                    Cliente <SortIcon column="nombre_completo" />
+                                <th onClick={() => handleSort('last_interaction')}>
+                                    Última Interacción {renderSortIndicator('last_interaction')}
                                 </th>
-                                <th onClick={() => handleSort('crm_intent')} className="sortable">
-                                    Estado <SortIcon column="crm_intent" />
+                                <th>Datos del Cliente</th>
+                                <th>AI Summary (Intent)</th>
+                                <th>Status Operativo</th> {/* NUEVA COLUMNA */}
+                                <th onClick={() => handleSort('unread_count')}>
+                                    No Leídos {renderSortIndicator('unread_count')}
                                 </th>
-                                <th onClick={() => handleSort('last_interaction')} className="sortable">
-                                    Último Msj <SortIcon column="last_interaction" />
-                                </th>
-                                <th>Análisis IA</th>
-                                <th onClick={() => handleSort('next_follow_up_date')} className="sortable">
-                                    Próx. Acción <SortIcon column="next_follow_up_date" />
-                                </th>
-                                <th>Acción</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {datosPaginados.length > 0 ? datosPaginados.map(cliente => {
-                                const badge = getBadgeInfo(cliente.crm_intent, cliente.prioridad_visual);
+                            {clientesPaginados.length > 0 ? clientesPaginados.map(cliente => (
+                                <tr key={cliente.id}>
+                                    {/* 1. Última Interacción */}
+                                    <td>
+                                        {new Date(cliente.last_interaction).toLocaleString('es-MX', {
+                                            day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+                                        })}
+                                        <div style={{ fontSize: '0.8em', color: getStatusColor(cliente.calificacion_semaforo) }}>
+                                            ● {cliente.calificacion_semaforo || 'N/A'}
+                                        </div>
+                                    </td>
 
-                                return (
-                                    <tr key={cliente.cliente_id} className={cliente.crm_intent === 'OPERATIONAL_ALERT' ? 'row-alert' : ''}>
-                                        {/* 1. Cliente */}
-                                        <td>
-                                            <div className="client-info">
-                                                <strong>{cliente.nombre_completo || 'Desconocido'}</strong>
-                                                <span className="phone">{cliente.telefono}</span>
-                                                {cliente.saldo_pendiente > 0 && (
-                                                    <span className="debt-badge">Debe: ${cliente.saldo_pendiente}</span>
+                                    {/* 2. Datos del Cliente */}
+                                    <td>
+                                        <strong>{cliente.nombre_completo || 'N/A'}</strong><br />
+                                        <span style={{ color: 'var(--gray-600)' }}>Tel: {cliente.telefono || 'N/A'}</span>
+                                        {cliente.direccion_real && (
+                                            <div style={{ marginTop: '0.25rem' }}>
+                                                {cliente.direccion_real}
+                                                {cliente.mapa_link && (
+                                                    <a href={cliente.mapa_link} target="_blank" rel="noopener noreferrer"
+                                                        title="Ver en Google Maps" style={{ marginLeft: '0.5rem', color: 'var(--blue-500)' }}>
+                                                        (Mapa 🗺️)
+                                                    </a>
                                                 )}
                                             </div>
-                                        </td>
-
-                                        {/* 2. Estado */}
-                                        <td><span className={`badge ${badge.class}`}>{badge.label}</span></td>
-
-                                        {/* 3. Último Msj */}
-                                        <td className="msg-cell">
-                                            <div className={`msg-bubble ${cliente.ultimo_mensaje_rol === 'assistant' ? 'assistant' : 'user'}`}>
-                                                {cliente.ultimo_mensaje_texto || '(Sin mensajes)'}
+                                        )}
+                                        {cliente.saldo_pendiente > 0 && (
+                                            <div style={{ color: 'var(--red-500)', fontWeight: 'bold' }}>
+                                                Saldo Pndte: ${cliente.saldo_pendiente.toFixed(2)}
                                             </div>
-                                            <div className="time">
-                                                {cliente.last_interaction
-                                                    ? new Date(cliente.last_interaction).toLocaleString('es-MX', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
-                                                    : ''}
-                                            </div>
-                                        </td>
+                                        )}
+                                    </td>
 
-                                        {/* 4. IA Summary */}
-                                        <td style={{ maxWidth: '220px' }}>
-                                            <p className="ai-summary">{cliente.ai_summary || cliente.razon_ia || '...'}</p>
-                                        </td>
+                                    {/* 3. AI Summary (Intent) */}
+                                    <td>
+                                        <div className={`crm-status-badge status-${cliente.crm_status}`}>
+                                            {cliente.crm_status}
+                                        </div>
+                                        <div className="ai-summary-text" title={cliente.ai_summary}>
+                                            {cliente.ai_summary.substring(0, 100)}...
+                                        </div>
+                                    </td>
 
-                                        {/* 5. Próxima Acción */}
-                                        <td>
-                                            {cliente.next_follow_up_date ? (
-                                                <div className="follow-up">
-                                                    📅 {new Date(cliente.next_follow_up_date).toLocaleDateString()}
-                                                    <br />
-                                                    ⏰ {new Date(cliente.next_follow_up_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                </div>
-                                            ) : (
-                                                <span className="dash">-</span>
-                                            )}
-                                        </td>
+                                    {/* 4. STATUS OPERATIVO (Nuevo) */}
+                                    <td>
+                                        {renderSyncStatus(cliente)}
+                                    </td>
 
-                                        {/* 6. Botones */}
-                                        <td>
-                                            <div className="actions">
-                                                <button className="action-btn chat-btn" onClick={() => setSelectedClientForChat(cliente)}>💬</button>
-                                                <button className="action-btn ai-btn" onClick={() => handleAnalizar(cliente.cliente_id)}>⚡</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                )
-                            }) : (
+                                    {/* 5. No Leídos */}
+                                    <td style={{ textAlign: 'center' }}>
+                                        {cliente.unread_count > 0 ? (
+                                            <span className="unread-count-badge">{cliente.unread_count}</span>
+                                        ) : ('0')}
+                                    </td>
+
+                                    {/* 6. Acciones */}
+                                    <td>
+                                        <button
+                                            className="action-button chat-button"
+                                            onClick={() => setSelectedClientForChat(cliente)}
+                                        >
+                                            Chat 💬
+                                        </button>
+                                        <button
+                                            className="action-button analyze-button"
+                                            onClick={() => forceAnalyze(cliente.id).then(cargarDatos)}
+                                        >
+                                            Force AI 🤖
+                                        </button>
+                                    </td>
+                                </tr>
+                            )) : (
                                 <tr>
                                     <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
                                         No se encontraron resultados para "{busqueda}"

@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '../services/supabaseClient.js';
+import { checkMariaDbStatus, checkPastAppointments } from '../services/eaDatabase.js';
 
 // GET /api/clientes/buscar?telefono=33123...
 export const buscarCliente = async (req, res) => {
@@ -11,7 +12,6 @@ export const buscarCliente = async (req, res) => {
     const cleanPhone = telefono.replace(/\D/g, '');
 
     try {
-        // Búsqueda parcial (LIKE)
         const { data, error } = await supabaseAdmin
             .from('clientes')
             .select('*')
@@ -45,18 +45,83 @@ export const getHistorialCliente = async (req, res) => {
     }
 };
 
+// --- EL CEREBRO DE LA FUENTE DE LA VERDAD ---
 // GET /api/clientes/admin-dashboard
 export const getAdminDashboard = async (req, res) => {
     try {
-        // Consultamos la vista maestra que creamos en Supabase
-        const { data, error } = await supabaseAdmin
-            .from('admin_crm_dashboard') // <--- La vista SQL del Paso 5
+        // 1. Obtener la vista base de Supabase (asumimos que 'admin_crm_dashboard' existe y es la base)
+        const { data: clientes, error } = await supabaseAdmin
+            .from('admin_crm_dashboard')
             .select('*');
 
         if (error) throw error;
 
-        // Devolvemos los datos tal cual
-        res.json(data);
+        // 2. ENRIQUECIMIENTO EN TIEMPO REAL (CRUCE DE 3 BASES DE DATOS)
+        // Usamos Promise.all para procesar los clientes en paralelo sin detener el loop
+        const datosEnriquecidos = await Promise.all(clientes.map(async (cliente) => {
+
+            // --- A. LÓGICA MARIADB (EASY!APPOINTMENTS) ---
+            let mariadbInfo = { exists: false, has_past_appointment: false };
+            if (cliente.telefono) {
+                // Buscamos si existe en la agenda
+                const check = await checkMariaDbStatus(cliente.telefono);
+                if (check.exists) {
+                    // Si existe, verificamos si tiene citas pasadas (cliente recurrente)
+                    const hasPast = await checkPastAppointments(check.id);
+                    mariadbInfo = { exists: true, has_past_appointment: hasPast };
+                }
+            }
+
+            // --- B. LÓGICA EVOLUTION API (WHATSAPP) ---
+            // Regla práctica: Si tiene whatsapp_id, está sincronizado en Evolution
+            const evolutionSynced = !!cliente.whatsapp_id;
+
+            // --- C. LÓGICA "DEBEMOS COTIZACIÓN" ---
+            // Buscamos en la tabla 'casos' si hay algo pendiente marcado como 'requiere_cotizacion'
+            let debeCotizacion = false;
+            // Nota: La vista suele llamar al ID 'cliente_id' o 'id'. Verificamos ambos.
+            const idBusqueda = cliente.cliente_id || cliente.id;
+
+            if (idBusqueda) {
+                const { data: casosPendientes } = await supabaseAdmin
+                    .from('casos')
+                    .select('id')
+                    .eq('cliente_id', idBusqueda)
+                    .eq('requiere_cotizacion', true)
+                    .neq('status', 'cerrado') // Solo si el caso no está cerrado
+                    .limit(1);
+
+                if (casosPendientes && casosPendientes.length > 0) {
+                    debeCotizacion = true;
+                }
+            }
+
+            // --- D. LÓGICA DE ALERTAS INTELIGENTES ---
+            // Regla: Si IA o el sistema dice que es "CITA" pero NO está en MariaDB -> ALERTA
+            // (Asumimos que crm_intent='CITA' es la bandera de la IA)
+            const esIntencionCita = cliente.crm_intent === 'CITA' || cliente.prioridad_visual === 'CITA';
+            const alertaCitaNoAgendada = esIntencionCita && !mariadbInfo.exists;
+
+            // Retornamos el cliente original + las nuevas banderas
+            return {
+                ...cliente,
+                // Banderas de Sincronización
+                sync_mariadb: mariadbInfo.exists,
+                sync_evolution: evolutionSynced,
+
+                // Estados Visuales
+                cita_realizada: mariadbInfo.has_past_appointment,
+                alerta_cita_desincronizada: alertaCitaNoAgendada, // Nuevo warning visual
+                debe_cotizacion: debeCotizacion,
+
+                // Datos extra de seguridad (por si la vista no los trae todos)
+                direccion_real: cliente.direccion_principal || '',
+                mapa_link: cliente.google_maps_link || '',
+                calificacion_semaforo: cliente.calificacion || 'AMABLE'
+            };
+        }));
+
+        res.json(datosEnriquecidos);
     } catch (error) {
         console.error('Error fetching admin dashboard:', error);
         res.status(500).json({ error: error.message });
@@ -64,20 +129,12 @@ export const getAdminDashboard = async (req, res) => {
 };
 
 // PATCH /api/clientes/:id/force-analyze
-// Para el botón "Analizar Ahora" que pondremos en el frontend
-//import { runNightlyAnalysis } from '../services/cronAnalysis.js'; // Asegúrate de importar esto
-
 export const forceAnalyzeClient = async (req, res) => {
     const { id } = req.params;
     try {
-        // En un futuro podríamos hacer que runNightlyAnalysis acepte un ID específico
-        // Por ahora, forzamos un análisis general que incluirá a este cliente si tiene msjs nuevos
-        // Ojo: Esto es síncrono y puede tardar. Idealmente debería ser un job.
-
-        // Versión simple: Solo marcamos last_interaction para que el cron lo detecte
         await supabaseAdmin
             .from('clientes')
-            .update({ last_interaction: new Date() }) // "Despertamos" al cliente
+            .update({ last_interaction: new Date() })
             .eq('id', id);
 
         res.json({ message: 'Cliente marcado para análisis inmediato.' });
@@ -94,8 +151,8 @@ export const getChatCliente = async (req, res) => {
             .from('mensajes_whatsapp')
             .select('*')
             .eq('cliente_id', id)
-            .order('created_at', { ascending: true }) // Del más viejo al más nuevo
-            .limit(50); // Últimos 50 mensajes para no saturar
+            .order('created_at', { ascending: true })
+            .limit(50);
 
         if (error) throw error;
         res.json(data);

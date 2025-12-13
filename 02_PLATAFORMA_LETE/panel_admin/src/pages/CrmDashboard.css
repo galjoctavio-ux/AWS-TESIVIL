@@ -318,3 +318,147 @@ th.sortable:hover {
     color: #ccc;
     font-weight: bold;
 }
+
+/* src/pages/CrmDashboard.css */
+
+/* --- Colores de la Fuente de la Verdad (CSS Variables) --- */
+:root {
+    --red-500: #ef4444;
+    --green-500: #22c55e;
+    --blue-500: #3b82f6;
+    --yellow-500: #f59e0b;
+    --gray-400: #9ca3af;
+    --gray-600: #4b5563;
+}
+
+/* Base de la tabla (ajustar si es necesario) */
+.crm-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.crm-table th,
+.crm-table td {
+    padding: 12px 15px;
+    border: 1px solid #e5e7eb;
+    text-align: left;
+    vertical-align: top;
+}
+
+.crm-table th {
+    background-color: #f3f4f6;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+}
+
+.crm-table tr:nth-child(even) {
+    background-color: #f9fafb;
+}
+
+/* Estilo para el resumen de la IA */
+.ai-summary-text {
+    font-size: 0.85em;
+    color: var(--gray-600);
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Badges de CRM Status */
+.crm-status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75em;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 5px;
+}
+
+/* Colores para los CRM Status */
+.status-LEAD {
+    background-color: var(--blue-500);
+}
+
+.status-QUOTE_FOLLOWUP {
+    background-color: var(--yellow-500);
+}
+
+.status-PENDIENTE {
+    background-color: var(--red-500);
+}
+
+.status-CERRADO {
+    background-color: var(--green-500);
+}
+
+/* Agrega más status si los tienes */
+.status-IMPORTED_HISTORY {
+    background-color: var(--gray-400);
+}
+
+.status-NONE {
+    background-color: var(--gray-600);
+}
+
+
+/* Contador de mensajes no leídos */
+.unread-count-badge {
+    background-color: var(--red-500);
+    color: white;
+    border-radius: 50%;
+    padding: 5px 10px;
+    font-weight: bold;
+    display: inline-block;
+    min-width: 30px;
+    text-align: center;
+}
+
+/* Botones de acción */
+.action-button {
+    margin-right: 5px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
+}
+
+.chat-button {
+    background-color: #4ade80;
+    /* Verde de WhatsApp */
+    color: white;
+}
+
+.analyze-button {
+    background-color: #8b5cf6;
+    /* Morado para IA */
+    color: white;
+}
+
+/* Pestañas de Filtro */
+.filter-tabs {
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 10px;
+}
+
+.filter-tabs button {
+    padding: 8px 15px;
+    border: 1px solid var(--gray-400);
+    background-color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.filter-tabs button.active {
+    background-color: var(--blue-500);
+    color: white;
+    border-color: var(--blue-500);
+    font-weight: bold;
+}
