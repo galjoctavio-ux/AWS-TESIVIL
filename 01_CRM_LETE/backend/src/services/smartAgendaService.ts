@@ -30,7 +30,7 @@ const generatePrompt = (chatHistory: string): string => {
     REGLAS DE EXTRACCIÓN:
     1. 'cliente_nombre', 'cliente_telefono'.
     2. 'fecha' (YYYY-MM-DD), 'hora' (HH:mm).
-    3. 'tecnico_nombre' (null si no hay).
+    3. 'tecnico_nombre' (null si no se menciona un técnico específico).
     4. 'costo' (numero o null).
     
     ⚠️ REGLA CRÍTICA DE DIRECCIÓN (DIVÍDELA EN DOS):
@@ -50,12 +50,10 @@ const geocodeAddress = async (address: string) => {
         return null;
     }
     try {
-        // TRUCO: Agregamos components=country:MX para forzar México
-        // y limpiamos espacios extra.
         const cleanAddress = address.trim();
         const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(cleanAddress)}&components=country:MX&key=${GOOGLE_API_KEY}`;
 
-        console.log(`🔍 Buscando en Google Maps: "${cleanAddress}"`); // Debug para ver qué buscamos
+        console.log(`🔍 Buscando en Google Maps: "${cleanAddress}"`);
 
         const response = await axios.get(url);
 
@@ -69,7 +67,7 @@ const geocodeAddress = async (address: string) => {
                 place_id: result.place_id
             };
         } else {
-            console.log(`⚠️ Google devolvió status: ${response.data.status}`); // ZERO_RESULTS o REQUEST_DENIED
+            console.log(`⚠️ Google devolvió status: ${response.data.status}`);
         }
         return null;
     } catch (error) {
@@ -78,16 +76,31 @@ const geocodeAddress = async (address: string) => {
     }
 };
 
-// Reemplaza tu función actual con esta versión corregida:
+// --- 3. GENERADOR DE LINKS MEJORADO ---
+// Prioriza la dirección legible si existe para que en el mapa aparezca "Av. Vallarta..." 
+const generateNavigationLink = (lat: number | null, lng: number | null, addressQuery: string) => {
+    const baseUrl = "https://www.google.com/maps/search/?api=1&query=";
 
-const generateNavigationLink = (lat: number | null, lng: number | null, query: string) => {
-    // Si tenemos coordenadas, generamos link directo al punto
-    if (lat && lng) {
-        return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+    // CASO 1: Tenemos una dirección validada por Google (Prioridad Visual)
+    if (addressQuery && addressQuery.length > 5 && addressQuery !== "Ubicación Compartida (WhatsApp)") {
+        return `${baseUrl}${encodeURIComponent(addressQuery)}`;
     }
-    // Si no, buscamos por texto (encodeURIComponent es vital)
-    const cleanQuery = query ? encodeURIComponent(query.trim()) : "";
-    return `https://www.google.com/maps/search/?api=1&query=${cleanQuery}`;
+
+    // CASO 2: Solo tenemos coordenadas (ej. Pin de Ubicación o dirección ambigua)
+    if (lat && lng) {
+        return `${baseUrl}${lat},${lng}`;
+    }
+
+    // CASO 3: Fallback
+    return "https://maps.google.com";
+};
+
+// --- HELPER PARA EXTRAER COORDENADAS DE URLS ---
+const extractCoordsFromUrl = (url: string) => {
+    const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
+    const match = url.match(regex);
+    if (match) return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) };
+    return null;
 };
 
 // --- FUNCIÓN PRINCIPAL DE PROCESAMIENTO ---
@@ -104,34 +117,32 @@ export const procesarSolicitudAgenda = async (
         const datos = JSON.parse(cleanJson);
 
         // B) GEOCODIFICACIÓN INTELIGENTE
-        // Usamos solo la parte "buscable" para obtener coordenadas
         let lat = null;
         let lng = null;
-
-        // La dirección oficial empieza siendo lo que dijo la IA, pero limpia
-        let direccionOficial = datos.direccion_buscable;
+        let direccionOficial = datos.direccion_buscable; // Dirección dicha por IA
         let avisoGeo = "⚠️ No pude localizar las coordenadas. Intenta enviar la ubicación (clip).";
 
-        // Intentamos geocodificar
         const geoData = await geocodeAddress(datos.direccion_buscable);
 
         if (geoData) {
             lat = geoData.lat;
             lng = geoData.lng;
-            direccionOficial = geoData.formatted_address; // La dirección bonita de Google (Ej: "Calle Real 123, Col X...")
+            direccionOficial = geoData.formatted_address; // Dirección oficial de Google
             avisoGeo = "✅ Coordenadas GPS localizadas.";
         }
 
-        // C) CONSTRUIR DIRECCIÓN COMPLETA PARA EL USUARIO Y TÉCNICO
-        // Unimos: Dirección Google + Complementos (Depto, Torre, etc.)
+        // C) CONSTRUIR DATOS FINALES
         const direccionCompletaTexto = `${direccionOficial}. ${datos.direccion_complemento || ''}`.trim();
-
         const mapLink = generateNavigationLink(lat, lng, direccionOficial);
+
+        // Manejo del técnico (default si es null)
+        const tecnicoMostrar = datos.tecnico_nombre || "Por Asignar";
 
         // D) GUARDAR DRAFT
         agendaDrafts.set(remoteJid, {
             ...datos,
-            direccion_texto: direccionCompletaTexto, // Guardamos la versión completa
+            tecnico_nombre: tecnicoMostrar, // Guardamos el técnico detectado
+            direccion_texto: direccionCompletaTexto,
             direccion_final: direccionCompletaTexto,
             ubicacion_lat: lat,
             ubicacion_lng: lng,
@@ -142,28 +153,22 @@ export const procesarSolicitudAgenda = async (
         // E) RESPUESTA AL USUARIO
         return `📍 *Verificación de Agenda*\n\n` +
             `👤 Cliente: ${datos.cliente_nombre}\n` +
+            `👷 Técnico: *${tecnicoMostrar}*\n` +
             `📅 Fecha: ${datos.fecha} a las ${datos.hora}\n` +
             `🏠 Dirección: "${direccionCompletaTexto}"\n` +
             `🌐 GPS: ${avisoGeo}\n` +
             `🗺️ Mapa: ${mapLink}\n\n` +
             `👉 *ACCIONES:*\n` +
             `1. Responde *SI* para confirmar.\n` +
-            `2. Corregir fecha: */FECHA YYYY-MM-DD HH:mm*\n` +
-            `3. Corregir Dir: Envía *Ubicación* (clip) o escribe solo calle y número.\n` +
-            `4. Cancelar: *RESET*`;
+            `2. Corregir fecha: */fecha YYYY-MM-DD HH:mm*\n` +
+            `3. Corregir Técnico: */tecnico Nombre*\n` +
+            `4. Corregir Dir: Envía *Ubicación* (clip) o escribe calle.\n` +
+            `5. Cancelar: *RESET*`;
 
     } catch (error) {
         console.error("Error processing agenda:", error);
         return "❌ Error procesando solicitud. Intenta de nuevo.";
     }
-};
-
-// --- HELPER PARA EXTRAER COORDENADAS DE URLS ---
-const extractCoordsFromUrl = (url: string) => {
-    const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
-    const match = url.match(regex);
-    if (match) return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) };
-    return null;
 };
 
 // --- MANEJO DE CONFIRMACIÓN ---
@@ -196,7 +201,21 @@ export const manejarConfirmacionAgenda = async (
         return `⚠️ Formato incorrecto. Usa: /fecha YYYY-MM-DD HH:mm`;
     }
 
-    // 3. MEJORA DE UBICACIÓN (LINK O CLIP O TEXTO)
+    // 3. CAMBIO DE TÉCNICO (NUEVO)
+    if (texto.startsWith('/tecnico ')) {
+        // Extraemos todo lo que esté después del comando "/tecnico "
+        // Usamos substring(9) porque "/tecnico " tiene 9 caracteres
+        const nuevoTecnico = mensajeTexto.substring(9).trim();
+
+        if (nuevoTecnico.length > 0) {
+            draft.tecnico_nombre = nuevoTecnico;
+            agendaDrafts.set(remoteJid, draft);
+            return `👷 *Técnico Actualizado* a: *${nuevoTecnico}*.\n¿Todo correcto? Responde *SI*.`;
+        }
+        return `⚠️ Debes escribir el nombre. Ejemplo: /tecnico Juan Pérez`;
+    }
+
+    // 4. MEJORA DE UBICACIÓN (LINK O CLIP O TEXTO)
     let nuevasCoords = null;
     let nuevoTexto = "";
 
@@ -218,16 +237,15 @@ export const manejarConfirmacionAgenda = async (
     }
     // C. CORRECCIÓN MANUAL DE TEXTO (RE-GEOCODING)
     else if (texto.length > 5 && texto !== 'si' && !texto.startsWith('/')) {
-        // Si el usuario escribe una dirección nueva manualmente, intentamos geocodificarla de nuevo
+        // Si el usuario escribe una dirección nueva manualmente
         const geo = await geocodeAddress(mensajeTexto);
         if (geo) {
             nuevasCoords = { lat: geo.lat, lng: geo.lng };
             nuevoTexto = geo.formatted_address;
-            draft.direccion_complemento = ""; // Limpiamos el complemento viejo si cambiaron toda la dirección
+            draft.direccion_complemento = ""; // Limpiamos complemento viejo
         } else {
-            // Si falla de nuevo, guardamos el texto pero avisamos
             draft.direccion_texto = mensajeTexto;
-            return `⚠️ Sigo sin encontrar "${mensajeTexto}" en el mapa.\nPor favor envía la *UBICACIÓN* (el clip 📎 del chat) para ser exactos.`;
+            return `⚠️ Sigo sin encontrar "${mensajeTexto}" en el mapa.\nPor favor envía la *UBICACIÓN* (el clip 📎) para ser exactos.`;
         }
     }
 
@@ -237,19 +255,19 @@ export const manejarConfirmacionAgenda = async (
         draft.ubicacion_lng = nuevasCoords.lng;
         draft.direccion_texto = nuevoTexto || draft.direccion_texto;
 
-        // ✅ CORRECCIÓN: Forzamos la regeneración del link siempre que haya nuevas coordenadas
-        // Eliminamos el if (!draft.link_gmaps_generado.includes('http'))
-        draft.link_gmaps_generado = generateNavigationLink(nuevasCoords.lat, nuevasCoords.lng, "");
+        // Regeneramos el link siempre que haya nuevas coordenadas
+        // Pasamos nuevoTexto para que el link use el nombre de la calle si está disponible
+        draft.link_gmaps_generado = generateNavigationLink(nuevasCoords.lat, nuevasCoords.lng, nuevoTexto || "");
 
         agendaDrafts.set(remoteJid, draft);
         return `✅ Ubicación GPS detectada (${nuevasCoords.lat}, ${nuevasCoords.lng}).\nResponde *SI* para finalizar.`;
     }
 
-    // 4. CONFIRMACIÓN FINAL ("SI")
+    // 5. CONFIRMACIÓN FINAL ("SI")
     if (texto === 'si' && draft.step === 'ESPERANDO_CONFIRMACION') {
         draft.step = 'AGENDAR_AHORA';
         agendaDrafts.set(remoteJid, draft);
-        // El webhookController detectará este estado y enviará los datos
+        // El webhookController detectará este estado
         return `🚀 Confirmando datos...`;
     }
 
