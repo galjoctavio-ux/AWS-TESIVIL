@@ -8,22 +8,18 @@ export const getCrmDashboardV2 = async (req, res) => {
     try {
         console.log("🔄 Iniciando sincronización de Dashboard CRM V2...");
 
-        // 1. OBTENER DATOS DE SUPABASE (La visión del negocio y la IA)
-        // Traemos clientes, sus casos recientes y transacciones financieras
+        // DESPUÉS (Versión corregida y segura)
         const { data: clientesSupa, error: errorSupa } = await supabase
             .from('clientes')
             .select(`
-                *,
-                casos (
-                    id, status, descripcion, costo_total, pago_realizado, tecnico_id, created_at
-                ),
-                billetera_transacciones (
-                    monto, tipo, estado
-                )
-            `)
+        *,
+        casos (
+            id, status, descripcion, costo_total, pago_realizado, tecnico_id, created_at
+        )
+        // Eliminamos la consulta a billetera_transacciones para evitar el error de relación
+    `)
             .order('last_interaction', { ascending: false })
-            .limit(100); // Limitamos para pruebas iniciales, luego podemos paginar
-
+            .limit(100);
         if (errorSupa) throw new Error(`Error Supabase: ${errorSupa.message}`);
 
         // 2. OBTENER DATOS DE MARIADB (La realidad operativa / Agenda)
