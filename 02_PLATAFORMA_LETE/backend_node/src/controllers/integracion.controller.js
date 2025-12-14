@@ -26,14 +26,23 @@ export const agendarDesdeBot = async (req, res) => {
             telefonoLimpio = telefonoLimpio.substring(2);
         }
 
-        // A) Buscar si ya existe
+        // A) Definir los datos de dirección para INSERT/UPDATE
+        const datosDireccion = {
+            direccion_principal: cliente.direccion,
+            google_maps_link: cliente.google_maps_link,
+            ubicacion_lat: cliente.latitud || null, // Asumo que el payload ahora trae latitud
+            ubicacion_lng: cliente.longitud || null, // Asumo que el payload ahora trae longitud
+        };
+
+
+        // B) Buscar si ya existe
         let { data: clienteDB, error: findError } = await supabaseAdmin
             .from('clientes')
             .select('id, nombre_completo')
             .eq('telefono', telefonoLimpio)
             .single();
 
-        // B) Si no existe, lo creamos
+        // C) Si no existe, lo creamos
         if (!clienteDB) {
             console.log(`[BOT] Creando cliente nuevo: ${cliente.nombre}`);
             const { data: newClient, error: createError } = await supabaseAdmin
@@ -41,8 +50,7 @@ export const agendarDesdeBot = async (req, res) => {
                 .insert({
                     telefono: telefonoLimpio,
                     nombre_completo: cliente.nombre || 'Cliente WhatsApp',
-                    direccion_principal: cliente.direccion,
-                    google_maps_link: cliente.google_maps_link
+                    ...datosDireccion // <--- INSERTA Dirección y GPS
                 })
                 .select()
                 .single();
@@ -50,13 +58,21 @@ export const agendarDesdeBot = async (req, res) => {
             if (createError) throw new Error(`Error creando cliente: ${createError.message}`);
             clienteDB = newClient;
         } else {
-            console.log(`[BOT] Cliente existente encontrado: ${clienteDB.id}`);
-            // Opcional: Podrías actualizar la dirección aquí si quisieras
-        }
+            // D) CORRECCIÓN CRÍTICA: Si existe, actualizamos los datos de dirección
+            console.log(`[BOT] Cliente existente encontrado: ${clienteDB.id}. Actualizando dirección.`);
 
+            const { error: updateError } = await supabaseAdmin
+                .from('clientes')
+                .update(datosDireccion) // <--- ACTUALIZA Dirección y GPS
+                .eq('id', clienteDB.id);
+
+            if (updateError) console.error(`[BOT] Error al actualizar dirección del cliente ${clienteDB.id}: ${updateError.message}`);
+        }
         // =================================================================
         // 2. CREAR EL CASO (SUPABASE)
+        // ... (El resto del código sigue igual)
         // =================================================================
+
         const { data: nuevoCaso, error: casoError } = await supabaseAdmin
             .from('casos')
             .insert({
