@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 // import { pool } from '../config/db'; // ELIMINADO: Ya no usamos DB local
 import { supabaseAdmin } from '../services/supabaseClient';
-import { geminiModel } from '../services/aiService'; // Solo importamos el modelo, no analyzeIntent aún
+//import { geminiModel } from '../services/aiService'; // Solo importamos el modelo, no analyzeIntent aún
 import { sendText } from '../services/whatsappService';
 import axios from 'axios';
 import {
@@ -275,7 +275,7 @@ export const receiveWebhook = async (req: Request, res: Response) => {
             const esComando = content.toLowerCase().startsWith('/agendar');
 
             if (esReenvio || esComando) {
-                const respuestaIA = await procesarSolicitudAgenda(content, remoteJid, geminiModel);
+                const respuestaIA = await procesarSolicitudAgenda(content, remoteJid);
                 await sendText(remoteJid, respuestaIA, 0);
                 return res.status(200).send('OK_AGENDA_INICIO');
             }

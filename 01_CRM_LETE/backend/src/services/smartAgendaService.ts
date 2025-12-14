@@ -1,9 +1,16 @@
 // src/services/smartAgendaService.ts
-import { GoogleGenerativeAI } from "@google/generative-ai";
+//import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk"; // CAMBIO: Usamos Groq SDK
 import axios from "axios";
 
 // --- CONFIGURACIÓN ---
 const GOOGLE_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
+
+// Inicializamos el cliente de Groq
+// Asegúrate de tener GROQ_API_KEY en tu archivo .env
+const groq = new Groq({
+    apiKey: process.env.GROQ_API_KEY
+});
 
 // --- MEMORIA TEMPORAL (Drafts) ---
 export const agendaDrafts = new Map<string, any>();
@@ -107,14 +114,36 @@ const extractCoordsFromUrl = (url: string) => {
 export const procesarSolicitudAgenda = async (
     chatContent: string,
     remoteJid: string,
-    geminiModel: any
+    //geminiModel: any
 ) => {
     try {
         // A) INTELIGENCIA ARTIFICIAL
         const prompt = generatePrompt(chatContent);
-        const result = await geminiModel.generateContent(prompt);
-        const cleanJson = result.response.text().replace(/```json|```/g, '').trim();
-        const datos = JSON.parse(cleanJson);
+        console.log("🤖 Consultando a Groq...");
+        const completion = await groq.chat.completions.create({
+            messages: [
+                { role: "user", content: prompt }
+            ],
+            model: "llama-3.3-70b-versatile", // Modelo muy potente y rápido
+            temperature: 0, // Temperatura 0 para que sea estricto con el JSON
+            response_format: { type: "json_object" } // Forzamos modo JSON para evitar errores
+        });
+
+        const rawContent = completion.choices[0]?.message?.content || "{}";
+
+        // Limpieza extra por seguridad (aunque el json_mode ayuda mucho)
+        const cleanJson = rawContent.replace(/```json|```/g, '').trim();
+
+        let datos;
+        try {
+            datos = JSON.parse(cleanJson);
+        } catch (e) {
+            console.error("Error parseando JSON de Groq:", rawContent);
+            return "❌ No pude entender los datos del cliente. Intenta ser más claro.";
+        }
+        //const result = await geminiModel.generateContent(prompt);
+        //const cleanJson = result.response.text().replace(/```json|```/g, '').trim();
+        //const datos = JSON.parse(cleanJson);
 
         // B) GEOCODIFICACIÓN INTELIGENTE
         let lat = null;
