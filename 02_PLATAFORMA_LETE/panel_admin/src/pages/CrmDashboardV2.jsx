@@ -1,37 +1,36 @@
 import React, { useEffect, useState, useMemo } from 'react';
-// Importamos la versión 2 de la API
-import { getCrmDashboardV2 } from '../apiService';
+import api, { forceAnalyze } from '../apiService';
 import ChatModal from '../components/ChatModal';
+import ClientCard from '../components/ClientCard';
 import './CrmDashboard.css';
-// Importamos los íconos (asumiendo que usas Font Awesome o similar)
-import { FaSyncAlt, FaMoneyBillWave, FaClock, FaCalendarCheck, FaExclamationTriangle, FaTimesCircle, FaCheckCircle, FaUserTag, FaHandPointRight } from 'react-icons/fa';
-import { IoChatbubbleEllipsesSharp } from 'react-icons/io5';
 
-const CrmDashboardV2 = () => {
-    // --- ESTADOS DE DATOS ---\
+const CrmDashboard = () => {
+    // --- ESTADOS DE DATOS ---
     const [clientes, setClientes] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [expandedRow, setExpandedRow] = useState(null);
-    const [modalAbierto, setModalAbierto] = useState(null); // Para futuros modales de Acción
 
-    // --- ESTADOS DE INTERFAZ ---\
+    // --- ESTADOS DE INTERFAZ ---
     const [filtro, setFiltro] = useState('TODOS');
     const [busqueda, setBusqueda] = useState('');
-    const [orden, setOrden] = useState({ key: 'status_integridad', direction: 'asc' }); // Ordenamos por Integridad por defecto
+    const [orden, setOrden] = useState({ key: 'last_interaction', direction: 'desc' });
     const [paginaActual, setPaginaActual] = useState(1);
     const itemsPorPagina = 20;
 
     const [selectedClientForChat, setSelectedClientForChat] = useState(null);
 
-    // --- CARGA DE DATOS (Usando V2) ---\
+    // --- CARGA DE DATOS ---
     const cargarDatos = async () => {
         setLoading(true);
         try {
-            // Llama a la nueva función
-            const data = await getCrmDashboardV2();
-            setClientes(Array.isArray(data) ? data : []);
+            // CORRECCIÓN CRÍTICA: La ruta correcta incluye 'admin-'
+            const response = await api.get('/clientes/admin-dashboard-v2');
+
+            // Verificamos la estructura de la respuesta (puede venir directa o anidada en data)
+            const dataRaw = response.data.data || response.data;
+            setClientes(Array.isArray(dataRaw) ? dataRaw : []);
+
         } catch (error) {
-            console.error("Error cargando CRM V2:", error);
+            console.error("Error cargando CRM V2 (Verifique ruta backend):", error);
             setClientes([]);
         } finally {
             setLoading(false);
@@ -40,236 +39,200 @@ const CrmDashboardV2 = () => {
 
     useEffect(() => {
         cargarDatos();
+        // Auto-refresh cada 5 minutos
+        const interval = setInterval(cargarDatos, 300000);
+        return () => clearInterval(interval);
     }, []);
 
-    // --- LÓGICA DE FILTRADO Y ORDENAMIENTO (Adaptada a la nueva estructura) ---
-    const clientesFiltrados = useMemo(() => {
-        let clientesFiltro = clientes;
+    // Resetear paginación al filtrar/buscar
+    useEffect(() => { setPaginaActual(1); }, [filtro, busqueda]);
 
-        // 1. Filtrado por Búsqueda (en nombre, teléfono o intent)
-        if (busqueda) {
-            const lowerBusqueda = busqueda.toLowerCase();
-            clientesFiltro = clientesFiltro.filter(c =>
-                c.nombre_completo?.toLowerCase().includes(lowerBusqueda) ||
-                c.telefono?.includes(busqueda) ||
-                c.crm_intent?.toLowerCase().includes(lowerBusqueda) ||
-                c.mensaje_integridad?.toLowerCase().includes(lowerBusqueda)
+    // --- CALCULOS DE CONTADORES ---
+    const counts = useMemo(() => {
+        return {
+            total: clientes.length,
+            // Alerta Unificada: Fantasmas + Manuales (que requieren revisión)
+            alertas: clientes.filter(c => c.status_integridad === 'ERROR_GHOST' || c.status_integridad === 'MANUAL').length,
+            fantasmas: clientes.filter(c => c.status_integridad === 'ERROR_GHOST').length,
+            manuales: clientes.filter(c => c.status_integridad === 'MANUAL').length,
+            sincronizados: clientes.filter(c => c.status_integridad === 'OK').length
+        };
+    }, [clientes]);
+
+    // --- LÓGICA DE FILTRADO, BÚSQUEDA Y ORDENAMIENTO ---
+    const datosFiltrados = useMemo(() => {
+        let datos = [...clientes];
+
+        // 1. Filtrar por estado
+        if (filtro === 'ALERTA') {
+            datos = datos.filter(c => c.status_integridad === 'ERROR_GHOST' || c.status_integridad === 'MANUAL');
+        } else if (filtro !== 'TODOS') {
+            datos = datos.filter(c => c.status_integridad === filtro);
+        }
+
+        // 2. Búsqueda inteligente (Nombre, Teléfono, Resumen IA)
+        if (busqueda.trim() !== '') {
+            const query = busqueda.toLowerCase().trim();
+            datos = datos.filter(c =>
+                (c.nombre_completo || '').toLowerCase().includes(query) ||
+                (c.telefono || '').includes(query) ||
+                (c.ai_summary || '').toLowerCase().includes(query)
             );
         }
 
-        // 2. Ordenamiento
-        const factor = orden.direction === 'asc' ? 1 : -1;
-        clientesFiltro.sort((a, b) => {
-            const aVal = a[orden.key];
-            const bVal = b[orden.key];
+        // 3. Ordenamiento
+        datos.sort((a, b) => {
+            let valA = a[orden.key];
+            let valB = b[orden.key];
 
-            // Ordenamiento por Integridad (Priorizar errores)
-            if (orden.key === 'status_integridad') {
-                const map = { 'ERROR_GHOST': 1, 'MANUAL': 2, 'OK': 3 };
-                return (map[aVal] - map[bVal]) * factor;
+            if (['last_interaction'].includes(orden.key)) {
+                valA = valA ? new Date(valA).getTime() : 0;
+                valB = valB ? new Date(valB).getTime() : 0;
+            } else if (orden.key === 'saldo_pendiente') {
+                // Ordenar numéricamente por finanzas
+                valA = a.finanzas?.saldo_pendiente || 0;
+                valB = b.finanzas?.saldo_pendiente || 0;
+            } else {
+                valA = valA ? String(valA).toLowerCase() : '';
+                valB = valB ? String(valB).toLowerCase() : '';
             }
 
-            // Lógica de ordenamiento general (adaptada)
-            if (aVal < bVal) return -1 * factor;
-            if (aVal > bVal) return 1 * factor;
+            if (valA < valB) return orden.direction === 'asc' ? -1 : 1;
+            if (valA > valB) return orden.direction === 'asc' ? 1 : -1;
             return 0;
         });
 
-        return clientesFiltro;
-    }, [clientes, busqueda, orden]);
+        return datos;
+    }, [clientes, filtro, busqueda, orden]);
 
     // --- PAGINACIÓN ---
-    const totalPaginas = Math.ceil(clientesFiltrados.length / itemsPorPagina);
+    const totalPaginas = Math.ceil(datosFiltrados.length / itemsPorPagina);
     const datosPaginados = useMemo(() => {
         const inicio = (paginaActual - 1) * itemsPorPagina;
-        return clientesFiltrados.slice(inicio, inicio + itemsPorPagina);
-    }, [clientesFiltrados, paginaActual]);
+        return datosFiltrados.slice(inicio, inicio + itemsPorPagina);
+    }, [datosFiltrados, paginaActual, itemsPorPagina]);
 
-    // --- LÓGICA DE RENDERING ---
-
-    // Función para renderizar el semáforo de Integridad
-    const renderIntegridadStatus = (cliente) => {
-        const { status_integridad, cita_real, mensaje_integridad } = cliente;
-
-        switch (status_integridad) {
-            case 'ERROR_GHOST':
-                return (
-                    <div className="status-badge critical" title="IA detectó cita, pero no está en MariaDB">
-                        <FaTimesCircle /> {mensaje_integridad}
-                    </div>
-                );
-            case 'MANUAL':
-                return (
-                    <div className="status-badge warning" title="Agendado en MariaDB sin paso previo por IA/Bot">
-                        <FaExclamationTriangle /> {mensaje_integridad}
-                    </div>
-                );
-            case 'OK':
-            default:
-                return (
-                    <div className="status-badge success" title={cita_real ? `Agendado: ${new Date(cita_real.fecha).toLocaleDateString()}` : 'Lead en Proceso'}>
-                        <FaCheckCircle /> {cita_real ? 'Sincronizado' : 'Lead OK'}
-                    </div>
-                );
-        }
+    // --- ACCIONES ---
+    const handleSort = (key) => {
+        setOrden(prev => ({
+            key,
+            direction: prev.key === key && prev.direction === 'desc' ? 'asc' : 'desc'
+        }));
     };
 
-    // Función para renderizar el estado financiero
-    const renderFinanzasStatus = (finanzas) => {
-        const porcentaje = finanzas.total_cotizado > 0
-            ? Math.min(100, (finanzas.total_pagado / finanzas.total_cotizado) * 100)
-            : 0;
-
-        const colorBarra = porcentaje === 100 ? '#4caf50' : (porcentaje > 0 ? '#ff9800' : '#f44336');
-
-        return (
-            <div className="finance-status">
-                <div className="progress-bar-container" title={`$${finanzas.total_pagado.toFixed(2)} pagado de $${finanzas.total_cotizado.toFixed(2)} cotizado`}>
-                    <div className="progress-bar" style={{ width: `${porcentaje}%`, backgroundColor: colorBarra }}></div>
-                </div>
-                <small>Pendiente: **${finanzas.saldo_pendiente.toFixed(2)}**</small>
-            </div>
-        );
-    };
-
-    // Placeholder para la acción de agendar (Fase 5)
-    const handleAction = (cliente, action) => {
-        if (action === 'AGENDAR_AHORA') {
-            alert(`Acción: Agendar a ${cliente.nombre_completo}. (Implementación en Fase 5)`);
-            // Aquí iría el modal o la llamada API
-        } else if (action === 'VER_DETALLES') {
+    const handleCardAction = (cliente, actionType) => {
+        if (actionType === 'REVISAR_MANUAL' || actionType === 'ERROR_GHOST') {
+            alert(`⚠️ CITA FANTASMA DETECTADA\n\nCliente: ${cliente.nombre_completo}\n\nLa IA detectó intención de cita, pero NO existe en la Agenda (MariaDB).\n\nSOLUCIÓN: Vaya a 'Crear Caso' y agende la cita manualmente para corregir esta discrepancia.`);
+        } else {
             setSelectedClientForChat(cliente);
         }
     }
 
+    // --- RENDERIZADO ---
     return (
-        <div className="crm-dashboard-container">
-            <h2><FaSyncAlt /> Centro de Comando CRM V2 (Doble Cruce de Verdad)</h2>
+        <div className="crm-container">
+            {/* HEADER */}
+            <header className="crm-header">
+                <div>
+                    <h1>🧠 Centro de Mando V2 (Auditoría)</h1>
+                    <div className="crm-stats">
+                        Total: <strong>{counts.total}</strong> |
+                        🚨 Atención Requerida: <strong style={{ color: '#ef4444' }}>{counts.alertas}</strong> |
+                        ✅ Sincronizados: <strong style={{ color: '#10b981' }}>{counts.sincronizados}</strong>
+                    </div>
+                </div>
 
-            {/* BARRA DE FILTROS Y BÚSQUEDA (Mantenemos tu diseño) */}
-            <div className="crm-controls">
-                <input
-                    type="text"
-                    placeholder="Buscar por nombre, teléfono o intent..."
-                    value={busqueda}
-                    onChange={(e) => {
-                        setBusqueda(e.target.value);
-                        setPaginaActual(1);
-                    }}
-                    className="search-input"
-                />
-                <button onClick={cargarDatos} className="tab-btn refresh-btn">
-                    Recargar Datos
+                <div className="crm-controls-group">
+                    <div className="search-box">
+                        <input
+                            type="text"
+                            placeholder="🔍 Buscar cliente, teléfono..."
+                            value={busqueda}
+                            onChange={(e) => setBusqueda(e.target.value)}
+                        />
+                    </div>
+                    <button onClick={cargarDatos} className="refresh-btn" title="Recargar Datos">🔄</button>
+                </div>
+            </header>
+
+            {/* BARRA DE PESTAÑAS (FILTROS) */}
+            <div className="crm-tabs">
+                <button
+                    onClick={() => setFiltro('ALERTA')}
+                    className={`tab-btn alert ${filtro === 'ALERTA' ? 'active' : ''}`}
+                >
+                    🚨 ALERTAS ({counts.alertas})
+                </button>
+                <button
+                    onClick={() => setFiltro('ERROR_GHOST')}
+                    className={`tab-btn ${filtro === 'ERROR_GHOST' ? 'active' : ''}`}
+                >
+                    👻 Fantasmas ({counts.fantasmas})
+                </button>
+                <button
+                    onClick={() => setFiltro('MANUAL')}
+                    className={`tab-btn manual ${filtro === 'MANUAL' ? 'active' : ''}`}
+                >
+                    ⚠️ Manuales ({counts.manuales})
+                </button>
+                <div style={{ width: '1px', background: '#e2e8f0', margin: '0 5px' }}></div>
+                <button
+                    onClick={() => setFiltro('OK')}
+                    className={`tab-btn ${filtro === 'OK' ? 'active' : ''}`}
+                >
+                    ✅ Sincronizados
+                </button>
+                <button
+                    onClick={() => setFiltro('TODOS')}
+                    className={`tab-btn ${filtro === 'TODOS' ? 'active' : ''}`}
+                >
+                    Todos
                 </button>
             </div>
 
-            {/* TABLA PRINCIPAL */}
+            {/* OPCIONES DE ORDENAMIENTO */}
+            <div className="crm-sort-options">
+                <span style={{ fontSize: '0.85em', color: '#64748b', marginRight: '10px' }}>Ordenar por:</span>
+                <button onClick={() => handleSort('last_interaction')} className={`sort-btn ${orden.key === 'last_interaction' ? 'active' : ''}`}>
+                    Recientes {orden.key === 'last_interaction' ? (orden.direction === 'desc' ? '▼' : '▲') : ''}
+                </button>
+                <button onClick={() => handleSort('saldo_pendiente')} className={`sort-btn ${orden.key === 'saldo_pendiente' ? 'active' : ''}`}>
+                    Deuda {orden.key === 'saldo_pendiente' ? (orden.direction === 'desc' ? '▼' : '▲') : ''}
+                </button>
+                <button onClick={() => handleSort('nombre_completo')} className={`sort-btn ${orden.key === 'nombre_completo' ? 'active' : ''}`}>
+                    Nombre {orden.key === 'nombre_completo' ? (orden.direction === 'desc' ? '▼' : '▲') : ''}
+                </button>
+            </div>
+
+            {/* GRID DE RESULTADOS (MODO TARJETAS) */}
             {loading ? (
-                <div className="loading-state">Cargando la verdad del negocio...</div>
+                <div className="loading-state">
+                    <div className="spinner"></div>
+                    <p>Auditando bases de datos (Supabase vs MariaDB)...</p>
+                </div>
+            ) : datosPaginados.length === 0 ? (
+                <div className="loading-state">
+                    <p>No se encontraron resultados para los filtros actuales.</p>
+                </div>
             ) : (
-                <div className="crm-table-wrapper">
-                    <table className="crm-table">
-                        <thead>
-                            <tr>
-                                <th onClick={() => setOrden({ key: 'nombre_completo', direction: orden.key === 'nombre_completo' && orden.direction === 'asc' ? 'desc' : 'asc' })}>
-                                    Cliente / Teléfono
-                                </th>
-                                <th onClick={() => setOrden({ key: 'status_integridad', direction: orden.key === 'status_integridad' && orden.direction === 'asc' ? 'desc' : 'asc' })}>
-                                    <FaSyncAlt /> Integridad Agenda
-                                </th>
-                                <th>
-                                    <FaCalendarCheck /> Agenda Real (MariaDB)
-                                </th>
-                                <th>
-                                    <FaUserTag /> Técnico Asignado
-                                </th>
-                                <th>
-                                    <FaMoneyBillWave /> Estado Financiero
-                                </th>
-                                <th>
-                                    <FaClock /> Última Interacción IA
-                                </th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {datosPaginados.map((cliente) => {
-                                // Buscamos el caso más reciente si existe
-                                const casoReciente = cliente.casos ? cliente.casos[cliente.casos.length - 1] : null;
-
-                                return (
-                                    <tr key={cliente.id}>
-                                        {/* Columna 1: Cliente */}
-                                        <td>
-                                            <strong>{cliente.nombre_completo || 'N/A'}</strong>
-                                            <small>{cliente.telefono}</small>
-                                            <div className="status-badge intent-badge" title="Intención detectada por la IA">
-                                                {cliente.crm_intent || 'LEAD (Sin IA)'}
-                                            </div>
-                                        </td>
-
-                                        {/* Columna 2: INTEGRIDAD (NUEVA) */}
-                                        <td className="integrity-status-cell">
-                                            {renderIntegridadStatus(cliente)}
-                                        </td>
-
-                                        {/* Columna 3: AGENDA REAL (NUEVA) */}
-                                        <td>
-                                            {cliente.cita_real ? (
-                                                <>
-                                                    {new Date(cliente.cita_real.fecha).toLocaleString()}
-                                                    <small>ID Cita: {cliente.cita_real.id_cita}</small>
-                                                </>
-                                            ) : 'No Agendado'}
-                                        </td>
-
-                                        <td>
-                                            {cliente.cita_real?.tecnico || cliente.tecnico_caso_supa || 'Pendiente'}
-                                        </td>
-
-                                        {/* Columna 5: FINANZAS (NUEVA) */}
-                                        <td>
-                                            {renderFinanzasStatus(cliente.finanzas)}
-                                        </td>
-
-                                        {/* Columna 6: Última Interacción */}
-                                        <td>
-                                            {cliente.last_interaction ? new Date(cliente.last_interaction).toLocaleString() : 'N/A'}
-                                            <small>{cliente.ai_summary}</small>
-                                        </td>
-
-                                        {/* Columna 7: ACCIONES */}
-                                        <td>
-                                            <button
-                                                className={`action-btn chat-btn ${cliente.status_integridad === 'ERROR_GHOST' ? 'primary-action' : ''}`}
-                                                onClick={() => handleAction(cliente, cliente.accion_sugerida)}
-                                                title={cliente.status_integridad === 'ERROR_GHOST' ? "Usar datos de IA para crear cita real" : "Ver detalles y chatear"}
-                                            >
-                                                {cliente.status_integridad === 'ERROR_GHOST' ? <FaHandPointRight /> : <IoChatbubbleEllipsesSharp />}
-                                                {' '}{cliente.status_integridad === 'ERROR_GHOST' ? 'Fix Agenda' : 'Chat'}
-                                            </button>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-
-                            {datosPaginados.length === 0 && (
-                                <tr>
-                                    <td colSpan="7" style={{ textAlign: 'center', padding: '30px', color: '#64748b' }}>
-                                        No se encontraron resultados para los filtros actuales.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                <div className="clientes-grid">
+                    {datosPaginados.map(cliente => (
+                        <ClientCard
+                            key={cliente.id || cliente.cliente_id}
+                            cliente={cliente}
+                            onAction={handleCardAction}
+                        />
+                    ))}
                 </div>
             )}
 
             {/* PAGINACIÓN */}
-            {!loading && (
+            {!loading && datosFiltrados.length > 0 && (
                 <div className="pagination">
                     <button disabled={paginaActual === 1} onClick={() => setPaginaActual(p => p - 1)} className="tab-btn">◀ Anterior</button>
-                    <span style={{ margin: '0 10px', color: 'var(--text-secondary)' }}>Página {paginaActual} de {totalPaginas || 1}</span>
+                    <span style={{ margin: '0 15px', color: '#64748b', fontSize: '0.9em' }}>
+                        Página {paginaActual} de {totalPaginas || 1}
+                    </span>
                     <button disabled={paginaActual === totalPaginas || totalPaginas === 0} onClick={() => setPaginaActual(p => p + 1)} className="tab-btn">Siguiente ▶</button>
                 </div>
             )}
@@ -281,10 +244,8 @@ const CrmDashboardV2 = () => {
                     onClose={() => setSelectedClientForChat(null)}
                 />
             )}
-
-            {/* Aquí irían los modales de Agendar y Cierre Forzoso (Fase 5) */}
         </div>
     );
 };
 
-export default CrmDashboardV2;
+export default CrmDashboard;
