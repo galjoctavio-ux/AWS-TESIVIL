@@ -30,7 +30,7 @@ export const getCrmDashboardV2 = async (req, res) => {
                 )
             `)
             .order('last_interaction', { ascending: false })
-            .limit(100);
+            .limit(10000);
 
         if (errorSupa) throw new Error(`Error Supabase: ${errorSupa.message}`);
 
