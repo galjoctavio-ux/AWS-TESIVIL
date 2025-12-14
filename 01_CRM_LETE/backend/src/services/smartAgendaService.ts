@@ -153,7 +153,7 @@ export const procesarSolicitudAgenda = async (
         // E) RESPUESTA AL USUARIO
         return `📍 *Verificación de Agenda*\n\n` +
             `👤 Cliente: ${datos.cliente_nombre}\n` +
-            `👷 Técnico: *${tecnicoMostrar}*\n` +
+            `👷 Técnico (por defecto Ing. Gallardo): *${tecnicoMostrar}*\n` +
             `📅 Fecha: ${datos.fecha} a las ${datos.hora}\n` +
             `🏠 Dirección: "${direccionCompletaTexto}"\n` +
             `🌐 GPS: ${avisoGeo}\n` +
