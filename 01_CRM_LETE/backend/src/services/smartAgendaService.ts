@@ -83,23 +83,25 @@ const geocodeAddress = async (address: string) => {
     }
 };
 
-// --- 3. GENERADOR DE LINKS MEJORADO ---
-// Prioriza la dirección legible si existe para que en el mapa aparezca "Av. Vallarta..." 
+// --- 3. GENERADOR DE LINKS ESTÁNDAR (CORREGIDO) ---
+// Genera un link universal que abre la app de Google Maps
 const generateNavigationLink = (lat: number | null, lng: number | null, addressQuery: string) => {
     const baseUrl = "https://www.google.com/maps/search/?api=1&query=";
 
-    // CASO 1: Tenemos una dirección validada por Google (Prioridad Visual)
+    // OPCIÓN A: Dirección por Texto (Prioridad Visual)
+    // Ejemplo: ...?query=Av+Vallarta+2440+Guadalajara
     if (addressQuery && addressQuery.length > 5 && addressQuery !== "Ubicación Compartida (WhatsApp)") {
         return `${baseUrl}${encodeURIComponent(addressQuery)}`;
     }
 
-    // CASO 2: Solo tenemos coordenadas (ej. Pin de Ubicación o dirección ambigua)
+    // OPCIÓN B: Coordenadas GPS
+    // Ejemplo: ...?query=20.6736,-103.344
     if (lat && lng) {
         return `${baseUrl}${lat},${lng}`;
     }
 
-    // CASO 3: Fallback
-    return "https://maps.google.com";
+    // OPCIÓN C: Fallback (Si todo falla, mapa general)
+    return "https://www.google.com/maps";
 };
 
 // --- HELPER PARA EXTRAER COORDENADAS DE URLS ---
