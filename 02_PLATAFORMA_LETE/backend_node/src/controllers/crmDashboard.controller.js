@@ -1,6 +1,6 @@
 import pool from '../services/eaDatabase.js';
-import { supabase } from '../services/supabaseClient.js';
-
+//import { supabase } from '../services/supabaseClient.js';
+import supabase from '../services/supabaseClient.js';
 /**
  * CONTROLADOR MAESTRO DEL DASHBOARD CRM
  * Objetivo: Cruzar la verdad de la IA (Supabase) con la verdad Operativa (MariaDB/EasyAppointments)
