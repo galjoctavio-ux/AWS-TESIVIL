@@ -1,635 +1,277 @@
 /* src/pages/CrmDashboard.css */
-:root {
-    --primary-color: #2563eb;
-    --bg-light: #f8fafc;
-    --border-color: #e2e8f0;
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
 
-    /* Semáforos y Estados */
-    --color-success: #22c55e;
-    /* Verde */
-    --color-warning: #f59e0b;
-    /* Amarillo/Naranja */
-    --color-danger: #ef4444;
-    /* Rojo */
-    --color-info: #3b82f6;
-    /* Azul */
-    --color-gray: #94a3b8;
-}
-
-.crm-container {
+/* --- GENERAL & HEADER --- */
+.crm-dashboard {
     padding: 20px;
-    background-color: var(--bg-light);
-    min-height: 100vh;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #f8fafc;
+    /* Color de fondo muy claro (similar a Tailwind's slate-50) */
+    min-height: 90vh;
 }
 
-/* HEADER */
-.crm-header {
+.dashboard-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    background: white;
-    padding: 15px 20px;
-    border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
 }
 
-.crm-header h1 {
-    font-size: 1.5rem;
-    color: var(--text-primary);
-    margin: 0;
-}
-
-.crm-stats {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-}
-
-/* CONTROLES Y FILTROS */
-.crm-controls-group {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
-
-.search-box input {
-    padding: 8px 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    width: 250px;
-    font-size: 0.9rem;
-}
-
-.crm-tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 15px;
-    flex-wrap: wrap;
-}
-
-.tab-btn {
-    padding: 8px 16px;
-    border: 1px solid var(--border-color);
-    background: white;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-    transition: all 0.2s;
-}
-
-.tab-btn:hover {
-    background-color: #f1f5f9;
-}
-
-.tab-btn.active {
-    background-color: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-}
-
-.tab-btn.alert.active {
-    background-color: var(--color-danger);
-    border-color: var(--color-danger);
-}
-
-.tab-btn.admin.active {
-    background-color: var(--color-info);
-    border-color: var(--color-info);
-}
-
-/* TABLA */
-.crm-table-wrapper {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    overflow-x: auto;
-}
-
-.crm-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 1000px;
-}
-
-.crm-table th {
-    background-color: #f8fafc;
-    color: var(--text-secondary);
+.dashboard-header h2 {
+    color: #1e293b;
+    /* Texto oscuro */
+    font-size: 1.8rem;
     font-weight: 600;
-    text-align: left;
-    padding: 12px 16px;
-    border-bottom: 2px solid var(--border-color);
-    font-size: 0.85rem;
-    cursor: pointer;
 }
 
-.crm-table td {
-    padding: 16px;
-    border-bottom: 1px solid var(--border-color);
-    vertical-align: top;
-    color: var(--text-primary);
-    font-size: 0.9rem;
+/* --- FILTROS Y BÚSQUEDA --- */
+.dashboard-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    /* Sombra ligera */
 }
 
-.crm-table tr:hover {
-    background-color: #f8fafc;
+.dashboard-controls input[type="text"],
+.dashboard-controls select {
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 1em;
+    flex: 1;
+    min-width: 150px;
+    max-width: 350px;
+    /* Limitar el ancho del input de búsqueda */
 }
 
-.row-alert {
-    background-color: #fef2f2;
+/* --- ESTADO DE CARGA --- */
+.loading-indicator {
+    text-align: center;
+    padding: 50px;
+    font-size: 1.2em;
+    color: #64748b;
 }
 
-/* Rojo muy suave para alertas */
+/* --- GRID DE CLIENTES (En lugar de tabla pura) --- */
+.clientes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    /* Mínimo 320px de ancho por tarjeta */
+    gap: 20px;
+}
 
-/* COLUMNA: CLIENTE */
-.client-info {
+/* --- TARJETA DE CLIENTE (CARD) --- */
+.cliente-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    /* Sombra más profesional */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-left: 5px solid;
+    /* Usaremos esto para el color de integridad (el semáforo) */
 }
 
-.client-name {
+.cliente-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.card-title {
+    font-size: 1.4rem;
     font-weight: 700;
-    color: var(--text-primary);
-    font-size: 0.95rem;
+    color: #1e293b;
+    margin-bottom: 2px;
 }
 
-.client-meta {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+.card-subtitle {
+    font-size: 0.9em;
+    color: #64748b;
 }
 
-.client-address a {
-    color: var(--primary-color);
-    text-decoration: none;
-}
-
-.client-email {
-    color: var(--text-secondary);
-    font-style: italic;
-}
-
-/* BADGES Y SEMÁFOROS */
+/* --- BADGES/ETIQUETAS (INTENT) --- */
 .badge {
     display: inline-block;
     padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 700;
+    border-radius: 4px;
+    font-size: 0.75em;
+    font-weight: 600;
     text-transform: uppercase;
+    /* Evita que el badge se extienda si no cabe */
+    flex-shrink: 0;
 }
 
-.badge-alert {
-    background-color: #fee2e2;
-    color: #991b1b;
+.badge-intent {
+    background-color: #e0f2fe;
+    color: #0284c7;
+    /* Azul para intención alta */
 }
 
-.badge-admin {
-    background-color: #dbeafe;
-    color: #1e40af;
-}
-
-.badge-cita {
-    background-color: #dcfce7;
-    color: #166534;
-}
-
-.badge-normal {
+.badge-intent-none {
     background-color: #f1f5f9;
+    color: #64748b;
+    /* Gris para intención nula */
+}
+
+/* --- SECCIÓN DE DETALLES --- */
+.card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 15px;
+}
+
+.detail-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9em;
     color: #475569;
 }
 
-/* Semáforo Calificación */
-.score-indicator {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    margin-right: 6px;
+.detail-row svg {
+    color: #3b82f6;
+    /* Icono azul por defecto */
+    min-width: 16px;
 }
 
-/* Status Operativo (Círculos) */
-.sync-status-container {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    margin-top: 5px;
-    font-size: 0.75rem;
-    font-weight: 600;
+/* --- INTEGRIDAD (COLOR BORDER Y TEXTO) --- */
+.status-OK {
+    border-left-color: #10b981;
 }
 
-/* COLUMNA: INTERACCIÓN (Chat Bubble) */
-.msg-cell {
-    min-width: 200px;
+/* Verde - Sincronizado */
+.status-MANUAL {
+    border-left-color: #f59e0b;
 }
 
-.msg-bubble {
-    background-color: #f1f5f9;
-    padding: 8px 12px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    margin-bottom: 5px;
-    border-top-left-radius: 2px;
-    max-width: 90%;
+/* Naranja - Agendado Manual */
+.status-ERROR_GHOST {
+    border-left-color: #ef4444;
 }
 
-.msg-bubble.assistant {
-    background-color: #e0f2fe;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 2px;
-    margin-left: auto;
+/* Rojo - Cita Fantasma */
+
+.status-label {
+    font-weight: 700;
+    padding: 2px 0;
 }
 
-.msg-meta {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
+.status-label.OK {
+    color: #10b981;
+}
+
+.status-label.MANUAL {
+    color: #f59e0b;
+}
+
+.status-label.ERROR_GHOST {
+    color: #ef4444;
+}
+
+/* --- RESUMEN IA / ACCIÓN (FOOTER) --- */
+.card-footer {
+    border-top: 1px solid #f1f5f9;
+    padding-top: 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.unread-badge {
-    background-color: var(--color-danger);
+.ai-summary-snippet {
+    font-size: 0.8em;
+    color: #64748b;
+    font-style: italic;
+    flex-grow: 1;
+    margin-right: 10px;
+    /* Limitar el espacio del resumen */
+    max-height: 38px;
+    overflow: hidden;
+    line-height: 1.3;
+}
+
+.btn-action {
+    background-color: #3b82f6;
     color: white;
-    padding: 2px 6px;
-    border-radius: 10px;
-    font-size: 0.7rem;
-}
-
-/* COLUMNA: IA & NOTAS */
-.ai-cell {
-    max-width: 250px;
-}
-
-.ai-summary {
-    font-size: 0.85rem;
-    line-height: 1.4;
-    color: var(--text-primary);
-    margin-bottom: 6px;
-}
-
-.internal-note {
-    background: #fffbeb;
-    padding: 6px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    border-left: 3px solid var(--color-warning);
-}
-
-/* COLUMNA: ACCIONES Y FINANZAS */
-.finance-cell {
-    min-width: 120px;
-}
-
-.debt-text {
-    color: var(--color-danger);
-    font-weight: 700;
-    font-size: 0.9rem;
-    margin-bottom: 4px;
-}
-
-.next-action {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    margin-bottom: 8px;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 5px;
-}
-
-.btn-icon {
     border: none;
-    padding: 6px;
+    padding: 8px 15px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 1.1rem;
-    transition: transform 0.1s;
-}
-
-.btn-chat {
-    background-color: #dcfce7;
-    color: #15803d;
-}
-
-.btn-ai {
-    background-color: #f3e8ff;
-    color: #7e22ce;
-}
-
-.btn-ea {
-    background-color: #e0f2fe;
-    color: #0369a1;
-}
-
-/* Botón crear EA */
-.btn-icon:hover {
-    transform: scale(1.1);
-}
-
-/* PAGINACIÓN */
-.pagination {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    padding: 20px;
-    align-items: center;
-}
-
-/* src/pages/CrmDashboard.css */
-
-/* ... (MANTENER TUS VARIABLES Y ESTILOS DE HEADER/CONTROLES QUE YA TENÍAS) ... */
-
-:root {
-    --primary-color: #2563eb;
-    --bg-light: #f8fafc;
-    --border-color: #e2e8f0;
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --color-success: #22c55e;
-    --color-warning: #f59e0b;
-    --color-danger: #ef4444;
-    --color-info: #3b82f6;
-    --color-gray: #94a3b8;
-}
-
-/* ... ESTILOS DE TABLA BASE ... */
-
-/* FILA EXPANDIBLE */
-.row-expanded-bg {
-    background-color: #f8fafc;
-    border-bottom: 2px solid #e2e8f0;
-}
-
-.details-panel {
-    padding: 20px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    /* 3 Columnas */
-    gap: 20px;
-    font-size: 0.9rem;
-}
-
-/* Tarjetas dentro del detalle */
-.detail-card {
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.detail-card h4 {
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    border-bottom: 1px solid #f1f5f9;
-    padding-bottom: 5px;
-    font-weight: 700;
-}
-
-/* Estilos de Texto dentro de las tarjetas */
-.full-text {
-    white-space: pre-wrap;
-    /* Respeta saltos de línea */
-    line-height: 1.5;
-    color: var(--text-primary);
-    font-size: 0.9rem;
-}
-
-.info-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    border-bottom: 1px dashed #f1f5f9;
-    padding-bottom: 4px;
-}
-
-.info-label {
     font-weight: 600;
-    color: var(--text-secondary);
-}
-
-.info-value {
-    color: var(--text-primary);
-    text-align: right;
-}
-
-/* Botón de expandir */
-.btn-expand {
-    background: transparent;
-    border: 1px solid var(--border-color);
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-secondary);
-    transition: all 0.2s;
-}
-
-.btn-expand:hover {
-    background-color: var(--bg-light);
-    color: var(--primary-color);
-}
-
-.btn-expand.open {
-    transform: rotate(180deg);
-    background-color: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-}
-
-/* Ajustes visuales fila principal */
-.main-row {
-    cursor: pointer;
-    transition: background 0.1s;
-}
-
-.main-row:hover {
-    background-color: #f1f5f9;
-}
-
-/* Badges pequeños para la tabla principal */
-.mini-badge {
-    font-size: 0.7rem;
-    padding: 2px 6px;
-    border-radius: 4px;
-    margin-right: 4px;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: white;
-}
-
-.bg-blue {
-    background-color: var(--color-info);
-}
-
-.bg-orange {
-    background-color: var(--color-warning);
-}
-
-.bg-red {
-    background-color: var(--color-danger);
-}
-
-.bg-green {
-    background-color: var(--color-success);
-}
-
-.bg-gray {
-    background-color: var(--color-gray);
-}
-
-/* Link de mapa bonito */
-.map-link-btn {
-    display: inline-block;
-    margin-top: 5px;
-    color: var(--color-info);
-    font-size: 0.85rem;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.map-link-btn:hover {
-    text-decoration: underline;
-}
-
-/* --- Estilos específicos para CrmDashboardV2 (Semáforos de Verdad) --- */
-
-.crm-table td,
-.crm-table th {
-    /* Ajuste para que las celdas acomoden los badges y barras */
-    vertical-align: top;
-    padding: 12px 8px;
-}
-
-.integrity-status-cell {
-    font-weight: bold;
-}
-
-/* Estilos de las etiquetas de estado */
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 8px;
-    margin-top: 5px;
-    border-radius: 4px;
-    font-size: 0.8em;
-    font-weight: 600;
+    transition: background-color 0.2s;
+    /* Estilo específico para la acción de revisión */
     white-space: nowrap;
 }
 
-.status-badge svg {
-    margin-right: 5px;
+.btn-action:hover {
+    background-color: #2563eb;
 }
 
-/* Semáforo de Integridad */
-.status-badge.critical {
-    background-color: #fce4e4;
-    /* Rojo suave */
-    color: #e53935;
-    /* Rojo fuerte */
-    border: 1px solid #e53935;
-    animation: pulse-red 1s infinite alternate;
-    /* Efecto de alerta */
+/* --- PAGINACIÓN --- */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+    gap: 15px;
 }
 
-.status-badge.warning {
-    background-color: #fffde7;
-    /* Amarillo suave */
-    color: #fbc02d;
-    /* Amarillo fuerte */
-    border: 1px solid #fbc02d;
-}
-
-.status-badge.success {
-    background-color: #e8f5e9;
-    /* Verde suave */
-    color: #43a047;
-    /* Verde fuerte */
-    border: 1px solid #43a047;
-}
-
-.status-badge.intent-badge {
-    background-color: #e3f2fd;
-    color: #1e88e5;
-    font-size: 0.75em;
-    margin-top: 8px;
+.tab-btn {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
     font-weight: 500;
 }
 
-/* Animación de parpadeo para estados críticos */
-@keyframes pulse-red {
-    from {
-        opacity: 1;
+.tab-btn:hover:not(:disabled) {
+    background-color: #f1f5f9;
+}
+
+.tab-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
-    to {
-        opacity: 0.7;
+    .dashboard-controls {
+        flex-direction: column;
     }
-}
 
+    .clientes-grid {
+        grid-template-columns: 1fr;
+        /* Una sola columna en móvil */
+    }
 
-/* --- Estilos Financieros (Barras de Progreso) --- */
+    .card-header {
+        flex-direction: column;
+        gap: 5px;
+    }
 
-.finance-status {
-    width: 100%;
-    min-width: 150px;
-}
-
-.progress-bar-container {
-    background-color: #eee;
-    border-radius: 4px;
-    overflow: hidden;
-    height: 10px;
-    margin-bottom: 5px;
-    width: 90%;
-    /* Ajuste visual */
-}
-
-.progress-bar {
-    height: 100%;
-    transition: width 0.3s ease-in-out;
-}
-
-.finance-status small {
-    display: block;
-    font-size: 0.8em;
-    color: #4b5563;
-    /* Gris oscuro para el texto */
-}
-
-/* Botón de acción para arreglar la agenda */
-.action-btn.primary-action {
-    background-color: #e53935;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    display: inline-flex;
-    align-items: center;
-    transition: background-color 0.2s;
-}
-
-.action-btn.primary-action:hover {
-    background-color: #c62828;
-}
-
-.action-btn.primary-action svg {
-    margin-right: 5px;
+    .badge {
+        align-self: flex-start;
+        margin-left: 0;
+    }
 }
