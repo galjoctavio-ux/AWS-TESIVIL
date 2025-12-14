@@ -2,13 +2,14 @@ import pool from '../services/eaDatabase.js';
 import { supabaseAdmin as supabase } from '../services/supabaseClient.js';
 
 /**
- * CONTROLADOR MAESTRO DEL DASHBOARD CRM V2 (CORREGIDO Y OPTIMIZADO)
+ * CONTROLADOR MAESTRO DEL DASHBOARD CRM V2
  */
 export const getCrmDashboardV2 = async (req, res) => {
     try {
         console.log("🔄 Iniciando sincronización de Dashboard CRM V2...");
 
-        // 1. OBTENER DATOS DE SUPABASE (Clientes, Casos, y Nombre de Técnico)
+        // 1. OBTENER DATOS DE SUPABASE
+        // IMPORTANTE: No usar comentarios // dentro del string select `...`
         const { data: clientesSupa, error: errorSupa } = await supabase
             .from('clientes')
             .select(`
@@ -19,9 +20,11 @@ export const getCrmDashboardV2 = async (req, res) => {
                     descripcion_problema, 
                     monto_cobrado, 
                     created_at,
-                    // SOLUCIÓN A PUNTO 7: Traer el nombre del técnico vía el JOIN implícito de Supabase
                     tecnico_id,
-                    profiles!casos_tecnico_id_fkey (nombre, rol) 
+                    profiles!casos_tecnico_id_fkey (
+                        nombre,
+                        rol
+                    )
                 )
             `)
             .order('last_interaction', { ascending: false })
@@ -29,7 +32,8 @@ export const getCrmDashboardV2 = async (req, res) => {
 
         if (errorSupa) throw new Error(`Error Supabase: ${errorSupa.message}`);
 
-        // 2. OBTENER DATOS DE MARIADB (Agenda) - Se mantienen 7 días para eficiencia en un CRM activo
+        // 2. OBTENER DATOS DE MARIADB (Agenda)
+        // Ampliamos a 30 días atrás para asegurar que salgan las citas recientes de la semana
         const queryMaria = `
             SELECT 
                 a.id AS cita_id,
@@ -46,32 +50,37 @@ export const getCrmDashboardV2 = async (req, res) => {
             FROM ea_appointments a
             LEFT JOIN ea_users c ON a.id_users_customer = c.id
             LEFT JOIN ea_users p ON a.id_users_provider = p.id
-            WHERE a.start_datetime >= DATE_SUB(NOW(), INTERVAL 7 DAY) OR a.start_datetime >= NOW()
-        `; // Se ajusta la lógica de la fecha para incluir todas las futuras.
+            WHERE a.start_datetime >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+        `;
 
         const [citasMaria] = await pool.execute(queryMaria);
 
         // 3. EL GRAN CRUCE (THE MERGE)
         const datosUnificados = clientesSupa.map(cliente => {
 
-            // A. Normalización (PUNTO 2 y 6)
-            // La única forma segura de match es usando los últimos 10 dígitos. 
-            // Si esto falla, los números están mal guardados en alguna de las dos bases.
+            // A. Normalización de teléfono para el cruce
             const telefonoCliente = (cliente.telefono || '').replace(/\D/g, '').slice(-10);
 
             // B. Buscar coincidencia en Agenda
             const citaEncontrada = citasMaria.find(cita => {
                 const telefonoCita = (cita.cliente_telefono || '').replace(/\D/g, '').slice(-10);
-                return telefonoCliente && telefonoCita.length >= 7 && telefonoCita === telefonoCliente;
+                // Validamos longitud para evitar falsos positivos
+                return telefonoCliente && telefonoCliente.length === 10 && telefonoCita === telefonoCliente;
             });
 
-            // C. Encontrar Técnico Asignado a un Caso reciente (PUNTO 7)
-            const casosConTecnicos = cliente.casos?.filter(c => c.profiles?.[0]?.nombre);
-            const tecnicoCaso = casosConTecnicos?.length > 0
-                ? `${casosConTecnicos[casosConTecnicos.length - 1].profiles[0].nombre}`
-                : null;
+            // C. Obtener nombre del técnico desde Supabase (si existe en los casos)
+            let tecnicoNombreSupa = null;
+            if (cliente.casos && cliente.casos.length > 0) {
+                const ultimoCaso = cliente.casos[cliente.casos.length - 1];
+                // Supabase puede devolver profiles como objeto o array dependiendo de la relación
+                if (ultimoCaso.profiles) {
+                    tecnicoNombreSupa = Array.isArray(ultimoCaso.profiles)
+                        ? ultimoCaso.profiles[0]?.nombre
+                        : ultimoCaso.profiles.nombre;
+                }
+            }
 
-            // D. Calcular Integridad (PUNTO 4 y 5)
+            // D. Calcular Integridad
             let integridad = 'OK';
             let mensajeIntegridad = 'Lead OK';
             let accionSugerida = 'VER_DETALLES';
@@ -90,9 +99,8 @@ export const getCrmDashboardV2 = async (req, res) => {
                 integridad = 'OK';
                 mensajeIntegridad = 'Sincronizado';
             }
-            // Los casos sin intención ni cita real se quedan en 'Lead OK'
 
-            // E. Calcular Finanzas (Se mantienen los cálculos basados en tu Schema)
+            // E. Calcular Finanzas
             const saldoPendiente = parseFloat(cliente.saldo_pendiente || 0);
             const totalCobrado = cliente.casos?.reduce((sum, caso) => sum + (parseFloat(caso.monto_cobrado) || 0), 0) || 0;
             const totalCotizadoEstimado = totalCobrado + saldoPendiente;
@@ -110,7 +118,7 @@ export const getCrmDashboardV2 = async (req, res) => {
                     id_cita: citaEncontrada.cita_id
                 } : null,
 
-                tecnico_caso_supa: tecnicoCaso, // Nombre del técnico del caso (Supabase)
+                tecnico_caso_supa: tecnicoNombreSupa,
 
                 status_integridad: integridad,
                 mensaje_integridad: mensajeIntegridad,
@@ -131,6 +139,6 @@ export const getCrmDashboardV2 = async (req, res) => {
 
     } catch (error) {
         console.error("❌ Error CRITICO en CrmDashboardV2:", error);
-        res.status(500).json({ error: "Error interno al cruzar datos. Consulte logs para detalles." });
+        res.status(500).json({ error: error.message });
     }
 };
