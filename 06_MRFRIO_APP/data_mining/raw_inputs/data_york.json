@@ -1,0 +1,155 @@
+[
+    {
+        "id_referencia": "york_residencial_inverter",
+        "nombre_comercial": "YORK RESIDENCIAL (INVERTER/MURO)",
+        "tipo": "Aire Residencial",
+        "imagen_local": "/images/equipos/york_default.png",
+        "logo_local": "/images/logos/york_logo.png",
+        "errores": [
+            {
+                "codigo": "E1",
+                "descripcion": "Falla en sensor de temperatura ambiente",
+                "solucion": "Verifique conexión del sensor de aire o reemplace."
+            },
+            {
+                "codigo": "E2",
+                "descripcion": "Falla en sensor del evaporador (unidad interna)",
+                "solucion": "Verifique el sensor de pozo en la unidad interior."
+            },
+            {
+                "codigo": "E3",
+                "descripcion": "Mal funcionamiento de velocidad del ventilador interior",
+                "solucion": "Revise motor de turbina, capacitor o sensor Hall."
+            },
+            {
+                "codigo": "E4",
+                "descripcion": "Error de EEPROM interior",
+                "solucion": "Falla de memoria en tarjeta. Reinicie el equipo."
+            },
+            {
+                "codigo": "E6",
+                "descripcion": "Protección por alta o baja presión del refrigerante",
+                "solucion": "Revise carga de gas y presiones de trabajo."
+            },
+            {
+                "codigo": "E7",
+                "descripcion": "Error de comunicación entre unidades",
+                "solucion": "Revise cableado de señal entre evaporador y condensador."
+            },
+            {
+                "codigo": "F1",
+                "descripcion": "Protección del Módulo IPM",
+                "solucion": "Sobrecorriente o falla en tarjeta inverter exterior."
+            },
+            {
+                "codigo": "F2",
+                "descripcion": "Sobrecorriente del compresor",
+                "solucion": "Compresor forzado, bobinas en corto o exceso de gas."
+            },
+            {
+                "codigo": "F3",
+                "descripcion": "Falla de comunicación tarjeta IPM y PCB exterior",
+                "solucion": "Revise conexiones internas en la condensadora."
+            },
+            {
+                "codigo": "F4",
+                "descripcion": "Protección por sobrecalentamiento (Descarga)",
+                "solucion": "Falta de refrigerante o condensador sucio."
+            },
+            {
+                "codigo": "F6",
+                "descripcion": "Falla en sensor de temperatura ambiente exterior",
+                "solucion": "Revise sensor de aire en condensadora."
+            },
+            {
+                "codigo": "F7",
+                "descripcion": "Falla en sensor de temperatura de succión",
+                "solucion": "Revise sensor en tubería de succión."
+            },
+            {
+                "codigo": "F8",
+                "descripcion": "Falla en motor ventilador exterior (DC)",
+                "solucion": "Motor de condensador dañado o bloqueado."
+            },
+            {
+                "codigo": "F19",
+                "descripcion": "Protección por alto y bajo voltaje",
+                "solucion": "Voltaje de alimentación fuera de rango."
+            },
+            {
+                "codigo": "F21",
+                "descripcion": "Falla en sensor de deshielo (Escarcha)",
+                "solucion": "Revise sensor de tubería exterior."
+            },
+            {
+                "codigo": "F25",
+                "descripcion": "Falla en sensor de temperatura de descarga",
+                "solucion": "Revise sensor en salida del compresor."
+            }
+        ]
+    },
+    {
+        "id_referencia": "york_central_comercial",
+        "nombre_comercial": "YORK CENTRAL / PAQUETE",
+        "tipo": "Comercial Ligero",
+        "imagen_local": "/images/equipos/york_default.png",
+        "logo_local": "/images/logos/york_logo.png",
+        "errores": [
+            {
+                "codigo": "E0",
+                "descripcion": "Error de secuencia de fases",
+                "solucion": "Invierta dos fases de la alimentación eléctrica."
+            },
+            {
+                "codigo": "E1",
+                "descripcion": "Mal funcionamiento de comunicación",
+                "solucion": "Error de comunicación entre termostato/placa y unidad."
+            },
+            {
+                "codigo": "E2",
+                "descripcion": "Mal funcionamiento del sensor T1",
+                "solucion": "Sensor de temperatura de retorno/ambiente dañado."
+            },
+            {
+                "codigo": "E3",
+                "descripcion": "Mal funcionamiento del sensor T2A / T3",
+                "solucion": "Sensor de temperatura de tubería o condensador."
+            },
+            {
+                "codigo": "E4",
+                "descripcion": "Mal funcionamiento del sensor T2B / T4",
+                "solucion": "Sensor de temperatura exterior o descarga."
+            },
+            {
+                "codigo": "E5",
+                "descripcion": "Protección de alta presión de descarga",
+                "solucion": "Condensador sucio, ventilador detenido o exceso de gas."
+            },
+            {
+                "codigo": "E6",
+                "descripcion": "Protección de baja presión de descarga",
+                "solucion": "Fuga de refrigerante o filtro obstruido."
+            },
+            {
+                "codigo": "P0",
+                "descripcion": "Protección de temperatura del evaporador",
+                "solucion": "Evaporador sucio o congelado."
+            },
+            {
+                "codigo": "P1",
+                "descripcion": "Protección anti-enfriamiento o descongelación",
+                "solucion": "Operación normal de protección."
+            },
+            {
+                "codigo": "P2",
+                "descripcion": "Protección de alta temperatura del condensador",
+                "solucion": "Limpie el serpentín condensador."
+            },
+            {
+                "codigo": "P3",
+                "descripcion": "Protección de temperatura del compresor",
+                "solucion": "Compresor sobrecalentado. Verifique carga."
+            }
+        ]
+    }
+]

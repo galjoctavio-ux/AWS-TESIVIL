@@ -1,86 +1,106 @@
 import json
 import os
 
-# --- CONFIGURACIÓN DE RUTAS ---
-PATH_ERRORES = os.path.join('..', 'raw_inputs', 'data_errores.json')
-PATH_EQUIPOS = os.path.join('..', 'raw_inputs', 'data_equipos.json')
-PATH_OUTPUT_DIR = os.path.join('..', 'output')
-PATH_OUTPUT_FILE = os.path.join(PATH_OUTPUT_DIR, 'DB_MASTER_MR_FRIO.json')
+# --- CONFIGURACIÓN ---
+# Carpeta donde están los JSONs
+BASE_INPUT_DIR = os.path.join('..', 'raw_inputs')
+# Ruta de salida del SQL
+OUTPUT_SQL = os.path.join('..', 'output', 'seed_full_database.sql')
+
+# Lista de archivos a procesar (Orden de importación)
+ARCHIVOS_A_PROCESAR = [
+    'DB_MASTER_MR_FRIO.json',  # Mirage
+    'data_carrier.json',       # Carrier
+    'data_york.json',          # York
+    'data_lg.json'             # LG (Nuevo!)
+]
+
+# Nombres de tablas en tu BD
+TABLA_MODELOS = "air_conditioner_models"
+TABLA_ERRORES = "error_codes"
+
+def escapar_sql(texto):
+    if not texto: return ""
+    return str(texto).replace("'", "''").replace("\\", "\\\\").strip()
 
 def main():
-    # 1. Cargar archivos
-    try:
-        with open(PATH_ERRORES, 'r', encoding='utf-8') as f:
-            errores_raw = json.load(f)
-        with open(PATH_EQUIPOS, 'r', encoding='utf-8') as f:
-            equipos_raw = json.load(f)
-    except FileNotFoundError as e:
-        print(f"❌ Error: {e}")
-        print("Asegúrate de que los archivos JSON estén en la carpeta 'raw_inputs'")
-        return
-
-    db_final = []
-    print(f"⚙️  Procesando {len(equipos_raw)} modelos...")
-
-    # 2. Unificar datos
-    for key_modelo, datos_equipo in equipos_raw.items():
+    print("🚀 Iniciando generación de SQL Maestro para Mr. Frío...")
+    
+    # Abrir archivo SQL para escritura
+    with open(OUTPUT_SQL, 'w', encoding='utf-8') as f_sql:
+        f_sql.write("-- SEEDER MAESTRO: MIRAGE + CARRIER + YORK --\n")
+        f_sql.write("-- Generado automáticamente --\n\n")
+        f_sql.write("BEGIN;\n")
         
-        # Normalizar nombre (quitar guiones bajos, mayúsculas)
-        nombre_humano = key_modelo.replace("_", " ").upper()
-        
-        modelo_nuevo = {
-            "id_referencia": key_modelo,
-            "nombre_comercial": nombre_humano,
-            "tipo": datos_equipo.get("tipo", "Aire Residencial"),
-            # Guardamos la referencia al archivo local que bajamos con el otro script
-            "imagen_local": f"/images/equipos/{datos_equipo.get('imagen', 'default.png')}",
-            "logo_local": f"/images/logos/{datos_equipo.get('logo', 'default.png')}",
-            # Guardamos la URL original por si acaso
-            "meta_original": {
-                "imagen_raw": datos_equipo.get("imagen"),
-                "logo_raw": datos_equipo.get("logo"),
-                "visible": datos_equipo.get("visible")
-            },
-            "lista_errores": []
-        }
+        # Limpiar tablas antes de insertar (Opcional, quita el comentario si quieres borrar todo antes)
+        # f_sql.write(f"TRUNCATE TABLE {TABLA_ERRORES}, {TABLA_MODELOS} RESTART IDENTITY CASCADE;\n\n")
 
-        # Vincular con sus errores
-        if key_modelo in errores_raw:
-            lista_errores = errores_raw[key_modelo]
+        id_modelo_counter = 1 
+
+        for archivo in ARCHIVOS_A_PROCESAR:
+            ruta_completa = os.path.join(BASE_INPUT_DIR, archivo)
             
-            # Caso 1: Los errores vienen como Objeto (Clave: Valor)
-            if isinstance(lista_errores, dict):
-                for codigo, detalle in lista_errores.items():
-                    modelo_nuevo["lista_errores"].append({
-                        "codigo": codigo,
-                        "descripcion": detalle.get("descrip", "").strip(),
-                        "solucion": detalle.get("solucion", "").strip()
-                    })
+            if not os.path.exists(ruta_completa):
+                print(f"⚠️  Advertencia: No encuentro {archivo}, saltando...")
+                continue
+
+            print(f"📂 Procesando: {archivo}...")
             
-            # Caso 2: Los errores vienen como Lista (Array) - Caso 'mpt_indoor'
-            elif isinstance(lista_errores, list):
-                for i, detalle in enumerate(lista_errores):
-                    if detalle: # Filtrar nulos
-                        # Si no hay código explícito, creamos uno genérico
-                        cod_temp = f"F_{i}" 
-                        modelo_nuevo["lista_errores"].append({
-                            "codigo": cod_temp,
-                            "descripcion": detalle.get("descrip", "").strip(),
-                            "solucion": detalle.get("solucion", "").strip()
-                        })
+            try:
+                with open(ruta_completa, 'r', encoding='utf-8') as f_json:
+                    data = json.load(f_json)
+                
+                for modelo in data:
+                    # 1. Datos del Modelo
+                    # Nota: Mapeamos los campos del JSON a las columnas de tu BD
+                    nombre = escapar_sql(modelo.get('nombre_comercial'))
+                    ref = escapar_sql(modelo.get('id_referencia'))
+                    
+                    # Manejo flexible de claves de imagen (Mirage vs Carrier/York manual)
+                    img = escapar_sql(modelo.get('imagen_local', ''))
+                    if not img: img = escapar_sql(modelo.get('imagen_url', '')) # Fallback
+                    
+                    logo = escapar_sql(modelo.get('logo_local', ''))
+                    if not logo: logo = escapar_sql(modelo.get('logo_url', '')) # Fallback
 
-        db_final.append(modelo_nuevo)
+                    tipo = escapar_sql(modelo.get('tipo', 'Aire Residencial'))
 
-    # 3. Crear carpeta de salida si no existe
-    os.makedirs(PATH_OUTPUT_DIR, exist_ok=True)
+                    # QUERY MODELO
+                    sql_mod = (
+                        f"INSERT INTO {TABLA_MODELOS} (id, name, reference_id, image_url, logo_url, type, created_at) "
+                        f"VALUES ({id_modelo_counter}, '{nombre}', '{ref}', '{img}', '{logo}', '{tipo}', NOW()) "
+                        f"ON CONFLICT (id) DO NOTHING;\n" # Evita errores si corres el script 2 veces
+                    )
+                    f_sql.write(sql_mod)
 
-    # 4. Guardar JSON Maestro
-    with open(PATH_OUTPUT_FILE, 'w', encoding='utf-8') as f:
-        json.dump(db_final, f, ensure_ascii=False, indent=4)
+                    # 2. Datos de Errores
+                    # Normalizamos la clave: Mirage usa 'errores', mi script Carrier usó 'errores', Mirage script anterior 'lista_errores'
+                    lista_errores = modelo.get('errores') or modelo.get('lista_errores') or []
 
-    print(f"\n✅ ¡Éxito! Base de datos maestra generada en:")
-    print(f"   -> {os.path.abspath(PATH_OUTPUT_FILE)}")
-    print(f"   -> Total de modelos procesados: {len(db_final)}")
+                    for error in lista_errores:
+                        codigo = escapar_sql(error.get('codigo'))
+                        desc = escapar_sql(error.get('descripcion'))
+                        sol = escapar_sql(error.get('solucion'))
+
+                        # QUERY ERROR
+                        sql_err = (
+                            f"INSERT INTO {TABLA_ERRORES} (model_id, code, description, solution, created_at) "
+                            f"VALUES ({id_modelo_counter}, '{codigo}', '{desc}', '{sol}', NOW());\n"
+                        )
+                        f_sql.write(sql_err)
+                    
+                    id_modelo_counter += 1
+                
+                f_sql.write(f"\n-- Fin de {archivo} --\n\n")
+
+            except Exception as e:
+                print(f"❌ Error leyendo {archivo}: {e}")
+
+        f_sql.write("COMMIT;\n")
+
+    print(f"\n✅ ¡MISIÓN CUMPLIDA! SQL generado en:")
+    print(f"   -> {os.path.abspath(OUTPUT_SQL)}")
+    print(f"   -> Total de modelos procesados: {id_modelo_counter - 1}")
 
 if __name__ == "__main__":
     main()

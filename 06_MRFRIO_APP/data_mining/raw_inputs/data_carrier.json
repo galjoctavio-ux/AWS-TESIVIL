@@ -1,0 +1,445 @@
+[
+    {
+        "id_referencia": "carrier_one",
+        "nombre_comercial": "CARRIER ONE",
+        "tipo": "Aire Residencial",
+        "imagen_local": "/images/equipos/carrier_default.png",
+        "logo_local": "/images/logos/carrier_one.png",
+        "errores": [
+            {
+                "codigo": "E1",
+                "descripcion": "Falla de sensor de temperatura aire interior",
+                "solucion": "Verifique la conexión y resistencia del sensor de ambiente."
+            },
+            {
+                "codigo": "E2",
+                "descripcion": "Falla de sensor de temperatura circuito interno",
+                "solucion": "Verifique el sensor de temperatura del serpentín (pozo)."
+            },
+            {
+                "codigo": "E6",
+                "descripcion": "Falla en el motor de ventilación interior",
+                "solucion": "Revise el motor de la turbina, el capacitor o posibles obstrucciones."
+            }
+        ]
+    },
+    {
+        "id_referencia": "carrier_one_plus",
+        "nombre_comercial": "CARRIER ONE +",
+        "tipo": "Aire Residencial",
+        "imagen_local": "/images/equipos/carrier_default.png",
+        "logo_local": "/images/logos/carrier_one_plus.png",
+        "errores": [
+            {
+                "codigo": "E1",
+                "descripcion": "Error EEPROM",
+                "solucion": "Falla de memoria en la tarjeta principal. Reinicie la energía."
+            },
+            {
+                "codigo": "E2",
+                "descripcion": "Error de detección de señal de cruce por cero",
+                "solucion": "Verifique la estabilidad del voltaje de entrada y la tarjeta electrónica."
+            },
+            {
+                "codigo": "E3",
+                "descripcion": "Velocidad del ventilador interior fuera de control",
+                "solucion": "El motor de la turbina opera a velocidad anormal. Revise capacitor o motor."
+            },
+            {
+                "codigo": "E5",
+                "descripcion": "Sensor de temperatura ambiente interior (T1) abierto o corto",
+                "solucion": "Revise la conexión del sensor de ambiente en la tarjeta."
+            },
+            {
+                "codigo": "E6",
+                "descripcion": "Sensor de temperatura de coil evaporador (T2) abierto o corto",
+                "solucion": "Revise la conexión del sensor de pozo en la tarjeta."
+            },
+            {
+                "codigo": "EC",
+                "descripcion": "Detección de fugas en refrigerante",
+                "solucion": "El sistema detecta pérdida de eficiencia. Busque fugas de gas."
+            },
+            {
+                "codigo": "E9",
+                "descripcion": "Error de comunicación en unidad interior y exterior",
+                "solucion": "(Solo modelo 2 TR) Revise el cable de señal entre unidades."
+            }
+        ]
+    },
+    {
+        "id_referencia": "carrier_up",
+        "nombre_comercial": "CARRIER UP",
+        "tipo": "Aire Residencial",
+        "imagen_local": "/images/equipos/carrier_default.png",
+        "logo_local": "/images/logos/carrier_up.png",
+        "errores": [
+            {
+                "codigo": "E1",
+                "descripcion": "Error EEPROM",
+                "solucion": "Falla interna de la tarjeta. Reinicie el equipo."
+            },
+            {
+                "codigo": "E2",
+                "descripcion": "Error de detección de señal de cruce por cero",
+                "solucion": "Problema de voltaje o frecuencia eléctrica."
+            },
+            {
+                "codigo": "E3",
+                "descripcion": "Velocidad del ventilador interior fuera de control",
+                "solucion": "Falla en motor de turbina o tarjeta de control."
+            },
+            {
+                "codigo": "E5",
+                "descripcion": "Sensor de temperatura ambiente interior (T1) abierto o corto",
+                "solucion": "Sustituya el sensor de ambiente."
+            },
+            {
+                "codigo": "E6",
+                "descripcion": "Sensor de temperatura de coil evaporador (T2) abierto o corto",
+                "solucion": "Sustituya el sensor de pozo."
+            },
+            {
+                "codigo": "EC",
+                "descripcion": "Detección de fugas en refrigerante",
+                "solucion": "Verifique presiones y carga de gas."
+            },
+            {
+                "codigo": "E9",
+                "descripcion": "Error de comunicación en unidad interior y exterior",
+                "solucion": "(Solo modelo 2 TR) Verifique cableado de interconexión."
+            }
+        ]
+    },
+    {
+        "id_referencia": "carrier_cygnus",
+        "nombre_comercial": "CARRIER CYGNUS",
+        "tipo": "Aire Residencial",
+        "imagen_local": "/images/equipos/carrier_default.png",
+        "logo_local": "/images/logos/carrier_cygnus.png",
+        "errores": [
+            {
+                "codigo": "E0",
+                "descripcion": "Error EEPROM evaporador",
+                "solucion": "Falla en tarjeta de unidad interior."
+            },
+            {
+                "codigo": "E1",
+                "descripcion": "Error de comunicación en unidad interior y exterior",
+                "solucion": "Revise cables de señal S o 3."
+            },
+            {
+                "codigo": "E2",
+                "descripcion": "Error de detección de señal cruce por cero",
+                "solucion": "Falla de circuito de detección en tarjeta."
+            },
+            {
+                "codigo": "E3",
+                "descripcion": "Velocidad del ventilador interior fuera de control",
+                "solucion": "Motor de turbina, sensor Hall o tarjeta."
+            },
+            {
+                "codigo": "E5",
+                "descripcion": "Sensor de temperatura exterior abierto/corto o error EEPROM",
+                "solucion": "Revise sensor de unidad exterior o parámetros de memoria."
+            },
+            {
+                "codigo": "E6",
+                "descripcion": "Sensor de habitación o serpentín evaporador abierto/corto",
+                "solucion": "Revise sensores de la unidad interior."
+            },
+            {
+                "codigo": "P0",
+                "descripcion": "Mal funcionamiento del IPM o IGBT",
+                "solucion": "Falla en módulo de potencia inversor (Tarjeta Condensador)."
+            },
+            {
+                "codigo": "P1",
+                "descripcion": "Sobrevoltaje o sobreprotección de baja tensión",
+                "solucion": "Voltaje de alimentación fuera de rango."
+            },
+            {
+                "codigo": "P2",
+                "descripcion": "Protección de alta temperatura del compresor",
+                "solucion": "Compresor sobrecalentado. Revise carga de gas y ventilación."
+            },
+            {
+                "codigo": "P4",
+                "descripcion": "Compresor inverter error drive",
+                "solucion": "Falla de arranque o sincronización del compresor."
+            }
+        ]
+    },
+    {
+        "id_referencia": "carrier_xpii",
+        "nombre_comercial": "CARRIER XP II INVERTER",
+        "tipo": "Inverter",
+        "imagen_local": "/images/equipos/carrier_default.png",
+        "logo_local": "/images/logos/carrier_xpii.png",
+        "errores": [
+            {
+                "codigo": "E0",
+                "descripcion": "Error EEPROM evaporador",
+                "solucion": "Falla en tarjeta interior."
+            },
+            {
+                "codigo": "E1",
+                "descripcion": "Error de comunicación en unidad interior y exterior",
+                "solucion": "Revise conexiones eléctricas entre unidades."
+            },
+            {
+                "codigo": "E3",
+                "descripcion": "Velocidad del ventilador interior fuera de control",
+                "solucion": "Motor de turbina dañado o bloqueado."
+            },
+            {
+                "codigo": "E4",
+                "descripcion": "Sensor ambiente interior (T1) abierto o corto",
+                "solucion": "Reemplace sensor T1."
+            },
+            {
+                "codigo": "E5",
+                "descripcion": "Sensor coil evaporador (T2) abierto o corto",
+                "solucion": "Reemplace sensor T2."
+            },
+            {
+                "codigo": "EC",
+                "descripcion": "Detección de fugas en refrigerante",
+                "solucion": "Sistema sin gas o sensores descalibrados."
+            },
+            {
+                "codigo": "F1",
+                "descripcion": "Sensor ambiente exterior (T4) abierto o corto",
+                "solucion": "Revise sensor T4 en condensadora."
+            },
+            {
+                "codigo": "F2",
+                "descripcion": "Sensor coil condensador (T3) abierto o corto",
+                "solucion": "Revise sensor T3 en condensadora."
+            },
+            {
+                "codigo": "F3",
+                "descripcion": "Sensor descarga compresor (T5) abierto o corto",
+                "solucion": "Revise sensor T5 en tubería de descarga."
+            },
+            {
+                "codigo": "F4",
+                "descripcion": "Error EEPROM condensador",
+                "solucion": "Falla en tarjeta exterior."
+            },
+            {
+                "codigo": "F5",
+                "descripcion": "Velocidad del ventilador exterior fuera de control",
+                "solucion": "Revise motor del condensador o aspa bloqueada."
+            },
+            {
+                "codigo": "P0",
+                "descripcion": "Mal funcionamiento del IPM o IGBT",
+                "solucion": "Falla en módulo inversor inteligente."
+            },
+            {
+                "codigo": "P1",
+                "descripcion": "Sobrevoltaje o protección de baja tensión",
+                "solucion": "Voltaje de suministro inestable."
+            },
+            {
+                "codigo": "P2",
+                "descripcion": "Protección de alta temperatura del compresor",
+                "solucion": "Falta de gas, exceso de gas o condensador sucio."
+            },
+            {
+                "codigo": "P4",
+                "descripcion": "Compresor inverter error drive",
+                "solucion": "Falla electrónica en el manejo del compresor."
+            }
+        ]
+    },
+    {
+        "id_referencia": "carrier_xpower_ultra",
+        "nombre_comercial": "CARRIER XPOWER ULTRA",
+        "tipo": "Inverter",
+        "imagen_local": "/images/equipos/carrier_default.png",
+        "logo_local": "/images/logos/carrier_xpower_ultra.png",
+        "errores": [
+            {
+                "codigo": "E0",
+                "descripcion": "Error EEPROM evaporador",
+                "solucion": "Falla en tarjeta interior."
+            },
+            {
+                "codigo": "E1",
+                "descripcion": "Error de comunicación en unidad interior y exterior",
+                "solucion": "Revise conexiones eléctricas entre unidades."
+            },
+            {
+                "codigo": "E3",
+                "descripcion": "Velocidad del ventilador interior fuera de control",
+                "solucion": "Motor de turbina dañado o bloqueado."
+            },
+            {
+                "codigo": "E4",
+                "descripcion": "Sensor ambiente interior (T1) abierto o corto",
+                "solucion": "Reemplace sensor T1."
+            },
+            {
+                "codigo": "E5",
+                "descripcion": "Sensor coil evaporador (T2) abierto o corto",
+                "solucion": "Reemplace sensor T2."
+            },
+            {
+                "codigo": "EC",
+                "descripcion": "Detección de fugas en refrigerante",
+                "solucion": "Sistema sin gas o sensores descalibrados."
+            },
+            {
+                "codigo": "F1",
+                "descripcion": "Sensor ambiente exterior (T4) abierto o corto",
+                "solucion": "Revise sensor T4 en condensadora."
+            },
+            {
+                "codigo": "F2",
+                "descripcion": "Sensor coil condensador (T3) abierto o corto",
+                "solucion": "Revise sensor T3 en condensadora."
+            },
+            {
+                "codigo": "F3",
+                "descripcion": "Sensor descarga compresor (T5) abierto o corto",
+                "solucion": "Revise sensor T5 en tubería de descarga."
+            },
+            {
+                "codigo": "F4",
+                "descripcion": "Error EEPROM condensador",
+                "solucion": "Falla en tarjeta exterior."
+            },
+            {
+                "codigo": "F5",
+                "descripcion": "Velocidad del ventilador exterior fuera de control",
+                "solucion": "Revise motor del condensador o aspa bloqueada."
+            },
+            {
+                "codigo": "P0",
+                "descripcion": "Mal funcionamiento del IPM o IGBT",
+                "solucion": "Falla en módulo inversor inteligente."
+            },
+            {
+                "codigo": "P1",
+                "descripcion": "Sobrevoltaje o protección de baja tensión",
+                "solucion": "Voltaje de suministro inestable."
+            },
+            {
+                "codigo": "P2",
+                "descripcion": "Protección de alta temperatura del compresor",
+                "solucion": "Falta de gas, exceso de gas o condensador sucio."
+            },
+            {
+                "codigo": "P4",
+                "descripcion": "Compresor inverter error drive",
+                "solucion": "Falla electrónica en el manejo del compresor."
+            }
+        ]
+    },
+    {
+        "id_referencia": "carrier_inv_16seer",
+        "nombre_comercial": "CARRIER INVERTER 16 SEER",
+        "tipo": "Inverter",
+        "imagen_local": "/images/equipos/carrier_default.png",
+        "logo_local": "/images/logos/carrier_inv_16seer.png",
+        "errores": [
+            {
+                "codigo": "E0",
+                "descripcion": "Error EEPROM evaporador",
+                "solucion": "Falla de memoria interna."
+            },
+            {
+                "codigo": "E1",
+                "descripcion": "Error de comunicación",
+                "solucion": "Falla de comunicación entre unidades."
+            },
+            {
+                "codigo": "E2",
+                "descripcion": "Error de señal cruce por cero",
+                "solucion": "Revise voltaje de entrada."
+            },
+            {
+                "codigo": "E3",
+                "descripcion": "Velocidad ventilador interior fuera de control",
+                "solucion": "Motor de turbina dañado."
+            },
+            {
+                "codigo": "E4",
+                "descripcion": "Sensor ambiente interior (T1) abierto/corto",
+                "solucion": "Revise sensor T1."
+            },
+            {
+                "codigo": "E5",
+                "descripcion": "Sensor coil evaporador (T2) abierto/corto",
+                "solucion": "Revise sensor T2."
+            },
+            {
+                "codigo": "EC",
+                "descripcion": "Detección de fugas",
+                "solucion": "Falta de gas refrigerante."
+            },
+            {
+                "codigo": "F0",
+                "descripcion": "Protección de sobrecarga en corriente",
+                "solucion": "Consumo eléctrico excesivo. Revise compresor."
+            },
+            {
+                "codigo": "F1",
+                "descripcion": "Sensor ambiente exterior (T4) abierto/corto",
+                "solucion": "Revise sensor T4."
+            },
+            {
+                "codigo": "F2",
+                "descripcion": "Sensor coil condensador (T3) abierto/corto",
+                "solucion": "Revise sensor T3."
+            },
+            {
+                "codigo": "F3",
+                "descripcion": "Sensor descarga compresor (T5) abierto/corto",
+                "solucion": "Revise sensor T5."
+            },
+            {
+                "codigo": "F4",
+                "descripcion": "Error EEPROM condensador",
+                "solucion": "Falla tarjeta exterior."
+            },
+            {
+                "codigo": "F5",
+                "descripcion": "Velocidad ventilador exterior fuera de control",
+                "solucion": "Falla motor exterior."
+            },
+            {
+                "codigo": "P0",
+                "descripcion": "Mal funcionamiento IPM/IGBT",
+                "solucion": "Falla módulo de potencia."
+            },
+            {
+                "codigo": "P1",
+                "descripcion": "Sobrevoltaje / Bajo voltaje",
+                "solucion": "Protección eléctrica activada."
+            },
+            {
+                "codigo": "P2",
+                "descripcion": "Protección alta temperatura compresor",
+                "solucion": "Compresor muy caliente."
+            },
+            {
+                "codigo": "P3",
+                "descripcion": "Temperatura de condensador muy baja",
+                "solucion": "Protección por baja temperatura exterior."
+            },
+            {
+                "codigo": "P4",
+                "descripcion": "Compresor inverter error drive",
+                "solucion": "Falla arranque compresor."
+            },
+            {
+                "codigo": "P6",
+                "descripcion": "Presión de compresor muy bajo",
+                "solucion": "Protección de baja presión."
+            }
+        ]
+    }
+]
