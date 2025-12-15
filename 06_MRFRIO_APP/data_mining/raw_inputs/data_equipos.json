@@ -1,0 +1,450 @@
+{
+    "absolutv": {
+        "capacidad": "",
+        "imagen": "absolutv.png",
+        "local": true,
+        "logo": "absolutv.png",
+        "tipo": "",
+        "visible": true
+    },
+    "abtx": {
+        "capacidad": "",
+        "imagen": "abtx.png",
+        "local": true,
+        "logo": "abtx.png",
+        "tipo": "",
+        "visible": true
+    },
+    "abtx36": {
+        "capacidad": "",
+        "imagen": "abtx36.png",
+        "local": true,
+        "logo": "abtx36.png",
+        "tipo": "",
+        "visible": true
+    },
+    "bluplus": {
+        "capacidad": "",
+        "imagen": "bluplus.png",
+        "local": true,
+        "logo": "bluplus.png",
+        "tipo": "",
+        "visible": true
+    },
+    "ci_series": {
+        "capacidad": "",
+        "imagen": "ciseries.png",
+        "local": true,
+        "logo": "ciseries.png",
+        "tipo": "",
+        "visible": true
+    },
+    "flex": {
+        "capacidad": "",
+        "imagen": "flex.png",
+        "local": false,
+        "logo": "flex.png",
+        "tipo": "",
+        "visible": true
+    },
+    "flux": {
+        "capacidad": "",
+        "imagen": "flux.png",
+        "local": true,
+        "logo": "flux.png",
+        "tipo": "",
+        "visible": true
+    },
+    "flux_electric": {
+        "capacidad": "",
+        "imagen": "flux_electric.png",
+        "local": false,
+        "logo": "flux_electric.png",
+        "tipo": "",
+        "visible": true
+    },
+    "inverter x32": {
+        "capacidad": "",
+        "imagen": "inverter_x32.png",
+        "local": false,
+        "logo": "inverter_x32.png",
+        "tipo": "",
+        "visible": true
+    },
+    "inverter_17": {
+        "capacidad": "",
+        "imagen": "i17.png",
+        "local": true,
+        "logo": "i17.png",
+        "tipo": "",
+        "visible": true
+    },
+    "inverter_q17": {
+        "capacidad": "",
+        "imagen": "inverterq17.png",
+        "local": false,
+        "logo": "inverterq17.png",
+        "tipo": "",
+        "visible": true
+    },
+    "inverter_v32": {
+        "capacidad": "",
+        "imagen": "inverter_v32.png",
+        "local": false,
+        "logo": "inverter_v32.png",
+        "tipo": "",
+        "visible": true
+    },
+    "inverter_x": {
+        "capacidad": "",
+        "imagen": "inverterx.png",
+        "local": false,
+        "logo": "inverterx.png",
+        "tipo": "",
+        "visible": true
+    },
+    "life+": {
+        "capacidad": "",
+        "imagen": "lifeplus.png",
+        "local": true,
+        "logo": "lifeplus.png",
+        "tipo": "",
+        "visible": true
+    },
+    "life12": {
+        "capacidad": "",
+        "imagen": "life12.png",
+        "local": false,
+        "logo": "life12.png",
+        "tipo": "",
+        "visible": true
+    },
+    "life12_plus": {
+        "capacidad": "",
+        "imagen": "life12_plus.png",
+        "local": false,
+        "logo": "life12_plus.png",
+        "tipo": "",
+        "visible": true
+    },
+    "live": {
+        "capacidad": "",
+        "imagen": "live.png",
+        "local": false,
+        "logo": "live.png",
+        "tipo": "",
+        "visible": false
+    },
+    "m19_platinum": {
+        "capacidad": "",
+        "imagen": "m19_platinum.png",
+        "local": false,
+        "logo": "m19_platinum.png",
+        "tipo": "",
+        "visible": true
+    },
+    "m900xeries": {
+        "capacidad": "",
+        "imagen": "m900xeries.png",
+        "local": true,
+        "logo": "m900xeries.png",
+        "tipo": "",
+        "visible": true
+    },
+    "magnum13": {
+        "capacidad": "",
+        "imagen": "magnum13.png",
+        "local": true,
+        "logo": "magnum13.png",
+        "tipo": "",
+        "visible": true
+    },
+    "magnum15": {
+        "capacidad": "",
+        "imagen": "magnum15.png",
+        "local": true,
+        "logo": "magnum15.png",
+        "tipo": "",
+        "visible": true
+    },
+    "magnum16": {
+        "capacidad": "",
+        "imagen": "magnum16.png",
+        "local": true,
+        "logo": "magnum16.png",
+        "tipo": "",
+        "visible": true
+    },
+    "magnum17": {
+        "capacidad": "",
+        "imagen": "magnum17.png",
+        "local": true,
+        "logo": "magnum17.png",
+        "tipo": "",
+        "visible": true
+    },
+    "magnum18": {
+        "capacidad": "",
+        "imagen": "magnum18.png",
+        "local": true,
+        "logo": "magnum18.png",
+        "tipo": "",
+        "visible": true
+    },
+    "magnum19": {
+        "capacidad": "",
+        "imagen": "magnum19.png",
+        "local": true,
+        "logo": "magnum19.png",
+        "tipo": "",
+        "visible": true
+    },
+    "magnum20": {
+        "capacidad": "",
+        "imagen": "magnum20.png",
+        "local": true,
+        "logo": "magnum20.png",
+        "tipo": "",
+        "visible": true
+    },
+    "magnum21": {
+        "capacidad": "",
+        "imagen": "magnum21.png",
+        "local": false,
+        "logo": "magnum21.png",
+        "tipo": "",
+        "visible": true
+    },
+    "magnum21_platinum": {
+        "capacidad": "",
+        "imagen": "magnum21_platinum.png",
+        "local": false,
+        "logo": "magnum21_platinum.png",
+        "tipo": "",
+        "visible": true
+    },
+    "magnum22": {
+        "capacidad": "",
+        "imagen": "magnum22.png",
+        "local": false,
+        "logo": "magnum22.png",
+        "tipo": "",
+        "visible": true
+    },
+    "magnum30": {
+        "capacidad": "",
+        "imagen": "magnum30.png",
+        "local": true,
+        "logo": "magnum30.png",
+        "tipo": "",
+        "visible": true
+    },
+    "magnum32": {
+        "capacidad": "",
+        "imagen": "magnum32.png",
+        "local": true,
+        "logo": "magnum32.png",
+        "tipo": "",
+        "visible": true
+    },
+    "matt17": {
+        "capacidad": "",
+        "imagen": "matt17.png",
+        "local": true,
+        "logo": "matt17.png",
+        "tipo": "",
+        "visible": true
+    },
+    "max053": {
+        "capacidad": "",
+        "imagen": "max053.png",
+        "local": true,
+        "logo": "max053.png",
+        "tipo": "",
+        "visible": true
+    },
+    "mpt_indoor": {
+        "capacidad": "",
+        "imagen": "mpt-indoor.png",
+        "local": true,
+        "logo": "mpt-indoor.png",
+        "tipo": "",
+        "visible": true
+    },
+    "mpt_outdoor": {
+        "capacidad": "",
+        "imagen": "mpt-outdoor.png",
+        "local": true,
+        "logo": "mpt-outdoor.png",
+        "tipo": "",
+        "visible": true
+    },
+    "neo": {
+        "capacidad": "",
+        "imagen": "neo.png",
+        "local": true,
+        "logo": "neo.png",
+        "tipo": "",
+        "visible": true
+    },
+    "nex": {
+        "capacidad": "",
+        "imagen": "nex.png",
+        "local": false,
+        "logo": "nex.png",
+        "tipo": "",
+        "visible": true
+    },
+    "smart": {
+        "capacidad": "",
+        "imagen": "smart.png",
+        "local": true,
+        "logo": "smart.png",
+        "tipo": "",
+        "visible": true
+    },
+    "titanium2": {
+        "capacidad": "",
+        "imagen": "titanium2.png",
+        "local": true,
+        "logo": "titanium2.png",
+        "tipo": "",
+        "visible": true
+    },
+    "titanium5": {
+        "capacidad": "",
+        "imagen": "titanium5.png",
+        "local": true,
+        "logo": "titanium5.png",
+        "tipo": "",
+        "visible": true
+    },
+    "titanium7": {
+        "capacidad": "",
+        "imagen": "titanium7.png",
+        "local": true,
+        "logo": "titanium7.png",
+        "tipo": "",
+        "visible": true
+    },
+    "titanium8": {
+        "capacidad": "",
+        "imagen": "titanium8.png",
+        "local": true,
+        "logo": "titanium8.png",
+        "tipo": "",
+        "visible": true
+    },
+    "titanium9": {
+        "capacidad": "",
+        "imagen": "titanium9.png",
+        "local": true,
+        "logo": "titanium9.png",
+        "tipo": "",
+        "visible": true
+    },
+    "turboflux": {
+        "capacidad": "",
+        "imagen": "turboflux.png",
+        "local": true,
+        "logo": "turboflux.png",
+        "tipo": "",
+        "visible": true
+    },
+    "uvc": {
+        "capacidad": "",
+        "imagen": "uvc.png",
+        "local": false,
+        "logo": "uvc.png",
+        "tipo": "",
+        "visible": true
+    },
+    "vluseries": {
+        "capacidad": "",
+        "imagen": "vluseries.png",
+        "local": true,
+        "logo": "vluseries.png",
+        "tipo": "",
+        "visible": true
+    },
+    "vox": {
+        "capacidad": "",
+        "imagen": "vox.png",
+        "local": false,
+        "logo": "vox.png",
+        "tipo": "",
+        "visible": true
+    },
+    "x-one": {
+        "capacidad": "",
+        "imagen": "xone.png",
+        "local": false,
+        "logo": "xone.png",
+        "tipo": "",
+        "visible": true
+    },
+    "x2": {
+        "capacidad": "",
+        "imagen": "x2.png",
+        "local": true,
+        "logo": "x2.png",
+        "tipo": "",
+        "visible": true
+    },
+    "x3": {
+        "capacidad": "",
+        "imagen": "x3.png",
+        "local": true,
+        "logo": "x3.png",
+        "tipo": "",
+        "visible": true
+    },
+    "xlife": {
+        "capacidad": "",
+        "imagen": "xlife.png",
+        "local": true,
+        "logo": "xlife.png",
+        "tipo": "",
+        "visible": true
+    },
+    "xmart": {
+        "capacidad": "",
+        "imagen": "xmart.png",
+        "local": true,
+        "logo": "xmart.png",
+        "tipo": "",
+        "visible": true
+    },
+    "xmax": {
+        "capacidad": "",
+        "imagen": "xmax.png",
+        "local": false,
+        "logo": "xmax.png",
+        "tipo": "",
+        "visible": true
+    },
+    "xplus": {
+        "capacidad": "",
+        "imagen": "xplus.png",
+        "local": false,
+        "logo": "xplus.png",
+        "tipo": "",
+        "visible": true
+    },
+    "xr": {
+        "capacidad": "",
+        "imagen": "xr.png",
+        "local": false,
+        "logo": "xr.png",
+        "tipo": "",
+        "visible": true
+    },
+    "xtra_multinverter": {
+        "capacidad": "",
+        "imagen": "xtra_multinverter.png",
+        "local": false,
+        "logo": "xtra_multinverter.png",
+        "tipo": "",
+        "visible": true
+    }
+}
