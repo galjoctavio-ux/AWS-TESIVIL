@@ -9,6 +9,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from supabase import create_client, Client
 from dotenv import load_dotenv
+from filtros import es_minisplit_coresa
 
 # --- CONFIGURACIÓN ESPECÍFICA ---
 PROVIDER_NAME = "Grupo Coresa"
@@ -112,6 +113,8 @@ def process_category(session, category_url):
                     if not tag_titulo: continue # Si no tiene título, saltamos
                     
                     title = tag_titulo.get_text(strip=True)
+                    if not es_minisplit_coresa(title):
+                        continue
                     link = tag_titulo.get('href', category_url)
 
                     # 2. Precio

@@ -7,6 +7,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from supabase import create_client, Client
 from dotenv import load_dotenv
+from filtros import es_accesorio_valido
 
 # 1. Configuración de Logs (Para saber qué pasó si falla en la madrugada)
 logging.basicConfig(
@@ -79,7 +80,8 @@ def fetch_and_store():
                 for variant in product['variants']:
                     # Limpieza y preparación de datos
                     title_full = f"{product['title']} - {variant['title']}".replace(" - Default Title", "")
-                    
+                    if not es_accesorio_valido(title_full): # Ojo con la variable del titulo
+                            continue
                     item = {
                         "provider_name": PROVIDER_NAME,
                         "product_title": title_full,

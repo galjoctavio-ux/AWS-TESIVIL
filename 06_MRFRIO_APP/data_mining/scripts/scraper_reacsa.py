@@ -7,6 +7,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from supabase import create_client, Client
 from dotenv import load_dotenv
+from filtros import es_accesorio_valido
 
 # --- CONFIGURACIÓN ESPECÍFICA DE ESTE PROVEEDOR ---
 BASE_URL = "https://reacsa.mx/products.json"
@@ -81,6 +82,9 @@ def fetch_and_store():
                     variant_title = variant['title'] if variant['title'] != "Default Title" else ""
                     title_full = f"{product['title']} {variant_title}".strip()
                     
+                    if not es_accesorio_valido(title_full):
+                        continue
+
                     item = {
                         "provider_name": PROVIDER_NAME,
                         "product_title": title_full,
