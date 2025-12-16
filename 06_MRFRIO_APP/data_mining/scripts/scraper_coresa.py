@@ -17,13 +17,7 @@ LOG_FILE = 'scraper_coresa.log'
 
 # URLs Principales extraídas de su menú de navegación
 URLS_CATEGORIAS = [
-    "https://www.grupocoresa.com/equipos-de-aire-acondicionado",
-    "https://www.grupocoresa.com/accesorios-y-refacciones",
-    "https://www.grupocoresa.com/equipos-de-refrigeracion",
-    "https://www.grupocoresa.com/equipos-de-ventilacion",
-    "https://www.grupocoresa.com/equipos-de-linea-blanca",
-    "https://www.grupocoresa.com/herramientas-y-accesorios-para-instalaciones",
-    "https://www.grupocoresa.com/industria-y-construccion"
+    "https://www.grupocoresa.com/equipos-de-aire-acondicionado"
 ]
 
 # SELECTORES MAGENTO 2 (Confirmados con tu HTML)
