@@ -44,3 +44,146 @@ export const loadDatabase = async () => {
         throw error;
     }
 };
+
+export const searchError = async (codePart: string) => {
+    try {
+        const db = await getDb();
+        const searchTerm = `%${codePart}%`;
+        const result = await db.getAllAsync(
+            'SELECT * FROM error_codes WHERE code LIKE ? LIMIT 10',
+            [searchTerm]
+        );
+        return result;
+    } catch (error) {
+        console.error('Error searching error:', error);
+        return [];
+    }
+};
+
+// ============================================
+// BIBLIOTECA DE ERRORES - FUNCIONES ADICIONALES
+// ============================================
+
+export interface BrandData {
+    name: string;
+    logo_url: string;
+    model_count: number;
+}
+
+export interface ModelData {
+    id: number;
+    name: string;
+    reference_id: string;
+    image_url: string;
+    logo_url: string;
+    type: string;
+}
+
+export interface ErrorCodeData {
+    id: number;
+    model_id: number;
+    code: string;
+    description: string;
+    solution: string;
+}
+
+/**
+ * Obtiene todas las marcas únicas con sus logos y conteo de modelos
+ */
+export const getBrands = async (): Promise<BrandData[]> => {
+    try {
+        const db = await getDb();
+        // Extraemos el nombre de la marca del logo_url (ej: /images/logos/mirage.png -> mirage)
+        const result = await db.getAllAsync<BrandData>(`
+            SELECT 
+                REPLACE(REPLACE(logo_url, '/images/logos/', ''), '.png', '') as name,
+                logo_url,
+                COUNT(*) as model_count
+            FROM air_conditioner_models 
+            GROUP BY logo_url
+            ORDER BY model_count DESC
+        `);
+        return result;
+    } catch (error) {
+        console.error('Error getting brands:', error);
+        return [];
+    }
+};
+
+/**
+ * Obtiene todos los modelos de una marca específica
+ */
+export const getModelsByBrand = async (logoUrl: string): Promise<ModelData[]> => {
+    try {
+        const db = await getDb();
+        const result = await db.getAllAsync<ModelData>(
+            'SELECT * FROM air_conditioner_models WHERE logo_url = ? ORDER BY name',
+            [logoUrl]
+        );
+        return result;
+    } catch (error) {
+        console.error('Error getting models by brand:', error);
+        return [];
+    }
+};
+
+/**
+ * Obtiene todos los códigos de error para un modelo específico
+ */
+export const getErrorsByModel = async (modelId: number): Promise<ErrorCodeData[]> => {
+    try {
+        const db = await getDb();
+        const result = await db.getAllAsync<ErrorCodeData>(
+            'SELECT * FROM error_codes WHERE model_id = ? ORDER BY code',
+            [modelId]
+        );
+        return result;
+    } catch (error) {
+        console.error('Error getting errors by model:', error);
+        return [];
+    }
+};
+
+/**
+ * Búsqueda predictiva de errores con filtro opcional por modelo
+ */
+export const searchErrorsInModel = async (codePart: string, modelId?: number): Promise<ErrorCodeData[]> => {
+    try {
+        const db = await getDb();
+        const searchTerm = `%${codePart}%`;
+
+        if (modelId) {
+            const result = await db.getAllAsync<ErrorCodeData>(
+                'SELECT * FROM error_codes WHERE model_id = ? AND code LIKE ? ORDER BY code LIMIT 20',
+                [modelId, searchTerm]
+            );
+            return result;
+        } else {
+            const result = await db.getAllAsync<ErrorCodeData>(
+                'SELECT * FROM error_codes WHERE code LIKE ? ORDER BY code LIMIT 20',
+                [searchTerm]
+            );
+            return result;
+        }
+    } catch (error) {
+        console.error('Error searching errors:', error);
+        return [];
+    }
+};
+
+/**
+ * Obtiene un modelo por su ID
+ */
+export const getModelById = async (modelId: number): Promise<ModelData | null> => {
+    try {
+        const db = await getDb();
+        const result = await db.getFirstAsync<ModelData>(
+            'SELECT * FROM air_conditioner_models WHERE id = ?',
+            [modelId]
+        );
+        return result || null;
+    } catch (error) {
+        console.error('Error getting model by id:', error);
+        return null;
+    }
+};

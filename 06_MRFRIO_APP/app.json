@@ -6,7 +6,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -30,7 +30,14 @@
     "plugins": [
       "expo-router",
       "expo-sqlite",
-      "expo-asset"
+      "expo-asset",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Permitir a Mr. Frío usar la cámara para escanear códigos QR de equipos."
+        }
+      ],
+      "expo-barcode-scanner"
     ]
   }
 }

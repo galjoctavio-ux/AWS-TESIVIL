@@ -59,11 +59,11 @@ Dado que `seed_full_database.sql` es un dump SQL estándar (PostgreSQL syntax), 
 ### Fase 1: Ingesta de Datos & Motor Offline (Semana 1-2)
 *Objetivo: Resolver el "Desafío SQL" y tener la Biblioteca de Errores funcional.*
 
-- [ ] **ETL Script**: Crear script para convertir `seed_full_database.sql` a SQLite.
-- [ ] **Database Service**:
+- [x] **ETL Script**: Crear script para convertir `seed_full_database.sql` a SQLite.
+- [x] **Database Service**:
     -   Implementar `FileSystem` copy logic.
     -   Inicializar conexión `SQLite.openDatabase`.
-- [ ] **UI Biblioteca Errores**:
+- [x] **UI Biblioteca Errores**:
     -   **Brand Grid**: Pantalla de selección de marcas (Query: `SELECT DISTINCT logo_url...`).
     -   **Model Carousel**: Selección visual de equipos.
     -   **The Solver**: Buscador predictivo de códigos de error.
@@ -72,33 +72,38 @@ Dado que `seed_full_database.sql` es un dump SQL estándar (PostgreSQL syntax), 
 ### Fase 2: Auth & Onboarding (Semana 2-3)
 *Objetivo: Gestión de usuarios y perfiles.*
 
-- [ ] **Firebase Auth**:
+- [x] **Firebase Auth**:
     -   Implementar Auth Provider (Context).
     -   Login Screen (Phone Auth simulado o Email/Pass para MVP inicial).
-- [ ] **User Profile Exists?**: Lógica para detectar si es usuario nuevo.
-- [ ] **Onboarding Wizard**:
+- [x] **User Profile Exists?**: Lógica para detectar si es usuario nuevo.
+- [x] **Onboarding Wizard**:
     -   Pantallas de bienvenida.
     -   Formulario de perfil base (Alias, Experiencia, Ciudad).
-- [ ] **Firestore User Document**: Creación del registro inicial en colección `users`.
+- [x] **Firestore User Document**: Creación del registro inicial en colección `users`.
 
-### Fase 3: Core Operativo (Semana 3-5)
+
+### Fase 3: Core Operativo (Semana 3-5) ✅
 *Objetivo: El corazón de la app (CRM y Servicios).*
 
-- [ ] **Firestore Schema**: Definición de reglas y tipos para `clients` y `services`.
-- [ ] **Módulo Clientes (CRM)**:
+- [x] **Firestore Schema**: Definición de reglas y tipos para `clients` y `services`.
+- [x] **Módulo Clientes (CRM)**:
     -   Lista de Clientes (Firestore Query con filtro `technician_id`).
     -   Crear/Editar Cliente.
-- [ ] **Módulo Servicios**:
+    -   Expediente del Cliente con historial de servicios.
+- [x] **Módulo Servicios**:
     -   Flujo "Nuevo Servicio" (Wizard de 3 pasos).
     -   Integración de Biblioteca de Errores en el reporte (si es Reparación).
-- [ ] **Dashboard "Mi Taller"**:
+    -   Detalle de Servicio con generación de PDF.
+- [x] **Dashboard "Mi Taller"**:
+    -   Widget de Perfil Profesional (Alias, Nivel, Barra de progreso).
+    -   Stats: Servicios, Clientes, QRs.
     -   Widgets de accesos rápidos.
     -   Resumen de actividad reciente.
 
 ### Fase 4: Utilerías & Refinamiento (Semana 6)
 *Objetivo: Herramientas satélite y pulido visual.*
 
-- [ ] **Generador PDF**: Implementación básica de `expo-print` para reportes de servicio.
-- [ ] **Calculadora BTU**: Lógica de cálculo térmico simple.
-- [ ] **Modo Oscuro/Claro**: Ajustes finales de NativeWind.
-- [ ] **Deploy**: Build de APK de prueba (EAS Build).
+- [x] **Generador PDF**: Implementación básica de `expo-print` para reportes de servicio.
+- [x] **Calculadora BTU**: Lógica de cálculo térmico simple y avanzado (PRO).
+- [x] **Modo Oscuro/Claro**: Ajustes finales de NativeWind con ThemeContext.
+- [x] **Deploy**: Configuración de EAS Build lista (`eas.json`).

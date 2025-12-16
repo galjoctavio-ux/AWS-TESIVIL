@@ -1,9 +1,10 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+// @ts-ignore - getReactNativePersistence exists at runtime but not in TS types
+import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
 // Configuración de Firebase
-// Para producción, usar variables de entorno en EAS Build o .env
 const firebaseConfig = {
     apiKey: "AIzaSyCn7uUld0txJnAcaCPNPOF5bzavGPuQRrM",
     authDomain: "mr-frio.firebaseapp.com",
@@ -16,7 +17,11 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+// Inicializar Auth con persistencia de AsyncStorage para React Native
+export const auth = initializeAuth(app, {
+    // @ts-ignore
+    persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+});
 
-//hola
+// Firestore estándar (sin persistencia IndexedDB ya que no es soportado en RN)
+export const db = getFirestore(app);
