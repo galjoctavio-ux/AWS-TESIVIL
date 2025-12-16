@@ -32,8 +32,8 @@
 - **IA**: Groq API (Llama 3) para moderación de contenido.
 - **Scraper**: Python/Node (Cloud Run/Lambda) para precios de insumos.
 - **Pagos**:
-    - **Stripe**: Suscripciones Recurrentes (PRO).
-    - **MercadoPago**: Pagos Únicos (Paquetes de Etiquetas Físicas).
+    -   **Stripe**: Suscripciones Recurrentes (PRO).
+    -   **MercadoPago**: Pagos Únicos (Paquetes de Etiquetas Físicas).
 
 ### 2.2 Principios de Diseño
 - **Offline-First**: La app debe ser funcional sin internet (SQLite local para caché crítico).
@@ -42,9 +42,9 @@
 
 ---
 
-## CAPÍTULO 3: MÓDULOS FUNCIONALES (CORE)
+## CAPÍTULO 3: MÓDULOS FUNCIONALES (CORE) – ESTRUCTURA "HAPPY PATH"
 
-### 3.0 Módulo 0: Onboarding y Registro
+### 3.0 Módulo 0: Onboarding y Registro (Entrada)
 **Objetivo**: Captura segura y configuración de privacidad.
 1.  **Pantalla de Bienvenida**:
     -   Principal: "Continuar con Celular" (Firebase Phone Auth - Anti-fraude).
@@ -62,193 +62,394 @@
     -   Usuario debe marcar: [x] Acepto T&C y Aviso Privacidad | [x] Acepto Disclaimer de Responsabilidad.
     -   Links abren en Modal/WebView (no sacar de la app).
 
-### 3.1 Módulo 1: Gestión de Servicios (CRM)
-**UX Goal**: Captura < 30 seg.
-**Flujo Nuevo Servicio**:
-1.  **Tipo de Servicio (UI Visual)**: 3 Botones Grandes [🛠️ Instalación] [🧽 Mantenimiento] [🔧 Reparación].
-2.  **Identificación del Cliente**:
-    -   **Regla de Oro (Aislamiento de Datos)**:
-        -   **Gestión de Contactos (Privacidad Centralizada)**: Existirá una base de datos maestra central. Cada registro tiene un `linked_technician_id`.
-        -   **Autocompletado**: La app solo muestra contactos vinculados al ID del técnico. El técnico ve y administra únicamente su propia cartera.
-        -   **Recordatorios (PRO)**: La función de recordatorios automáticos basados en "Próximo Servicio" es exclusiva para suscripción PRO.
+### 3.1 Módulo 1: "Mi Taller" (Dashboard & Clientes)
+**Objetivo**: Centro de control diario del técnico. Consolida la agenda, herramientas rápidas y, fundamentalmente, la gestión de su cartera de clientes. Es la pantalla de "aterrizaje" obligatoria al abrir la app.
 
-3.  **Datos del Equipo**:
-    -   **Marca**: Grid de Logotipos (3 columnas).
-        -   **Visual**: Identificación rápida (logotipos).
-        -   **Lista**: Mirage, Midea, York, Trane, Carrier, LG, Samsung, Daikin, Hisense + Genérica.
-    -   **Vinculación QR**: Ver Módulo 3.4.
-4.  **Trabajo Realizado**:
-    -   **Chips Multi-select** (Selección rápida):
-        -   [Limpieza Evap/Cond]
-        -   [Carga de Gas]
-        -   [Cambio Capacitor]
-        -   [Cambio Contactor]
-        -   [Reparación Tarjeta]
-        -   [Búsqueda Fugas]
-        -   [Soldadura]
-        -   [Cambio Sensor]
-        -   [Desinstalación]
-        -   [Diagnóstico]
-        -   [Otro]
-    -   *Auto-select*: Si Tipo="Instalación", pre-marcar chip [Instalación].
-    -   **Listas de Verificación (Checklists)**:
-        -   *Instalación*: [Vacío realizado], [Torque aplicado], [Protección eléctrica verificada], [Prueba de operación].
-        -   *Objetivo*: Generar evidencia técnica estructurada y ganar tokens adicionales.
-5.  **Cierre**: Fotos (Opcionales, comprimidas), Notas, Próximo Servicio (auto +1 año si Instalación).
+**Componentes Clave Detallados**:
 
-### 3.2 Módulo Perfil Profesional (Privado)
-**Ubicación UX**: Sección "Mi Carrera" en el menú principal.
-**Objetivo**: Agregador de métricas de crecimiento profesional. NO es público en V1.
-**Elementos Visibles**:
--   **Identidad**: Alias, Rango Actual (Novato/Técnico/Pro), Ciudad.
--   **Estadísticas de Carrera**:
-    -   Años de experiencia.
-    -   Total de Servicios Registrados.
-    -   Equipos Activos (QRs).
-    -   Casos SOS Resueltos (Soluciones aceptadas).
--   **Nivel de Perfil**: Barra de progreso (`profile_completeness_score`). Motiva a completar datos y capacitación.
--   **Insignias**: Visualización de logros (ej. "Primer QR", "Experto en Inverter", "Buen Samaritano").
-**Disclaimer UI**: "Este perfil es privado. En futuras versiones podrás decidir si hacerlo público para aparecer en el Directorio Certificado."
-*Nota: Las estadísticas de este perfil se alimentan y visualizan desde el nuevo dashboard "Mi Taller".*
+1.  **Widget de Perfil Profesional (Header)**
+    -   **Ubicación**: Top (Sticky/Fijo al hacer scroll).
+    -   **Elementos Visuales**:
+        -   Avatar del Técnico.
+        -   Alias / Nombre del Negocio.
+        -   Nivel actual (Novato / Técnico / Pro).
+        -   Barra de progreso visual (`profile_completeness_score`).
+    -   **Interacción**: Un tap en el área del perfil redirige al **Módulo 7: Economía & Tienda**.
 
-### 3.3 Módulo 2: Cotizador Pro (Premium)  
+2.  **Recordatorios / Calendario (Agenda Activa)**
+    -   **Función**: Mostrar únicamente lo urgente/inmediato.
+    -   **Visualización**: Tarjetas de "Próximos Servicios" (Hoy/Mañana).
+    -   **Acciones Rápidas** (en la tarjeta):
+        -   `[Llamar]`: Abre el marcador del teléfono.
+        -   `[WhatsApp]`: Abre chat directo.
+        -   `[Registrar Servicio]`: Convierte la cita en una orden de trabajo activa.
 
-1.  **Configuración Inicial (Wizard)**:
-    -   **Identidad**: Carga de Logotipo y selección de colores para el PDF.
-    -   **Config (Wizard de Calibración)**:
-    -   Pregunta 1: "¿Cuál es tu costo de Mano de Obra para una instalación básica de 1 ton?". (Default: $2,000)
-    -   Pregunta 2 (Referencia Exacta): "¿A cuánto compras hoy **1 rollo de tubo flexible de cobre de 1/2" de 15.2m**?".
-    -   Pregunta 3 (Referencia Exacta): "¿A cuánto compras hoy un minisplit **Inverter marca Mirage 1 ton solo frío 110v**?".
-    -   *Lógica*: El sistema compara estos valores contra su base de datos (Scraper) para hallar el "Factor de Realidad Local" del técnico y ajustar todos los precios automáticamente.
-    -   **Mano de Obra (Defaults Sugeridos)**:
-        -   1 Ton: $2,000
-        -   1.5 Ton: $2,200
-        -   2 Ton: $2,400
-        -   3 Ton: $3,000
-        -   *Nota*: El técnico puede sobrescribir estos valores.
-    -   **Configuración de Precios (Estratégica)**:
-        -   **Modo Manual (Default)**: El técnico ingresa sus costos; la app aplica margen.
-        -   **Modo Asistido (Beta/Pro)**: Sistema sugiere precios de mercado (Web Scraping). Incluye disclaimer: *"Los precios mostrados son referencias. Usted es responsable de verificar el precio final."*
-2.  **Nueva Cotización**:
-    -   **Selección de Equipo**:
-        -   Manual: Marca, Modelo, Tonelaje (1, 1.5, 2, 3), Voltaje.
-        -   *Base de Datos*: Precios referenciales cargados (foco inicial en equipos **Mirage**).
-        -   *Integración*: Opción "Cargar desde Calculadora BTU" para sugerir tonelaje.
-    -   **Tipo de Instalación**:
-        -   **Básica**: Incluye Kit de instalación estándar (3-4m tubería, armaflex, cinta, cable señal).
-        -   **Personalizada / Extras**:
-            -   Tubería de cobre extra.
-            -   Bomba de condensado.
-            -   Soldadura de plata.
-            -   Carga de Gas (R22, R32, R410A).
-            -   Canaletas, bases de piso/pared.
-    -   **Materiales Adicionales**:
-        -   Catálogo de insumos sueltos (tramos de cable uso rudo, pastillas, ménsulas).
-        -   *Alcance*: Solo insumos básicos de AA. Para proyectos eléctricos complejos, usar herramienta especializada.
-3.  **Cálculo Automático**:
-    -   `Precio_Insumo = (Precio_Base_Scraper * Factor_Realidad) * (1 + Margen_Ganancia)`
-    -   `Total = Suma_Insumos + Mano_Obra`
-4.  **Salida**: PDF profesional y estéticamente agradable (diseño limpio, colores corporativos), con desglose y validez 7 días. Opción "Guardar y Asociar a Servicio".
+3.  **Grid de Acceso Rápido (Toolbox)**
+    -   **Función**: Atajos para evitar navegación profunda en menús.
+    -   **Botones**:
+        -   `[Nuevo Servicio]`: Botón destacado para iniciar una orden sin cita previa.
+        -   `[Calculadora BTU]`
+        -   `[Guía Cables]`
+        -   `[Códigos Error]`
 
-### 3.4 Módulo 3: Ecosistema QR
-**Concepto**: "La Llave Física". El QR da acceso al historial del equipo.
+4.  **Cartera de Clientes (Directorio y Expedientes)**
+    -   **Ubicación**: Sección central/inferior del Dashboard, accesible mediante un botón "Ver Mis Clientes" o una lista de "Clientes Recientes".
+    -   **Lógica de Filtrado**: La app consulta la base de datos y muestra exclusivamente los clientes vinculados al ID del técnico logueado.
+    -   **A) Vista de Lista (Listado Principal)**:
+        -   Buscador rápido (por Nombre o Colonia).
+        -   Cada fila muestra: Nombre del Cliente + Dirección corta + Última fecha de visita.
+    -   **B) Vista "Expediente del Cliente" (Al abrir un cliente)**: Se despliega una pantalla con dos pestañas o secciones claras:
+        -   **Datos Generales (Perfil)**:
+            -   Nombre completo.
+            -   Teléfono (con icono para marcar/whatsapp).
+            -   Dirección completa (con icono para abrir Google Maps).
+            -   Notas fijas (Ej: "Timbre no sirve", "Cliente exigente").
+        -   **Historial de Servicios (Timeline)**:
+            -   Lista cronológica descendente (del más reciente al más antiguo) de todos los trabajos realizados a este cliente específico.
+            -   **Datos por ítem**:
+                -   Fecha del servicio.
+                -   Tipo de trabajo (Ej: Mantenimiento, Instalación).
+                -   Equipo intervenido (Ej: Minisplit Sala).
+                -   Monto cobrado.
+            -   **Objetivo**: Que el técnico pueda responder en segundos: *"Sí, Doña María, la última vez que le cargamos gas fue en Marzo del año pasado"*.
 
-#### A. Escaneo con Cámara Nativa (Vista Web / Cliente)
-**Acceso**: URL pública con token único (ej. `bitacora.smart/qr/xyz123`). No requiere login ni descargar app.
-1.  **Encabezado de Estado**:
-    -   Marca/Modelo del Equipo.
-    -   Estado actual: "✅ Al corriente" o "⚠️ Mantenimiento Sugerido" (basado en fecha del último servicio).
+5.  **Historial Avanzado (Logbook Global)**
+    -   **Función**: Registro global de toda la actividad del técnico (a diferencia de la vista por cliente).
+    -   **Herramientas**:
+        -   Buscador y filtros (Fecha, Tipo de Servicio).
+        -   *Feature PRO*: Exportar reporte en PDF.
+        -   Opción "Repetir Servicio": Permite clonar los datos de un servicio pasado para crear uno nuevo rápidamente.
+
+6.  **Estadísticas y Progreso**
+    -   **Visualización**: Tarjetas pequeñas (KPIs).
+    -   **Datos**: Servicios completados en la semana actual y Tokens acumulados.
+
+7.  **Submódulo: Capacitación Ligera (In-App)**
+    -   **Contenido**: Cápsulas informativas de "Buenas Prácticas" (Instalación, Normativa, Errores).
+    -   **Formato**: Texto breve + Imagen/Video corto.
+    -   **Mecánica**: Otorga Tokens por lectura completa para incentivar el uso de la app.
+    -   **Disclaimer**: "Material de apoyo, no certificación oficial".
+
+### 3.2 Módulo 2: Gestión de Servicios & CRM (El Núcleo Operativo)
+**Objetivo (UX Goal)**: Velocidad y fricción cero. El técnico debe poder registrar un servicio en menos de 30 segundos. Es la herramienta principal de trabajo; si esto es lento, el técnico dejará de usar la app.
+
+**Flujo de Usuario (Step-by-Step)**:
+
+1.  **Selección del Tipo de Servicio (Categorización Visual)**
+    -   **Interfaz**: Pantalla limpia con 3 botones de gran tamaño (fáciles de tocar con guantes o manos sucias).
+    -   **Opciones**:
+        -   `[🛠️ Instalación]`: Configura el flujo para equipos nuevos.
+        -   `[🧽 Mantenimiento]`: Configura el flujo para limpieza/preventivo.
+        -   `[🔧 Reparación]`: Configura el flujo para correctivo/fallas.
+    -   **Lógica**: La selección determina qué "Checklist" y qué sugerencias automáticas aparecen en el paso 4.
+
+2.  **Identificación del Cliente (CRM & Privacidad)**
+    -   **Lógica de Negocio: "Aislamiento de Datos" (Data Isolation)**:
+        -   **Arquitectura**: Existe una tabla maestra (`contacts_table`), pero cada fila tiene un campo `technician_id`.
+        -   **Consulta (Query)**: Al buscar, la app ejecuta: *"Mostrar contactos DONDE technician_id = [ID del Usuario Actual]"*.
+        -   **Resultado**: El técnico siente que es "su" agenda privada. Nunca ve los clientes de otros técnicos.
+    -   **Interacción**:
+        -   **Buscador Inteligente**: Campo de texto con autocompletado. Escribe "Jua" → Aparece "Juan Pérez", "Juan Mecánico", etc.
+        -   **Botón "Nuevo Cliente"**: Si no aparece en la lista, permite crearlo ahí mismo sin salir del flujo (abre un modal rápido).
+    -   **Feature PRO (Monetización)**:
+        -   **Free**: El técnico registra la fecha manualmente.
+        -   **PRO**: Opción "Activar Recordatorio Automático". La app enviará una notificación al técnico (y opcionalmente un WhatsApp pre-redactado al cliente) cuando se cumpla el ciclo de servicio.
+
+3.  **Datos del Equipo (Activos)**
+    -   **Selección de Marca (Visual Grid)**:
+        -   **UX**: Grilla de logos de 3 columnas para reconocimiento visual instantáneo (más rápido que leer una lista).
+        -   **Marcas Prioritarias**: Mirage, Midea, York, Trane, Carrier, LG, Samsung, Daikin, Hisense.
+        -   **Opción Final**: Botón "Genérica / Otra" (para marcas blancas).
+    -   **Integración QR (Hooks)**: Botón "Vincular/Escanear QR". (Permite asociar este servicio a una etiqueta física pegada en el equipo, facilitando el historial futuro. Detalle completo en Módulo 3).
+
+4.  **Trabajo Realizado (Registro Técnico)**
+    -   **Chips Multi-select (Entrada Rápida)**:
+        -   Nube de etiquetas pulsables. Se pueden seleccionar varias.
+        -   **Opciones**: Limpieza Evap/Cond, Carga de Gas, Cambio Capacitor, Cambio Contactor, Reparación Tarjeta, Búsqueda Fugas, Soldadura, Cambio Sensor, Desinstalación, Diagnóstico, Otro.
+        -   **Auto-Select Inteligente**: Si en el Paso 1 se eligió "Instalación", el chip [Instalación] aparece marcado por defecto.
+    -   **Listas de Verificación (Checklists de Calidad)**:
+        -   Se despliegan según el tipo de servicio.
+        -   **Caso Instalación**:
+            -   [ ] Vacío realizado (Micras).
+            -   [ ] Torque aplicado en tuercas.
+            -   [ ] Protección eléctrica verificada (Voltaje/Tierra).
+            -   [ ] Prueba de operación (Delta T).
+        -   **Gamificación**: Completar la checklist al 100% otorga un "Bono de Calidad" en Tokens. Genera evidencia de que se hizo el trabajo bien.
+
+5.  **Cierre y Evidencia**
+    -   **Fotos**:
+        -   Captura desde cámara o galería.
+        -   **Compresión**: Las imágenes se comprimen automáticamente antes de subir para no gastar los datos móviles del técnico ni el almacenamiento del servidor.
+    -   **Notas**: Campo de texto libre para observaciones ("El cliente pidió no mover el mueble", "El equipo hace ruido extraño en el fan").
+    -   **Próxima Cita**:
+        -   Cálculo automático: Fecha actual + 6 meses (Mantenimiento) o + 1 año (Instalación). Editable por el usuario.
+
+### 3.2-B Módulo: Perfil Profesional (Sección "Mi Carrera")
+**Ubicación**: Pestaña dedicada en el menú o acceso desde el Header del Dashboard.
+**Estado V1**: Privado (Solo para ojos del técnico).
+**Objetivo**: Retención y Auto-superación. Funciona como un "espejo profesional" que le muestra al técnico cuánto ha crecido.
+
+**Componentes Visuales**:
+1.  **Tarjeta de Identidad**:
+    -   Avatar.
+    -   Alias.
+    -   Rango: Novato → Técnico → Pro (Basado en puntos/servicios).
+    -   Ubicación (Ciudad base).
+2.  **Estadísticas de Carrera (Lifetime Stats)**:
+    -   Datos acumulados desde el día 1 de uso de la app.
+    -   **Años de Experiencia**: (Input manual al registrarse + tiempo en app).
+    -   **Total de Servicios**: Contador incrementa con cada cierre en el Módulo 3.2.
+    -   **Equipos Activos**: Número de QRs únicos vinculados.
+    -   **Casos SOS Resueltos**: Métrica de reputación en la comunidad (ayuda a otros).
+3.  **Nivel de Perfil (Barra de Progreso)**:
+    -   **Visual**: Barra porcentual `profile_completeness_score`.
+    -   **Acción**: "Completa tu perfil para llegar al 100%". Items faltantes: "¿Qué herramientas usas?", "Sube tu logo", "Verifica tu teléfono".
+4.  **Sala de Trofeos (Insignias/Badges)**:
+    -   Visualización de logros desbloqueados en color, y bloqueados en gris (para motivar).
+    -   **Ejemplos**:
+        -   🏆 **Primer QR**: Por etiquetar el primer equipo.
+        -   ❄️ **Experto en Inverter**: Por registrar +50 servicios en equipos Inverter.
+        -   🤝 **Buen Samaritano**: Por recibir 10 "Gracias" en el módulo de comunidad.
+
+**Disclaimer UI**:
+"Este perfil es privado. Estás construyendo tu hoja de vida digital. En futuras versiones, podrás decidir hacerlo público para aparecer en el Directorio Certificado y conseguir más clientes."
+
+### 3.3 Módulo 2: Cotizador Pro (Premium) – Especificación Detallada
+**Objetivo del Módulo**:
+Proporcionar una herramienta de generación de presupuestos HVAC que cubra el ciclo completo de venta (Instalación, Preventivo, Correctivo) en menos de 120 segundos. El sistema debe garantizar la rentabilidad del técnico mediante la gestión inteligente de costos de insumos (conectada a precios de mercado) y protegerlo legalmente mediante alcances de servicio predefinidos.
+
+#### 1. Arquitectura de Datos y Configuración (Backend & Setup)
+El sistema no opera con precios estáticos, sino con un modelo relacional dinámico.
+
+**1.1 Base de Datos de Insumos (Master Data)**
+El backend mantiene una tabla maestra (`master_items_db`) con aproximadamente 174 ítems esenciales.
+*   **Categorización (`item_type`)**:
+    *   `MATERIAL`: Tubería (cobre/aluminio), cable, armaflex, cinta.
+    *   `REFACCION`: Capacitores, motores, sensores, tarjetas, contactores.
+    *   `GAS`: Refrigerantes (R22, R410A, R32) por Kg/Lata.
+    *   `SERVICIO_CIVIL`: Mano de obra estandarizada (Ranurado, Perforación Losa, Instalación Eléctrica).
+    *   `PAQUETE_PREVENTIVO`: Precios base de mantenimiento por tonelaje.
+*   **Ranking de Valor (`pareto_rank`)**: Cada ítem tiene un índice basado en su precio promedio para ordenamiento (Items caros primero).
+
+**1.2 Perfil Económico del Usuario (User Configuration)**
+El técnico debe configurar su entorno económico. Se ofrecen dos modalidades:
+*   **Modalidad A: Control Total (Manual - Default)**
+    *   **Interfaz**: Lista paginada de los 174 ítems, ordenada por `pareto_rank` DESC (comienza con lo más caro).
+    *   **Input**: El usuario ingresa su **Costo Real de Compra** (incluyendo IVA).
+    *   **Lógica "El Vigilante" (The Watcher)**: Proceso en background (Cron job) que compara semanalmente el `user_cost` vs. `global_market_average`.
+        *   **Trigger**: Si `global_market_average` sube > 2% vs semana anterior.
+        *   **Acción**: Notificación Push y bandera visual (🔴) en el ítem: *"Alerta de Mercado: El Cobre subió 5%. Tu costo registrado ($X) podría estar desactualizado."*
+*   **Modalidad B: Piloto Automático (Algorítmico - Beta)**
+    *   **Input**: El usuario solo define el costo de 5 "Ítems Testigo" (ej. Rollo Cobre 1/2", Gas R410A, Minisplit 1 Ton, Capacitor 35uf, Cinta Momia).
+    *   **Algoritmo**:
+        *   Calcula `Factor_Realidad = Costo_Usuario / Promedio_Global`.
+        *   Extrapola este factor a los ~169 ítems restantes de la misma categoría.
+    *   **Output UI**: Los precios calculados se muestran con un tag "Estimado".
+
+**1.3 Configuración de Mano de Obra y Textos**
+Variables fijas almacenadas en `user_settings`:
+*   `labor_base_1ton`: Costo instalación básica.
+*   `labor_extra_tubing`: Costo Mano de Obra por metro lineal de tubería adicional (tender, soldar, encintar).
+*   `labor_extra_pump`: Costo Mano de Obra por instalar bomba.
+*   `text_scope_maintenance`: Texto enriquecido (Rich Text) con la descripción legal/técnica del mantenimiento preventivo.
+
+#### 2. Flujo Principal: "El Trifurcador" (UX Entry Point)
+Al iniciar "Nueva Cotización" y seleccionar al Cliente, el sistema presenta 3 tarjetas de selección grandes (Cards) que determinan la interfaz y la lógica de cálculo.
+
+**RUTA 1: VENTA E INSTALACIÓN (Flujo Complejo)**
+Caso de Uso: Instalaciones nuevas, cambios de domicilio, obra civil.
+*   **Paso 1.1: Definición de Suministro (Switch)**
+    *   Pregunta: "¿Quién suministra el equipo?"
+    *   **Opción A [Cliente]**: El sistema oculta selectores de marca/modelo. Solo pide Tonelaje (para calcular costo MO base). Costo Equipo = $0.
+    *   **Opción B [Técnico]**: Se despliega Wizard de Equipo.
+        *   Selectores: Tipo (Minisplit/Piso Techo) > Tecnología (Inverter/On-Off) > Voltaje (110v/220v) > Capacidad (1-3 Ton).
+        *   Data Fetch: Obtiene costo del equipo de la BD + Margen Configurado.
+*   **Paso 1.2: Definición de Alcance (Básico vs. Adicionales)**
+    *   Botón "Instalación Básica": Cierre directo. Asume kit incluido. Pasa a Resumen.
+    *   Botón "Con Adicionales": Despliega lista de conceptos extras.
+*   **Paso 1.3: Gestión de Adicionales (Lógica Híbrida)**
+    *   Se presentan dos tipos de selectores en la misma lista:
+        *   **Servicios de Obra (Checkboxes Simples)**:
+            *   Ítems: Perforación Losa, Ranurado (m), Instalación Base Piso, Desmontaje equipo viejo.
+            *   Lógica: Suma precio fijo precargado (`price_service_civil`).
+        *   **Materiales Variables (Selectores Drill-down)**:
+            *   Ítems: Tubería Extra, Bomba de Condensado, Kit de Instalación (si no viene incluido).
+            *   Interacción: Al hacer clic en "Tubería Extra", se abre modal filtrando la BD por `category = 'TUBERIA'`.
+            *   Selección: El usuario elige "Tubo Rígido Tipo L 1/2".
+            *   Input: Cantidad (Metros).
+            *   **Cálculo Compuesto**:
+                $$Precio = (CostoMaterial \times (1+StockFactor) \times Margen) + (ManoObraExtra \times Cantidad)$$
+
+**RUTA 2: MANTENIMIENTO PREVENTIVO (Flujo Volumen)**
+Caso de Uso: Servicios recurrentes, limpieza estandarizada.
+*   **Paso 2.1: Calculadora de Volumen**
+    *   Interfaz: Lista de capacidades con contadores Stepper ( [-] 0 [+] ).
+        *   1 Ton (Precio Base $X)
+        *   1.5 Ton (Precio Base $Y)...
+    *   Subtotal Dinámico: Se actualiza en tiempo real.
+*   **Paso 2.2: Política de Descuentos**
+    *   Condicional: Si `total_equipos > 1`, aparece campo "Descuento por Paquete".
+    *   Opciones: % (Porcentaje) o $ (Monto fijo).
+*   **Paso 2.3: Validación de Alcance**
+    *   Muestra una vista previa del texto `text_scope_maintenance`.
+    *   Permite edición temporal para esta cotización (ej. agregar "Nota: Se requiere uso de andamios por cuenta del cliente").
+
+**RUTA 3: REPARACIÓN Y CORRECTIVO (Flujo Custom/Tienda)**
+Caso de Uso: Fallas, recargas de gas, cambios de piezas, diagnósticos.
+*   **Paso 3.1: Definición de Mano de Obra (Diagnóstico)**
+    *   Selector: Lista de servicios comunes (Revisión General, Corrección de Fuga, Cambio de Compresor).
+    *   Opción Manual: Campo de texto libre ("Reparación de tarjeta electrónica...") + Campo de Precio (Mano de Obra Pura).
+*   **Paso 3.2: La Tienda de Refacciones (Shopping Cart)**
+    *   **Interfaz**: Buscador con barra de búsqueda y filtros rápidos (Chips: Gas, Electricidad, Motores).
+    *   **Acceso a BD**: Consulta los 174 ítems.
+    *   **Alertas en Tiempo Real**: Si el técnico selecciona un ítem (ej. "Gas R410A") cuyo precio global ha subido drásticamente en las últimas 24h, aparece un Toast: *"⚠️ El precio de este gas subió hoy. Verifica tu margen."*
+    *   **Carrito**: Acumula `(Costo_Refaccion * Margen)` al total.
+
+#### 3. Lógica Financiera Transversal (Business Logic)
+Reglas matemáticas que aplican a todas las rutas para asegurar la utilidad.
+
+**3.1 Factor de Stock (Financiamiento de Inventario)**
+Aplica exclusivamente a materiales fraccionables (Tubería, Cable).
+*   **Problema**: El técnico compra rollos de 15.2m pero vende 3m. El resto es capital parado.
+*   **Solución**: Al vender por metro, el sistema aplica un markup adicional configurable (ej. +20%) sobre el costo lineal proporcional.
+    $$CostoUnitarioCalculado = (CostoRollo / Longitud) \times 1.20$$
+
+**3.2 Manejo de Impuestos (IVA)**
+*   **Input**: El sistema asume que todos los costos ingresados por el técnico (Manual o Auto) **YA INCLUYEN IVA**. (Es la realidad operativa, compran en mostrador).
+*   **Cálculo de Venta**: El Margen de Ganancia se aplica sobre el costo bruto (con IVA).
+*   **Output (PDF)**:
+    *   **Switch "Cliente requiere factura": OFF (Default)**. Muestra "Total a Pagar".
+    *   **Switch "Cliente requiere factura": ON**. Realiza desglose inverso visual.
+        *   Base = Total / 1.16
+        *   IVA = Base * 0.16
+        *   Total = (Intacto)
+
+#### 4. Salida: Generación del PDF (Output)
+El documento generado varía estructuralmente según la Ruta elegida.
+*   **Cabecera (Común)**: Logotipo, Datos de Contacto, Folio #, Datos del Cliente, Fecha.
+*   **Cuerpo (Variable)**:
+    *   **Si Ruta 1 (Instalación)**: Tabla detallada.
+        *   Concepto Principal: "Suministro e Instalación..."
+        *   Sección Adicionales: "Materiales y Servicios Extra" (Desglose de lo seleccionado en drill-down).
+    *   **Si Ruta 2 (Preventivo)**: Tabla Resumen.
+        *   Columna Cantidad | Descripción (Capacidad) | P. Unitario | Importe.
+        *   Bloque de Texto Legal: "Alcance del Servicio" (El texto configurado).
+    *   **Si Ruta 3 (Correctivo)**: Tabla Bipartita.
+        *   Sección A: Servicios / Mano de Obra.
+        *   Sección B: Refacciones y Materiales Suministrados.
+*   **Pie de Página (Común)**:
+    *   Vigencia (Dinámica: 7, 15, 30 días).
+    *   Notas / Condiciones Comerciales.
+    *   **Área de Cierre**:
+        *   Costo Total (Gran y legible).
+        *   **Link Inteligente**: "Aceptar Presupuesto" (Deep link a WhatsApp API con mensaje pre-llenado).
+
+### 3.4 Módulo 3: Ecosistema QR ("La Llave Maestra")
+**Objetivo Estratégico**:
+*   **Retención (Lock-in)**: El técnico "marca su territorio". Al pegar el QR, convierte ese aire acondicionado en un cliente recurrente exclusivo (mientras sea el último en dar servicio).
+*   **Viralidad (Growth Hack)**: La vista pública actúa como un "Caballo de Troya". Si otro técnico escanea el código, ve el banner para descargar la app.
+*   **Confianza**: Ofrece al cliente final una bitácora digital transparente, algo que la competencia no tiene.
+**Ubicación UX**: Botón Flotante (FAB) con icono de QR 📷, omnipresente en el Dashboard y CRM.
+
+#### A. Experiencia del Cliente (Web View / Sin App)
+**Concepto**: "Fricción Cero". El cliente no descarga nada. Solo escanea con su cámara nativa.
+**Acceso Seguro**: URL pública con token hash (ej. `app.tudominio.com/qr/a8b9c7...`).
+
+**Estructura de la Pantalla Web**:
+1.  **Header de Estado (Semáforo)**:
+    -   Muestra Marca/Modelo.
+    -   **Lógica Visual**:
+        -   🟢 Al corriente: Si último servicio < 6 meses.
+        -   ⚠️ Mantenimiento Sugerido: Si último servicio > 6 meses.
+        -   🔴 Crítico: Si último servicio > 12 meses (Opcional).
 2.  **Bitácora Transparente (Read-Only)**:
-    -   Lista cronológica de servicios.
-    -   **Datos visibles**: Fecha | Tipo (Mantenimiento/Reparación) | Detalle "Sanitizado" (ej. "Limpieza profunda y carga de gas") | Nombre del Técnico (o Alias) | Nivel Público.
-3.  **Contacto del Último Técnico (Dinámico)**:
-    -   Botón grande: `[ 💬 Contactar por WhatsApp ]`.
-    -   **Regla**: Enlaza SIEMPRE al último técnico que registró un servicio en este equipo.
-    -   *Incentivo*: "El último en actualizar se adueña del canal de comunicación".
-4.  **Sección "Gancho para Técnicos" (Banner Inferior)**:
-    -   Diseño diferenciado (Fondo oscuro/llamativo).
-    -   Texto: "¿Eres Técnico? ¿Quieres llevar el control de todos tus equipos, recordatorios automáticos y unirte a la comunidad?"
-    -   CTA: `[ Descargar Bitácora de Aires Acondicionados Smart para Técnicos ]`.
+    -   Lista simplificada ("Sanitizada").
+    -   **Muestra**: Fecha, Tipo ("Mantenimiento"), Detalle Público ("Limpieza profunda"), Alias del Técnico ("Juan F.").
+    -   **Oculta**: Precios, Notas internas, Datos de contacto de técnicos anteriores.
+3.  **Botón de Contacto (La Joya del Sistema)**:
+    -   **Regla de Oro ("King of the Hill")**: El botón de WhatsApp SIEMPRE enlaza al **último** técnico que registró un servicio en la app.
+    -   **Efecto**: Incentiva al técnico a registrar el servicio en la app inmediatamente para "sobreescribir" al técnico anterior y adueñarse del cliente.
+4.  **Banner de Adquisición ("El Gancho")**:
+    -   Ubicado al pie de página.
+    -   Diseñado para atraer a otros técnicos curiosos o dueños de flotillas.
+    -   **Copy**: "¿Eres técnico? Organiza tus clientes con esta app gratis." → Link a Store.
 
-#### B. Escaneo desde la App (Técnico)
-**Modos**:
-1.  **Crear Caso**: Al escanear en proceso de servicio -> Abre formulario de nuevo servicio vinculado.
-2.  **Ver Historial**: Al escanear en consulta -> Muestra timeline completo (incluyendo notas privadas propias).
+#### B. Experiencia del Técnico (In-App Scanner)
+**Flujo**: El técnico usa el escáner dentro de la App.
+*   **Caso 1: QR Nuevo (Virgen)**:
+    *   La app detecta que el QR no está asignado.
+    *   Abre modal: "Vincular equipo".
+    *   Pide: Cliente (Seleccionar o Crear) + Datos del Equipo.
+    *   **Resultado**: El código físico queda "casado" permanentemente con ese ID de equipo en la base de datos.
+*   **Caso 2: QR Existente (Consulta)**:
+    *   Muestra el "Expediente Completo" (Módulo 3.1).
+    *   Incluye **Notas Privadas** (visibles solo para el autor o si se comparten en un futuro equipo de trabajo).
+*   **Caso 3: QR Existente (Acción)**:
+    *   Desde la pantalla de consulta, botón directo: `[ + Nuevo Servicio ]`.
+    *   Pre-llena automáticamente los datos del cliente y del equipo en el formulario del **Módulo 3.2**.
 
-#### C. Traducción de Reputación (Manejo de Percepción)
-Para proteger la imagen del técnico, se usan etiquetas comerciales en la Vista Web mientras se mantiene la gamificación interna.
+#### C. Traducción de Reputación (Trust System)
+Mecanismo psicológico para validar al técnico ante el cliente sin exponer la jerarquía interna de "juego".
 
-| Nivel Interno (App) | Vista Web (Cliente) | Significado para el Cliente |
+| Nivel Interno (Gamificación) | Etiqueta Pública (Web View) | Percepción del Cliente |
 | :--- | :--- | :--- |
-| **Nivel 1 (Novato)** | ✅ Miembro Verificado | Garantía de que el técnico está registrado y validado. |
-| **Nivel 2 (Técnico)** | 🛡️ Técnico Profesional | Confianza y experiencia comprobada. |
-| **Nivel 3 (Pro)** | 🥇 Especialista | Autoridad máxima en el servicio. |
+| **Nivel 1 (Novato)** | ✅ Miembro Verificado | "Es seguro dejarlo entrar a mi casa. La app sabe quién es." |
+| **Nivel 2 (Técnico)** | 🛡️ Técnico Profesional | "Sabe lo que hace. Tiene experiencia." |
+| **Nivel 3 (Pro)** | 🥇 Especialista Certificado | "Es el mejor. Vale lo que cobra." |
 
-#### D. Lógica de la Vista Web Pública (Seguridad)
--   **Acceso "Bearer Token"**: La seguridad radica en el acceso físico al QR. Quien escanea, tiene permiso de "Solo Lectura".
--   **Sanitización de Datos**: La API filtra notas privadas o comentarios sensibles.
--   **Campos Whitelist**: Solo se muestran `service_type`, `public_description`, `date`, `tech_public_alias`.
+#### D. Lógica de Seguridad y Datos (Backend Rules)
+*   **Acceso "Bearer Token"**: La seguridad es física. Quien tiene acceso al QR (está frente al equipo), tiene permiso de lectura. No se requieren contraseñas para la vista web.
+*   **Sanitización de Datos (Privacy Filter)**:
+    *   La API que alimenta la vista web (`GET /api/public/equipment/{id}`) debe filtrar estrictamente los campos.
+    *   **Whitelist**: `service_date`, `service_category`, `public_notes`, `tech_public_name`, `tech_badge_level`.
+    *   **Blacklist**: `price`, `private_notes`, `client_phone`, `tech_phone` (excepto el actual).
+*   **Inmutabilidad**: Una vez que un QR se asigna a un equipo, no se puede "borrar" fácilmente para evitar fraudes. Si el equipo se tira a la basura, el historial muere con él.
+*   **Métricas de Perfil**: Cada vez que un técnico pega y vincula un QR nuevo, su contador de Equipos Activos en el Perfil Profesional (**Módulo 3.2-B**) aumenta +1. Esto desbloquea insignias como "Dueño de la Zona" (al tener 50 QRs activos).
 
-**Reglas de Integridad**:
-1.  **Escaneo QR Virgen**: Permite registrar Marca/Modelo -> Se "casa" con el ID.
-2.  **Inmutabilidad**: Prohibido reciclar etiquetas. Un QR = Un Activo físico.
-**Privacidad**:
--   **NUNCA** muestra: Teléfono o Empresa del técnico anterior (salvo el botón de contacto del *último* técnico).
--   **Métricas Internas**: Se contabilizan QRs activos y equipos con historial recurrente para el Perfil Profesional.
+### 3.5 Módulo 4: Herramientas Técnicas & Calculadora (Utility Belt)
+**Objetivo**: Convertir el celular en una navaja suiza. Agrupar las herramientas de consulta diaria para evitar que el técnico tenga que "adivinar" o buscar en Google, centralizando el conocimiento técnico validado.
 
-### 3.5 Módulo 4: Mi Taller (Dashboard Unificado)
-**Objetivo**: Centro de control diario del técnico. Reemplaza la pantalla de inicio tradicional para maximizar retención.
-**Componentes Clave**:
-1.  **Recordatorios/Calendario**:
-    -   Vista central de equipos que requieren servicio próximo.
-    -   Acciones rápidas: [Llamar], [WhatsApp], [Registrar Servicio].
-2.  **Grid de Acceso Rápido**:
-    -   Accesos directos a Herramientas: [Nuevo Servicio], [Calculadora BTU], [Guía Cables], [Códigos Error].
-3.  **Historial Avanzado (Logbook)**:
-    -   Buscador y filtros potentes (Fecha, Cliente, Marca, Tipo).
-    -   *Feature PRO*: Exportar reporte en PDF. Opción de "Repetir Servicio" (clonar datos).
-4.  **Estadísticas y Progreso**:
-    -   KPIs rápidos: Servicios semana, Tokens ganados.
-    -   Visualización del `profile_completeness_score`.
+#### 3.5.1 Asistente Eléctrico (Wizard de Instalación)
+**UX**: Formulario progresivo de 3 pasos.
+**Motor de Decisión (Logic Flow)**:
+El sistema toma los inputs y cruza la información con la siguiente matriz de decisión basada en normativa estándar (NOM-001) y buenas prácticas.
+*   **Variables de Entrada**:
+    *   **Capacidad**: 1, 1.5, 2, 3 Ton.
+    *   **Voltaje**: 110v / 220v.
+    *   **Tecnología**: Inverter / Estándar (On-Off).
+    *   **Distancia**:
+        *   **Corto**: < 20 metros (Kit básico).
+        *   **Largo**: 20 - 50 metros (Caída de tensión).
 
-#### 3.5.1 Submódulo: Herramientas Técnicas (Free)
--   **Guía de Cables y Protecciones (Wizard Paso a Paso)**:
-    -   **Input**:
-        -   **Tonelaje**: 1, 1.5, 2, 3 Ton.
-        -   **Voltaje**: 110v / 220v.
-        -   **Distancia**: <20m (Estándar) / <25m (Inverter) o Mayor (hasta 50m).
-        -   **Tipo de Aire Acondicionado**: Inverter / Estándar.
-    -   **Output (Lógica NOM-001)**:
-        -   **1 Ton / 110V / Estándar**:
-            -   Corto: 12 AWG + Pastilla 15A.
-            -   Largo: 12 AWG + Pastilla 15A.
-        -   **1 Ton / 220V / Estándar**:
-            -   Corto: 14 AWG + Pastilla 10A.
-            -   Largo: 12 AWG + Pastilla 10A.
-        -   **1.5 - 2 Ton / 220V / Estándar**:
-            -   Corto: 12 AWG + Pastilla 15A.
-            -   Largo: 12 AWG + Pastilla 15A.
-        -   **3 Ton / 220V / Estándar**:
-            -   Corto: 12 AWG + Pastilla 20A.
-            -   Largo: 10 AWG + Pastilla 20A.
+**Matriz de Salida (Output para el Usuario)**:
 
-        -   **1 Ton / 110V / Inverter**:
-            -   Corto: 14 AWG + Pastilla 15A.
-            -   Largo: 12 AWG + Pastilla 15A.
-        -   **1 Ton / 220V / Inverter**:
-            -   Corto: 14 AWG + Pastilla 10A.
-            -   Largo: 12 AWG + Pastilla 10A.
-        -   **1.5 - 2 Ton / 220V / Inverter**:
-            -   Corto: 14 AWG + Pastilla 15A.
-            -   Largo: 12 AWG + Pastilla 15A.
-        -   **3 Ton / 220V / Inverter**:
-            -   Corto: 12 AWG + Pastilla 20A.
-            -   Largo: 10 AWG + Pastilla 20A.
+| Capacidad | Voltaje | Tecnología | Distancia | Cable Sugerido | Pastilla (Breaker) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 1 Ton | 110V | Estándar | Corto/Largo | 12 AWG | 1 x 15A |
+| 1 Ton | 110V | Inverter | Corto | 14 AWG | 1 x 15A |
+| 1 Ton | 110V | Inverter | Largo | 12 AWG | 1 x 15A |
+| 1 Ton | 220V | Estándar | Corto | 14 AWG | 2 x 10A |
+| 1 Ton | 220V | Estándar | Largo | 12 AWG | 2 x 10A |
+| 1 Ton | 220V | Inverter | Corto | 14 AWG | 2 x 10A |
+| 1 Ton | 220V | Inverter | Largo | 12 AWG | 2 x 10A |
+| 1.5 - 2 Ton | 220V | Estándar | Corto/Largo | 12 AWG | 2 x 15A |
+| 1.5 - 2 Ton | 220V | Inverter | Corto | 14 AWG | 2 x 15A |
+| 1.5 - 2 Ton | 220V | Inverter | Largo | 12 AWG | 2 x 15A |
+| 3 Ton | 220V | Estándar | Corto | 12 AWG | 2 x 20A |
+| 3 Ton | 220V | Estándar | Largo | 10 AWG | 2 x 20A |
+| 3 Ton | 220V | Inverter | Corto | 12 AWG | 2 x 20A |
+| 3 Ton | 220V | Inverter | Largo | 10 AWG | 2 x 20A |
 
--   **Tabla P-T (Presión-Temperatura)**:
-    -   **Selector**: R410A, R22, R32.
-    -   **Interfaz**: Slider o Input de temperatura ambiente.
-    -   **Output**: Presión de succión ideal (PSI).
+**Nota UI**: Mostrar visualmente el calibre y la pastilla con íconos vectoriales grandes.
+
+#### 3.5.2 Tabla P-T Dinámica (Gas Ruler)
+**Herramienta**: Referencia rápida para carga de gas.
+*   **Interfaz**:
+    *   **Selector de Gas**: Tabs superiores `[R410A]` `[R32]` `[R22]`.
+    *   **Input**: Slider horizontal para Temperatura Ambiente (°C).
+    *   **Output**: Un indicador tipo "medidor" que muestra el rango de PSI ideal (Succión/Baja).
+*   **Base de Conocimiento (Data Ranges)**:
+     -   **Output**: Presión de succión ideal (PSI).
         -   **R-410A (Orientativo)**:
             -   25 °C: ~105 – 125 psig (≈ 7.2 – 8.6 bar)
             -   30 °C: ~110 – 130 psig (≈ 7.6 – 9.0 bar)
@@ -266,107 +467,311 @@ Para proteger la imagen del técnico, se usan etiquetas comerciales en la Vista 
             -   30 °C: ~55 – 75 psig (≈ 3.8 – 5.2 bar)
             -   35 °C: ~60 – 80 psig (≈ 4.1 – 5.5 bar)
             -   40 °C: ~65 – 90 psig (≈ 4.5 – 6.2 bar)
--   **Biblioteca de Errores**: Buscador offline (Marca + Código = Diagnóstico). Módulo independiente con valores y códigos en directorio dedicado.
 
-#### 3.5.2 Submódulo: Capacitación Ligera
-**Objetivo**: Formación técnica continua "In-App". Accesible desde Mi Taller.
--   **Contenido**: Cápsulas de "Buenas Prácticas" (Instalación, Normativa, Errores Comunes).
--   **Formato**: Micro-contenidos (Texto + Imagen/Video corto).
--   **Recompensa**: Tokens por completar módulos y desbloqueo de Insignias.
--   *Disclaimer*: "Capacitación interna para mejora profesional. No es una certificación oficial."
+#### 3.5.3 Biblioteca de Errores (Offline)
+**Recurso Base**: `seed_full_database.sql` (Base de Datos Relacional Local) (en `C:\TESIVIL\AWS-TESIVIL\AWS-TESIVIL\06_MRFRIO_APP\data_mining\output\seed_full_database.sql`).
+**Objetivo**: Diagnóstico instantáneo y **OFFLINE**. El técnico debe poder identificar el error en una azotea sin señal de internet en menos de 10 segundos.
 
-### 3.6 Módulo 5: Comunidad SOS
-**Objetivo**: Resolución de problemas, Gamificación y construcción de Reputación Técnica Interna.
-**Flujo**:
-1.  **Crear Hilo (SOS)**:
-    -   Requiere: Marca, Modelo y Descripción del problema. (Foto del error/equipo es opcional).
-    -   Costo: Gratis (o pequeña quema de tokens si hay abuso).
-    -   **Filtro IA (Calidad)**: Groq analiza texto para:
-        1.  Bloquear contenido ofensivo.
-        2.  **Filtrar respuestas sin valor**: Se rechazan comentarios tipo "ok", "gracias", "yo también" que no aporten solución técnica.
-2.  **Respuestas**:
-    -   Técnicos responden. El autor marca una como "Solución".
-    -   **Recompensa**: Autor gana puntos por cerrar el caso. Respondedor (Solución) gana **X Tokens**.
-3.  **Moderación**:
-    -   Sistema de Reportes (Flag). Si un usuario acumula reportes -> Ban temporal automático.
-    -   **Gamificación y Calidad**:
-        -   **Calificación**: Las respuestas tendrán botones de Like/Dislike.
-        -   **Recompensas**: Se generan tokens por responder (validado por IA/Groq para asegurar utilidad y evitar insultos).
-        -   **Límites de Spam**:
-            -   Max 2 respuestas premiadas con tokens por hora.
-            -   Max 5 comentarios totales por hora por técnico.
+1.  **Arquitectura de Datos (Implementación Técnica)**
+    *   Para garantizar velocidad y disponibilidad, esta base de datos no se consulta por API cada vez, sino que vive dentro del teléfono.
+    *   **Motor Local**: SQLite. El archivo SQL se inyecta como base de datos local en la primera instalación de la app.
+    *   **Sincronización Híbrida**:
+        *   La app viene precargada con estos 67 modelos y cientos de errores.
+        *   **Update System**: Cuando tú (Admin) agregues un nuevo modelo (ej. "Mirage X32") en el servidor, la app descarga solo el "delta" (la diferencia) la próxima vez que tenga Wi-Fi.
 
-        -   **Distintivos**: El nombre del técnico mostrará su alias y una insignia de rango: **Novato**, **Técnico** o **Pro** (Suscripción).
-    -   **Base de Datos de Fallas Comunitaria (Nuevo)**:
-        -   **Input**: Al finalizar una reparación, se ofrece reportar "Caso Común" por tokens.
-        -   **Consenso**: Un reporte solo se hace público cuando 3 técnicos diferentes reporten la misma falla/solución para el mismo modelo.
-        -   **Objetivo**: Crear base de conocimiento confiable vs spam.
+2.  **Interfaz de Usuario (UX de Diagnóstico)**
+    *   Aprovechando los campos `image_url` y `logo_url` de tu SQL, la navegación es visual, no de texto.
+    *   **Paso A: Selección de Marca (Brand Grid)**
+        *   **Visual**: Grid de logotipos grandes sobre fondo blanco (card view).
+        *   **Data Source**: `SELECT DISTINCT logo_url FROM air_conditioner_models`.
+        *   **Marcas Detectadas**: Mirage, Carrier, York, LG, etc.
+    *   **Paso B: Identificación de Equipo (Visual Match)**
+        *   **Problema**: El técnico a veces no sabe si es un "Magnum 19" o un "X3".
+        *   **Solución**: Carrusel Visual.
+        *   **Interfaz**: Al tocar "Mirage", se muestran las fotos de los equipos (`image_url`) en un carrusel horizontal o grid vertical.
+        *   **Datos**: Muestra `name` (ej. "MAGNUM19") y `type` (ej. "Inverter/Muro").
+        *   **Lógica**: El técnico ve la foto y dice: "Es este, el que tiene la franja plateada".
+    *   **Paso C: El Buscador de Códigos (The Solver)**
+        *   Una vez dentro del modelo (ej. ID=19 M900XERIES):
+        *   **Input**: Un teclado numérico/alfanumérico grande.
+        *   **Búsqueda Predictiva**: Al escribir "E", la lista se filtra: E1, E2, E6.
+        *   **Tarjeta de Solución (Result Card)**:
+            *   **Código**: Grande y Rojo (ej. E6).
+            *   **Descripción** (Del SQL): "Velocidad del motor evaporador menor a 200 RPM..."
+            *   **Solución** (Del SQL - Formateada): La app detecta los saltos de línea en tu SQL y los convierte en Bullet Points interactivos:
+                *   ☑ Motor o turbina obstruida.
+                *   ☑ Capacitor en mal estado.
+                *   ☑ Sensor de velocidad dañado.
 
-### 3.7 Módulo 6: Calculadora BTU
--   **Versión Free**:
-    -   Fórmula: `Área * Factor Zona`.
-    -   **Factores**: Templada (600 BTU/m²), Cálida (700 BTU/m²), Muy Cálida (800 BTU/m²).
-    -   Limitación: No guarda, marca de agua.
--   **Versión Pro (Análisis Térmico Completo)**:
+3.  **Integración Transversal (Conectando con otros módulos)**
+    *   Este módulo alimenta a toda la app:
+    *   **Conexión con Módulo 3.4 (QR)**:
+        *   Al escanear un QR vinculado a un equipo (ej. un Mirage Life 12), aparece un botón directo: `[ 🛠️ Ver Códigos de Falla de este equipo ]`. Salta los pasos A y B, llevando directo a la lista de errores de ese modelo exacto.
+    *   **Conexión con Módulo 3.2 (CRM - Nuevo Servicio)**:
+        *   Si el técnico selecciona "Reparación" -> "Mirage", la app sugiere: "¿Tienes un código de error visible?". Si pone "Sí" y escribe el código, la solución se guarda automáticamente en las notas del servicio.
 
-    -   **A. Geometría**: Largo x Ancho x Altura (Volumen m³).
-    -   **B. Ganancia Solar (Ventanas)**: Cantidad, Orientación (N/S/E/O) y Protección (Persiana/Película).
-    -   **C. Ocupación**: N° Personas (Actividad ligera/pesada).
-    -   **D. Carga Interna**: Equipos (TVs, Computadoras, Hornos - Watts estimados).
-    -   **E. Aislamiento**: Paredes (Ladrillo/Tabla/Cristal) y Techo (Losa/Aislado).
-    -   *Resultado*: BTU Exactos + Sugerencia Comercial (ej. "Requiere 14,500 BTU → Instalar 1.5 Ton").
-    -   **Persistencia**: Guarda análisis en Firestore.
-    -   **PDF**: Exportable con footer legal.
-    -   **Regla UI**: Toast de Disclaimer al abrir por primera vez.
+4.  **Estrategia de Contenido (Tu SQL como Activo)**
+    *   Analizando tu archivo, tienes joyas específicas que aumentan el valor de la suscripción PRO:
+    *   **Contenido Premium (York/Carrier/LG)**: Las marcas comerciales (VRF, Paquetes) suelen tener manuales difíciles de conseguir.
+    *   **Estrategia**: Los códigos de Mirage (masivos) son Gratis. Los códigos de LG VRF / York Paquete (Industrial/Comercial) son exclusivos para usuarios PRO o desbloqueables con Tokens.
+    *   **Manejo de Variantes**:
+        *   Tu SQL tiene variantes interesantes como CARRIER ONE vs CARRIER ONE +. La app debe agruparlas inteligentemente o permitir "Ver modelos similares" si el técnico no encuentra el error en uno.
 
-### 3.8 Módulo 7: Economía de Tokens
--   **Historial de Movimientos**: Se incluirá un módulo dedicado "Mi Billetera" donde el usuario podrá consultar el detalle de ganancias y consumo de tokens.
-**Definición Legal**: "Los Tokens NO son dinero, son instransferibles y revocables."
-**Daily Caps (Anti-Granja)**:
-> *Nota: Todos los valores y límites son editables desde el Panel de Administrador.*
-| Acción | Ganancia | Límite Diario |
-| :--- | :--- | :--- |
-| Registrar Servicio | 10 | 6 |
-| SOS | 20 | 1 |
-| Respuesta Validada | 50 | ∞ |
+#### 3.5.4 Submódulo: Capacitación Ligera (LMS)
+**Objetivo**: Micro-learning para fidelización.
+*   **Feed**: Lista scrollable de tarjetas ("Cápsulas").
+*   **Contenido**: Video corto (30 seg) o Infografía.
+*   **Botón**: "Marcar como aprendido".
+*   **Economía**:
+    *   Cada cápsula vista = +5 Tokens.
+    *   Completar serie "Instalación Segura" = Insignia en Perfil.
+*   **Disclaimer Legal**: Texto visible indicando que son consejos de mejores prácticas y no sustituyen certificaciones oficiales ni manuales del fabricante.
 
-**Protección Anti-Fraude**:
--   **Límites Diarios**: Los topes (caps) de tokens son **POR DÍA** (reset 00:00 local) para evitar granjas humanas.
--   **Bloqueo de Velocidad**: Si un usuario intenta registrar > 6 servicios en tiempos imposibles (ej. 1 hora) -> Flag de revisión.
--   **Geofencing**: Servicios idénticos (mismo GPS) en corto tiempo no generan tokens.
+#### 3.5.5 Calculadora BTU (El Vendedor Silencioso)
+Esta herramienta justifica la venta de equipos más grandes o inverter ante el cliente.
+*   **Versión FREE (Estimación Rápida)**
+    *   **Input**: Largo, Ancho, Zona Climática (Templada/Cálida/Muy Cálida).
+    *   **Fórmula**: $Área (m^2) \times FactorZona$.
+    *   **Output**: Número en BTUs (Solo lectura).
+    *   **Limitante**: Marca de agua grande y sin opción de guardar.
+*   **Versión PRO (Carga Térmica Detallada)**
+    *   **Inputs Detallados (Audit)**:
+        *   **Volumen**: Largo $\times$ Ancho $\times$ Alto ($m^3$).
+        *   **Ganancia Solar**:
+            *   Ventanas (m²): Orientación (Norte/Sur/Este/Oeste) + Protección (Sin/Con Persiana).
+        *   **Carga Interna**:
+            *   Ocupantes: Cantidad $\times$ 400 BTU (aprox).
+            *   Electrónicos: Sumatoria de Watts (TVs, PCs).
+            *   Cocina/Hornos: Si aplica.
+        *   **Envolvente**: Tipo de techo (Losa concreto vs Aislado).
+    *   **Cálculo & Resultado Comercial**:
+        *   Resultado Matemático: 14,200 BTU.
+        *   **Sugerencia Comercial (Redondeo inteligente)**: "El cálculo exacto es 14,200 BTU. Se recomienda instalar equipo de 1.5 Toneladas (18,000 BTU) para eficiencia óptima."
+    *   **Entregable**:
+        *   Genera PDF profesional con el desglose del análisis térmico.
+        *   Permite adjuntar este PDF a una Cotización del Módulo 3.3.
 
-### 3.9 Módulo 8: Tienda y Recompensas
-**Objetivo**: Monetizar insumos y premiar lealtad.
-**Estrategia Dual de Etiquetas QR**:
-1.  **QR Gratis (Viral)**: Todo técnico puede generar e imprimir sus propias etiquetas desde la app (PDF). Fomenta adopción masiva.
-2.  **Etiquetas Profesionales (Monetización)**: Venta de paquetes físicos (material duradero, adhesivo industrial, diseño premium).
 
-**Secciones de la Tienda**:
-1.  **Tienda de Dinero Real (Insumos)**:
-    -   **Producto Exclusivo**: Paquetes de Etiquetas QR Profesionales (20, 50, 100 piezas).
-    -   **Pagos**: MercadoPago / Stripe.
-    -   **Administración**: El precio de los paquetes es editable desde el Panel Admin.
-    -   **Logística**: Envío a domicilio.
+### 3.6 Módulo 5: Comunidad SOS (Foro Técnico & Base de Conocimiento)
+**Objetivo Estratégico**: Crear una red de apoyo "Peer-to-Peer" que aumente la retención diaria (Daily Active Users). Transforma la app de una herramienta solitaria a una comunidad vibrante, utilizando IA para mantener la calidad y evitar el "ruido".
 
-2.  **Tienda de Tokens (Canje Digital)**:
-    -   **Objetivo**: Canjear tokens acumulados por servicios o herramientas premium.
-    -   **Catálogo Diverso "Quemadores"**:
-        -   *Nota*: Todo el catálogo y sus costos en tokens es 100% editable desde el Panel de Administración.
-        1.  **Launch Booster (Admin Toggle)**: "7 Días Premium" a costo reducido de tokens. (Objetivo: Impulsar adopción inicial).
-        2.  **Artículos Físicos**: De bajo costo (cinta momia, herramientas básicas).
-        3.  **Features PRO**: Acceso temporal estándar (ej. "1 semana de Cotizador Pro").
-        4.  **Promociones Digitales**: Destacar preguntas/respuestas en la comunidad.
-        5.  **Descuentos**: En la compra de paquetes de Etiquetas QR Profesionales.
-3.  **Logística**:
+#### 1. Flujo de Creación de Hilo (El Problema)
+*   **UX**: Botón flotante "Pedir Ayuda SOS" en la pantalla de Comunidad.
+*   **Formulario de Entrada**:
+    *   **Marca/Modelo**: Selectores obligatorios (vinculados a la BD de equipos).
+    *   **Descripción**: Campo de texto (Mínimo 50 caracteres para evitar posteos vagos).
+    *   **Evidencia**: Foto o Video corto (Opcional pero recomendado).
+*   **Filtro IA (Groq - Gatekeeper 1)**:
+    *   Antes de publicar, el texto pasa por la API de Groq/LLM.
+    *   **Regla de Bloqueo**: Detecta lenguaje ofensivo, spam comercial o datos sensibles (teléfonos).
+    *   **Regla de Calidad**: Si el texto es "Ayuda no sirve", la IA rechaza y sugiere: *"Por favor detalla qué pruebas has hecho y qué código de error aparece."*
+
+#### 2. Sistema de Respuestas Inteligentes (La Solución)
+Aquí es donde la IA y la Gamificación actúan para asegurar que las respuestas sean útiles.
+1.  **Filtro IA en Respuestas (Groq - Gatekeeper 2)**:
+    *   **Objetivo**: Eliminar el "Ruido Social" que no aporta valor técnico.
+    *   **Lógica**:
+        *   Input Usuario: "Ok", "Gracias", "A mí también me pasa", "Jaja".
+        *   Análisis IA: Clasifica como `NON_TECHNICAL_VALUE`.
+        *   **Acción**: Se permite publicar (para socializar) pero **NO genera Tokens** y se oculta visualmente bajo un botón "Ver más comentarios" si hay muchos.
+    *   **Validación de Valor**:
+        *   Input Usuario: "Revisa el capacitor de marcha, si mide menos de 30uF cámbialo."
+        *   Análisis IA: Clasifica como `TECHNICAL_SOLUTION`.
+        *   **Acción**: Publicación destacada + Posibilidad de ganar Tokens.
+2.  **Cierre del Ciclo (La Recompensa)**:
+    *   Solo el autor del hilo puede marcar una respuesta como **[✅ Solución Aceptada]**.
+    *   **Distribución de Tokens**:
+        *   Autor: Gana **X tokens** (Poco, por usar la plataforma y cerrar el caso).
+        *   Respondedor: Gana **XXX tokens** (Mucho, incentivo fuerte por resolver).
+
+#### 3. Moderación y Límites (Anti-Abuso)
+Reglas duras para proteger la economía de la app.
+*   **Límites de Velocidad (Rate Limiting)**:
+    *   Max 5 comentarios totales por hora (Frena bots y spammers humanos).
+    *   Max 2 respuestas premiadas con tokens por hora (Evita "granjeo" de tokens).
+*   **Sistema de Reputación**:
+    *   Botones `[👍 Útil]` y `[👎 Reportar]` en cada respuesta.
+    *   **Trigger de Ban**: Si un usuario acumula 3 reportes validados (ej. insultos) en 24h → Suspensión automática de escritura por 3 días.
+
+#### 4. Distintivos Visuales (Jerarquía Social)
+El ego es un motor poderoso en comunidades técnicas.
+*   **Novato (Nivel 1)**: Sin icono especial. Usuario nuevo.
+*   **Técnico (Nivel 2)**: Icono 🛡️. Usuario que ha completado su perfil y ha dado al menos 5 soluciones aceptadas.
+*   **Pro (Nivel 3)**: Icono 🥇 + Borde Dorado. Suscriptores de pago O usuarios con >50 soluciones aceptadas (Top Contributors). *Nota: Dar estatus Pro a los mejores colaboradores gratuitos es una gran estrategia de retención.*
+
+#### 5. Base de Datos de Fallas Comunitaria (El "Waze" de las Reparaciones)
+Este es un activo de alto valor que se construye solo (Crowdsourcing).
+*   **Concepto**: Convertir problemas aislados en una "Verdad Técnica".
+*   **Mecanismo de Consenso (La Regla de 3)**:
+    1.  **Reporte A**: El Técnico Juan reporta: Marca X, Modelo Y, Error E4 = Sensor de Pozo dañado. → Estado: *Pendiente*.
+    2.  **Reporte B**: El Técnico Pedro reporta lo mismo 2 semanas después. → Estado: *Validando*.
+    3.  **Reporte C**: El Técnico Luis reporta lo mismo. → Estado: **CONFIRMADO**.
+*   **Resultado**:
+    *   El sistema crea automáticamente una entrada en la **Biblioteca de Errores (Módulo 3.5.3)**.
+    *   Se convierte en información pública accesible para todos.
+*   **Incentivo**: Cuando un reporte pasa a "Confirmado", los 3 técnicos que aportaron el dato reciben un bono retroactivo de Tokens.
+
+### 3.7 Módulo 6: Economía de Tokens ("Mi Billetera")
+**Objetivo Estratégico**: Gamificación Conductual. Incentivar el uso del CRM y la ayuda comunitaria mediante recompensas virtuales, manteniendo un control estricto para evitar abusos o inflación de la economía interna.
+
+#### 1. Interfaz de Usuario: "Mi Billetera" (Wallet UI)
+*   **Ubicación**: Accesible desde el Menú Principal y visible de forma resumida en el Dashboard (Contador de Tokens).
+*   **Dashboard Financiero**:
+    *   **Saldo Actual**: Número grande y claro.
+    *   **Nivel de Usuario**: Barra de progreso hacia el siguiente nivel (Novato -> Pro).
+    *   **Historial de Movimientos (Ledger)**:
+        *   Lista cronológica estilo bancario:
+            *   ⬇️ **+10 Tokens** | Registro de Servicio (Cliente: Juan P.) | Hoy 10:30 AM
+            *   ⬇️ **+50 Tokens** | Respuesta Validada (Hilo #882) | Ayer 04:15 PM
+            *   ⬆️ **-200 Tokens** | Canje en Tienda (Guantes Nitrilo) | 12/Dic
+*   **Valor Percibido**: El diseño debe sentirse "valioso", usando colores dorados o metálicos para los tokens, aunque legalmente no sean dinero.
+
+#### 2. Reglas de Emisión (Faucets & Caps)
+Definición estricta de cómo se "imprime" moneda en el sistema. Los límites están calculados para un flujo de trabajo humano realista.
+
+**Tabla de Ganancias Configurable (Backend)**:
+
+| Acción (Trigger) | Recompensa | Límite Diario (Cap) | Racional del Límite |
+| :--- | :--- | :--- | :--- |
+| Registrar Servicio | +10 Tokens | 6 Servicios | Un técnico promedio hace 3-5 trabajos. Más de 6 suele ser improbable o gestión de flotillas (que requiere otro plan). |
+| Crear Hilo SOS | +20 Tokens | 1 Hilo | Incentiva pedir ayuda real, pero evita que llenen el foro de preguntas spam solo para ganar puntos. |
+| Respuesta Validada | +50 Tokens | ∞ (Ilimitado) | "High Value Action". Queremos fomentar expertos. El límite natural es la dificultad de que te marquen como "Solución". |
+| Perfil Completo | +100 Tokens | 1 (Única vez) | Incentivo de Onboarding ("One-off"). |
+| Vincular QR Nuevo | +15 Tokens | 10 QRs | Fomenta la expansión del ecosistema físico. |
+
+*   **Reset**: Los contadores diarios se reinician a las **00:00:00 hora local** del dispositivo del usuario.
+
+#### 3. Sistema de Seguridad "El Sheriff" (Anti-Fraude)
+Algoritmos pasivos que corren en el servidor para detectar anomalías y bloquear "granjas" de tokens.
+*   **A. Bloqueo de Velocidad (Velocity Checks)**:
+    *   **Regla**: "Nadie repara un aire acondicionado en 5 minutos".
+    *   **Lógica**: Si el Usuario X registra 2 servicios con una diferencia de tiempo < 15 minutos, el segundo servicio se guarda pero **NO genera tokens** y levanta una bandera amarilla ⚠️.
+*   **B. Geofencing (Validación GPS)**:
+    *   **Regla**: "No puedes reparar 3 equipos distintos desde el sofá de tu casa".
+    *   **Lógica**: El sistema compara las coordenadas GPS de los últimos registros.
+    *   **Condición**: Si `Coordenada Serv 1 == Coordenada Serv 2` (radio < 20m) **Y** Cliente es diferente → **Bloqueo de tokens**. (Se asume que es spam o prueba falsa).
+*   **C. Detección de Patrones de Texto**:
+    *   Si el usuario llena los campos de descripción con "asdasd", "test", "prueba", la IA (Groq) detecta contenido basura y anula la recompensa.
+
+#### 4. Marco Legal y Términos (Liability)
+Texto obligatorio visible en la sección "Ayuda" de la Billetera para proteger a la empresa.
+> **AVISO LEGAL**: "Los 'Tokens Smart' son puntos de fidelidad virtuales sin valor monetario en el mundo real. Son intransferibles entre cuentas y no pueden canjearse por dinero en efectivo (fiat). La plataforma se reserva el derecho de revocar tokens obtenidos mediante métodos fraudulentos, scripts automatizados o uso indebido de la aplicación sin previo aviso."
+
+### 3.8 Módulo 8: Tienda y Recompensas (Marketplace)
+**Objetivo Estratégico**:
+*   **Monetización Directa**: Venta de insumos propietarios (Etiquetas QR).
+*   **Economía Circular**: "Quemar" los tokens generados para evitar inflación y dar valor real al esfuerzo del técnico.
+
+#### 1. Estrategia de Producto: El Ecosistema QR Dual
+Un modelo "Freemium" aplicado al hardware (etiquetas).
+*   **A. QR Gratis (DIY - Do It Yourself)**:
+    *   **Formato**: Archivo PDF generado dinámicamente en la app.
+    *   **Uso**: El técnico lo descarga, lo imprime en su impresora de casa y lo pega con cinta adhesiva.
+    *   **Ventaja**: Elimina la barrera de entrada. Permite que cualquiera pruebe el sistema hoy mismo.
+    *   **Limitante**: Se desgasta con la lluvia/sol (los aires acondicionados están en exteriores).
+*   **B. QR Profesional (Producto Físico - De Pago)**:
+    *   **Material**: Vinil de alta resistencia, adhesivo industrial (para superficies rugosas/metal), capa UV anti-sol.
+    *   **Diseño**: Branding premium de la App + Espacio para que el técnico escriba su teléfono con plumón permanente.
+    *   **Valor**: "Imagen Profesional". El cliente final ve una etiqueta oficial, no un papel pegado con diurex.
+
+#### 2. Sección A: Tienda de Dinero Real (Revenue Stream)
+Venta directa a través de pasarelas de pago seguras.
+*   **Catálogo de Productos (SKUs)**:
+    *   📦 **Pack Inicial (20 QRs)**: Ideal para probar.
+    *   📦 **Pack Taller (50 QRs)**: Mejor costo unitario.
+    *   📦 **Pack Flotilla (100 QRs)**: Margen máximo.
+*   **Gestión de Precios**:
+    *   Los precios (`price_mxn`) se controlan desde tu Panel Administrativo, permitiéndote ajustar según costos de imprenta o promociones sin actualizar la app en las tiendas.
+*   **Checkout Flow**:
+    *   Integración nativa con **MercadoPago** (líder en LatAm) y **Stripe**.
+    *   Formulario de envío integrado (Dirección guardada en perfil del usuario).
+
+#### 3. Sección B: Tienda de Tokens (Digital & Merch)
+Aquí es donde los usuarios gastan sus ganancias ("Token Burn"). El objetivo es ofrecer recompensas atractivas que tengan un costo marginal bajo para ti.
+*   **Categorías de Canje**:
+    1.  **Productos Digitales (Margen 100% - Costo $0)**:
+        *   🚀 **Booster "Semana PRO"**: Desbloquea todas las funciones Premium por 7 días. (Estrategia: El usuario se acostumbra a lo bueno y luego compra la suscripción).
+        *   📄 **Desbloqueo Cotizador**: Pagar X tokens por generar 1 PDF de cotización sin marca de agua (Micro-transacción).
+        *   📢 **"Destacar mi Pregunta"**: Pone su hilo SOS al inicio del foro por 24h.
+    2.  **Productos Híbridos (Descuentos)**:
+        *   🎫 **Cupón 20% OFF en QRs Físicos**: El usuario gasta tokens → Tú recibes una venta en dinero real (con descuento, pero venta al fin).
+    3.  **Productos Físicos (Merchandising - Costo Real)**:
+        *   Requieren gran cantidad de tokens para ser rentables.
+        *   **Herramientas básicas**: Cinta Momia, Desarmador de bolsillo, Gorra con logo de la App.
+        *   **Regla de Envío**: "El envío se paga aparte (Dinero)" O "Envío gratis solo al canjear junto con un Pack de QRs".
+
+#### 4. Logística y Backoffice (Panel Admin)
+Para que esto no sea un dolor de cabeza operativo, el sistema administrativo debe ser simple.
+*   **Tablero de Pedidos**:
+    *   Vista de lista: `Nuevo` | `Pagado` | `En Proceso` | `Enviado`.
+*   **Gestión de Envíos**:
+    *   Al recibir un pedido de QRs o Merch, el administrador prepara el paquete.
+    *   **Input**: Campo para ingresar Tracking Number (Número de guía) y Paquetería (DHL/Estafeta/Correos).
+    *   **Acción**: Al guardar, la app dispara una **Notificación Push** al técnico: *"¡Tu paquete va en camino! Rastréalo aquí."*
     -   Panel Admin para marcar "Enviado" y subir guía de rastreo.
 
-### 3.10 Módulo 9 (Admin): Panel de Gestión
--   **Dashboard**: KPIs de conversión, uso de tokens.
--   **Flags de Usuario**: `eligible_for_public_directory` (false default), `trust_score_internal`, `profile_completeness_score`.
--   **Reglas Dinámicas**: Editar JSON de `token_earn_rules`, `btu_factors`, costos de catálogo y reglas de consenso.
--   **Catálogo**: Gestión de Productos (Precio, Stock, Imagen) para ambas tiendas.
--   **Moderación**: Cola de reportes con Score de IA.
--   **Logs**: Auditoría inmutable de acciones administrativas.
+### 3.9 Módulo 9: Panel de Administración (God Mode)
+**Plataforma**: Web App (Escritorio). No es visible en la app móvil. Acceso exclusivo para Super Admins (Tú) y personal de soporte.
+
+#### 1. Dashboard Ejecutivo (KPIs)
+Visión de "Águila" sobre la salud del negocio y la app.
+*   **Métricas de Negocio (Dinero)**:
+    *   Ventas Totales (MXN) mes actual vs anterior.
+    *   Pedidos de QRs pendientes de envío.
+*   **Métricas de Producto (Retención)**:
+    *   **DAU (Daily Active Users)**: Técnicos únicos activos hoy.
+    *   **Tasa de Retención**: % de usuarios que regresan después de 7 días.
+*   **Economía de Tokens**:
+    *   **Token Float**: Total de tokens en circulación (emitidos - quemados). Alerta si la inflación es alta.
+    *   **Burn Rate**: Tokens gastados en tienda vs. Tokens generados.
+
+#### 2. Gestión de Usuarios (User CRM)
+Control granular sobre cada técnico registrado.
+*   **Buscador**: Por Alias, Correo, Teléfono o ID.
+*   **Perfil de Usuario (Vista Admin)**:
+    *   Datos: Personales + Historial de Dispositivos (IPs).
+    *   **Flags de Control (Toggles)**:
+        *   `eligible_for_public_directory`: **[ON/OFF]**. Interruptor manual. Si está en ON, el técnico aparece en la búsqueda pública de la web.
+        *   `is_banned`: **[ON/OFF]**. Bloqueo total de acceso.
+        *   `is_pro_subscriber`: **[ON/OFF]**. Acceso manual a funciones de pago (para pruebas o regalos).
+    *   **Scores Calculados**:
+        *   `trust_score_internal`: (0-100). Calculado automáticamente (Reportes recibidos vs. Soluciones dadas).
+        *   `profile_completeness_score`: % de llenado de perfil.
+*   **Acciones**: Restablecer contraseña, Regalar Tokens (Compensación de soporte), Enviar Push Notification individual.
+
+#### 3. Motor de Reglas Dinámicas (Remote Config)
+La capacidad de ajustar la lógica del negocio en caliente, sin lanzar una actualización en las App Stores.
+*   **Interfaz**: Editor JSON con validación de sintaxis o formularios simples.
+*   **Archivos Configurables**:
+    *   `token_earn_rules.json`: Cambiar cuántos tokens da un "Like" o un "Registro de Servicio".
+    *   `market_prices_master.json`: Actualizar el precio base del Cobre o Gas R410A en el Cotizador.
+    *   `btu_factors.json`: Ajustar los factores de cálculo térmico si se detectan imprecisiones.
+    *   `store_config.json`: Activar/Desactivar productos de la tienda de canje.
+
+#### 4. Gestión del Catálogo (E-commerce)
+*   **Inventario Unificado**:
+    *   **Gestión de Productos Físicos (Packs de QRs, Herramientas)**: Control de Stock, Costo MXN, Peso (para envíos).
+    *   **Gestión de Productos Digitales (Boosters, Funciones)**: Costo en Tokens, Duración.
+*   **Logística de Envíos**:
+    *   Cola de pedidos "Pagados / No Enviados".
+    *   Botón para cargar "Número de Guía" y marcar como "Enviado" (Dispara notificación al usuario).
+
+#### 5. Moderación con IA (La Sala de Justicia)
+Herramienta para mantener limpia la comunidad SOS.
+*   **Cola de Prioridad**:
+    *   No muestra todo el contenido, solo lo marcado por Groq AI como sospechoso o lo reportado por usuarios humanos > 3 veces.
+*   **Score de Toxicidad**:
+    *   Visualización del texto con las palabras ofensivas resaltadas automáticamente.
+*   **Acciones Rápidas**:
+    *   [Ignorar] (Falso positivo).
+    *   [Borrar Contenido].
+    *   [Borrar + Banear Usuario 24h].
+
+#### 6. Logs de Auditoría (Seguridad)
+Registro inmutable de "Quién hizo qué" dentro del panel administrativo.
+*   **Ejemplo**: "Admin1 cambió el precio del Gas R410A de $800 a $850 el 12/Dic a las 14:00".
+*   **Ejemplo**: "Admin2 otorgó 500 tokens manuales al usuario JuanPerez".
+*   **Objetivo**: Evitar robos internos o errores no rastreables.
 ---
 
 ## CAPÍTULO 4: ESQUEMA DE DATOS (FIRESTORE)
