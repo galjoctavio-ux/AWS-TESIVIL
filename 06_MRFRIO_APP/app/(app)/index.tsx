@@ -5,6 +5,7 @@ import { useState, useCallback } from 'react';
 import { getClients } from '../../services/clients-service';
 import { getUserProfile, UserProfile, UserRank } from '../../services/user-service';
 import { Ionicons } from '@expo/vector-icons';
+import BottomNav from '../../components/BottomNav';
 
 // Rank display helper
 const getRankLabel = (rank: UserRank | undefined) => {
@@ -150,9 +151,9 @@ export default function HomeScreen() {
                                 className="items-center flex-1"
                             >
                                 <View className={`w-14 h-14 rounded-2xl items-center justify-center mb-2 ${action.primary ? 'bg-blue-600' :
-                                        action.accent ? 'bg-green-600' :
-                                            action.alert ? 'bg-red-500' :
-                                                'bg-gray-100'
+                                    action.accent ? 'bg-green-600' :
+                                        action.alert ? 'bg-red-500' :
+                                            'bg-gray-100'
                                     }`}>
                                     <Ionicons
                                         name={action.icon as any}
@@ -209,7 +210,7 @@ export default function HomeScreen() {
                 {/* ========================================== */}
                 {/* STATUS BAR - Compact Stats */}
                 {/* ========================================== */}
-                <View className="px-4 mt-6 mb-8">
+                <View className="px-4 mt-6 mb-24">
                     <View className="bg-gray-900 rounded-2xl p-4 flex-row items-center justify-between">
                         <View className="flex-row items-center">
                             <Text className="text-2xl mr-2">{rankInfo.icon}</Text>
@@ -229,6 +230,9 @@ export default function HomeScreen() {
                 </View>
 
             </ScrollView>
+
+            {/* Bottom Navigation */}
+            <BottomNav />
         </View>
     );
 }

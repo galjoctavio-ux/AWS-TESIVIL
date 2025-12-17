@@ -4,6 +4,7 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { useState, useCallback } from 'react';
 import { getClients } from '../../services/clients-service';
 import { Ionicons } from '@expo/vector-icons';
+import BottomNav from '../../components/BottomNav';
 
 type TabType = 'services' | 'clients';
 
@@ -196,13 +197,8 @@ export default function AgendaScreen() {
                 )}
             </View>
 
-            {/* FAB */}
-            <TouchableOpacity
-                className="absolute bottom-6 right-6 bg-blue-600 w-14 h-14 rounded-full justify-center items-center shadow-lg"
-                onPress={() => router.push(activeTab === 'clients' ? '/(app)/clients/add' : '/(app)/services/new')}
-            >
-                <Ionicons name="add" size={28} color="white" />
-            </TouchableOpacity>
+            {/* Bottom Navigation */}
+            <BottomNav />
         </View>
     );
 }

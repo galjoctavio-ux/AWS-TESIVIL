@@ -1,6 +1,7 @@
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import BottomNav from '../../../components/BottomNav';
 
 // Tool definitions with proper categorization
 const DIAGNOSTIC_TOOLS = [
@@ -142,6 +143,9 @@ export default function ToolsIndex() {
                     {BUSINESS_TOOLS.map(renderToolCard)}
                 </View>
             </ScrollView>
+
+            {/* Bottom Navigation */}
+            <BottomNav />
         </View>
     );
 }
