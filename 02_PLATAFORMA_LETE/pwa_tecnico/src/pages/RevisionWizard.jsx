@@ -180,16 +180,24 @@ const RevisionWizard = () => {
     try {
       console.log("🚀 Intentando envío DIRECTO al servidor...");
 
-      // INTENTO 1: ENVÍO DIRECTO (Saltando la cola local)
-      // Ajusta '/revisiones' si tu ruta en apiService.js requiere otra cosa
-      const respuesta = await api.post('/revisiones', formData);
+      // --- CORRECCIÓN CRÍTICA: ESTRUCTURAR EL PAYLOAD ---
+      // El backend espera: { revisionData: {...}, equiposData: [...], firmaBase64: "..." }
+      // Pero formData lo tiene todo mezclado. Vamos a separarlo:
+
+      const { equiposData, firmaBase64, ...datosGenerales } = formData;
+
+      const payloadCorrecto = {
+        revisionData: datosGenerales, // Aquí van los voltajes, cliente, id, etc.
+        equiposData: equiposData,     // Aquí va el array de equipos
+        firmaBase64: firmaBase64      // La firma va aparte
+      };
+
+      // Enviar el payload estructurado
+      const respuesta = await api.post('/revisiones', payloadCorrecto);
+      // ---------------------------------------------------
 
       console.log("✅ Enviado con éxito:", respuesta.data);
       alert('✅ Reporte ENVIADO y procesado por el servidor.');
-
-      // Limpiamos borrador local porque ya se subió
-      // (Opcional: aquí podrías llamar a borrarBorrador(formData.caso_id))
-
       navigate('/');
 
     } catch (errorNetwork) {
