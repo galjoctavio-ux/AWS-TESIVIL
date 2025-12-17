@@ -4,21 +4,20 @@ import { useState, useEffect } from 'react';
 import { getBrands, BrandData, searchErrorsInModel, ErrorCodeData } from '../../../services/database-service';
 import { Ionicons } from '@expo/vector-icons';
 
-// Mapeo de logos de marcas - las marcas principales con sus logos
+// Mapeo de logos de las 4 marcas principales
 const brandLogos: { [key: string]: any } = {
-    'york': require('../../../assets/logos/york_logo.png'),
-    'lg': require('../../../assets/logos/logo_lg.png'),
-    'carrier': require('../../../assets/logos/carrier_logo.png'),
-    'xtra_multinverter': require('../../../assets/logos/xtra_multinverter.png'),
-    'xr': require('../../../assets/logos/xr.png'),
-    'xplus': require('../../../assets/logos/xplus.png'),
-    'xone': require('../../../assets/logos/xone.png'),
-    'xmax': require('../../../assets/logos/xmax.png'),
-    'xmart': require('../../../assets/logos/xmart.png'),
-    'xlife': require('../../../assets/logos/xlife.png'),
-    'x3': require('../../../assets/logos/x3.png'),
-    'x2': require('../../../assets/logos/x2.png'),
-    'vox': require('../../../assets/logos/vox.png'),
+    'MIRAGE': require('../../../assets/logos/magnum19.png'),  // Mirage flagship model as brand logo
+    'YORK': require('../../../assets/logos/york_logo.png'),
+    'LG': require('../../../assets/logos/logo_lg.png'),
+    'CARRIER': require('../../../assets/logos/carrier_logo.png'),
+};
+
+// Colores por marca para un diseño visual distintivo
+const brandColors: { [key: string]: string } = {
+    'MIRAGE': '#3B82F6',   // Azul
+    'YORK': '#10B981',     // Verde
+    'LG': '#EF4444',       // Rojo
+    'CARRIER': '#F97316',  // Naranja
 };
 
 // Fallback icon para marcas sin logo específico
@@ -69,18 +68,10 @@ export default function LibraryIndex() {
     };
 
     const getBrandLogoSource = (name: string) => {
-        const lowerName = name.toLowerCase();
-
-        // Check direct match first
-        if (brandLogos[lowerName]) {
-            return brandLogos[lowerName];
+        // Direct lookup by brand name (uppercase)
+        if (brandLogos[name]) {
+            return brandLogos[name];
         }
-
-        // Check for partial matches
-        if (lowerName.includes('york')) return brandLogos['york'];
-        if (lowerName.includes('lg')) return brandLogos['lg'];
-        if (lowerName.includes('carrier')) return brandLogos['carrier'];
-
         return null;
     };
 
@@ -97,34 +88,31 @@ export default function LibraryIndex() {
     };
 
     const renderBrandItem = ({ item, index }: { item: BrandData; index: number }) => {
-        const colors = [
-            '#3B82F6', '#8B5CF6', '#06B6D4', '#10B981',
-            '#F97316', '#EC4899', '#6366F1', '#14B8A6'
-        ];
-        const bgColor = colors[index % colors.length];
+        // Use brand-specific color
+        const bgColor = brandColors[item.name] || '#3B82F6';
         const logoSource = getBrandLogoSource(item.name);
 
         return (
             <TouchableOpacity
                 onPress={() => router.push({
                     pathname: '/(app)/library/models',
-                    params: { logoUrl: item.logo_url, brandName: formatBrandName(item.name) }
+                    params: { brandName: item.name }
                 })}
                 style={{
                     flex: 1,
-                    margin: 6,
-                    borderRadius: 16,
-                    padding: 16,
+                    margin: 8,
+                    borderRadius: 20,
+                    padding: 20,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    minHeight: 130,
-                    maxWidth: '31%',
+                    minHeight: 160,
+                    maxWidth: '46%',
                     backgroundColor: bgColor,
                     shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 4,
-                    elevation: 3,
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.15,
+                    shadowRadius: 8,
+                    elevation: 5,
                 }}
             >
                 {logoSource ? (
@@ -152,11 +140,11 @@ export default function LibraryIndex() {
                         color: 'white',
                         fontWeight: 'bold',
                         textAlign: 'center',
-                        fontSize: 12
+                        fontSize: 16
                     }}
                     numberOfLines={2}
                 >
-                    {formatBrandName(item.name)}
+                    {item.displayName || item.name}
                 </Text>
                 <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 11, marginTop: 4 }}>
                     {item.model_count} modelos
@@ -324,8 +312,8 @@ export default function LibraryIndex() {
                         </Text>
                         <FlatList
                             data={brands}
-                            numColumns={3}
-                            keyExtractor={(item) => item.logo_url}
+                            numColumns={2}
+                            keyExtractor={(item) => item.name}
                             renderItem={renderBrandItem}
                             contentContainerStyle={{ paddingBottom: 20 }}
                             showsVerticalScrollIndicator={false}

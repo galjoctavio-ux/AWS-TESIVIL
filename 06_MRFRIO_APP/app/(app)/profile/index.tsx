@@ -1,7 +1,8 @@
-import { View, Text, TouchableOpacity, ScrollView, Alert, RefreshControl } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert, RefreshControl, Image, ActivityIndicator } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { useAuth } from '../../../context/AuthContext';
 import { getUserProfile, UserProfile, UserRank } from '../../../services/user-service';
+import { updateProfilePhotoFlow } from '../../../services/image-service';
 import { Ionicons } from '@expo/vector-icons';
 import { useState, useCallback } from 'react';
 import BottomNav from '../../../components/BottomNav';
@@ -19,6 +20,7 @@ export default function ProfileScreen() {
     const router = useRouter();
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [refreshing, setRefreshing] = useState(false);
+    const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
     const loadProfile = async () => {
         if (!user) return;
@@ -40,6 +42,25 @@ export default function ProfileScreen() {
         setRefreshing(true);
         await loadProfile();
         setRefreshing(false);
+    };
+
+    const handleChangePhoto = async () => {
+        if (!user || uploadingPhoto) return;
+
+        try {
+            setUploadingPhoto(true);
+            const photoURL = await updateProfilePhotoFlow(user.uid);
+            if (photoURL) {
+                // Actualizar perfil local
+                setProfile(prev => prev ? { ...prev, photoURL } : null);
+                Alert.alert('¡Listo!', 'Tu foto de perfil ha sido actualizada');
+            }
+        } catch (error: any) {
+            console.error('Error changing photo:', error);
+            Alert.alert('Error', error.message || 'No se pudo cambiar la foto');
+        } finally {
+            setUploadingPhoto(false);
+        }
     };
 
     const displayName = profile?.alias || profile?.businessName || user?.email?.split('@')[0] || 'Usuario';
@@ -93,9 +114,34 @@ export default function ProfileScreen() {
                 <View className="px-4 -mt-14 mb-6">
                     <View className="bg-white rounded-3xl p-5 shadow-lg border border-gray-100">
                         <View className="flex-row items-center mb-4">
-                            <View className="bg-blue-100 w-20 h-20 rounded-2xl items-center justify-center mr-4">
-                                <Text className="text-blue-600 text-3xl font-bold">{displayName.charAt(0).toUpperCase()}</Text>
-                            </View>
+                            {/* Avatar con foto de perfil */}
+                            <TouchableOpacity
+                                onPress={handleChangePhoto}
+                                disabled={uploadingPhoto}
+                                className="relative mr-4"
+                            >
+                                {profile?.photoURL ? (
+                                    <Image
+                                        source={{ uri: profile.photoURL }}
+                                        className="w-20 h-20 rounded-2xl"
+                                        resizeMode="cover"
+                                    />
+                                ) : (
+                                    <View className="bg-blue-100 w-20 h-20 rounded-2xl items-center justify-center">
+                                        <Text className="text-blue-600 text-3xl font-bold">{displayName.charAt(0).toUpperCase()}</Text>
+                                    </View>
+                                )}
+
+                                {/* Overlay de cámara */}
+                                <View className="absolute bottom-0 right-0 bg-blue-600 w-7 h-7 rounded-full items-center justify-center border-2 border-white shadow-sm">
+                                    {uploadingPhoto ? (
+                                        <ActivityIndicator size="small" color="white" />
+                                    ) : (
+                                        <Ionicons name="camera" size={14} color="white" />
+                                    )}
+                                </View>
+                            </TouchableOpacity>
+
                             <View className="flex-1">
                                 <Text className="text-xl font-bold text-gray-800">{displayName}</Text>
                                 <View className={`${rankInfo.color} self-start px-3 py-1 rounded-full mt-1 flex-row items-center`}>

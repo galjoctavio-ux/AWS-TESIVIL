@@ -1,5 +1,9 @@
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system';
+import * as ImagePicker from 'expo-image-picker';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from '../firebaseConfig';
+import { updateUserProfile } from './user-service';
 
 // ============================================
 // SERVICIO DE COMPRESIÓN DE IMÁGENES - Mr. Frío
@@ -174,3 +178,98 @@ export const formatFileSize = (bytes: number): string => {
         return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
     }
 };
+
+// ============================================
+// FUNCIONES DE FOTO DE PERFIL
+// ============================================
+
+/**
+ * Abre el selector de imágenes para elegir una foto de perfil.
+ * La imagen se redimensiona automáticamente usando ImagePicker.
+ */
+export const pickProfileImage = async (): Promise<string | null> => {
+    try {
+        // Solicitar permisos
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+            throw new Error('Se requiere permiso para acceder a la galería');
+        }
+
+        // Abrir selector con configuración de redimensionamiento
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: 'images',
+            allowsEditing: true,
+            aspect: [1, 1],         // Cuadrada para perfil
+            quality: 0.7,           // 70% calidad para ahorrar espacio
+            exif: false,            // No necesitamos metadata EXIF
+        });
+
+        if (result.canceled || !result.assets || result.assets.length === 0) {
+            return null;
+        }
+
+        return result.assets[0].uri;
+    } catch (error) {
+        console.error('Error picking profile image:', error);
+        throw error;
+    }
+};
+
+/**
+ * Sube una imagen de perfil a Firebase Storage.
+ * @param userId ID del usuario
+ * @param imageUri URI local de la imagen
+ * @returns URL de descarga de la imagen subida
+ */
+export const uploadProfilePhoto = async (
+    userId: string,
+    imageUri: string
+): Promise<string> => {
+    try {
+        // Convertir URI a blob
+        const response = await fetch(imageUri);
+        const blob = await response.blob();
+
+        // Referencia en Firebase Storage
+        const photoRef = ref(storage, `profile_photos/${userId}_${Date.now()}.jpg`);
+
+        // Subir imagen
+        await uploadBytes(photoRef, blob);
+
+        // Obtener URL de descarga
+        const downloadURL = await getDownloadURL(photoRef);
+
+        console.log('Profile photo uploaded:', downloadURL);
+        return downloadURL;
+    } catch (error) {
+        console.error('Error uploading profile photo:', error);
+        throw error;
+    }
+};
+
+/**
+ * Flujo completo: seleccionar, subir y actualizar perfil.
+ * @param userId ID del usuario
+ * @returns URL de la foto o null si se canceló
+ */
+export const updateProfilePhotoFlow = async (userId: string): Promise<string | null> => {
+    try {
+        // 1. Seleccionar imagen (ya comprimida por ImagePicker)
+        const imageUri = await pickProfileImage();
+        if (!imageUri) {
+            return null; // Usuario canceló
+        }
+
+        // 2. Subir a Firebase Storage
+        const photoURL = await uploadProfilePhoto(userId, imageUri);
+
+        // 3. Actualizar perfil del usuario en Firestore
+        await updateUserProfile(userId, { photoURL });
+
+        return photoURL;
+    } catch (error) {
+        console.error('Error updating profile photo:', error);
+        throw error;
+    }
+};
+

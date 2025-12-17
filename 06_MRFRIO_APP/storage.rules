@@ -1,0 +1,37 @@
+rules_version = '2';
+
+// Reglas de Firebase Storage para Mr. Frío
+// Controlan el acceso a archivos subidos (fotos de perfil, evidencias, etc.)
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // ============================================
+    // FOTOS DE PERFIL
+    // ============================================
+    // Cualquiera puede ver, solo usuarios autenticados pueden subir
+    match /profile_photos/{fileName} {
+      allow read: if true;
+      allow write: if request.auth != null
+                   && request.resource.size < 5 * 1024 * 1024  // Max 5MB
+                   && request.resource.contentType.matches('image/.*');
+    }
+    
+    // ============================================
+    // EVIDENCIAS DE SERVICIOS
+    // ============================================
+    // Solo el técnico dueño puede leer/escribir
+    match /service_photos/{technicianId}/{fileName} {
+      allow read, write: if request.auth != null 
+                         && request.auth.uid == technicianId;
+    }
+    
+    // ============================================
+    // REGLA POR DEFECTO
+    // ============================================
+    // Denegar todo lo demás
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

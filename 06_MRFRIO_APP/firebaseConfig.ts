@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 // @ts-ignore - getReactNativePersistence exists at runtime but not in TS types
 import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
 // Configuración de Firebase
@@ -25,3 +26,6 @@ export const auth = initializeAuth(app, {
 
 // Firestore estándar (sin persistencia IndexedDB ya que no es soportado en RN)
 export const db = getFirestore(app);
+
+// Firebase Storage para subir imágenes (fotos de perfil, evidencias, etc.)
+export const storage = getStorage(app);

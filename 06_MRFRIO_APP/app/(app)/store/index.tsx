@@ -23,7 +23,7 @@ export default function StoreCatalog() {
             getUserProfile(user!.uid)
         ]);
         setProducts(prods);
-        setBalance(userProfile?.token_balance || 0);
+        setBalance(userProfile?.tokenBalance || 0);
         setLoading(false);
     };
 

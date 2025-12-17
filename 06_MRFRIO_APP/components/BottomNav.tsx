@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, TouchableOpacity, Text, Platform } from 'react-native';
+import { View, TouchableOpacity, Text } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface TabItem {
     name: string;
@@ -18,6 +19,7 @@ const TABS: TabItem[] = [
 ];
 
 export default function BottomNav() {
+    const insets = useSafeAreaInsets();
     const router = useRouter();
     const pathname = usePathname();
 
@@ -39,7 +41,7 @@ export default function BottomNav() {
                 borderTopWidth: 1,
                 borderTopColor: '#E2E8F0',
                 paddingTop: 12,
-                paddingBottom: Platform.OS === 'ios' ? 30 : 28,
+                paddingBottom: Math.max(insets.bottom, 12) + 12,
                 paddingHorizontal: 20,
                 flexDirection: 'row',
                 justifyContent: 'space-around',

@@ -45,17 +45,18 @@ service cloud.firestore {
     // ============================================
     match /quotes/{quoteId} {
       allow read: if request.auth != null 
-        && (resource == null || request.auth.uid == resource.data.userId);
+        && (resource == null || request.auth.uid == resource.data.technicianId);
       allow create: if request.auth != null 
-        && request.auth.uid == request.resource.data.userId;
+        && request.auth.uid == request.resource.data.technicianId;
       allow update, delete: if request.auth != null 
-        && request.auth.uid == resource.data.userId;
+        && request.auth.uid == resource.data.technicianId;
     }
     
     // ============================================
     // EQUIPOS - lectura pública para QR, escritura dueño
     // ============================================
     match /equipments/{equipmentId} {
+      // LECTURA: pública para vista QR web
       allow read: if true;
       allow create: if request.auth != null 
         && request.auth.uid == request.resource.data.technicianId;
@@ -71,6 +72,7 @@ service cloud.firestore {
         && request.auth.uid == resource.data.userId;
       allow create: if request.auth != null 
         && request.auth.uid == request.resource.data.userId;
+      // No permitir update/delete (immutable ledger)
     }
     
     // ============================================
@@ -78,6 +80,7 @@ service cloud.firestore {
     // ============================================
     match /fraud_logs/{logId} {
       allow create: if request.auth != null;
+      // Solo Cloud Functions o Admin SDK pueden leer
     }
     
     // ============================================
@@ -88,41 +91,26 @@ service cloud.firestore {
         && request.auth.uid == resource.data.userId;
       allow create: if request.auth != null 
         && request.auth.uid == request.resource.data.userId;
+      // Update solo desde Cloud Functions (webhook Stripe/MP)
     }
-
+    
     // ============================================
-    // SOS THREADS (Comunidad) - lectura pública, escritura autenticada
-    // IMPORTANTE: El código usa "sos_threads", no "community_threads"
+    // COMMUNITY THREADS (SOS) - lectura pública, escritura autenticada
     // ============================================
-    match /sos_threads/{threadId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null 
-        && request.auth.uid == request.resource.data.authorId;
-      allow update: if request.auth != null 
-        && request.auth.uid == resource.data.authorId;
-      allow delete: if false;
-    }
-
-    // ============================================
-    // SOS COMMENTS (Respuestas en hilos)
-    // ============================================
-    match /sos_comments/{commentId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null 
-        && request.auth.uid == request.resource.data.authorId;
-      allow update: if request.auth != null 
-        && request.auth.uid == resource.data.authorId;
-      allow delete: if false;
-    }
-
-    // ============================================
-    // COMMUNITY FAILURES (Base de fallas comunitaria - Regla de 3)
-    // ============================================
-    match /community_failures/{failureId} {
-      allow read: if request.auth != null;
+    match /community_threads/{threadId} {
+      allow read: if true;
       allow create: if request.auth != null;
-      allow update: if request.auth != null;
+      allow update: if request.auth != null 
+        && request.auth.uid == resource.data.authorId;
       allow delete: if false;
+      
+      // Subcollection: Respuestas
+      match /replies/{replyId} {
+        allow read: if true;
+        allow create: if request.auth != null;
+        allow update, delete: if request.auth != null 
+          && request.auth.uid == resource.data.authorId;
+      }
     }
     
     // ============================================

@@ -66,19 +66,19 @@ const modelImages: { [key: string]: any } = {
 
 export default function ModelsScreen() {
     const router = useRouter();
-    const { logoUrl, brandName } = useLocalSearchParams<{ logoUrl: string; brandName: string }>();
+    const { brandName } = useLocalSearchParams<{ brandName: string }>();
     const [models, setModels] = useState<ModelData[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (logoUrl) {
+        if (brandName) {
             loadModels();
         }
-    }, [logoUrl]);
+    }, [brandName]);
 
     const loadModels = async () => {
         try {
-            const data = await getModelsByBrand(logoUrl!);
+            const data = await getModelsByBrand(brandName!);
             setModels(data);
         } catch (error) {
             console.error('Error loading models:', error);

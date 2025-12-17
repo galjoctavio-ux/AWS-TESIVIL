@@ -95,7 +95,11 @@ export default function ThreadDetail() {
     const isAuthor = user?.uid === thread.authorId;
 
     return (
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1 bg-slate-50">
+        <KeyboardAvoidingView
+            behavior="padding"
+            className="flex-1 bg-slate-50"
+            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 25}
+        >
             {/* Header */}
             <View className="bg-white pt-12 pb-4 px-4 shadow-sm z-10 flex-row items-center border-b border-gray-100">
                 <TouchableOpacity onPress={() => router.back()} className="mr-4">
@@ -158,7 +162,7 @@ export default function ThreadDetail() {
                             {/* Mark Solution Button (Only for Author available if not solved yet) */}
                             {isAuthor && thread.status !== 'Resuelto' && !comment.isSolution && (
                                 <TouchableOpacity
-                                    onPress={() => handleMarkSolution(comment.id, comment.authorId)}
+                                    onPress={() => handleMarkSolution(comment.id!, comment.authorId)}
                                     className="bg-green-100 px-3 py-1 rounded-full"
                                 >
                                     <Text className="text-green-700 text-xs font-bold">Marcar Solución</Text>

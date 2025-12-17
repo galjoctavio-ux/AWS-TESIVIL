@@ -1,6 +1,7 @@
 import { Slot, SplashScreen, useRouter, useSegments } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { loadDatabase } from '../services/database-service';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import { ThemeProvider } from '../context/ThemeContext';
@@ -90,11 +91,13 @@ function InitialLayout() {
 
 export default function Layout() {
     return (
-        <ThemeProvider>
-            <AuthProvider>
-                <InitialLayout />
-            </AuthProvider>
-        </ThemeProvider>
+        <SafeAreaProvider>
+            <ThemeProvider>
+                <AuthProvider>
+                    <InitialLayout />
+                </AuthProvider>
+            </ThemeProvider>
+        </SafeAreaProvider>
     );
 }
 

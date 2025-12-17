@@ -1,9 +1,9 @@
-import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, Image } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { getThreads, SOSThread } from '../../../services/community-service';
+import { getThreads, searchThreads, SOSThread } from '../../../services/community-service';
 import { useAuth } from '../../../context/AuthContext';
 
 export default function CommunityFeed() {
@@ -12,6 +12,28 @@ export default function CommunityFeed() {
     const [threads, setThreads] = useState<SOSThread[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<'recent' | 'solved'>('recent');
+
+    // Search state
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState<SOSThread[]>([]);
+    const [searching, setSearching] = useState(false);
+
+    // Debounced search
+    useEffect(() => {
+        if (searchQuery.length < 2) {
+            setSearchResults([]);
+            return;
+        }
+
+        setSearching(true);
+        const timer = setTimeout(async () => {
+            const results = await searchThreads(searchQuery);
+            setSearchResults(results);
+            setSearching(false);
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
 
     const loadThreads = async () => {
         setLoading(true);
@@ -79,39 +101,69 @@ export default function CommunityFeed() {
                     <View style={{ width: 24 }} />
                 </View>
 
-                {/* Filter Tabs */}
-                <View className="flex-row bg-gray-100 p-1 rounded-xl">
-                    <TouchableOpacity
-                        onPress={() => setFilter('recent')}
-                        className={`flex-1 py-2 rounded-lg items-center ${filter === 'recent' ? 'bg-white shadow-sm' : ''}`}
-                    >
-                        <Text className={`font-medium ${filter === 'recent' ? 'text-blue-600' : 'text-gray-500'}`}>Recientes</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => setFilter('solved')}
-                        className={`flex-1 py-2 rounded-lg items-center ${filter === 'solved' ? 'bg-white shadow-sm' : ''}`}
-                    >
-                        <Text className={`font-medium ${filter === 'solved' ? 'text-green-600' : 'text-gray-500'}`}>Resueltos</Text>
-                    </TouchableOpacity>
+                {/* Search Bar */}
+                <View className="flex-row items-center bg-gray-100 rounded-xl px-3 py-2 mb-3">
+                    <Ionicons name="search" size={20} color="#9CA3AF" />
+                    <TextInput
+                        className="flex-1 ml-2 text-gray-700"
+                        placeholder="Buscar casos (marca, error, síntoma...)"
+                        placeholderTextColor="#9CA3AF"
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                    />
+                    {searchQuery.length > 0 && (
+                        <TouchableOpacity onPress={() => setSearchQuery('')}>
+                            <Ionicons name="close-circle" size={20} color="#9CA3AF" />
+                        </TouchableOpacity>
+                    )}
                 </View>
+
+                {/* Filter Tabs - only show when not searching */}
+                {searchQuery.length < 2 && (
+                    <View className="flex-row bg-gray-100 p-1 rounded-xl">
+                        <TouchableOpacity
+                            onPress={() => setFilter('recent')}
+                            className={`flex-1 py-2 rounded-lg items-center ${filter === 'recent' ? 'bg-white shadow-sm' : ''}`}
+                        >
+                            <Text className={`font-medium ${filter === 'recent' ? 'text-blue-600' : 'text-gray-500'}`}>Recientes</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => setFilter('solved')}
+                            className={`flex-1 py-2 rounded-lg items-center ${filter === 'solved' ? 'bg-white shadow-sm' : ''}`}
+                        >
+                            <Text className={`font-medium ${filter === 'solved' ? 'text-green-600' : 'text-gray-500'}`}>Resueltos</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
             </View>
 
+            {/* Search Results Header */}
+            {searchQuery.length >= 2 && (
+                <View className="px-4 pt-2">
+                    <Text className="text-gray-500 text-sm">
+                        {searching ? 'Buscando...' : `${searchResults.length} resultados para "${searchQuery}"`}
+                    </Text>
+                </View>
+            )}
+
             {/* List */}
-            {loading ? (
+            {loading || searching ? (
                 <View className="flex-1 justify-center items-center">
                     <ActivityIndicator size="large" color="#2563EB" />
                 </View>
             ) : (
                 <FlatList
-                    data={threads}
-                    keyExtractor={item => item.id}
+                    data={searchQuery.length >= 2 ? searchResults : threads}
+                    keyExtractor={item => item.id || Math.random().toString()}
                     renderItem={renderThread}
                     contentContainerStyle={{ padding: 16 }}
                     ListEmptyComponent={
                         <View className="items-center mt-20">
-                            <Ionicons name="people-outline" size={64} color="#CBD5E1" />
+                            <Ionicons name={searchQuery.length >= 2 ? "search-outline" : "people-outline"} size={64} color="#CBD5E1" />
                             <Text className="text-gray-400 mt-4 text-center px-10">
-                                Sé el primero en preguntar. La comunidad está lista para ayudar.
+                                {searchQuery.length >= 2
+                                    ? 'No se encontraron casos. ¡Crea uno nuevo!'
+                                    : 'Sé el primero en preguntar. La comunidad está lista para ayudar.'}
                             </Text>
                         </View>
                     }

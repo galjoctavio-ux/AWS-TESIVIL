@@ -68,6 +68,7 @@ export interface BrandData {
     name: string;
     logo_url: string;
     model_count: number;
+    displayName: string;
 }
 
 export interface ModelData {
@@ -87,22 +88,86 @@ export interface ErrorCodeData {
     solution: string;
 }
 
+// Definición de las 4 marcas principales
+const BRAND_CONFIG = [
+    {
+        name: 'MIRAGE',
+        displayName: 'Mirage',
+        logo_url: '/images/logos/mirage.png',
+        logoPattern: ['mirage', 'absolutv', 'abtx', 'flex', 'magnum', 'life', 'titanium', 'x2', 'x3', 'xlife', 'xmart', 'xmax', 'xone', 'xplus', 'xr', 'xtra', 'vox', 'ciseries', 'inverter', 'smart', 'neo', 'nex', 'flux', 'bluplus', 'vlu', 'uvc', 'matt', 'max', 'mpt', 'live']
+    },
+    {
+        name: 'YORK',
+        displayName: 'York',
+        logo_url: '/images/logos/york_logo.png',
+        logoPattern: ['york']
+    },
+    {
+        name: 'LG',
+        displayName: 'LG',
+        logo_url: '/images/logos/logo_lg.png',
+        logoPattern: ['lg']
+    },
+    {
+        name: 'CARRIER',
+        displayName: 'Carrier',
+        logo_url: '/images/logos/carrier_logo.png',
+        logoPattern: ['carrier']
+    }
+];
+
 /**
- * Obtiene todas las marcas únicas con sus logos y conteo de modelos
+ * Determina la marca de un modelo basado en su logo_url o reference_id
+ */
+const getBrandForModel = (logoUrl: string, referenceId: string): string => {
+    const lowerLogo = logoUrl.toLowerCase();
+    const lowerRef = referenceId.toLowerCase();
+
+    // Check for York, LG, Carrier first (more specific)
+    if (lowerLogo.includes('york') || lowerRef.includes('york')) return 'YORK';
+    if (lowerLogo.includes('lg') || lowerRef.includes('lg')) return 'LG';
+    if (lowerLogo.includes('carrier') || lowerRef.includes('carrier')) return 'CARRIER';
+
+    // Default to Mirage (all other models are Mirage)
+    return 'MIRAGE';
+};
+
+/**
+ * Obtiene las 4 marcas principales con sus logos y conteo de modelos
  */
 export const getBrands = async (): Promise<BrandData[]> => {
     try {
         const db = await getDb();
-        // Extraemos el nombre de la marca del logo_url (ej: /images/logos/mirage.png -> mirage)
-        const result = await db.getAllAsync<BrandData>(`
-            SELECT 
-                REPLACE(REPLACE(logo_url, '/images/logos/', ''), '.png', '') as name,
-                logo_url,
-                COUNT(*) as model_count
-            FROM air_conditioner_models 
-            GROUP BY logo_url
-            ORDER BY model_count DESC
-        `);
+
+        // Obtener todos los modelos para contar por marca
+        const allModels = await db.getAllAsync<{ logo_url: string; reference_id: string }>(
+            'SELECT logo_url, reference_id FROM air_conditioner_models'
+        );
+
+        // Contar modelos por marca
+        const brandCounts: { [key: string]: number } = {
+            'MIRAGE': 0,
+            'YORK': 0,
+            'LG': 0,
+            'CARRIER': 0
+        };
+
+        for (const model of allModels) {
+            const brand = getBrandForModel(model.logo_url, model.reference_id);
+            brandCounts[brand]++;
+        }
+
+        // Construir resultado con las marcas
+        const result: BrandData[] = BRAND_CONFIG.map(brand => ({
+            name: brand.name,
+            displayName: brand.displayName,
+            logo_url: brand.logo_url,
+            model_count: brandCounts[brand.name] || 0
+        }));
+
+        // Ordenar por cantidad de modelos (Mirage primero)
+        result.sort((a, b) => b.model_count - a.model_count);
+
         return result;
     } catch (error) {
         console.error('Error getting brands:', error);
@@ -113,14 +178,22 @@ export const getBrands = async (): Promise<BrandData[]> => {
 /**
  * Obtiene todos los modelos de una marca específica
  */
-export const getModelsByBrand = async (logoUrl: string): Promise<ModelData[]> => {
+export const getModelsByBrand = async (brandName: string): Promise<ModelData[]> => {
     try {
         const db = await getDb();
-        const result = await db.getAllAsync<ModelData>(
-            'SELECT * FROM air_conditioner_models WHERE logo_url = ? ORDER BY name',
-            [logoUrl]
+
+        // Obtener todos los modelos
+        const allModels = await db.getAllAsync<ModelData>(
+            'SELECT * FROM air_conditioner_models ORDER BY name'
         );
-        return result;
+
+        // Filtrar por marca
+        const filteredModels = allModels.filter(model => {
+            const modelBrand = getBrandForModel(model.logo_url, model.reference_id);
+            return modelBrand === brandName.toUpperCase();
+        });
+
+        return filteredModels;
     } catch (error) {
         console.error('Error getting models by brand:', error);
         return [];

@@ -129,7 +129,7 @@ export default function WalletScreen() {
         >
             <View className="p-6">
                 {/* Balance Card */}
-                <View className="bg-gradient-to-br from-amber-500 to-yellow-600 p-6 rounded-3xl shadow-xl mb-6">
+                <View className="p-6 rounded-3xl shadow-xl mb-6" style={{ backgroundColor: '#F59E0B' }}>
                     {/* Header */}
                     <View className="flex-row justify-between items-start mb-4">
                         <Text className="text-amber-100 font-medium">Saldo Actual</Text>

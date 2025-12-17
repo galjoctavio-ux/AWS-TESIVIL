@@ -1,8 +1,8 @@
 import { View, Text, TouchableOpacity, TextInput, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { createThread, SOSThread } from '../../../services/community-service';
+import { createThread, searchThreads, SOSThread } from '../../../services/community-service';
 import { useAuth } from '../../../context/AuthContext';
 import { getUserProfile } from '../../../services/user-service';
 
@@ -17,6 +17,33 @@ export default function NewThread() {
     const [model, setModel] = useState('');
 
     const [loading, setLoading] = useState(false);
+
+    // Similar cases detection
+    const [similarCases, setSimilarCases] = useState<SOSThread[]>([]);
+    const [searchingSimilar, setSearchingSimilar] = useState(false);
+
+    // Debounced search for similar cases
+    useEffect(() => {
+        const searchTerm = `${title} ${brand}`.trim();
+        if (searchTerm.length < 3) {
+            setSimilarCases([]);
+            return;
+        }
+
+        setSearchingSimilar(true);
+        const timer = setTimeout(async () => {
+            try {
+                const results = await searchThreads(searchTerm, 3);
+                setSimilarCases(results);
+            } catch (error) {
+                console.log('Error searching similar cases:', error);
+            } finally {
+                setSearchingSimilar(false);
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [title, brand]);
 
     const handleSubmit = async () => {
         if (!title.trim() || !content.trim() || !brand.trim()) {
@@ -100,6 +127,51 @@ export default function NewThread() {
                         maxLength={60}
                     />
                 </View>
+
+                {/* Similar Cases Section */}
+                {(searchingSimilar || similarCases.length > 0) && (
+                    <View className="bg-amber-50 p-4 rounded-xl border border-amber-200 mb-4">
+                        <View className="flex-row items-center mb-3">
+                            <Ionicons name="search" size={18} color="#D97706" />
+                            <Text className="text-amber-800 font-bold ml-2">¿Ya se resolvió antes?</Text>
+                        </View>
+
+                        {searchingSimilar ? (
+                            <View className="flex-row items-center justify-center py-2">
+                                <ActivityIndicator size="small" color="#D97706" />
+                                <Text className="text-amber-600 text-sm ml-2">Buscando casos similares...</Text>
+                            </View>
+                        ) : (
+                            <>
+                                {similarCases.map((item) => (
+                                    <TouchableOpacity
+                                        key={item.id}
+                                        onPress={() => router.push({ pathname: '/(app)/community/[id]', params: { id: item.id } })}
+                                        className="bg-white p-3 rounded-lg mb-2 border border-amber-100"
+                                    >
+                                        <View className="flex-row justify-between items-start">
+                                            <Text className="font-medium text-gray-800 flex-1 mr-2" numberOfLines={1}>
+                                                {item.title}
+                                            </Text>
+                                            {item.status === 'Resuelto' && (
+                                                <View className="bg-green-100 px-2 py-0.5 rounded flex-row items-center">
+                                                    <Ionicons name="checkmark-circle" size={12} color="#16A34A" />
+                                                    <Text className="text-green-700 text-[10px] ml-1 font-bold">Resuelto</Text>
+                                                </View>
+                                            )}
+                                        </View>
+                                        <Text className="text-gray-500 text-xs mt-1">
+                                            {item.brand} • {item.commentCount} respuestas
+                                        </Text>
+                                    </TouchableOpacity>
+                                ))}
+                                <Text className="text-amber-600 text-xs text-center mt-1">
+                                    Revisa estos casos antes de publicar
+                                </Text>
+                            </>
+                        )}
+                    </View>
+                )}
 
                 <View className="bg-white p-4 rounded-xl border border-gray-100 mb-6">
                     <Text className="text-sm font-bold text-gray-700 mb-2">Descripción Detallada</Text>

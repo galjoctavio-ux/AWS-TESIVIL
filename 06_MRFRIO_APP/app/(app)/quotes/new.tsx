@@ -55,7 +55,8 @@ export default function NewQuote() {
             description: itemDesc.trim(),
             quantity: qty,
             unitCost: price,
-            type: itemType
+            type: itemType,
+            category: 'repair'  // Default category for this simple flow
         };
 
         setItems([...items, newItem]);
@@ -80,11 +81,13 @@ export default function NewQuote() {
             const quoteData: Omit<QuoteData, 'createdAt'> = {
                 userId: user?.uid || '',
                 clientName: selectedClient.name,
-                // Extra fields for PDF stored in notes or we need to expand interface. For now, basic:
+                serviceType: 'Reparación',  // Default for this simple flow
                 items,
                 subtotal: totals.subtotal,
-                tax: totals.tax, // Changed from iva
+                tax: totals.tax,
                 total: totals.total,
+                laborCost: items.filter(i => i.type === 'Labor').reduce((sum, i) => sum + (i.unitCost * i.quantity), 0),
+                materialsCost: items.filter(i => i.type === 'Material').reduce((sum, i) => sum + (i.unitCost * i.quantity), 0),
                 requires_invoice: requiresInvoice,
                 validity_days: 15,
                 status: 'Draft',

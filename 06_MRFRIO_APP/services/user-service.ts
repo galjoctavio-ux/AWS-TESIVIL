@@ -20,6 +20,7 @@ export interface UserProfile {
     alias: string;                    // Nombre público único (visible en bitácoras)
     businessName?: string;            // Nombre de empresa (opcional, privado)
     city: string;                     // Ciudad base (para BTU y precios)
+    photoURL?: string;                // URL de foto de perfil (redimensionada)
 
     // Niveles y progreso
     rank: UserRank;                   // Novato < 2 años, Técnico > 2 años, Pro = suscriptor
@@ -35,6 +36,9 @@ export interface UserProfile {
 
     // Estadísticas de carrera (Lifetime Stats)
     stats: UserStats;
+
+    // Economía de Tokens
+    tokenBalance?: number;            // Balance de tokens (calculado desde wallet ledger)
 
     // Legal (Aceptación obligatoria)
     termsAcceptedAt?: any;
