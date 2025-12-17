@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --foreground-rgb: 30, 41, 59;
+    --background-start: 248, 250, 252;
+    --background-end: 241, 245, 249;
+}
+
+body {
+    color: rgb(var(--foreground-rgb));
+    background: linear-gradient(180deg,
+            rgb(var(--background-start)) 0%,
+            rgb(var(--background-end)) 100%);
+    min-height: 100vh;
+}
+
+/* Custom animations */
+@keyframes pulse-status {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.animate-pulse-status {
+    animation: pulse-status 2s ease-in-out infinite;
+}

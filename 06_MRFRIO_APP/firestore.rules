@@ -1,0 +1,138 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ============================================
+    // USUARIOS
+    // ============================================
+    match /users/{userId} {
+      allow read, write: if request.auth != null 
+        && request.auth.uid == userId;
+      
+      // Subcollection: Training progress
+      match /training/{capsuleId} {
+        allow read, write: if request.auth != null 
+          && request.auth.uid == userId;
+      }
+    }
+    
+    // ============================================
+    // CLIENTES - solo el técnico dueño
+    // ============================================
+    match /clients/{clientId} {
+      allow read: if request.auth != null 
+        && (resource == null || request.auth.uid == resource.data.technicianId);
+      allow create: if request.auth != null 
+        && request.auth.uid == request.resource.data.technicianId;
+      allow update, delete: if request.auth != null 
+        && request.auth.uid == resource.data.technicianId;
+    }
+    
+    // ============================================
+    // SERVICIOS - solo el técnico dueño
+    // ============================================
+    match /services/{serviceId} {
+      allow read: if request.auth != null 
+        && (resource == null || request.auth.uid == resource.data.technicianId);
+      allow create: if request.auth != null 
+        && request.auth.uid == request.resource.data.technicianId;
+      allow update, delete: if request.auth != null 
+        && request.auth.uid == resource.data.technicianId;
+    }
+    
+    // ============================================
+    // COTIZACIONES - solo el técnico dueño
+    // ============================================
+    match /quotes/{quoteId} {
+      allow read: if request.auth != null 
+        && (resource == null || request.auth.uid == resource.data.userId);
+      allow create: if request.auth != null 
+        && request.auth.uid == request.resource.data.userId;
+      allow update, delete: if request.auth != null 
+        && request.auth.uid == resource.data.userId;
+    }
+    
+    // ============================================
+    // EQUIPOS - lectura pública para QR, escritura dueño
+    // ============================================
+    match /equipments/{equipmentId} {
+      allow read: if true;
+      allow create: if request.auth != null 
+        && request.auth.uid == request.resource.data.technicianId;
+      allow update, delete: if request.auth != null 
+        && request.auth.uid == resource.data.technicianId;
+    }
+    
+    // ============================================
+    // TOKEN TRANSACTIONS (Ledger) - solo el usuario dueño
+    // ============================================
+    match /token_transactions/{transactionId} {
+      allow read: if request.auth != null 
+        && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null 
+        && request.auth.uid == request.resource.data.userId;
+    }
+    
+    // ============================================
+    // FRAUD LOGS - solo crear, nunca leer/modificar desde cliente
+    // ============================================
+    match /fraud_logs/{logId} {
+      allow create: if request.auth != null;
+    }
+    
+    // ============================================
+    // PAYMENT INTENTS - solo el usuario dueño puede leer
+    // ============================================
+    match /payment_intents/{intentId} {
+      allow read: if request.auth != null 
+        && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null 
+        && request.auth.uid == request.resource.data.userId;
+    }
+
+    // ============================================
+    // SOS THREADS (Comunidad) - lectura pública, escritura autenticada
+    // IMPORTANTE: El código usa "sos_threads", no "community_threads"
+    // ============================================
+    match /sos_threads/{threadId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null 
+        && request.auth.uid == request.resource.data.authorId;
+      allow update: if request.auth != null 
+        && request.auth.uid == resource.data.authorId;
+      allow delete: if false;
+    }
+
+    // ============================================
+    // SOS COMMENTS (Respuestas en hilos)
+    // ============================================
+    match /sos_comments/{commentId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null 
+        && request.auth.uid == request.resource.data.authorId;
+      allow update: if request.auth != null 
+        && request.auth.uid == resource.data.authorId;
+      allow delete: if false;
+    }
+
+    // ============================================
+    // COMMUNITY FAILURES (Base de fallas comunitaria - Regla de 3)
+    // ============================================
+    match /community_failures/{failureId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if false;
+    }
+    
+    // ============================================
+    // ORDERS (Compras en tienda) - solo el usuario dueño
+    // ============================================
+    match /orders/{orderId} {
+      allow read: if request.auth != null 
+        && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null 
+        && request.auth.uid == request.resource.data.userId;
+    }
+  }
+}

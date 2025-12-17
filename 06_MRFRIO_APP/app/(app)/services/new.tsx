@@ -121,11 +121,23 @@ export default function NewService() {
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
             aspect: [4, 3],
-            quality: 0.5,
+            quality: 1, // Get full quality, we'll compress ourselves
         });
 
         if (!result.canceled) {
-            setPhotos([...photos, result.assets[0].uri]);
+            try {
+                // Compress image before adding
+                const { compressServicePhoto } = await import('../../../services/image-service');
+                const compressed = await compressServicePhoto(result.assets[0].uri);
+                setPhotos([...photos, compressed.uri]);
+
+                if (compressed.compressionRatio) {
+                    console.log(`Photo compressed: ${compressed.compressionRatio}% reduction`);
+                }
+            } catch (e) {
+                // Fallback to original if compression fails
+                setPhotos([...photos, result.assets[0].uri]);
+            }
         }
     };
 

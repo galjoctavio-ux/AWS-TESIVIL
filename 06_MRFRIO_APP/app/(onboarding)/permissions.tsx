@@ -74,7 +74,7 @@ export default function PermissionsSetup() {
 
             if (success) {
                 await refreshOnboardingStatus();
-                router.replace('/(app)/dashboard');
+                router.replace('/(app)/');
             } else {
                 Alert.alert('Error', 'No se pudo guardar tu configuración.');
             }

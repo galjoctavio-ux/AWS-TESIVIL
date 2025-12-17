@@ -34,11 +34,24 @@ export default function StoreCatalog() {
     );
 
     const handlePurchase = async (product: StoreProduct) => {
+        // For MXN products (physical items), go to checkout
+        if (product.currency === 'MXN') {
+            router.push({
+                pathname: '/store/checkout',
+                params: {
+                    productId: product.id,
+                    productName: product.name,
+                    productPrice: product.price.toString(),
+                    isPhysical: (product.category === 'Merch' || product.category === 'Herramientas').toString(),
+                }
+            });
+            return;
+        }
+
+        // For Token products, show confirmation alert
         Alert.alert(
-            'Confirmar Compra',
-            product.currency === 'Tokens'
-                ? `¿Canjear ${product.name} por ${product.price} Tokens?`
-                : `¿Comprar ${product.name} por $${product.price} MXN?`,
+            'Confirmar Canje',
+            `¿Canjear ${product.name} por ${product.price} Tokens?`,
             [
                 { text: 'Cancelar', style: 'cancel' },
                 {
@@ -48,7 +61,7 @@ export default function StoreCatalog() {
                             setProcessingId(product.id);
                             const result = await purchaseProduct(user!.uid, product.id);
                             Alert.alert('¡Éxito!', result.message);
-                            loadData(); // Update balance
+                            loadData();
                         } catch (error: any) {
                             Alert.alert('Error', error.message);
                         } finally {

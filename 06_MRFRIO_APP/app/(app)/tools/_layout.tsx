@@ -11,9 +11,29 @@ export default function ToolsLayout() {
             }}
         >
             <Stack.Screen
+                name="index"
+                options={{
+                    headerShown: false,
+                }}
+            />
+            <Stack.Screen
                 name="btu-calculator"
                 options={{
                     title: 'Calculadora BTU',
+                    headerBackTitle: 'Atrás'
+                }}
+            />
+            <Stack.Screen
+                name="cable-guide"
+                options={{
+                    title: 'Guía de Cables',
+                    headerBackTitle: 'Atrás'
+                }}
+            />
+            <Stack.Screen
+                name="pt-table"
+                options={{
+                    title: 'Tabla P-T',
                     headerBackTitle: 'Atrás'
                 }}
             />

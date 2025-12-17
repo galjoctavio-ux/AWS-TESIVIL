@@ -53,10 +53,10 @@ function InitialLayout() {
                     router.replace('/(onboarding)/welcome');
                 }
             } else {
-                // Usuario onboarded - ir a dashboard
+                // Usuario onboarded - ir a inicio (tabs)
                 if (!inAppGroup) {
-                    console.log('User onboarded, redirecting to dashboard');
-                    router.replace('/(app)/dashboard');
+                    console.log('User onboarded, redirecting to home');
+                    router.replace('/(app)/');
                 }
             }
         } else {
