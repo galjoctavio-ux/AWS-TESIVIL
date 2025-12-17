@@ -1,24 +1,26 @@
 import Dexie from 'dexie';
 
-// Base de datos offline para PWA Técnico
+// Actualizamos la versión a 2 para soportar los nuevos cambios
 export const db = new Dexie('TesivilOfflineDB');
 
-// Mantenemos el esquema original con auto-increment id
 db.version(2).stores({
     borradores: '++id, &key, last_updated',
     cola_sincronizacion: '++id, tipo, status, retry_count, timestamp'
 });
 
+// Versión 3: Cambiamos 'key' a primary key para soportar upsert correctamente
+db.version(3).stores({
+    // 'key' ahora es el primary key para que put() haga upsert automático
+    borradores: 'key, last_updated',
+    cola_sincronizacion: '++id, tipo, status, retry_count, timestamp'
+});
+
 /**
- * Guarda un borrador genérico (upsert manual).
+ * Guarda un borrador genérico.
  * key: Un string único, ej: "cotizacion_draft" o "revision_55"
- * Primero elimina el registro existente (si hay) y luego inserta uno nuevo.
  */
 export const guardarBorrador = async (key, data) => {
-    // Eliminar el registro existente primero para evitar ConstraintError
-    await db.borradores.where('key').equals(key).delete();
-    // Insertar el nuevo registro
-    await db.borradores.add({
+    await db.borradores.put({
         key: key,
         data: data,
         last_updated: new Date()
