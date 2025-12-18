@@ -37,6 +37,12 @@ export default function ToolsLayout() {
                     headerBackTitle: 'Atrás'
                 }}
             />
+            <Stack.Screen
+                name="qr-labels"
+                options={{
+                    headerShown: false,
+                }}
+            />
         </Stack>
     );
 }

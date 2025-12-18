@@ -1,8 +1,22 @@
 import { collection, addDoc, getDocs, query, where, serverTimestamp, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
+// ============================================
+// TESIVIL QR SYSTEM - "Hoja de Vida del Equipo"
+// URL Format: https://qr.tesivil.com/a/[TOKEN]
+// ============================================
+
+const QR_WEB_BASE_URL = 'https://qr.tesivil.com';
+
+export interface GeoLocation {
+    latitude: number;
+    longitude: number;
+    capturedAt: any;
+}
+
 export interface EquipmentData {
-    qrCode: string;              // Unique QR identifier
+    token: string;               // 6-char alphanumeric unique token (PRIMARY KEY for QR)
+    qrCode?: string;             // Legacy - original scanned QR value (for reference)
     clientId: string;            // Owner client
     brand: string;
     model: string;
@@ -11,15 +25,104 @@ export interface EquipmentData {
     location?: string;           // e.g., "Sala", "Recámara"
     technicianId: string;        // Original technician who linked QR
     lastServiceTechId?: string;  // King of the Hill - último técnico que dio servicio
+    lastServiceTechPhone?: string; // Phone for WhatsApp contact
+    lastServiceTechAlias?: string; // Display name
     lastServiceDate?: any;       // Fecha del último servicio
+    geoLocation?: GeoLocation;   // Passive geolocation capture
     createdAt?: any;
 }
 
+// ============================================
+// TOKEN GENERATION (6-char alphanumeric)
+// ============================================
+
+const TOKEN_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789';
+const TOKEN_LENGTH = 6;
+
 /**
- * Lookup equipment by QR code
+ * Generates a random 6-character alphanumeric token.
+ * Example output: "a1b2c3", "x9y8z7"
+ */
+const generateRandomToken = (): string => {
+    let token = '';
+    for (let i = 0; i < TOKEN_LENGTH; i++) {
+        token += TOKEN_CHARS.charAt(Math.floor(Math.random() * TOKEN_CHARS.length));
+    }
+    return token;
+};
+
+/**
+ * Generates a unique token, checking against existing tokens in Firestore.
+ * Retries up to 10 times if collision detected.
+ */
+export const generateUniqueToken = async (): Promise<string> => {
+    const MAX_RETRIES = 10;
+
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+        const token = generateRandomToken();
+
+        // Check if token already exists
+        const existing = await getEquipmentByToken(token);
+        if (!existing) {
+            console.log(`Generated unique token: ${token} (attempt ${attempt + 1})`);
+            return token;
+        }
+
+        console.log(`Token collision detected: ${token}, retrying...`);
+    }
+
+    // Fallback: include timestamp to guarantee uniqueness
+    const fallbackToken = generateRandomToken() + Date.now().toString(36).slice(-2);
+    console.warn(`Using fallback token after max retries: ${fallbackToken}`);
+    return fallbackToken.slice(0, 8); // Allow slightly longer for emergency
+};
+
+// ============================================
+// EQUIPMENT LOOKUP FUNCTIONS
+// ============================================
+
+/**
+ * Lookup equipment by 6-char token (PRIMARY lookup for QR system)
+ */
+export const getEquipmentByToken = async (token: string): Promise<(EquipmentData & { id: string }) | null> => {
+    try {
+        const q = query(
+            collection(db, 'equipments'),
+            where('token', '==', token.toLowerCase())
+        );
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            return null;
+        }
+
+        const docSnap = querySnapshot.docs[0];
+        return { id: docSnap.id, ...docSnap.data() } as EquipmentData & { id: string };
+    } catch (e) {
+        console.error('Error looking up equipment by token:', e);
+        return null;
+    }
+};
+
+/**
+ * Lookup equipment by scanned QR code value (legacy support)
  */
 export const getEquipmentByQrCode = async (qrCode: string): Promise<(EquipmentData & { id: string }) | null> => {
     try {
+        // First try to find by token (if the QR contains just the token)
+        if (qrCode.length === 6 && /^[a-z0-9]+$/i.test(qrCode)) {
+            const byToken = await getEquipmentByToken(qrCode);
+            if (byToken) return byToken;
+        }
+
+        // Extract token from URL if full URL scanned
+        const tokenFromUrl = extractTokenFromUrl(qrCode);
+        if (tokenFromUrl) {
+            const byToken = await getEquipmentByToken(tokenFromUrl);
+            if (byToken) return byToken;
+        }
+
+        // Fallback: search by legacy qrCode field
         const q = query(
             collection(db, 'equipments'),
             where('qrCode', '==', qrCode)
@@ -30,10 +133,27 @@ export const getEquipmentByQrCode = async (qrCode: string): Promise<(EquipmentDa
             return null;
         }
 
-        const doc = querySnapshot.docs[0];
-        return { id: doc.id, ...doc.data() } as EquipmentData & { id: string };
+        const docSnap = querySnapshot.docs[0];
+        return { id: docSnap.id, ...docSnap.data() } as EquipmentData & { id: string };
     } catch (e) {
         console.error('Error looking up equipment by QR:', e);
+        return null;
+    }
+};
+
+/**
+ * Extract token from TESIVIL QR URL
+ * Input: "https://qr.tesivil.com/a/abc123" -> Output: "abc123"
+ */
+export const extractTokenFromUrl = (url: string): string | null => {
+    try {
+        // Match pattern: /a/[token]
+        const match = url.match(/\/a\/([a-z0-9]+)/i);
+        if (match && match[1]) {
+            return match[1].toLowerCase();
+        }
+        return null;
+    } catch {
         return null;
     }
 };
@@ -56,17 +176,38 @@ export const getEquipmentById = async (equipmentId: string): Promise<(EquipmentD
     }
 };
 
+// ============================================
+// EQUIPMENT CRUD OPERATIONS
+// ============================================
+
+interface AddEquipmentInput {
+    clientId: string;
+    brand: string;
+    model: string;
+    technicianId: string;
+    qrCode?: string;           // Original scanned value (for reference)
+    btu?: number;
+    location?: string;
+    geoLocation?: GeoLocation;
+}
+
 /**
- * Add new equipment to Firestore
+ * Add new equipment to Firestore with auto-generated 6-char token.
+ * Returns the token (not document ID) for QR generation.
  */
-export const addEquipment = async (equipmentData: Omit<EquipmentData, 'createdAt'>): Promise<string> => {
+export const addEquipment = async (equipmentData: AddEquipmentInput): Promise<{ id: string; token: string }> => {
     try {
+        // Generate unique 6-char token
+        const token = await generateUniqueToken();
+
         const docRef = await addDoc(collection(db, 'equipments'), {
             ...equipmentData,
+            token: token.toLowerCase(),
             createdAt: serverTimestamp(),
         });
-        console.log('Equipment created with ID:', docRef.id);
-        return docRef.id;
+
+        console.log(`Equipment created - ID: ${docRef.id}, Token: ${token}`);
+        return { id: docRef.id, token };
     } catch (e) {
         console.error('Error adding equipment:', e);
         throw e;
@@ -85,8 +226,8 @@ export const getEquipmentsByClient = async (clientId: string): Promise<(Equipmen
         const querySnapshot = await getDocs(q);
 
         const equipments: (EquipmentData & { id: string })[] = [];
-        querySnapshot.forEach((doc) => {
-            equipments.push({ id: doc.id, ...doc.data() } as EquipmentData & { id: string });
+        querySnapshot.forEach((docSnap) => {
+            equipments.push({ id: docSnap.id, ...docSnap.data() } as EquipmentData & { id: string });
         });
 
         return equipments;
@@ -108,8 +249,8 @@ export const getEquipmentsByTechnician = async (technicianId: string): Promise<(
         const querySnapshot = await getDocs(q);
 
         const equipments: (EquipmentData & { id: string })[] = [];
-        querySnapshot.forEach((doc) => {
-            equipments.push({ id: doc.id, ...doc.data() } as EquipmentData & { id: string });
+        querySnapshot.forEach((docSnap) => {
+            equipments.push({ id: docSnap.id, ...docSnap.data() } as EquipmentData & { id: string });
         });
 
         return equipments;
@@ -151,29 +292,56 @@ export const updateLastServiceTechnician = async (
     }
 };
 
-// ============================================
-// QR URL GENERATION
-// ============================================
+/**
+ * Updates equipment geolocation (passive capture)
+ */
+export const updateEquipmentGeoLocation = async (
+    equipmentId: string,
+    latitude: number,
+    longitude: number
+): Promise<boolean> => {
+    try {
+        const equipmentRef = doc(db, 'equipments', equipmentId);
+        await updateDoc(equipmentRef, {
+            geoLocation: {
+                latitude,
+                longitude,
+                capturedAt: serverTimestamp(),
+            },
+        });
+        console.log(`GeoLocation updated for equipment ${equipmentId}: ${latitude}, ${longitude}`);
+        return true;
+    } catch (e) {
+        console.error('Error updating equipment geolocation:', e);
+        return false;
+    }
+};
 
-const QR_WEB_BASE_URL = process.env.EXPO_PUBLIC_QR_WEB_URL || 'https://qr.mrfrio.app';
+// ============================================
+// QR URL GENERATION - TESIVIL Format
+// URL: https://qr.tesivil.com/a/[TOKEN]
+// ============================================
 
 /**
- * Genera la URL pública para el QR de un equipo
+ * Genera la URL pública para el QR de un equipo usando el token.
+ * Format: https://qr.tesivil.com/a/[TOKEN]
  */
-export const getQrWebUrl = (equipmentId: string): string => {
-    return `${QR_WEB_BASE_URL}/qr/${equipmentId}`;
+export const getQrWebUrl = (token: string): string => {
+    return `${QR_WEB_BASE_URL}/a/${token.toLowerCase()}`;
 };
 
 /**
- * Genera el contenido para el código QR (para imprimir/descargar)
+ * Genera el contenido completo para el código QR (para imprimir/descargar)
  */
-export const generateQrContent = (equipmentId: string): {
+export const generateQrContent = (token: string): {
     url: string;
     displayText: string;
+    token: string;
 } => {
     return {
-        url: getQrWebUrl(equipmentId),
-        displayText: `MR. FRÍO | Escanea para ver historial`,
+        url: getQrWebUrl(token),
+        displayText: 'HOJA DE VIDA DEL EQUIPO | Escanea para ver historial',
+        token: token.toLowerCase(),
     };
 };
 
@@ -241,26 +409,36 @@ export const getPublicServiceTimeline = async (equipmentId: string): Promise<Pub
 };
 
 /**
- * Obtiene el estado del equipo para el semáforo
+ * Obtiene el estado del equipo para el semáforo (verde/amarillo/rojo)
  */
 export const getEquipmentStatus = (lastServiceDate: Date | null): {
     status: 'ok' | 'warning' | 'critical';
     monthsSinceService: number;
+    nextMaintenanceDate: Date;
 } => {
+    const now = new Date();
+
     if (!lastServiceDate) {
-        return { status: 'critical', monthsSinceService: 99 };
+        return {
+            status: 'critical',
+            monthsSinceService: 99,
+            nextMaintenanceDate: new Date(), // Maintenance needed now
+        };
     }
 
-    const now = new Date();
     const monthsSinceService = Math.floor(
         (now.getTime() - lastServiceDate.getTime()) / (1000 * 60 * 60 * 24 * 30)
     );
 
+    // Calculate next maintenance date (6 months from last service)
+    const nextMaintenanceDate = new Date(lastServiceDate);
+    nextMaintenanceDate.setMonth(nextMaintenanceDate.getMonth() + 6);
+
     if (monthsSinceService < 6) {
-        return { status: 'ok', monthsSinceService };
+        return { status: 'ok', monthsSinceService, nextMaintenanceDate };
     } else if (monthsSinceService < 12) {
-        return { status: 'warning', monthsSinceService };
+        return { status: 'warning', monthsSinceService, nextMaintenanceDate };
     } else {
-        return { status: 'critical', monthsSinceService };
+        return { status: 'critical', monthsSinceService, nextMaintenanceDate };
     }
 };

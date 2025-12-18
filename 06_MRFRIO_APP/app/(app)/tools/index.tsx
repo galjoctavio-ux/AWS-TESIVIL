@@ -29,14 +29,25 @@ const DIAGNOSTIC_TOOLS = [
 
 const CALCULATION_TOOLS = [
     {
-        id: 'btu',
+        id: 'btu-free',
         icon: 'calculator',
         title: 'Calculadora BTU',
-        description: 'Estima la carga térmica del espacio',
-        route: '/(app)/tools/btu-calculator',
+        description: 'Estimación rápida de carga térmica',
+        route: '/(app)/tools/btu-calculator-free',
         color: 'bg-purple-500',
         iconBg: 'bg-purple-100',
         iconColor: '#8B5CF6',
+    },
+    {
+        id: 'btu-pro',
+        icon: 'analytics',
+        title: 'Calculadora BTU PRO',
+        description: 'Cálculo avanzado con desglose detallado',
+        route: '/(app)/tools/btu-calculator-pro',
+        color: 'bg-purple-700',
+        iconBg: 'bg-purple-200',
+        iconColor: '#7C3AED',
+        premium: true,
     },
     {
         id: 'cables',
@@ -51,6 +62,16 @@ const CALCULATION_TOOLS = [
 ];
 
 const BUSINESS_TOOLS = [
+    {
+        id: 'qr-labels',
+        icon: 'print',
+        title: 'Etiquetas QR',
+        description: 'Genera hojas de etiquetas para equipos',
+        route: '/(app)/tools/qr-labels',
+        color: 'bg-indigo-500',
+        iconBg: 'bg-indigo-100',
+        iconColor: '#6366F1',
+    },
     {
         id: 'quote',
         icon: 'document-text',

@@ -61,7 +61,7 @@ export default function Register() {
                 <Text className="text-gray-700 font-semibold mb-1">Email</Text>
                 <TextInput
                     className="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 mb-4 focus:border-blue-500 focus:bg-white"
-                    placeholder="ejemplo@mrfrio.com"
+                    placeholder="ejemplo@qrclima.com"
                     value={email}
                     onChangeText={setEmail}
                     autoCapitalize="none"
@@ -101,7 +101,7 @@ export default function Register() {
                             Acepto los{' '}
                             <Text
                                 className="text-blue-600 underline"
-                                onPress={() => openLink('https://mrfrio.app/terms')}
+                                onPress={() => openLink('https://qrclima.com/terms')}
                             >
                                 Términos y Condiciones
                             </Text>
@@ -121,7 +121,7 @@ export default function Register() {
                             Acepto el{' '}
                             <Text
                                 className="text-blue-600 underline"
-                                onPress={() => openLink('https://mrfrio.app/privacy')}
+                                onPress={() => openLink('https://qrclima.com/privacy')}
                             >
                                 Aviso de Privacidad
                             </Text>

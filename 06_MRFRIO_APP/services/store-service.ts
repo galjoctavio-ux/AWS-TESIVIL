@@ -51,7 +51,7 @@ const PRODUCT_CATALOG: StoreProduct[] = [
     },
     {
         id: 'gorra',
-        name: 'Gorra Oficial Mr. Frío',
+        name: 'Gorra Oficial QRclima',
         description: 'Bordado 3D de alta calidad. Protege del sol en la azotea.',
         imageUrl: '',
         price: 250,

@@ -156,7 +156,7 @@ export const generateServiceReport = async (data: ReportData): Promise<void> => 
     </head>
     <body>
         <div class="header">
-            <h1>❄️ Mr. Frío</h1>
+            <h1>❄️ QRclima</h1>
             <div class="subtitle">Reporte de Servicio Técnico</div>
         </div>
 
@@ -235,7 +235,7 @@ export const generateServiceReport = async (data: ReportData): Promise<void> => 
         </div>
 
         <div class="footer">
-            Documento generado el ${new Date().toLocaleDateString('es-MX')} por Mr. Frío App
+            Documento generado el ${new Date().toLocaleDateString('es-MX')} por QRclima App
         </div>
     </body>
     </html>
@@ -437,7 +437,7 @@ export const generateQuotePDF = async (data: QuotePDFData): Promise<void> => {
     </head>
     <body>
         <div class="header">
-            <h1>❄️ Mr. Frío</h1>
+            <h1>❄️ QRclima</h1>
             <div class="subtitle">PRESUPUESTO</div>
             <div class="folio">Folio: ${folio} | Fecha: ${currentDate}</div>
         </div>
@@ -523,7 +523,7 @@ export const generateQuotePDF = async (data: QuotePDFData): Promise<void> => {
 
         <div class="footer">
             Técnico: ${technicianEmail || 'Técnico Certificado'}<br>
-            Documento generado el ${currentDate} por Mr. Frío App
+            Documento generado el ${currentDate} por QRclima App
         </div>
     </body>
     </html>

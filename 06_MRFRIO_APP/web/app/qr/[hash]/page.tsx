@@ -227,10 +227,10 @@ export default function QRPublicView() {
                     <h1 className="text-2xl font-bold text-gray-800 mb-2">No encontrado</h1>
                     <p className="text-gray-500 mb-6">{error || 'Este código QR no está registrado.'}</p>
                     <a
-                        href="https://mrfrio.app"
+                        href="https://qrclima.com"
                         className="inline-block bg-blue-600 text-white px-6 py-3 rounded-xl font-bold"
                     >
-                        Ir a Mr. Frío
+                        Ir a QRclima
                     </a>
                 </div>
             </main>
@@ -245,7 +245,7 @@ export default function QRPublicView() {
             {/* Header con estado */}
             <header className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 pb-20">
                 <div className="max-w-md mx-auto">
-                    <p className="text-blue-200 text-sm mb-1">❄️ Mr. Frío</p>
+                    <p className="text-blue-200 text-sm mb-1">❄️ QRclima</p>
                     <h1 className="text-2xl font-bold mb-4">Historial del Equipo</h1>
 
                     <StatusBadge status={getEquipmentStatus()} />
@@ -295,7 +295,7 @@ export default function QRPublicView() {
                             <p className="text-xs text-gray-500">{lastTech.rank} • {lastTech.city}</p>
                         </div>
                         <a
-                            href={`https://wa.me/52?text=Hola, vi tu perfil en Mr. Frío y necesito servicio para mi aire acondicionado.`}
+                            href={`https://wa.me/52?text=Hola, vi tu perfil en QRclima y necesito servicio para mi aire acondicionado.`}
                             className="bg-green-500 text-white px-4 py-2 rounded-xl text-sm font-bold"
                         >
                             Contactar
@@ -325,7 +325,7 @@ export default function QRPublicView() {
                         Encuentra técnicos verificados cerca de ti
                     </p>
                     <a
-                        href="https://mrfrio.app/directorio"
+                        href="https://qrclima.com/directorio"
                         className="inline-block bg-white text-blue-600 px-6 py-3 rounded-xl font-bold"
                     >
                         Buscar Técnicos
@@ -334,7 +334,7 @@ export default function QRPublicView() {
 
                 {/* Footer */}
                 <footer className="text-center text-gray-400 text-sm pb-8">
-                    <p>Información proporcionada por <strong>Mr. Frío</strong></p>
+                    <p>Información proporcionada por <strong>QRclima</strong></p>
                     <p className="text-xs mt-1">Los datos son responsabilidad del técnico registrado.</p>
                 </footer>
             </div>

@@ -3,7 +3,7 @@ import { db } from '../firebaseConfig';
 // import Constants from 'expo-constants'; // Uncomment when using real env vars
 
 // ============================================
-// SERVICIO DE PAGOS - Mr. Frío
+// SERVICIO DE PAGOS - QRclima
 // Según master_plan.md - Módulos 7 y 8
 // Estructura preparada para Stripe y MercadoPago
 // ============================================

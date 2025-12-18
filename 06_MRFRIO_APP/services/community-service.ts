@@ -6,7 +6,7 @@ import {
 import { db } from '../firebaseConfig';
 
 // ============================================
-// COMUNIDAD SOS - Mr. Frío
+// COMUNIDAD SOS - QRclima
 // Según master_plan.md - Módulo 6 (Community SOS)
 // ============================================
 

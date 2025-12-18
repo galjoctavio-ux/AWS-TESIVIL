@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Mr. Frío",
-    "slug": "mr-frio",
-    "scheme": "mrfrio",
+    "name": "QRclima: Bitácora y Cálculos",
+    "slug": "qrclima",
+    "scheme": "qrclima",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -34,7 +34,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Permitir a Mr. Frío usar la cámara para escanear códigos QR de equipos."
+          "cameraPermission": "Permitir a QRclima usar la cámara para escanear códigos QR de equipos."
         }
       ],
       "expo-barcode-scanner"

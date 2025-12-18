@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 // Mapeo de logos de las 4 marcas principales
 const brandLogos: { [key: string]: any } = {
-    'MIRAGE': require('../../../assets/logos/magnum19.png'),  // Mirage flagship model as brand logo
+    'MIRAGE': require('../../../assets/logos/Mirage-Logo.png'),  // Mirage flagship model as brand logo
     'YORK': require('../../../assets/logos/york_logo.png'),
     'LG': require('../../../assets/logos/logo_lg.png'),
     'CARRIER': require('../../../assets/logos/carrier_logo.png'),

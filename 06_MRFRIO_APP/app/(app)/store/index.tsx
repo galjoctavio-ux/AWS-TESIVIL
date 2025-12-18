@@ -119,7 +119,7 @@ export default function StoreCatalog() {
                     <TouchableOpacity onPress={() => router.back()}>
                         <Ionicons name="arrow-back" size={24} color="white" />
                     </TouchableOpacity>
-                    <Text className="text-xl font-bold text-white">Tienda Mr. Frío</Text>
+                    <Text className="text-xl font-bold text-white">Tienda QRclima</Text>
                     <View className="bg-white/10 px-3 py-1 rounded-full flex-row items-center">
                         <Text className="text-yellow-400 mr-2">🪙</Text>
                         <Text className="text-white font-bold">{balance}</Text>

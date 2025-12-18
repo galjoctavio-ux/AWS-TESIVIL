@@ -20,7 +20,7 @@ export default function Welcome() {
 
             {/* Título */}
             <Text className="text-4xl font-bold text-white text-center mb-4">
-                ¡Bienvenido a Mr. Frío!
+                ¡Bienvenido a QRclima!
             </Text>
 
             {/* Mensaje personalizado */}

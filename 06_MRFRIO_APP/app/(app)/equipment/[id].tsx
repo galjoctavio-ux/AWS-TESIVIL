@@ -1,10 +1,11 @@
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Alert, Linking } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useAuth } from '../../../context/AuthContext';
 import { useState, useEffect } from 'react';
-import { getEquipmentById, EquipmentData } from '../../../services/equipment-service';
+import { getEquipmentById, EquipmentData, getQrWebUrl } from '../../../services/equipment-service';
 import { getClientById, ClientData } from '../../../services/clients-service';
 import { Ionicons } from '@expo/vector-icons';
+import * as Clipboard from 'expo-clipboard';
 
 export default function EquipmentDetail() {
     const { id } = useLocalSearchParams<{ id: string }>();
@@ -114,19 +115,58 @@ export default function EquipmentDetail() {
 
             {/* Content */}
             <ScrollView className="flex-1 p-6" showsVerticalScrollIndicator={false}>
-                {/* QR Code Info */}
+                {/* QR Token Info - TESIVIL System */}
                 <View className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
-                    <View className="flex-row items-center mb-3">
-                        <View className="bg-purple-100 p-2 rounded-full mr-3">
-                            <Ionicons name="qr-code" size={20} color="#7C3AED" />
+                    <View className="flex-row items-center justify-between mb-3">
+                        <View className="flex-row items-center">
+                            <View className="bg-purple-100 p-2 rounded-full mr-3">
+                                <Ionicons name="qr-code" size={20} color="#7C3AED" />
+                            </View>
+                            <Text className="text-lg font-bold text-gray-800">Hoja de Vida</Text>
                         </View>
-                        <Text className="text-lg font-bold text-gray-800">Código QR</Text>
+                        {equipment.token && (
+                            <View className="bg-purple-500 px-3 py-1 rounded-full">
+                                <Text className="text-white font-bold text-xs">
+                                    {equipment.token.toUpperCase()}
+                                </Text>
+                            </View>
+                        )}
                     </View>
-                    <View className="bg-gray-100 p-3 rounded-xl">
-                        <Text className="text-gray-600 font-mono text-sm" numberOfLines={2}>
-                            {equipment.qrCode}
-                        </Text>
-                    </View>
+
+                    {/* Token and URL Display */}
+                    {equipment.token ? (
+                        <>
+                            <TouchableOpacity
+                                onPress={async () => {
+                                    const url = getQrWebUrl(equipment.token);
+                                    await Clipboard.setStringAsync(url);
+                                    Alert.alert('Copiado', 'URL del QR copiada al portapapeles');
+                                }}
+                                className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 p-4 rounded-xl mb-3"
+                            >
+                                <Text className="text-purple-800 font-mono text-sm text-center">
+                                    {getQrWebUrl(equipment.token)}
+                                </Text>
+                                <Text className="text-purple-500 text-xs text-center mt-2">
+                                    Toca para copiar 📋
+                                </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                onPress={() => Linking.openURL(getQrWebUrl(equipment.token))}
+                                className="bg-purple-600 p-3 rounded-xl flex-row items-center justify-center"
+                            >
+                                <Ionicons name="open-outline" size={18} color="white" />
+                                <Text className="text-white font-bold ml-2">Ver Vista Pública</Text>
+                            </TouchableOpacity>
+                        </>
+                    ) : (
+                        <View className="bg-gray-100 p-3 rounded-xl">
+                            <Text className="text-gray-500 text-sm text-center">
+                                Este equipo no tiene token QR asignado
+                            </Text>
+                        </View>
+                    )}
                 </View>
 
                 {/* Equipment Details */}

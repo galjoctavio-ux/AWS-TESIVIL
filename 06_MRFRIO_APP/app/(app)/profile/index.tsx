@@ -220,7 +220,7 @@ export default function ProfileScreen() {
                 <View className="items-center mb-10 px-4">
                     <TouchableOpacity onLongPress={handleAdminAccess} delayLongPress={2000}>
                         <Text className="text-gray-400 text-xs">Versión 1.0.0 (Build 2025)</Text>
-                        <Text className="text-gray-300 text-[10px] text-center mt-1">Mr. Frío © 2025</Text>
+                        <Text className="text-gray-300 text-[10px] text-center mt-1">QRclima © 2025</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>

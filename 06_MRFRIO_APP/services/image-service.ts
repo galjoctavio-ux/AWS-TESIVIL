@@ -6,7 +6,7 @@ import { storage } from '../firebaseConfig';
 import { updateUserProfile } from './user-service';
 
 // ============================================
-// SERVICIO DE COMPRESIÓN DE IMÁGENES - Mr. Frío
+// SERVICIO DE COMPRESIÓN DE IMÁGENES - QRclima
 // ============================================
 
 export interface CompressionOptions {

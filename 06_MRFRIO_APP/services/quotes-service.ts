@@ -2,7 +2,7 @@ import { collection, addDoc, serverTimestamp, doc, updateDoc, getDocs, query, wh
 import { db } from '../firebaseConfig';
 
 // ============================================
-// COTIZADOR PRO - Mr. Frío
+// COTIZADOR PRO - QRclima
 // Según master_plan.md - Módulo 3 (Pro-Quoter)
 // ============================================
 

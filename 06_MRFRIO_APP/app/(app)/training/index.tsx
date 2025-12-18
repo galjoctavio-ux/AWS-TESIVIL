@@ -1,109 +1,194 @@
 import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { getCapsules, completeCapsule, TrainingCapsule } from '../../../services/training-service';
+import {
+    initializeTrainingData,
+    getModulesByBlock,
+    getOverallProgress,
+    TrainingModule
+} from '../../../services/training-service';
 import { useAuth } from '../../../context/AuthContext';
-import { getUserProfile } from '../../../services/user-service';
+import { getModulesByCategory } from '../../../services/training-service';
+
+// Categorías disponibles
+const CATEGORIES = [
+    { id: 'all', label: 'Todos', icon: 'apps-outline' },
+    { id: 'HVAC', label: 'HVAC', icon: 'snow-outline' },
+    { id: 'Electricidad', label: 'Eléctrico', icon: 'flash-outline' },
+    { id: 'Seguridad', label: 'Seguridad', icon: 'shield-outline' },
+    { id: 'Negocio', label: 'Negocio', icon: 'briefcase-outline' },
+    { id: 'Herramientas', label: 'Herramientas', icon: 'construct-outline' },
+];
+
+// Colores por nivel
+const LEVEL_COLORS = {
+    'Básico': { bg: 'bg-green-100', text: 'text-green-700', icon: '#16A34A' },
+    'Intermedio': { bg: 'bg-yellow-100', text: 'text-yellow-700', icon: '#CA8A04' },
+    'Avanzado': { bg: 'bg-red-100', text: 'text-red-700', icon: '#DC2626' },
+};
+
+// Nombres de bloques
+const BLOCK_NAMES: { [key: number]: string } = {
+    1: 'Tendencias y Tecnología',
+    2: 'Herramientas y Documentación',
+    3: 'Termodinámica y Diagnóstico',
+    4: 'Componentes y Fallas',
+    5: 'Sistemas Inverter',
+    6: 'Electrónica de Potencia',
+    7: 'Electricidad Básica',
+    8: 'Calidad de Energía',
+};
+
+interface BlockData {
+    block: number;
+    name: string;
+    modules: TrainingModule[];
+}
 
 export default function TrainingFeed() {
     const router = useRouter();
     const { user } = useAuth();
 
-    const [capsules, setCapsules] = useState<TrainingCapsule[]>([]);
-    const [completedIds, setCompletedIds] = useState<string[]>([]); // Simulation of state
+    const [blocks, setBlocks] = useState<BlockData[]>([]);
     const [loading, setLoading] = useState(true);
-    const [processingId, setProcessingId] = useState<string | null>(null);
+    const [expandedBlock, setExpandedBlock] = useState<number | null>(1);
+    const [overallProgress, setOverallProgress] = useState({ completedModules: 0, totalModules: 40 });
+    const [blockStats, setBlockStats] = useState<{ [key: number]: { completed: number; total: number } }>({});
+    const [selectedCategory, setSelectedCategory] = useState<string>('all');
+    const [filteredModules, setFilteredModules] = useState<TrainingModule[]>([]);
 
     const loadData = async () => {
         setLoading(true);
-        const data = await getCapsules();
-        setCapsules(data);
-        // In real app we would load 'completedIds' from Firestore user subcollection
+        try {
+            // Inicializar datos si es primera vez
+            await initializeTrainingData();
+
+            // Cargar módulos por bloque
+            const blocksData = await getModulesByBlock();
+            setBlocks(blocksData);
+
+            // Cargar progreso si hay usuario
+            if (user?.uid) {
+                const progress = await getOverallProgress(user.uid);
+                setOverallProgress({
+                    completedModules: progress.completedModules,
+                    totalModules: progress.totalModules
+                });
+
+                // Mapear stats por bloque
+                const stats: { [key: number]: { completed: number; total: number } } = {};
+                progress.blockStats.forEach(s => {
+                    stats[s.block] = { completed: s.completed, total: s.total };
+                });
+                setBlockStats(stats);
+            }
+        } catch (error) {
+            console.error('Error loading training data:', error);
+        }
         setLoading(false);
     };
 
     useFocusEffect(
         useCallback(() => {
             loadData();
-        }, [])
+        }, [user?.uid])
     );
 
-    const handleComplete = async (capsule: TrainingCapsule) => {
-        if (completedIds.includes(capsule.id)) {
-            Alert.alert('Completado', 'Ya aprendiste este tema.');
-            return;
-        }
-
-        try {
-            setProcessingId(capsule.id);
-            // Simulate reading "content"
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            const earned = await completeCapsule(user!.uid, capsule.id);
-            setCompletedIds([...completedIds, capsule.id]);
-
-            Alert.alert('¡Excelente!', `Has ganado ${earned} Tokens por capacitarte.`);
-        } catch (error: any) {
-            // If already completed in backend but local state out of sync
-            if (error.message.includes('Ya completaste')) {
-                setCompletedIds([...completedIds, capsule.id]);
-            }
-            Alert.alert('Info', error.message);
-        } finally {
-            setProcessingId(null);
-        }
+    const handleModulePress = (module: TrainingModule) => {
+        router.push(`/training/module/${module.id}` as any);
     };
 
-    const renderCapsule = ({ item }: { item: TrainingCapsule }) => {
-        const isCompleted = completedIds.includes(item.id);
+    const toggleBlock = (blockNum: number) => {
+        setExpandedBlock(expandedBlock === blockNum ? null : blockNum);
+    };
+
+    const renderModule = ({ item }: { item: TrainingModule }) => {
+        const levelStyle = LEVEL_COLORS[item.level] || LEVEL_COLORS['Básico'];
+        const isCompleted = false; // TODO: check from progress
 
         return (
             <TouchableOpacity
-                onPress={() => handleComplete(item)} // Simplification: Tapping simulates "Watching & Completing"
-                disabled={!!processingId || isCompleted}
-                className={`bg-white rounded-xl mb-4 p-4 border flex-row items-center ${isCompleted ? 'border-green-200 bg-green-50' : 'border-gray-100 shadow-sm'}`}
+                onPress={() => handleModulePress(item)}
+                className={`bg-white rounded-xl mb-3 p-4 border flex-row items-center ${isCompleted ? 'border-green-200 bg-green-50' : 'border-gray-100 shadow-sm'}`}
             >
-                <View className={`w-12 h-12 rounded-full items-center justify-center mr-4 ${isCompleted ? 'bg-green-100' : 'bg-indigo-100'}`}>
-                    <Ionicons
-                        name={item.thumbnail as any}
-                        size={24}
-                        color={isCompleted ? '#16A34A' : '#4F46E5'}
-                    />
+                <View className={`w-10 h-10 rounded-full items-center justify-center mr-3 ${levelStyle.bg}`}>
+                    <Ionicons name="book-outline" size={20} color={levelStyle.icon} />
                 </View>
 
                 <View className="flex-1">
-                    <View className="flex-row justify-between items-start">
-                        <Text className={`font-bold text-base flex-1 mr-2 ${isCompleted ? 'text-green-800' : 'text-gray-800'}`}>
-                            {item.title}
-                        </Text>
-                        {isCompleted && <Ionicons name="checkmark-circle" size={20} color="#16A34A" />}
-                    </View>
-
-                    <Text className="text-gray-500 text-xs mb-2" numberOfLines={2}>{item.description}</Text>
-
-                    <View className="flex-row items-center">
-                        <View className="bg-gray-100 px-2 py-0.5 rounded mr-2">
-                            <Text className="text-gray-500 text-[10px]">{item.duration}</Text>
+                    <Text className="font-bold text-gray-800 text-sm" numberOfLines={2}>{item.title}</Text>
+                    <View className="flex-row items-center mt-1">
+                        <View className={`px-2 py-0.5 rounded mr-2 ${levelStyle.bg}`}>
+                            <Text className={`text-[10px] font-medium ${levelStyle.text}`}>{item.level}</Text>
                         </View>
-                        {!isCompleted && (
-                            <Text className="text-yellow-600 font-bold text-xs">+ {item.rewardTokens} Tokens</Text>
-                        )}
+                        <Text className="text-gray-400 text-[10px]">{item.estimated_time_minutes} min</Text>
+                        <Text className="text-yellow-600 font-bold text-[10px] ml-2">+{item.token_reward} Tokens</Text>
                     </View>
                 </View>
 
-                {processingId === item.id && (
-                    <View className="absolute inset-0 bg-white/80 items-center justify-center rounded-xl">
-                        <ActivityIndicator color="#4F46E5" />
-                        <Text className="text-indigo-600 font-bold text-xs mt-1">Aprendiendo...</Text>
-                    </View>
+                {isCompleted ? (
+                    <Ionicons name="checkmark-circle" size={24} color="#16A34A" />
+                ) : (
+                    <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
                 )}
             </TouchableOpacity>
         );
     };
 
-    const progress = completedIds.length / (capsules.length || 1);
+    const renderBlock = (blockData: BlockData) => {
+        const isExpanded = expandedBlock === blockData.block;
+        const stats = blockStats[blockData.block] || { completed: 0, total: blockData.modules.length };
+        const progress = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0;
+
+        return (
+            <View key={blockData.block} className="mb-4">
+                <TouchableOpacity
+                    onPress={() => toggleBlock(blockData.block)}
+                    className="bg-white rounded-xl p-4 flex-row items-center justify-between border border-gray-100 shadow-sm"
+                >
+                    <View className="flex-row items-center flex-1">
+                        <View className="w-10 h-10 rounded-full bg-indigo-100 items-center justify-center mr-3">
+                            <Text className="text-indigo-700 font-bold">{blockData.block}</Text>
+                        </View>
+                        <View className="flex-1">
+                            <Text className="font-bold text-gray-800">{BLOCK_NAMES[blockData.block] || blockData.name}</Text>
+                            <View className="flex-row items-center mt-1">
+                                <View className="flex-1 h-1.5 bg-gray-200 rounded-full mr-2">
+                                    <View
+                                        className="h-full bg-indigo-500 rounded-full"
+                                        style={{ width: `${progress}%` }}
+                                    />
+                                </View>
+                                <Text className="text-gray-500 text-xs">{stats.completed}/{stats.total}</Text>
+                            </View>
+                        </View>
+                    </View>
+                    <Ionicons
+                        name={isExpanded ? "chevron-up" : "chevron-down"}
+                        size={20}
+                        color="#6B7280"
+                    />
+                </TouchableOpacity>
+
+                {isExpanded && (
+                    <View className="mt-2 ml-4">
+                        <FlatList
+                            data={blockData.modules}
+                            keyExtractor={item => item.id.toString()}
+                            renderItem={renderModule}
+                            scrollEnabled={false}
+                        />
+                    </View>
+                )}
+            </View>
+        );
+    };
+
+    const totalProgress = overallProgress.totalModules > 0
+        ? (overallProgress.completedModules / overallProgress.totalModules) * 100
+        : 0;
 
     return (
         <View className="flex-1 bg-slate-50">
@@ -113,7 +198,7 @@ export default function TrainingFeed() {
                     <TouchableOpacity onPress={() => router.back()}>
                         <Ionicons name="arrow-back" size={24} color="white" />
                     </TouchableOpacity>
-                    <Text className="text-xl font-bold text-white">Capacitación Ligera</Text>
+                    <Text className="text-xl font-bold text-white">Capacitación QRclima</Text>
                     <View style={{ width: 24 }} />
                 </View>
 
@@ -121,32 +206,62 @@ export default function TrainingFeed() {
                 <View className="bg-white/10 p-4 rounded-xl backdrop-blur-md">
                     <View className="flex-row justify-between mb-2">
                         <Text className="text-indigo-100 font-bold text-xs">TU PROGRESO</Text>
-                        <Text className="text-yellow-400 font-bold text-xs">{completedIds.length}/{capsules.length} COMPLETADO</Text>
+                        <Text className="text-yellow-400 font-bold text-xs">
+                            {overallProgress.completedModules}/{overallProgress.totalModules} COMPLETADOS
+                        </Text>
                     </View>
                     <View className="h-2 bg-indigo-900/50 rounded-full overflow-hidden">
                         <View
                             className="h-full bg-yellow-400 rounded-full"
-                            style={{ width: `${progress * 100}%` }}
+                            style={{ width: `${totalProgress}%` }}
                         />
                     </View>
                     <Text className="text-indigo-200 text-[10px] mt-2">
-                        Completa todos los módulos para obtener la Insignia "Técnico Certificado".
+                        🏆 Completa todos los módulos para obtener la Insignia "Técnico Certificado QRclima"
                     </Text>
                 </View>
             </View>
 
             <ScrollView className="flex-1 p-4">
-                <Text className="font-bold text-gray-800 text-lg mb-4">Módulos Disponibles</Text>
+                {/* Category Filters */}
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    className="mb-4 -mx-4 px-4"
+                >
+                    {CATEGORIES.map(cat => (
+                        <TouchableOpacity
+                            key={cat.id}
+                            onPress={() => setSelectedCategory(cat.id)}
+                            className={`flex-row items-center px-4 py-2 mr-2 rounded-full ${selectedCategory === cat.id
+                                    ? 'bg-indigo-600'
+                                    : 'bg-white border border-gray-200'
+                                }`}
+                        >
+                            <Ionicons
+                                name={cat.icon as any}
+                                size={16}
+                                color={selectedCategory === cat.id ? 'white' : '#6B7280'}
+                            />
+                            <Text className={`ml-2 font-medium ${selectedCategory === cat.id ? 'text-white' : 'text-gray-600'
+                                }`}>
+                                {cat.label}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
+
+                <Text className="font-bold text-gray-800 text-lg mb-4">
+                    {selectedCategory === 'all' ? '8 Bloques de Conocimiento' : `Categoría: ${selectedCategory}`}
+                </Text>
 
                 {loading ? (
-                    <ActivityIndicator size="large" color="#4F46E5" className="mt-10" />
+                    <View className="items-center py-10">
+                        <ActivityIndicator size="large" color="#4F46E5" />
+                        <Text className="text-gray-500 mt-2">Cargando módulos...</Text>
+                    </View>
                 ) : (
-                    <FlatList
-                        data={capsules}
-                        keyExtractor={item => item.id}
-                        renderItem={renderCapsule}
-                        scrollEnabled={false} // Handled by parent ScrollView
-                    />
+                    blocks.map(renderBlock)
                 )}
 
                 <View className="h-20" />

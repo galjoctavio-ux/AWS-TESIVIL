@@ -1,0 +1,155 @@
+[
+    {
+        "id_referencia": "lg_residencial_inverter",
+        "nombre_comercial": "LG RESIDENCIAL (INVERTER V / ART COOL)",
+        "tipo": "Aire Residencial",
+        "imagen_local": "/images/equipos/lg_default.png",
+        "logo_local": "/images/logos/lg_logo.png",
+        "errores": [
+            {
+                "codigo": "CH01",
+                "descripcion": "Falla en sensor de temperatura de aire interior",
+                "solucion": "Sensor abierto o en corto. Mida resistencia (10kΩ a 25°C) o revise conexión en PCB."
+            },
+            {
+                "codigo": "CH02",
+                "descripcion": "Falla en sensor de tubería de entrada (Evaporador)",
+                "solucion": "Sensor de pozo abierto/corto. Verifique conexión CN-TH1 en la tarjeta."
+            },
+            {
+                "codigo": "CH05",
+                "descripcion": "Error de comunicación entre unidad interior y exterior",
+                "solucion": "Revise cable de señal (Term 3). Verifique voltaje DC oscilante. Revise fusibles y reactores en condensadora."
+            },
+            {
+                "codigo": "CH06",
+                "descripcion": "Falla en sensor de tubería de salida (Evaporador)",
+                "solucion": "Sensor de salida abierto/corto. Revise su resistencia y conexión."
+            },
+            {
+                "codigo": "CH09",
+                "descripcion": "Error de EEPROM (Unidad Interior)",
+                "solucion": "Falla de memoria en tarjeta interior. Intente reprogramar o reemplace la PCB."
+            },
+            {
+                "codigo": "CH10",
+                "descripcion": "Motor ventilador interior bloqueado (BLDC)",
+                "solucion": "Motor trabado, conector suelto o falla en sensor Hall. Revise voltaje de motor (300V DC)."
+            },
+            {
+                "codigo": "CH12",
+                "descripcion": "Falla en sensor de tubería media (Evaporador)",
+                "solucion": "Sensor intermedio abierto/corto. Común en equipos Multi-Split."
+            },
+            {
+                "codigo": "CH21",
+                "descripcion": "Error de IPM (Sobrecorriente en Compresor)",
+                "solucion": "Compresor trabado, exceso de refrigerante o disipador de calor sucio en tarjeta inverter."
+            },
+            {
+                "codigo": "CH23",
+                "descripcion": "Bajo voltaje en DC Link",
+                "solucion": "Voltaje de entrada muy bajo o falla en capacitores de la tarjeta exterior."
+            },
+            {
+                "codigo": "CH26",
+                "descripcion": "Falla de posición del compresor DC",
+                "solucion": "Compresor no arranca. Revise terminales U,V,W o daño mecánico en compresor."
+            },
+            {
+                "codigo": "CH29",
+                "descripcion": "Sobrecorriente en compresor (Software)",
+                "solucion": "Compresor forzado, obstrucción en tubería o válvula de expansión cerrada."
+            },
+            {
+                "codigo": "CH32",
+                "descripcion": "Alta temperatura en descarga del compresor",
+                "solucion": "Falta de refrigerante (fuga) o válvula de servicio semi-cerrada."
+            },
+            {
+                "codigo": "CH41",
+                "descripcion": "Falla en sensor de descarga (Compresor)",
+                "solucion": "Sensor de descarga abierto/corto. Resistencia alta (200kΩ a 25°C usualmente)."
+            },
+            {
+                "codigo": "CH44",
+                "descripcion": "Falla en sensor de aire exterior",
+                "solucion": "Sensor de ambiente en condensadora dañado o desconectado."
+            },
+            {
+                "codigo": "CH45",
+                "descripcion": "Falla en sensor de tubería condensador",
+                "solucion": "Sensor de coil exterior dañado."
+            },
+            {
+                "codigo": "CH53",
+                "descripcion": "Falla de comunicación (Interior a Exterior)",
+                "solucion": "Similar a CH05. Pérdida de señal por más de 3 minutos."
+            },
+            {
+                "codigo": "CH60",
+                "descripcion": "Error de EEPROM (Unidad Exterior)",
+                "solucion": "Falla de memoria en tarjeta condensadora. Reemplace la PCB."
+            },
+            {
+                "codigo": "CH61",
+                "descripcion": "Alta temperatura en tubería de condensador",
+                "solucion": "Condensador sucio, motor ventilador exterior lento o exceso de gas."
+            },
+            {
+                "codigo": "CH67",
+                "descripcion": "Motor ventilador exterior bloqueado (BLDC)",
+                "solucion": "Aspa atorada por objeto, conector suelto o motor dañado."
+            }
+        ]
+    },
+    {
+        "id_referencia": "lg_comercial_multi_v",
+        "nombre_comercial": "LG COMERCIAL (MULTI V / VRF)",
+        "tipo": "Comercial / VRF",
+        "imagen_local": "/images/equipos/lg_default.png",
+        "logo_local": "/images/logos/lg_logo.png",
+        "errores": [
+            {
+                "codigo": "CH03",
+                "descripcion": "Error de comunicación (Control Remoto)",
+                "solucion": "Falla entre control cableado y unidad interior."
+            },
+            {
+                "codigo": "CH04",
+                "descripcion": "Error de bomba de drenaje / Flotador",
+                "solucion": "Bomba de condensados averiada o switch de nivel activado (Bandeja llena)."
+            },
+            {
+                "codigo": "CH24",
+                "descripcion": "Switch de alta/baja presión abierto",
+                "solucion": "Presión anormal en el sistema o switch dañado."
+            },
+            {
+                "codigo": "CH51",
+                "descripcion": "Error de sobre-capacidad",
+                "solucion": "La suma de unidades interiores excede la capacidad de la condensadora."
+            },
+            {
+                "codigo": "CH52",
+                "descripcion": "Error de comunicación (Inverter a Principal)",
+                "solucion": "Falla de comunicación interna entre tarjetas de la condensadora."
+            },
+            {
+                "codigo": "CH54",
+                "descripcion": "Fase invertida o faltante (L1, L2, L3)",
+                "solucion": "Revise la alimentación trifásica. Invierta dos fases."
+            },
+            {
+                "codigo": "CH150",
+                "descripcion": "Falla de sensores múltiples",
+                "solucion": "Múltiples sensores abiertos/corto. Revise arnés general."
+            },
+            {
+                "codigo": "CH200",
+                "descripcion": "Falla de auto-detección de tubería",
+                "solucion": "Error durante la puesta en marcha automática."
+            }
+        ]
+    }
+]

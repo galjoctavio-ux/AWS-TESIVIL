@@ -133,7 +133,7 @@ export default function PermissionsSetup() {
                 Habilitar Poderes
             </Text>
             <Text className="text-gray-500 mb-8 text-lg">
-                Para que Mr. Frío funcione al 100%, necesitamos acceso a estas herramientas de tu celular.
+                Para que QRclima funcione al 100%, necesitamos acceso a estas herramientas de tu celular.
             </Text>
 
             <PermissionItem
@@ -189,7 +189,7 @@ export default function PermissionsSetup() {
                     </View>
                     <View className="flex-1">
                         <Text className="text-gray-600">
-                            Entiendo que Mr. Frío es una herramienta de asistencia y <Text className="font-bold">no sustituye mi criterio técnico profesional</Text>.
+                            Entiendo que QRclima es una herramienta de asistencia y <Text className="font-bold">no sustituye mi criterio técnico profesional</Text>.
                         </Text>
                     </View>
                 </TouchableOpacity>

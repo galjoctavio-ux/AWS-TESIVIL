@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// Reglas de Firebase Storage para Mr. Frío
+// Reglas de Firebase Storage para QRclima
 // Controlan el acceso a archivos subidos (fotos de perfil, evidencias, etc.)
 
 service firebase.storage {

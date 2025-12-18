@@ -55,16 +55,13 @@ export default function NewEquipment() {
             Alert.alert('Error', 'Ingresa el modelo del equipo');
             return;
         }
-        if (!qr_code) {
-            Alert.alert('Error', 'No se detectó código QR');
-            return;
-        }
 
         try {
             setSaving(true);
 
-            const equipmentId = await addEquipment({
-                qrCode: qr_code,
+            // addEquipment now returns {id, token} - token is the 6-char code for QR
+            const { id: equipmentId, token } = await addEquipment({
+                qrCode: qr_code || undefined, // Original scanned value (optional reference)
                 clientId: selectedClient.id,
                 brand: brand.trim(),
                 model: model.trim(),
@@ -74,8 +71,8 @@ export default function NewEquipment() {
             });
 
             Alert.alert(
-                'Éxito',
-                'Equipo registrado correctamente',
+                '¡Equipo Registrado!',
+                `Token QR: ${token.toUpperCase()}\n\nEste código aparecerá en las etiquetas QR del equipo.`,
                 [
                     {
                         text: 'Ver Equipo',
@@ -90,6 +87,7 @@ export default function NewEquipment() {
             setSaving(false);
         }
     };
+
 
     return (
         <View className="flex-1 bg-slate-50">

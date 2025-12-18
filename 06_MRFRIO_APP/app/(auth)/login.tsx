@@ -29,13 +29,13 @@ export default function Login() {
     return (
         <View className="flex-1 justify-center items-center bg-gray-100 p-6">
             <View className="bg-white p-8 rounded-2xl w-full max-w-sm shadow-xl">
-                <Text className="text-3xl font-bold text-blue-600 text-center mb-2">Mr. Frío</Text>
+                <Text className="text-3xl font-bold text-blue-600 text-center mb-2">QRclima</Text>
                 <Text className="text-gray-500 text-center mb-8">Acceso Técnico</Text>
 
                 <Text className="text-gray-700 font-semibold mb-1">Email</Text>
                 <TextInput
                     className="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 mb-4 focus:border-blue-500 focus:bg-white"
-                    placeholder="ejemplo@mrfrio.com"
+                    placeholder="ejemplo@qrclima.com"
                     value={email}
                     onChangeText={setEmail}
                     autoCapitalize="none"

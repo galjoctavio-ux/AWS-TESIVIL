@@ -48,7 +48,7 @@ export default function UpcomingServicesWidget({ services, clients }: Props) {
         const client = getClient(clientId);
         if (client?.phone) {
             const cleanPhone = client.phone.replace(/\D/g, '');
-            const message = `Hola ${client.name}, soy tu técnico de Mr. Frío. Te confirmo la cita de hoy.`;
+            const message = `Hola ${client.name}, soy tu técnico de QRclima. Te confirmo la cita de hoy.`;
             Linking.openURL(`https://wa.me/52${cleanPhone}?text=${encodeURIComponent(message)}`);
         } else {
             Alert.alert('Sin teléfono', 'Este cliente no tiene número registrado.');

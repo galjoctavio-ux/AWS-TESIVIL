@@ -54,14 +54,21 @@ EXPO_PUBLIC_MP_PUBLIC_KEY=TEST-PLACEHOLDER
 EXPO_PUBLIC_API_URL=https://us-central1-your-project.cloudfunctions.net
 
 # URL del QR Web View
-EXPO_PUBLIC_QR_WEB_URL=https://qr.mrfrio.app
+EXPO_PUBLIC_QR_WEB_URL=https://qr.tesivil.app/a
 
 # ============================================
-# GROQ AI CONFIGURATION (Para moderación de contenido)
+# GROQ AI CONFIGURATION (Para moderación de comentarios en Training)
 # Obtén tu clave en: https://console.groq.com/keys
 # ============================================
-# Esta clave debe usarse SOLO en Cloud Functions
-# GROQ_API_KEY=gsk_PLACEHOLDER
+# Usamos Groq por su velocidad y costo - Para moderar comentarios en tiempo real
+EXPO_PUBLIC_GROQ_API_KEY=tu_api_key_aqui
+
+# ============================================
+# GEMINI 2.5 FLASH CONFIGURATION (Para generación de noticias)
+# Obtén tu clave en: https://aistudio.google.com/app/apikey
+# ============================================
+# Usamos Gemini para generar contenido de noticias HVAC automáticamente
+EXPO_PUBLIC_GEMINI_API_KEY=tu_api_key_aqui
 
 # ============================================
 # DESARROLLO

@@ -14,7 +14,7 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-const THEME_STORAGE_KEY = '@mrfrio_theme_mode';
+const THEME_STORAGE_KEY = '@qrclima_theme_mode';
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
     const systemColorScheme = useColorScheme();

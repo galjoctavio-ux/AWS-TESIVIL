@@ -81,7 +81,7 @@ function InitialLayout() {
         return (
             <View className="flex-1 justify-center items-center bg-blue-500">
                 <ActivityIndicator size="large" color="#ffffff" />
-                <Text className="text-white mt-4">Cargando Mr. Frío...</Text>
+                <Text className="text-white mt-4">Cargando QRclima...</Text>
             </View>
         );
     }
