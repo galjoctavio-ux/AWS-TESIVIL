@@ -8,6 +8,7 @@ import {
     startReading,
     canTakeQuiz,
     submitQuiz,
+    calculateReadingTime,
     TrainingModule,
     QuizQuestion
 } from '../../../../services/training-service';

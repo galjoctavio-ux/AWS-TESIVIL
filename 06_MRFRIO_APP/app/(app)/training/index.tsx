@@ -96,6 +96,18 @@ export default function TrainingFeed() {
         }, [user?.uid])
     );
 
+    // Filter blocks when category changes
+    useEffect(() => {
+        if (selectedCategory === 'all') {
+            setFilteredModules([]);
+        } else {
+            const filtered = blocks.flatMap(b =>
+                b.modules.filter(m => m.category === selectedCategory)
+            );
+            setFilteredModules(filtered);
+        }
+    }, [selectedCategory, blocks]);
+
     const handleModulePress = (module: TrainingModule) => {
         router.push(`/training/module/${module.id}` as any);
     };
@@ -234,8 +246,8 @@ export default function TrainingFeed() {
                             key={cat.id}
                             onPress={() => setSelectedCategory(cat.id)}
                             className={`flex-row items-center px-4 py-2 mr-2 rounded-full ${selectedCategory === cat.id
-                                    ? 'bg-indigo-600'
-                                    : 'bg-white border border-gray-200'
+                                ? 'bg-indigo-600'
+                                : 'bg-white border border-gray-200'
                                 }`}
                         >
                             <Ionicons
@@ -260,8 +272,24 @@ export default function TrainingFeed() {
                         <ActivityIndicator size="large" color="#4F46E5" />
                         <Text className="text-gray-500 mt-2">Cargando módulos...</Text>
                     </View>
-                ) : (
+                ) : selectedCategory === 'all' ? (
                     blocks.map(renderBlock)
+                ) : (
+                    <View>
+                        {filteredModules.length === 0 ? (
+                            <View className="items-center py-10">
+                                <Ionicons name="search-outline" size={40} color="#D1D5DB" />
+                                <Text className="text-gray-400 mt-2">No hay módulos en esta categoría</Text>
+                            </View>
+                        ) : (
+                            <FlatList
+                                data={filteredModules}
+                                keyExtractor={item => item.id.toString()}
+                                renderItem={renderModule}
+                                scrollEnabled={false}
+                            />
+                        )}
+                    </View>
                 )}
 
                 <View className="h-20" />

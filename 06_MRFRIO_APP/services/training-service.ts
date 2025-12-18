@@ -15,6 +15,18 @@ import { ALL_TRAINING_DATA } from './training-data';
 // Constantes de configuración
 const QUIZ_COOLDOWN_HOURS = 1;
 const READING_REQUIRED_PERCENT = 0.8; // 80% del tiempo estimado
+const WORDS_PER_MINUTE = 200; // Velocidad de lectura promedio
+const MIN_READING_SECONDS = 30; // Mínimo 30 segundos
+
+/**
+ * Calcula el tiempo de lectura en segundos basado en el contenido
+ */
+export const calculateReadingTime = (content: string): number => {
+    const words = content.split(/\s+/).filter(w => w.length > 0).length;
+    const minutes = words / WORDS_PER_MINUTE;
+    const seconds = Math.ceil(minutes * 60);
+    return Math.max(MIN_READING_SECONDS, seconds);
+};
 
 // ============================================
 // DATOS DE LOS 40 TEMAS - PARSEADOS DE cursos.txt
@@ -143,10 +155,12 @@ export const canTakeQuiz = async (
         return { allowed: true };
     }
 
-    // Verificar tiempo de lectura (80%)
+    // Verificar tiempo de lectura (80% del tiempo calculado dinámicamente)
     if (progress.reading_started_at) {
         const startTime = new Date(progress.reading_started_at);
-        const requiredMs = module.estimated_time_minutes * 60 * 1000 * READING_REQUIRED_PERCENT;
+        // Calcular tiempo requerido dinámicamente basado en el contenido
+        const dynamicReadingSeconds = calculateReadingTime(module.content_body || '');
+        const requiredMs = dynamicReadingSeconds * 1000 * READING_REQUIRED_PERCENT;
         const elapsedMs = Date.now() - startTime.getTime();
 
         if (elapsedMs >= requiredMs) {
