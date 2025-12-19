@@ -1,4 +1,5 @@
 import express from 'express';
+import { authMiddleware } from '../middleware/auth.middleware.js';
 import eaPool from '../services/eaDatabase.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import { randomBytes } from 'crypto';
