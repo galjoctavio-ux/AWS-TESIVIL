@@ -93,7 +93,7 @@ function Dashboard() {
           </Link>
 
           <Link
-            to="/crm"
+            to="/crm-dashboard-v3"
             className="main-button"
             style={{
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', /* Degradado Morado IA */

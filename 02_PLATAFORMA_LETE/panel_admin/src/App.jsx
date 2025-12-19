@@ -6,12 +6,12 @@ import MapeoPrecios from './pages/MapeoPrecios';
 import GestionMateriales from './pages/GestionMateriales';
 import CotizacionesList from './pages/CotizacionesList';
 import ConfiguracionFinanciera from './pages/ConfiguracionFinanciera';
-import EditarCotizacion from './pages/EditarCotizacion'; // <--- IMPORTACIÓN CORRECTA AQUÍ ARRIBA
+import EditarCotizacion from './pages/EditarCotizacion';
 import ProtectedRoute from './components/ProtectedRoute';
 import ConfiguracionPagos from './pages/ConfiguracionPagos';
 import GestionFinanciera from './pages/GestionFinanciera';
-import CrmDashboard from './pages/CrmDashboard';
-import CrmDashboardV2 from './pages/CrmDashboardV2.jsx';
+// V1 y V2 eliminados
+import CrmDashboardV3 from './pages/CrmDashboardV3';
 import './App.css';
 import './responsive.css';
 
@@ -48,7 +48,7 @@ function App() {
       />
       <Route path="/finanzas-gestion" element={<ProtectedRoute allowedRoles={['admin', 'superadmin']}><GestionFinanciera /></ProtectedRoute>} />
 
-      {/* RUTA DE EDICIÓN MAESTRA (NUEVA) */}
+      {/* RUTA DE EDICIÓN MAESTRA */}
       <Route
         path="/cotizaciones/editar/:id"
         element={
@@ -72,21 +72,12 @@ function App() {
         }
       />
 
+      {/* --- NUEVO CRM V3 (ÚNICO) --- */}
       <Route
-        path="/crm"
+        path="/crm-dashboard-v3"
         element={
           <ProtectedRoute allowedRoles={['admin', 'superadmin']}>
-            <CrmDashboard />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* 2. AGREGA ESTA NUEVA RUTA AQUÍ */}
-      <Route
-        path="/crm-v2"
-        element={
-          <ProtectedRoute allowedRoles={['admin', 'superadmin']}>
-            <CrmDashboardV2 />
+            <CrmDashboardV3 />
           </ProtectedRoute>
         }
       />
