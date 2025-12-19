@@ -55,3 +55,22 @@ export const updateCitaLocation = async (idCita, nuevaDireccion, token) => {
     throw error; // Lanzamos el error para que el App.jsx muestre el alert
   }
 };
+
+// 4. (NUEVO) Eliminar Cita (Hard Delete)
+export const deleteCita = async (idCita, token) => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/citas/${idCita}?token=${token}`, {
+      method: 'DELETE',
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Error al eliminar la cita');
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Error en deleteCita:", error);
+    throw error;
+  }
+};
