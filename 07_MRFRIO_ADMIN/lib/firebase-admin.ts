@@ -18,21 +18,51 @@ import { getAuth } from 'firebase-admin/auth';
 // 
 // ============================================
 
-const firebaseAdminConfig = {
-    credential: cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        // Reemplazar \n escapados con saltos de línea reales
-        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    }),
+// Parse private key - handle different escape formats
+const formatPrivateKey = (key: string | undefined): string | undefined => {
+    if (!key) return undefined;
+    // Remove surrounding quotes if present
+    let cleaned = key.replace(/^["']|["']$/g, '');
+    // Replace literal \n with actual newlines
+    cleaned = cleaned.replace(/\\n/g, '\n');
+    return cleaned;
 };
 
-// Inicializar solo si no hay instancias existentes
-const app = getApps().length === 0 ? initializeApp(firebaseAdminConfig) : getApps()[0];
+let adminDb: FirebaseFirestore.Firestore;
+let adminAuth: ReturnType<typeof getAuth>;
 
-// Exportar instancias
-export const adminDb = getFirestore(app);
-export const adminAuth = getAuth(app);
+try {
+    const privateKey = formatPrivateKey(process.env.FIREBASE_PRIVATE_KEY);
+
+    if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL || !privateKey) {
+        console.warn('Firebase Admin: Missing required environment variables');
+        console.warn('FIREBASE_PROJECT_ID:', !!process.env.FIREBASE_PROJECT_ID);
+        console.warn('FIREBASE_CLIENT_EMAIL:', !!process.env.FIREBASE_CLIENT_EMAIL);
+        console.warn('FIREBASE_PRIVATE_KEY:', !!privateKey);
+    }
+
+    const firebaseAdminConfig = {
+        credential: cert({
+            projectId: process.env.FIREBASE_PROJECT_ID,
+            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+            privateKey: privateKey,
+        }),
+    };
+
+    // Inicializar solo si no hay instancias existentes
+    const app = getApps().length === 0 ? initializeApp(firebaseAdminConfig) : getApps()[0];
+
+    // Exportar instancias
+    adminDb = getFirestore(app);
+    adminAuth = getAuth(app);
+} catch (error) {
+    console.error('Firebase Admin initialization error:', error);
+    // Create mock objects to prevent crashes
+    adminDb = null as any;
+    adminAuth = null as any;
+}
+
+export { adminDb, adminAuth };
 
 // ============================================
 // Helper Functions

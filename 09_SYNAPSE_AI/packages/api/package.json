@@ -1,0 +1,38 @@
+{
+    "name": "@synapse/api",
+    "version": "0.1.0",
+    "private": true,
+    "description": "SYNAPSE_AI Backend API - Fastify + TypeScript",
+    "main": "dist/index.js",
+    "scripts": {
+        "dev": "tsx watch src/index.ts",
+        "build": "tsc",
+        "start": "node dist/index.js",
+        "lint": "eslint src/",
+        "type-check": "tsc --noEmit",
+        "test": "jest",
+        "test:unit": "jest --testPathPattern=unit",
+        "test:integration": "jest --testPathPattern=integration"
+    },
+    "dependencies": {
+        "fastify": "^4.25.0",
+        "@fastify/cors": "^8.5.0",
+        "@fastify/rate-limit": "^9.1.0",
+        "@supabase/supabase-js": "^2.39.0",
+        "groq-sdk": "^0.3.0",
+        "@google/generative-ai": "^0.2.0",
+        "node-cron": "^3.0.3",
+        "rss-parser": "^3.13.0",
+        "zod": "^3.22.0",
+        "dotenv": "^16.3.0"
+    },
+    "devDependencies": {
+        "typescript": "^5.3.0",
+        "tsx": "^4.7.0",
+        "@types/node": "^20.10.0",
+        "@types/node-cron": "^3.0.11",
+        "eslint": "^8.56.0",
+        "jest": "^29.7.0",
+        "@types/jest": "^29.5.0"
+    }
+}

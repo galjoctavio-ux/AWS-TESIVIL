@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { doc, getDoc, collection, query, where, orderBy, getDocs, limit } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 // ============================================
 // TIPOS
@@ -151,28 +153,102 @@ export default function QRPage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        // TODO: Fetch real data from Firestore
-        // const fetchEquipment = async () => {
-        //   const equipmentRef = doc(db, 'equipments', hash);
-        //   const snap = await getDoc(equipmentRef);
-        //   if (snap.exists()) {
-        //     setEquipment(snap.data() as EquipmentData);
-        //   } else {
-        //     setError('Equipo no encontrado');
-        //   }
-        //   setLoading(false);
-        // };
-        // fetchEquipment();
+        const fetchEquipment = async () => {
+            try {
+                // Try to find equipment by document ID (hash)
+                const equipmentRef = doc(db, 'equipments', hash);
+                const equipSnap = await getDoc(equipmentRef);
 
-        // MOCK: Simulate loading
-        setTimeout(() => {
-            if (hash) {
-                setEquipment(mockEquipment);
-            } else {
-                setError('Código QR inválido');
+                if (equipSnap.exists()) {
+                    const data = equipSnap.data();
+
+                    // Map Firestore data to our interface
+                    const equipmentData: EquipmentData = {
+                        id: equipSnap.id,
+                        brand: data.brand || 'Sin marca',
+                        model: data.model || 'Sin modelo',
+                        capacity: data.btu ? `${(data.btu / 12000).toFixed(1)} Toneladas` : 'N/A',
+                        type: data.type || 'Minisplit',
+                        installDate: data.installDate?.toDate?.(),
+                        lastServiceDate: data.lastServiceDate?.toDate?.() || new Date(),
+                        lastTechnicianId: data.lastServiceTechId || '',
+                        lastTechnicianPhone: data.lastServiceTechPhone || '',
+                        lastTechnicianAlias: data.lastServiceTechAlias || 'Técnico',
+                        lastTechnicianBadge: data.lastServiceTechRank === 'Pro' ? 'Pro' :
+                            data.lastServiceTechRank === 'Técnico' ? 'Técnico' : 'Novato',
+                        services: [],
+                    };
+
+                    // Fetch service history
+                    const servicesQuery = query(
+                        collection(db, 'services'),
+                        where('equipmentId', '==', hash),
+                        orderBy('date', 'desc'),
+                        limit(10)
+                    );
+
+                    const servicesSnap = await getDocs(servicesQuery);
+
+                    equipmentData.services = servicesSnap.docs.map(docSnap => {
+                        const sData = docSnap.data();
+                        return {
+                            id: docSnap.id,
+                            date: sData.date?.toDate?.() || new Date(),
+                            type: sData.type || 'Mantenimiento',
+                            publicNotes: sData.publicNotes || sData.notes?.substring(0, 100),
+                            technicianAlias: sData.technicianAlias || 'Técnico',
+                            technicianBadge: sData.technicianRank === 'Pro' ? 'Pro' :
+                                sData.technicianRank === 'Técnico' ? 'Técnico' : 'Novato',
+                        } as ServiceRecord;
+                    });
+
+                    setEquipment(equipmentData);
+                } else {
+                    // Try searching by token field as fallback
+                    const tokenQuery = query(
+                        collection(db, 'equipments'),
+                        where('token', '==', hash.toLowerCase())
+                    );
+                    const tokenSnap = await getDocs(tokenQuery);
+
+                    if (!tokenSnap.empty) {
+                        const equipDoc = tokenSnap.docs[0];
+                        const data = equipDoc.data();
+
+                        const equipmentData: EquipmentData = {
+                            id: equipDoc.id,
+                            brand: data.brand || 'Sin marca',
+                            model: data.model || 'Sin modelo',
+                            capacity: data.btu ? `${(data.btu / 12000).toFixed(1)} Toneladas` : 'N/A',
+                            type: data.type || 'Minisplit',
+                            installDate: data.installDate?.toDate?.(),
+                            lastServiceDate: data.lastServiceDate?.toDate?.() || new Date(),
+                            lastTechnicianId: data.lastServiceTechId || '',
+                            lastTechnicianPhone: data.lastServiceTechPhone || '',
+                            lastTechnicianAlias: data.lastServiceTechAlias || 'Técnico',
+                            lastTechnicianBadge: 'Técnico',
+                            services: [],
+                        };
+
+                        setEquipment(equipmentData);
+                    } else {
+                        setError('Equipo no encontrado');
+                    }
+                }
+            } catch (err) {
+                console.error('Error fetching equipment:', err);
+                setError('Error al cargar los datos');
+            } finally {
+                setLoading(false);
             }
+        };
+
+        if (hash) {
+            fetchEquipment();
+        } else {
+            setError('Código QR inválido');
             setLoading(false);
-        }, 1000);
+        }
     }, [hash]);
 
     // Loading state
@@ -199,7 +275,7 @@ export default function QRPage() {
                         href="https://mrfrio.app"
                         className="inline-block px-6 py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition"
                     >
-                        Ir a Mr. Frío
+                        Ir a QRclima
                     </a>
                 </div>
             </div>
@@ -244,13 +320,13 @@ export default function QRPage() {
                             <div
                                 key={service.id}
                                 className={`bg-white rounded-xl p-4 shadow-sm border-l-4 ${service.type === 'Instalación' ? 'border-green-500' :
-                                        service.type === 'Mantenimiento' ? 'border-blue-500' : 'border-orange-500'
+                                    service.type === 'Mantenimiento' ? 'border-blue-500' : 'border-orange-500'
                                     }`}
                             >
                                 <div className="flex justify-between items-start mb-2">
                                     <div>
                                         <span className={`text-xs font-medium px-2 py-0.5 rounded ${service.type === 'Instalación' ? 'bg-green-100 text-green-700' :
-                                                service.type === 'Mantenimiento' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
+                                            service.type === 'Mantenimiento' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
                                             }`}>
                                             {service.type}
                                         </span>
@@ -305,7 +381,7 @@ export default function QRPage() {
                             <span className="text-3xl">❄️</span>
                             <div className="flex-1">
                                 <p className="text-white font-bold text-sm">¿Eres técnico de A/C?</p>
-                                <p className="text-blue-100 text-xs">Organiza tus clientes con Mr. Frío - ¡Gratis!</p>
+                                <p className="text-blue-100 text-xs">Organiza tus clientes con QRclima - ¡Gratis!</p>
                             </div>
                             <a
                                 href="https://mrfrio.app/download"

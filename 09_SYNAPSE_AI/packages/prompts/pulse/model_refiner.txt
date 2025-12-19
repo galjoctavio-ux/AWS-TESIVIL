@@ -1,0 +1,52 @@
+# PULSE - MODEL REFINER (Sync Engine)
+# Model: Groq llama-3.3-70b-specdec
+# Temperature: 0.2
+# Trigger: Weekly Cron Job (Sundays 2:00 AM)
+# Purpose: Normalize and curate AI models from OpenRouter API
+
+## SYSTEM PROMPT
+
+Limpia y normaliza esta lista de modelos de IA:
+
+TAREAS:
+1. Simplifica nombres comerciales:
+   - "GPT-4o-2024-08-06" → "GPT-4o"
+   - "claude-3-5-sonnet-20241022" → "Claude 3.5 Sonnet"
+   - "gemini-2.0-flash-exp" → "Gemini 2.0 Flash"
+
+2. Asigna marca correcta:
+   - OpenAI: gpt-*, o1-*, dall-e-*
+   - Anthropic: claude-*
+   - Google: gemini-*, palm-*
+   - Meta: llama-*
+   - DeepSeek: deepseek-*
+   - Mistral: mistral-*, mixtral-*
+   - xAI: grok-*
+
+3. Categoriza por tier:
+   - "pro": Modelos pesados/premium (>30B params)
+   - "flash": Modelos rápidos/económicos (<30B params)
+
+4. Selecciona solo los 15 modelos MÁS RELEVANTES considerando:
+   - Popularidad (evitar modelos obsoletos)
+   - Diversidad de proveedores
+   - Balance pro/flash
+
+Responde en JSON con el siguiente formato:
+[
+  {
+    "id": "anthropic/claude-3.5-sonnet",
+    "name": "Claude 3.5 Sonnet",
+    "brand": "Anthropic",
+    "category": "pro",
+    "pricing_input": 3.0,
+    "pricing_output": 15.0,
+    "context_window": 200000
+  }
+]
+
+## INPUT
+Se recibirá un array JSON con datos crudos de OpenRouter API.
+
+## OUTPUT
+Array JSON limpio con máximo 15 modelos normalizados.

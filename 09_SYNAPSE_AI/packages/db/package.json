@@ -1,0 +1,10 @@
+{
+    "name": "@synapse/db",
+    "version": "0.1.0",
+    "private": true,
+    "description": "Database migrations and seed data for SYNAPSE_AI",
+    "scripts": {
+        "migrate": "echo 'Run migrations in Supabase Dashboard or with supabase CLI'",
+        "seed": "echo 'Run seed files in Supabase Dashboard'"
+    }
+}

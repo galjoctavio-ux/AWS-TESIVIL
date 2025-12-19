@@ -1,0 +1,33 @@
+{
+    "name": "synapse-ai",
+    "version": "0.1.0",
+    "private": true,
+    "description": "SYNAPSE_AI - AI ecosystem for professionals and creators",
+    "workspaces": [
+        "packages/*"
+    ],
+    "scripts": {
+        "dev": "turbo run dev",
+        "build": "turbo run build",
+        "lint": "turbo run lint",
+        "type-check": "turbo run type-check",
+        "test": "turbo run test",
+        "test:unit": "turbo run test:unit",
+        "test:integration": "turbo run test:integration",
+        "clean": "turbo run clean && rm -rf node_modules",
+        "db:migrate": "npm run -w packages/db migrate",
+        "db:seed": "npm run -w packages/db seed",
+        "mobile:dev": "npm run -w apps/mobile dev",
+        "admin:dev": "npm run -w apps/admin dev",
+        "api:dev": "npm run -w packages/api dev"
+    },
+    "devDependencies": {
+        "turbo": "^2.3.0",
+        "typescript": "^5.3.0"
+    },
+    "engines": {
+        "node": ">=20.0.0",
+        "npm": ">=10.0.0"
+    },
+    "packageManager": "npm@10.2.0"
+}

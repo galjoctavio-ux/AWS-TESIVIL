@@ -1,33 +1,100 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-// Mock data for demonstration
-const mockStats = {
-    dau: 127,
-    mau: 892,
-    totalRevenue: 15750,
-    pendingOrders: 8,
-    tokenFloat: 45230,
-    proSubscribers: 34,
-    reportsToReview: 3,
-    servicesThisWeek: 423,
-};
+// Types for API response
+interface DashboardStats {
+    totalUsers: number;
+    proUsers: number;
+    servicesThisMonth: number;
+    tokenFloat: number;
+    pendingOrders: number;
+}
 
-const mockRecentOrders = [
-    { id: 'ORD-001', user: 'FrioTec2024', product: 'Pack 50 QRs', amount: 399, status: 'paid', date: '2024-12-16' },
-    { id: 'ORD-002', user: 'ACMaster', product: 'Pack 100 QRs', amount: 699, status: 'processing', date: '2024-12-15' },
-    { id: 'ORD-003', user: 'TecnicoJuan', product: 'Pack 20 QRs', amount: 199, status: 'shipped', date: '2024-12-14' },
-];
+interface Order {
+    id: string;
+    userId?: string;
+    product?: string;
+    amount?: number;
+    status: string;
+    createdAt?: any;
+}
 
-const mockFlaggedContent = [
-    { id: 'REP-001', type: 'comment', author: 'usuario123', content: 'Texto sospechoso...', toxicityScore: 0.78 },
-    { id: 'REP-002', type: 'thread', author: 'nuevo2024', content: 'Publicación spam...', toxicityScore: 0.65 },
-];
+interface FlaggedItem {
+    id: string;
+    type: 'thread' | 'comment';
+    authorId?: string;
+    content?: string;
+    toxicityScore?: number;
+}
 
 export default function AdminDashboard() {
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [stats, setStats] = useState<DashboardStats>({
+        totalUsers: 0,
+        proUsers: 0,
+        servicesThisMonth: 0,
+        tokenFloat: 0,
+        pendingOrders: 0,
+    });
+    const [recentOrders, setRecentOrders] = useState<Order[]>([]);
+    const [flaggedContent, setFlaggedContent] = useState<FlaggedItem[]>([]);
+
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            try {
+                setLoading(true);
+                const response = await fetch('/api/stats');
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch stats');
+                }
+
+                const data = await response.json();
+
+                if (data.error) {
+                    setError(data.message || 'Error loading data');
+                } else {
+                    setStats(data.stats);
+                    setRecentOrders(data.recentOrders || []);
+                    setFlaggedContent(data.flaggedContent || []);
+                }
+            } catch (err) {
+                console.error('Error fetching dashboard:', err);
+                setError('Error al conectar con Firebase');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchDashboardData();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-slate-500">Cargando dashboard...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+                <div className="bg-white rounded-xl p-8 shadow-lg max-w-md text-center">
+                    <span className="text-4xl mb-4 block">⚠️</span>
+                    <h1 className="text-xl font-bold text-slate-800 mb-2">Error de Conexión</h1>
+                    <p className="text-slate-500 mb-4">{error}</p>
+                    <p className="text-sm text-slate-400">Verifica que el archivo .env.local esté configurado correctamente.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-slate-50">
@@ -35,7 +102,7 @@ export default function AdminDashboard() {
             <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-slate-800 text-white transform transition-transform lg:translate-x-0">
                 <div className="p-6 border-b border-slate-700">
                     <h1 className="text-xl font-bold flex items-center gap-2">
-                        ❄️ <span>Mr. Frío Admin</span>
+                        ❄️ <span>QRclima Admin</span>
                     </h1>
                     <p className="text-slate-400 text-sm mt-1">Panel de Administración</p>
                 </div>
@@ -55,16 +122,16 @@ export default function AdminDashboard() {
                         <li>
                             <Link href="/orders" className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-slate-700 text-slate-300 transition">
                                 <span>📦</span> Pedidos
-                                {mockStats.pendingOrders > 0 && (
-                                    <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{mockStats.pendingOrders}</span>
+                                {stats.pendingOrders > 0 && (
+                                    <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{stats.pendingOrders}</span>
                                 )}
                             </Link>
                         </li>
                         <li>
                             <Link href="/moderation" className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-slate-700 text-slate-300 transition">
                                 <span>🛡️</span> Moderación
-                                {mockStats.reportsToReview > 0 && (
-                                    <span className="ml-auto bg-yellow-500 text-white text-xs px-2 py-0.5 rounded-full">{mockStats.reportsToReview}</span>
+                                {flaggedContent.length > 0 && (
+                                    <span className="ml-auto bg-yellow-500 text-white text-xs px-2 py-0.5 rounded-full">{flaggedContent.length}</span>
                                 )}
                             </Link>
                         </li>
@@ -98,49 +165,49 @@ export default function AdminDashboard() {
                 {/* Header */}
                 <div className="mb-8">
                     <h2 className="text-3xl font-bold text-slate-800">Dashboard</h2>
-                    <p className="text-slate-500 mt-1">Resumen de actividad y métricas clave</p>
+                    <p className="text-slate-500 mt-1">Datos en tiempo real de Firebase 🔥</p>
                 </div>
 
                 {/* KPIs Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    {/* DAU */}
+                    {/* Total Users */}
                     <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
                         <div className="flex items-center justify-between mb-4">
                             <span className="text-3xl">👤</span>
-                            <span className="text-green-500 text-sm font-medium">+12%</span>
+                            <span className="text-green-500 text-sm font-medium">Firebase ✓</span>
                         </div>
-                        <p className="text-3xl font-bold text-slate-800">{mockStats.dau}</p>
-                        <p className="text-slate-500 text-sm">Usuarios Hoy (DAU)</p>
-                    </div>
-
-                    {/* Revenue */}
-                    <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
-                        <div className="flex items-center justify-between mb-4">
-                            <span className="text-3xl">💰</span>
-                            <span className="text-green-500 text-sm font-medium">+8%</span>
-                        </div>
-                        <p className="text-3xl font-bold text-slate-800">${mockStats.totalRevenue.toLocaleString()}</p>
-                        <p className="text-slate-500 text-sm">Ventas Este Mes (MXN)</p>
-                    </div>
-
-                    {/* Token Float */}
-                    <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
-                        <div className="flex items-center justify-between mb-4">
-                            <span className="text-3xl">🪙</span>
-                            <span className="text-yellow-500 text-sm font-medium">Estable</span>
-                        </div>
-                        <p className="text-3xl font-bold text-slate-800">{mockStats.tokenFloat.toLocaleString()}</p>
-                        <p className="text-slate-500 text-sm">Tokens en Circulación</p>
+                        <p className="text-3xl font-bold text-slate-800">{stats.totalUsers}</p>
+                        <p className="text-slate-500 text-sm">Usuarios Totales</p>
                     </div>
 
                     {/* PRO Subscribers */}
                     <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
                         <div className="flex items-center justify-between mb-4">
                             <span className="text-3xl">⭐</span>
-                            <span className="text-green-500 text-sm font-medium">+5</span>
+                            <span className="text-green-500 text-sm font-medium">Firebase ✓</span>
                         </div>
-                        <p className="text-3xl font-bold text-slate-800">{mockStats.proSubscribers}</p>
+                        <p className="text-3xl font-bold text-slate-800">{stats.proUsers}</p>
                         <p className="text-slate-500 text-sm">Suscriptores PRO</p>
+                    </div>
+
+                    {/* Token Float */}
+                    <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
+                        <div className="flex items-center justify-between mb-4">
+                            <span className="text-3xl">🪙</span>
+                            <span className="text-green-500 text-sm font-medium">Firebase ✓</span>
+                        </div>
+                        <p className="text-3xl font-bold text-slate-800">{stats.tokenFloat.toLocaleString()}</p>
+                        <p className="text-slate-500 text-sm">Tokens en Circulación</p>
+                    </div>
+
+                    {/* Services This Month */}
+                    <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
+                        <div className="flex items-center justify-between mb-4">
+                            <span className="text-3xl">🔧</span>
+                            <span className="text-green-500 text-sm font-medium">Firebase ✓</span>
+                        </div>
+                        <p className="text-3xl font-bold text-slate-800">{stats.servicesThisMonth}</p>
+                        <p className="text-slate-500 text-sm">Servicios Este Mes</p>
                     </div>
                 </div>
 
@@ -149,28 +216,35 @@ export default function AdminDashboard() {
                     {/* Recent Orders */}
                     <div className="bg-white rounded-xl shadow-sm border border-slate-100">
                         <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-                            <h3 className="font-bold text-lg text-slate-800">Pedidos Recientes</h3>
+                            <h3 className="font-bold text-lg text-slate-800">Pedidos Pendientes</h3>
                             <Link href="/orders" className="text-blue-600 text-sm hover:underline">Ver todos →</Link>
                         </div>
-                        <div className="divide-y divide-slate-100">
-                            {mockRecentOrders.map((order) => (
-                                <div key={order.id} className="p-4 flex items-center justify-between hover:bg-slate-50 transition">
-                                    <div>
-                                        <p className="font-medium text-slate-800">{order.id}</p>
-                                        <p className="text-sm text-slate-500">{order.user} • {order.product}</p>
+                        {recentOrders.length > 0 ? (
+                            <div className="divide-y divide-slate-100">
+                                {recentOrders.map((order) => (
+                                    <div key={order.id} className="p-4 flex items-center justify-between hover:bg-slate-50 transition">
+                                        <div>
+                                            <p className="font-medium text-slate-800">{order.id.slice(0, 8)}...</p>
+                                            <p className="text-sm text-slate-500">{order.product || 'Producto'}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="font-bold text-slate-800">${order.amount || 0}</p>
+                                            <span className={`text-xs px-2 py-0.5 rounded-full ${order.status === 'paid' ? 'bg-green-100 text-green-700' :
+                                                    order.status === 'processing' ? 'bg-blue-100 text-blue-700' :
+                                                        'bg-purple-100 text-purple-700'
+                                                }`}>
+                                                {order.status === 'paid' ? 'Pagado' : order.status === 'processing' ? 'Preparando' : order.status}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div className="text-right">
-                                        <p className="font-bold text-slate-800">${order.amount}</p>
-                                        <span className={`text-xs px-2 py-0.5 rounded-full ${order.status === 'paid' ? 'bg-green-100 text-green-700' :
-                                                order.status === 'processing' ? 'bg-blue-100 text-blue-700' :
-                                                    'bg-purple-100 text-purple-700'
-                                            }`}>
-                                            {order.status === 'paid' ? 'Pagado' : order.status === 'processing' ? 'Preparando' : 'Enviado'}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="p-8 text-center text-slate-400">
+                                <span className="text-4xl block mb-2">📦</span>
+                                <p>No hay pedidos pendientes</p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Moderation Queue */}
@@ -179,9 +253,9 @@ export default function AdminDashboard() {
                             <h3 className="font-bold text-lg text-slate-800">Cola de Moderación</h3>
                             <Link href="/moderation" className="text-blue-600 text-sm hover:underline">Ver todos →</Link>
                         </div>
-                        {mockFlaggedContent.length > 0 ? (
+                        {flaggedContent.length > 0 ? (
                             <div className="divide-y divide-slate-100">
-                                {mockFlaggedContent.map((item) => (
+                                {flaggedContent.map((item) => (
                                     <div key={item.id} className="p-4 hover:bg-slate-50 transition">
                                         <div className="flex justify-between items-start mb-2">
                                             <div>
@@ -189,25 +263,16 @@ export default function AdminDashboard() {
                                                     }`}>
                                                     {item.type === 'comment' ? 'Comentario' : 'Hilo'}
                                                 </span>
-                                                <span className="text-slate-500 text-sm ml-2">@{item.author}</span>
+                                                <span className="text-slate-500 text-sm ml-2">@{item.authorId?.slice(0, 8) || 'usuario'}</span>
                                             </div>
-                                            <span className={`text-xs font-medium ${item.toxicityScore > 0.7 ? 'text-red-600' : 'text-yellow-600'
-                                                }`}>
-                                                🚨 {Math.round(item.toxicityScore * 100)}%
-                                            </span>
+                                            {item.toxicityScore && (
+                                                <span className={`text-xs font-medium ${item.toxicityScore > 0.7 ? 'text-red-600' : 'text-yellow-600'
+                                                    }`}>
+                                                    🚨 {Math.round(item.toxicityScore * 100)}%
+                                                </span>
+                                            )}
                                         </div>
-                                        <p className="text-slate-600 text-sm truncate">{item.content}</p>
-                                        <div className="mt-3 flex gap-2">
-                                            <button className="text-xs px-3 py-1 rounded bg-slate-100 text-slate-600 hover:bg-slate-200">
-                                                Ignorar
-                                            </button>
-                                            <button className="text-xs px-3 py-1 rounded bg-red-100 text-red-600 hover:bg-red-200">
-                                                Borrar
-                                            </button>
-                                            <button className="text-xs px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700">
-                                                Banear
-                                            </button>
-                                        </div>
+                                        <p className="text-slate-600 text-sm truncate">{item.content || 'Contenido flaggeado'}</p>
                                     </div>
                                 ))}
                             </div>
@@ -220,26 +285,12 @@ export default function AdminDashboard() {
                     </div>
                 </div>
 
-                {/* Activity Summary */}
-                <div className="mt-8 bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-                    <h3 className="font-bold text-lg text-slate-800 mb-4">Actividad Semanal</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="text-center p-4 bg-slate-50 rounded-lg">
-                            <p className="text-2xl font-bold text-blue-600">{mockStats.servicesThisWeek}</p>
-                            <p className="text-slate-500 text-sm">Servicios</p>
-                        </div>
-                        <div className="text-center p-4 bg-slate-50 rounded-lg">
-                            <p className="text-2xl font-bold text-green-600">89</p>
-                            <p className="text-slate-500 text-sm">QRs Vinculados</p>
-                        </div>
-                        <div className="text-center p-4 bg-slate-50 rounded-lg">
-                            <p className="text-2xl font-bold text-purple-600">34</p>
-                            <p className="text-slate-500 text-sm">Hilos SOS</p>
-                        </div>
-                        <div className="text-center p-4 bg-slate-50 rounded-lg">
-                            <p className="text-2xl font-bold text-yellow-600">156</p>
-                            <p className="text-slate-500 text-sm">Cotizaciones</p>
-                        </div>
+                {/* Connection Status */}
+                <div className="mt-8 bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-4">
+                    <span className="text-2xl">🔥</span>
+                    <div>
+                        <p className="font-bold text-green-800">Firebase Conectado</p>
+                        <p className="text-green-600 text-sm">Proyecto: mr-frio | Datos en tiempo real</p>
                     </div>
                 </div>
             </main>

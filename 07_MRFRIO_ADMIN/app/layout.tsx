@@ -5,7 +5,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-    title: 'Mr. Frío Admin | Panel de Administración',
+    title: 'QRclima Admin | Panel de Administración',
     description: 'Panel de administración para la aplicación Mr. Frío',
 }
 

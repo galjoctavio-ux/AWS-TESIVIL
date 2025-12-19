@@ -5,7 +5,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-    title: 'Historial del Equipo | Mr. Frío',
+    title: 'Historial del Equipo | QRclima',
     description: 'Consulta el historial de servicios de tu equipo de aire acondicionado',
     viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
 }
