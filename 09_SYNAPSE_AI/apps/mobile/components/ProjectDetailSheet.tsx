@@ -22,6 +22,7 @@ import * as Haptics from 'expo-haptics';
 import { SPACING, RADIUS, API_URL } from '@/constants/config';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemeColors } from '@/constants/themes';
+import { incrementStat } from '@/lib/userStats';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -99,6 +100,11 @@ export function ProjectDetailSheet({ project, onClose, onVote }: ProjectDetailSh
     const imageViewerRef = useRef<FlatList>(null);
 
     const styles = createStyles(colors);
+
+    // Track view once on mount
+    React.useEffect(() => {
+        incrementStat('projectsViewed');
+    }, []);
 
     // Local state for instant vote feedback
     const [localUpvotes, setLocalUpvotes] = useState(project.upvotes_count || 0);

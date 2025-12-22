@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { View, Text, Pressable, StyleSheet, ScrollView, Image, Alert, TouchableOpacity } from 'react-native';
+import { useState, useCallback } from 'react';
+import { View, Text, Pressable, StyleSheet, ScrollView, Image, Alert, TouchableOpacity, TextInput, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,30 +11,72 @@ import { ThemeColors } from '@/constants/themes';
 import { Icon, IconName } from '@/components/icons/Icon';
 import { getUserStats, UserStats } from '@/lib/userStats';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAlias } from '@/contexts/AliasContext';
 
 const PROFILE_IMAGE_KEY = '@synapse_profile_image';
+const ONBOARDING_COMPLETE_KEY = '@synapse_onboarding_complete';
+const { width } = Dimensions.get('window');
 
 export default function ProfileScreen() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
     const { colors } = useTheme();
     const { user, isAuthenticated, signOut, isLoading: authLoading } = useAuth();
+    const { alias, setAlias } = useAlias();
     const [profileImage, setProfileImage] = useState<string | null>(null);
     const [stats, setStats] = useState<UserStats>({ promptsGenerated: 0, projectsViewed: 0, reviewsGiven: 0 });
+    const [isEditingAlias, setIsEditingAlias] = useState(false);
+    const [tempAlias, setTempAlias] = useState('');
 
     const styles = createStyles(colors);
 
+    // Handler functions - defined first so they can be referenced
+    const handleResetOnboarding = async () => {
+        try {
+            await AsyncStorage.removeItem(ONBOARDING_COMPLETE_KEY);
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            router.replace('/onboarding');
+        } catch (error) {
+            console.error('Error resetting onboarding:', error);
+            Alert.alert('Error', 'No se pudo reiniciar el onboarding');
+        }
+    };
+
+    const handleLogout = async () => {
+        Alert.alert(
+            'Cerrar Sesión',
+            '¿Estás seguro que deseas cerrar sesión?',
+            [
+                { text: 'Cancelar', style: 'cancel' },
+                {
+                    text: 'Cerrar Sesión',
+                    style: 'destructive',
+                    onPress: async () => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                        await signOut();
+                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                    },
+                },
+            ]
+        );
+    };
+
     // Menu items - dynamic based on auth state
     const getMenuItems = (): { id: string; icon: IconName; label: string; route?: string; action?: () => void; hidden?: boolean }[] => {
+        const baseItems = [
+            { id: 'settings', icon: 'Settings' as IconName, label: 'Configuración', route: '/settings' },
+            { id: 'onboarding', icon: 'Info' as IconName, label: 'Ver Onboarding', action: handleResetOnboarding },
+        ];
+
         if (isAuthenticated) {
             return [
-                { id: 'settings', icon: 'Settings', label: 'Configuración', route: '/settings' },
-                { id: 'logout', icon: 'LogOut', label: 'Cerrar Sesión', action: handleLogout },
+                ...baseItems,
+                { id: 'logout', icon: 'LogOut' as IconName, label: 'Cerrar Sesión', action: handleLogout },
             ];
         }
         return [
-            { id: 'login', icon: 'LogIn', label: 'Iniciar Sesión', route: '/auth/login' },
-            { id: 'settings', icon: 'Settings', label: 'Configuración', route: '/settings' },
+            { id: 'login', icon: 'LogIn' as IconName, label: 'Iniciar Sesión', route: '/auth/login' },
+            ...baseItems,
         ];
     };
 
@@ -45,10 +87,17 @@ export default function ProfileScreen() {
         { id: 'reviews', label: 'Reseñas', value: stats.reviewsGiven, route: '/profile/reviews' },
     ];
 
-    useEffect(() => {
-        loadProfileImage();
-        loadStats();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            loadStats();
+        }, [])
+    );
+
+    useFocusEffect(
+        useCallback(() => {
+            loadProfileImage();
+        }, [])
+    );
 
     const loadStats = async () => {
         const userStats = await getUserStats();
@@ -128,25 +177,6 @@ export default function ProfileScreen() {
         );
     };
 
-    const handleLogout = async () => {
-        Alert.alert(
-            'Cerrar Sesión',
-            '¿Estás seguro que deseas cerrar sesión?',
-            [
-                { text: 'Cancelar', style: 'cancel' },
-                {
-                    text: 'Cerrar Sesión',
-                    style: 'destructive',
-                    onPress: async () => {
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                        await signOut();
-                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                    },
-                },
-            ]
-        );
-    };
-
     const handleMenuPress = (item: ReturnType<typeof getMenuItems>[0]) => {
         Haptics.selectionAsync();
         if (item.action) {
@@ -162,6 +192,37 @@ export default function ProfileScreen() {
             // router.push(stat.route);
             console.log('Navigate to:', stat.route);
         }
+    };
+
+    const handleEditAlias = () => {
+        setTempAlias(alias);
+        setIsEditingAlias(true);
+        Haptics.selectionAsync();
+    };
+
+    const handleSaveAlias = async () => {
+        const trimmed = tempAlias.trim();
+        // Validate: 3-20 chars, only letters, numbers, underscore
+        const validPattern = /^[a-zA-Z0-9_]{3,20}$/;
+        if (!validPattern.test(trimmed)) {
+            Alert.alert(
+                'Alias inválido',
+                'El alias debe tener entre 3 y 20 caracteres y solo puede contener letras, números y guión bajo (_).'
+            );
+            return;
+        }
+        try {
+            await setAlias(trimmed);
+            setIsEditingAlias(false);
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        } catch (error) {
+            Alert.alert('Error', 'No se pudo guardar el alias');
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setIsEditingAlias(false);
+        setTempAlias('');
     };
 
     return (
@@ -206,6 +267,45 @@ export default function ProfileScreen() {
                     </View>
                 </View>
 
+                {/* Alias Section */}
+                <View style={styles.aliasSection}>
+                    <View style={styles.aliasSectionHeader}>
+                        <View style={styles.aliasIconContainer}>
+                            <Icon name="AtSign" size={18} color={colors.primary} />
+                        </View>
+                        <Text style={styles.aliasSectionTitle}>Mi Alias</Text>
+                    </View>
+                    <Text style={styles.aliasHint}>Este nombre aparecerá en tus comentarios y reseñas</Text>
+
+                    {isEditingAlias ? (
+                        <View style={styles.aliasEditContainer}>
+                            <TextInput
+                                style={styles.aliasInput}
+                                value={tempAlias}
+                                onChangeText={setTempAlias}
+                                placeholder="Tu alias..."
+                                placeholderTextColor={colors.textMuted}
+                                maxLength={20}
+                                autoFocus
+                                autoCapitalize="none"
+                            />
+                            <View style={styles.aliasEditButtons}>
+                                <TouchableOpacity style={styles.aliasCancelButton} onPress={handleCancelEdit}>
+                                    <Icon name="X" size={18} color={colors.textMuted} />
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.aliasSaveButton} onPress={handleSaveAlias}>
+                                    <Icon name="Check" size={18} color="#FFFFFF" />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    ) : (
+                        <TouchableOpacity style={styles.aliasDisplay} onPress={handleEditAlias}>
+                            <Text style={styles.aliasText}>@{alias}</Text>
+                            <Icon name="Edit2" size={16} color={colors.textMuted} />
+                        </TouchableOpacity>
+                    )}
+                </View>
+
                 {/* Stats - Clickable */}
                 <View style={styles.statsRow}>
                     {STATS_CONFIG.map((stat, index) => (
@@ -220,7 +320,6 @@ export default function ProfileScreen() {
                         >
                             <Text style={styles.statValue}>{stat.value}</Text>
                             <Text style={styles.statLabel}>{stat.label}</Text>
-                            <Icon name="ChevronRight" size={14} color={colors.textMuted} />
                         </Pressable>
                     ))}
                 </View>
@@ -254,14 +353,14 @@ export default function ProfileScreen() {
                                     {item.label}
                                 </Text>
                             </View>
-                            <Icon name="ChevronRight" size={18} color={colors.textMuted} />
+                            {/* <Icon name="ChevronRight" size={18} color={colors.textMuted} /> */}
                         </Pressable>
                     ))}
                 </View>
 
                 {/* App Info */}
                 <View style={styles.appInfo}>
-                    <Text style={styles.appVersion}>SYNAPSE AI v0.1.0</Text>
+                    <Text style={styles.appVersion}>SYNAPSE AI v1.0.0</Text>
                     <Text style={styles.appCopyright}>© 2025 SYNAPSE AI</Text>
                 </View>
             </ScrollView>
@@ -365,8 +464,10 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     statItem: {
         flex: 1,
         alignItems: 'center',
-        paddingVertical: SPACING.md,
-        gap: 2,
+        justifyContent: 'center',
+        paddingVertical: 24, // Increased padding
+        minHeight: 100, // Enforced min height
+        gap: SPACING.sm,
     },
     statItemPressed: {
         backgroundColor: `${colors.primary}10`,
@@ -376,16 +477,18 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
         borderRightColor: colors.surfaceBorder,
     },
     statValue: {
-        fontSize: 20,
+        fontSize: 26, // Slightly larger
         fontWeight: '700',
         color: colors.textPrimary,
+        textAlign: 'center',
     },
     statLabel: {
-        fontSize: 12,
+        fontSize: 13,
         color: colors.textSecondary,
+        textAlign: 'center',
     },
     menuSection: {
-        marginTop: SPACING.lg,
+        marginTop: 32, // Increased margin
         marginHorizontal: SPACING.lg,
         backgroundColor: colors.surface,
         borderRadius: RADIUS.xl,
@@ -397,10 +500,11 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: SPACING.md,
-        paddingHorizontal: SPACING.md,
+        paddingVertical: 18,
+        paddingHorizontal: SPACING.lg,
         borderBottomWidth: 1,
         borderBottomColor: colors.surfaceBorder,
+        minHeight: 56,
     },
     menuItemPressed: {
         backgroundColor: `${colors.primary}10`,
@@ -409,11 +513,12 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: SPACING.md,
+        flex: 1,
     },
     menuIconContainer: {
-        width: 36,
-        height: 36,
-        borderRadius: 10,
+        width: 40,
+        height: 40,
+        borderRadius: 12,
         backgroundColor: `${colors.primary}15`,
         alignItems: 'center',
         justifyContent: 'center',
@@ -441,5 +546,94 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     appCopyright: {
         fontSize: 12,
         color: colors.textMuted,
+    },
+    // Alias Section Styles
+    aliasSection: {
+        marginHorizontal: SPACING.lg,
+        marginBottom: SPACING.lg,
+        backgroundColor: colors.surface,
+        borderRadius: RADIUS.xl,
+        borderWidth: 1,
+        borderColor: colors.surfaceBorder,
+        padding: SPACING.lg,
+    },
+    aliasSectionHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: SPACING.sm,
+        marginBottom: SPACING.xs,
+    },
+    aliasIconContainer: {
+        width: 32,
+        height: 32,
+        borderRadius: 8,
+        backgroundColor: `${colors.primary}15`,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    aliasSectionTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: colors.textPrimary,
+    },
+    aliasHint: {
+        fontSize: 12,
+        color: colors.textMuted,
+        marginBottom: SPACING.md,
+        marginLeft: 40,
+    },
+    aliasEditContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: SPACING.sm,
+    },
+    aliasInput: {
+        flex: 1,
+        backgroundColor: colors.background,
+        borderRadius: RADIUS.md,
+        paddingHorizontal: SPACING.md,
+        paddingVertical: SPACING.sm,
+        fontSize: 15,
+        color: colors.textPrimary,
+        borderWidth: 1,
+        borderColor: colors.surfaceBorder,
+    },
+    aliasEditButtons: {
+        flexDirection: 'row',
+        gap: SPACING.xs,
+    },
+    aliasCancelButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 10,
+        backgroundColor: colors.background,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: colors.surfaceBorder,
+    },
+    aliasSaveButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 10,
+        backgroundColor: colors.primary,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    aliasDisplay: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: colors.background,
+        borderRadius: RADIUS.md,
+        paddingHorizontal: SPACING.md,
+        paddingVertical: SPACING.md,
+        borderWidth: 1,
+        borderColor: colors.surfaceBorder,
+    },
+    aliasText: {
+        fontSize: 16,
+        fontWeight: '500',
+        color: colors.primary,
     },
 });

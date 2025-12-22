@@ -1,8 +1,8 @@
 import 'react-native-reanimated';
 import '../global.css';
 
-import { useEffect, useState, useCallback } from 'react';
-import { Stack, useRouter, useSegments, SplashScreen } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Stack, useRouter, useSegments, SplashScreen, useNavigationContainerRef } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View, ActivityIndicator } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -11,6 +11,11 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { AliasProvider } from '@/contexts/AliasContext';
+import { initSentry } from '@/services/errorReporting';
+
+// Initialize Sentry
+initSentry();
 
 const ONBOARDING_COMPLETE_KEY = '@synapse_onboarding_complete';
 
@@ -32,33 +37,67 @@ const queryClient = new QueryClient({
 function RootLayoutNav() {
     const router = useRouter();
     const segments = useSegments();
+    const rootNavigation = useNavigationContainerRef();
     const { colors, isDark } = useTheme();
-    const [isLoading, setIsLoading] = useState(true);
+    const [isNavigationReady, setIsNavigationReady] = useState(false);
     const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState<boolean | null>(null);
+
+    // Track when navigation is ready
+    useEffect(() => {
+        if (rootNavigation?.isReady()) {
+            setIsNavigationReady(true);
+        }
+    }, [rootNavigation?.isReady()]);
 
     useEffect(() => {
         checkOnboardingStatus();
     }, []);
 
+    // Re-check onboarding status when navigating TO onboarding screen
+    // This handles the case when user clicks "Ver Onboarding" from profile
     useEffect(() => {
-        if (hasCompletedOnboarding === null) return;
+        const inOnboarding = segments[0] === 'onboarding';
+        if (inOnboarding && isNavigationReady) {
+            // Re-read from AsyncStorage to get the latest state
+            checkOnboardingStatus();
+        }
+    }, [segments, isNavigationReady]);
+
+    useEffect(() => {
+        // Wait for both: onboarding status checked AND navigation ready
+        if (hasCompletedOnboarding === null || !isNavigationReady) return;
 
         // Hide splash screen once we know the onboarding status
         SplashScreen.hideAsync();
 
         const inOnboarding = segments[0] === 'onboarding';
-        const inTabs = segments[0] === '(tabs)';
 
-        if (!hasCompletedOnboarding && !inOnboarding) {
-            // User hasn't completed onboarding, redirect to onboarding
-            router.replace('/onboarding');
-        } else if (hasCompletedOnboarding && inOnboarding) {
-            // User has completed onboarding but is on onboarding screen, redirect to main app
-            router.replace('/(tabs)/engine');
-        }
+        // Defer navigation to next tick to ensure layout is fully mounted
+        const timer = setTimeout(async () => {
+            try {
+                // Re-read from AsyncStorage to get the LATEST state before redirecting
+                const currentValue = await AsyncStorage.getItem(ONBOARDING_COMPLETE_KEY);
+                const currentlyCompleted = currentValue === 'true';
 
-        setIsLoading(false);
-    }, [hasCompletedOnboarding, segments]);
+                if (!currentlyCompleted && !inOnboarding) {
+                    // User hasn't completed onboarding, redirect to onboarding
+                    router.replace('/onboarding');
+                } else if (currentlyCompleted && inOnboarding) {
+                    // User has completed onboarding but is on onboarding screen
+                    // ONLY redirect if this was a fresh app launch, not intentional navigation
+                    // Check if the value was JUST removed (user wants to see onboarding again)
+                    // If AsyncStorage says complete but state says not, user just reset it - don't redirect
+                    if (hasCompletedOnboarding) {
+                        router.replace('/(tabs)/engine');
+                    }
+                }
+            } catch (error) {
+                console.error('Navigation error:', error);
+            }
+        }, 100); // Increased delay to ensure navigation is ready
+
+        return () => clearTimeout(timer);
+    }, [hasCompletedOnboarding, segments, isNavigationReady]);
 
     const checkOnboardingStatus = async () => {
         try {
@@ -70,14 +109,8 @@ function RootLayoutNav() {
         }
     };
 
-    if (isLoading || hasCompletedOnboarding === null) {
-        return (
-            <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }}>
-                <ActivityIndicator size="large" color={colors.primary} />
-            </View>
-        );
-    }
-
+    // Always render the Stack to ensure the navigator is mounted
+    // Show loading state inside the Stack content
     return (
         <>
             <StatusBar style={isDark ? 'light' : 'dark'} />
@@ -93,6 +126,23 @@ function RootLayoutNav() {
                 <Stack.Screen name="auth/login" options={{ headerShown: false, presentation: 'modal' }} />
                 <Stack.Screen name="settings" options={{ headerShown: false }} />
             </Stack>
+            {/* Show loading overlay while checking onboarding status */}
+            {hasCompletedOnboarding === null && (
+                <View
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: colors.background,
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}
+                >
+                    <ActivityIndicator size="large" color={colors.primary} />
+                </View>
+            )}
         </>
     );
 }
@@ -102,11 +152,13 @@ export default function RootLayout() {
         <GestureHandlerRootView style={{ flex: 1 }}>
             <ThemeProvider>
                 <AuthProvider>
-                    <QueryClientProvider client={queryClient}>
-                        <SafeAreaProvider>
-                            <RootLayoutNav />
-                        </SafeAreaProvider>
-                    </QueryClientProvider>
+                    <AliasProvider>
+                        <QueryClientProvider client={queryClient}>
+                            <SafeAreaProvider>
+                                <RootLayoutNav />
+                            </SafeAreaProvider>
+                        </QueryClientProvider>
+                    </AliasProvider>
                 </AuthProvider>
             </ThemeProvider>
         </GestureHandlerRootView>

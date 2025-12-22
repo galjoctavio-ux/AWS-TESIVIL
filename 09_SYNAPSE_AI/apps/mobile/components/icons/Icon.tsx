@@ -23,6 +23,8 @@ import {
     Wind,
     MonitorSmartphone,
     LogIn,
+    LogOut,
+    Info,
     Crown,
     History,
     Settings,
@@ -36,6 +38,8 @@ import {
     AlertTriangle,
     RefreshCw,
     Camera,
+    AtSign,
+    Edit2,
     Aperture,
     Circle,
     Plane,
@@ -89,10 +93,14 @@ const ICONS: Record<string, LucideIcon> = {
 
     // Profile Menu
     LogIn,
+    LogOut,
     Crown,
     History,
     Settings,
     FileText,
+    Info,
+    AtSign,
+    Edit2,
 
     // UI Elements
     Search,

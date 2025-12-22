@@ -25,7 +25,7 @@ import { SkeletonList } from '@/components/SkeletonCard';
 async function fetchModels(category?: string): Promise<any[]> {
     const params = new URLSearchParams();
     params.set('limit', '50');
-    params.set('sort', 'score');
+    params.set('sort', 'score_overall');
     if (category && category !== 'all') {
         params.set('category', category);
     }

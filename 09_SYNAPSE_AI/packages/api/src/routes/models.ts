@@ -38,11 +38,31 @@ const modelsRoutes: FastifyPluginAsync = async (fastify) => {
 
             // Apply category filter
             if (query.category && query.category !== 'all') {
-                dbQuery = dbQuery.eq('category', query.category);
+                // Map frontend categories to database categories
+                // Supports both old (coding, vision) and new (code, image) names
+                const categoryMap: Record<string, string> = {
+                    'chat': 'chat',
+                    'code': 'code',
+                    'codigo': 'code',
+                    'coding': 'code', // legacy
+                    'image': 'image',
+                    'imagen': 'image',
+                    'vision': 'image', // legacy
+                    'audio': 'audio',
+                };
+                const dbCategory = categoryMap[query.category.toLowerCase()] || query.category;
+                dbQuery = dbQuery.eq('category', dbCategory);
             }
 
-            // Apply sorting
-            const sortField = query.sort || 'score_overall';
+            // Apply sorting - map common aliases to actual column names
+            const sortFieldMap: Record<string, string> = {
+                'score': 'score_overall',
+                'score_overall': 'score_overall',
+                'name': 'name',
+                'created_at': 'created_at',
+            };
+            const requestedSort = query.sort || 'score_overall';
+            const sortField = sortFieldMap[requestedSort] || 'score_overall';
             dbQuery = dbQuery.order(sortField, { ascending: false });
 
             // Apply pagination
@@ -80,14 +100,37 @@ const modelsRoutes: FastifyPluginAsync = async (fastify) => {
 
     // ───────────────────────────────────────────────────────────────
     // GET /api/models/top - Get top 3 models (podium)
+    // Supports category filter: chat, coding, vision, audio, all
     // ───────────────────────────────────────────────────────────────
     fastify.get('/top', async (request, reply) => {
         try {
-            const { data: topModels, error } = await supabaseAdmin
+            const query = request.query as { category?: string };
+
+            let dbQuery = supabaseAdmin
                 .from('ai_models')
                 .select('*')
                 .order('score_overall', { ascending: false })
                 .limit(3);
+
+            // Apply category filter
+            if (query.category && query.category !== 'all') {
+                // Map frontend categories to database categories
+                // Supports both old (coding, vision) and new (code, image) names
+                const categoryMap: Record<string, string> = {
+                    'chat': 'chat',
+                    'code': 'code',
+                    'codigo': 'code',
+                    'coding': 'code', // legacy
+                    'image': 'image',
+                    'imagen': 'image',
+                    'vision': 'image', // legacy
+                    'audio': 'audio',
+                };
+                const dbCategory = categoryMap[query.category.toLowerCase()] || query.category;
+                dbQuery = dbQuery.eq('category', dbCategory);
+            }
+
+            const { data: topModels, error } = await dbQuery;
 
             if (error) {
                 fastify.log.error(error);
@@ -100,6 +143,7 @@ const modelsRoutes: FastifyPluginAsync = async (fastify) => {
             return {
                 success: true,
                 data: topModels,
+                category: query.category || 'all',
             };
         } catch (error: any) {
             fastify.log.error(error);

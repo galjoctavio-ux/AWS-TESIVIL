@@ -3,6 +3,15 @@ import dotenv from 'dotenv';
 import path from 'path';
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
+import * as Sentry from '@sentry/node';
+
+// Initialize Sentry for API
+// TODO: Replace with your actual Sentry DSN
+Sentry.init({
+    dsn: "https://93e60bfec53b9c08f44f0eecc3d9a20d@o4510577429250048.ingest.us.sentry.io/4510577468506112",
+    tracesSampleRate: 1.0,
+});
+
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import rateLimit from '@fastify/rate-limit';
@@ -34,6 +43,13 @@ fastify.register(cors, {
 fastify.register(rateLimit, {
     max: 100,
     timeWindow: '1 minute',
+});
+
+// Sentry Error Handler
+fastify.setErrorHandler((error, request, reply) => {
+    Sentry.captureException(error);
+    fastify.log.error(error);
+    reply.status(500).send({ ok: false, message: 'Internal Server Error' });
 });
 
 // Routes

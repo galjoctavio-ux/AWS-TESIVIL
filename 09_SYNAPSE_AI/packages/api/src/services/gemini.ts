@@ -99,7 +99,88 @@ ${rawContent}`;
             return null;
         }
 
-        const parsed = JSON.parse(jsonMatch[0]);
+        let jsonToparse = jsonMatch[0];
+
+        // Sanitize common JSON issues from LLM output
+        // 1. Remove control characters that break JSON parsing
+        jsonToparse = jsonToparse.replace(/[\x00-\x1F\x7F]/g, (char) => {
+            // Keep newlines and tabs as escaped versions
+            if (char === '\n') return '\\n';
+            if (char === '\r') return '\\r';
+            if (char === '\t') return '\\t';
+            return ''; // Remove other control chars
+        });
+
+        // 2. Fix truncated arrays (e.g., ["item1", "item2... -> add closing ])
+        // Count brackets to detect truncation
+        const openBrackets = (jsonToparse.match(/\[/g) || []).length;
+        const closeBrackets = (jsonToparse.match(/\]/g) || []).length;
+        if (openBrackets > closeBrackets) {
+            // Truncated array - try to fix by closing open strings and arrays
+            // Remove trailing incomplete string
+            jsonToparse = jsonToparse.replace(/,\s*"[^"]*$/, '');
+            // Add missing closing brackets
+            for (let i = 0; i < openBrackets - closeBrackets; i++) {
+                jsonToparse += ']';
+            }
+        }
+
+        // 3. Fix truncated objects (missing closing braces)
+        const openBraces = (jsonToparse.match(/\{/g) || []).length;
+        const closeBraces = (jsonToparse.match(/\}/g) || []).length;
+        if (openBraces > closeBraces) {
+            // Remove trailing incomplete key-value
+            jsonToparse = jsonToparse.replace(/,\s*"[^"]*"?\s*:?\s*[^,}]*$/, '');
+            // Add missing closing braces
+            for (let i = 0; i < openBraces - closeBraces; i++) {
+                jsonToparse += '}';
+            }
+        }
+
+        // 4. Fix unescaped quotes within strings (common LLM issue)
+        // This is tricky - we do a best-effort fix for obvious cases
+        // Pattern: "key": "value with "quoted" word" -> "key": "value with \"quoted\" word"
+        // We skip this for now as it's complex and may cause more issues
+
+        let parsed: any;
+        try {
+            parsed = JSON.parse(jsonToparse);
+        } catch (parseError: any) {
+            console.error('    ❌ JSON parse failed after sanitization:', parseError.message);
+            console.error('    📄 Problematic JSON (first 500 chars):', jsonToparse.slice(0, 500));
+
+            // Last resort: try to extract individual fields with regex
+            try {
+                const titleMatch = jsonToparse.match(/"title"\s*:\s*"([^"]+)"/);
+                const whyMatch = jsonToparse.match(/"why_it_matters"\s*:\s*"([^"]+)"/);
+                const topicMatch = jsonToparse.match(/"topic_id"\s*:\s*"([^"]+)"/);
+                const importanceMatch = jsonToparse.match(/"importance"\s*:\s*(\d+)/);
+
+                // Try to extract bullets array
+                const bulletsMatch = jsonToparse.match(/"bullets"\s*:\s*\[([\s\S]*?)\]/);
+                let bullets: string[] = [];
+                if (bulletsMatch) {
+                    const bulletStrings = bulletsMatch[1].match(/"([^"]+)"/g);
+                    bullets = bulletStrings?.map(b => b.replace(/^"|"$/g, '')) || [];
+                }
+
+                if (titleMatch) {
+                    console.log('    🔧 Recovered with regex fallback');
+                    parsed = {
+                        title: titleMatch[1],
+                        bullets: bullets,
+                        why_it_matters: whyMatch?.[1] || '',
+                        topic_id: topicMatch?.[1] || 'GENERAL_NEWS',
+                        importance: importanceMatch ? parseInt(importanceMatch[1]) : 5,
+                    };
+                } else {
+                    return null;
+                }
+            } catch (regexError) {
+                console.error('    ❌ Regex fallback also failed');
+                return null;
+            }
+        }
 
         return {
             title: parsed.title || '',

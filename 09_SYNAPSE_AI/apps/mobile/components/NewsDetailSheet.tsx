@@ -136,15 +136,19 @@ const NewsDetailSheet = forwardRef<BottomSheet, NewsDetailSheetProps>(
 
         const likeMutation = useMutation({
             mutationFn: async () => {
+                console.log('[NewsDetailSheet] Sending like request for:', articleId);
                 const response = await fetch(`${API_URL}/api/news/${articleId}/like`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    body: '{}', // Empty body required by Fastify
                 });
                 const data = await response.json();
-                if (!data.success) throw new Error(data.error);
+                console.log('[NewsDetailSheet] Like response:', data);
+                if (!data.success) throw new Error(data.error || 'Like failed');
                 return data;
             },
             onSuccess: (data) => {
+                console.log('[NewsDetailSheet] Like success, newCount:', data.newCount);
                 setLiked(true);
                 // Update local count immediately from API response
                 if (data.newCount !== undefined) {
@@ -155,6 +159,9 @@ const NewsDetailSheet = forwardRef<BottomSheet, NewsDetailSheetProps>(
                 }
                 queryClient.invalidateQueries({ queryKey: ['news', articleId] });
                 queryClient.invalidateQueries({ queryKey: ['news'] });
+            },
+            onError: (error: Error) => {
+                console.error('[NewsDetailSheet] Like error:', error.message);
             },
         });
 

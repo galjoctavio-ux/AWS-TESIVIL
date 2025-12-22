@@ -23,11 +23,11 @@ export function initCronJobs() {
     });
 
     // ═══════════════════════════════════════════════════════════════
-    // SYNC BENCHMARKS - Monthly (1st of month, 3:00 AM)
-    // Updates benchmark scores from LMSYS/HuggingFace
+    // SYNC BENCHMARKS - Weekly (Sundays 3:00 AM)
+    // Updates benchmark scores from LMArena, Open LLM, BigCode, etc.
     // ═══════════════════════════════════════════════════════════════
-    cron.schedule('0 3 1 * *', async () => {
-        console.log('📈 [CRON] Starting monthly benchmark sync...');
+    cron.schedule('0 3 * * 0', async () => {
+        console.log('📈 [CRON] Starting weekly benchmark sync...');
         try {
             await syncBenchmarks();
             console.log('✅ [CRON] Benchmark sync completed');
@@ -67,7 +67,7 @@ export function initCronJobs() {
 
     console.log('✅ Cron jobs initialized:');
     console.log('   • Model sync: Sundays 2:00 AM');
-    console.log('   • Benchmark sync: 1st of month 3:00 AM');
+    console.log('   • Benchmark sync: Sundays 3:00 AM');
     console.log('   • News aggregator: Hourly 7am-11pm');
     console.log('   • Hot score update: Every hour at :30');
 }

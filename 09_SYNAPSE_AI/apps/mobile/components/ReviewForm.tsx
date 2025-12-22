@@ -11,6 +11,7 @@ import { SPACING, RADIUS, API_URL } from '@/constants/config';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemeColors } from '@/constants/themes';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { incrementStat } from '@/lib/userStats';
 
 interface ReviewFormProps {
     modelId: string;
@@ -95,6 +96,7 @@ export function ReviewForm({ modelId, modelName, onSuccess, onCancel }: ReviewFo
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['models', modelId, 'reviews'] });
             queryClient.invalidateQueries({ queryKey: ['models', modelId, 'stats'] });
+            incrementStat('reviewsGiven');
             onSuccess?.();
         },
     });

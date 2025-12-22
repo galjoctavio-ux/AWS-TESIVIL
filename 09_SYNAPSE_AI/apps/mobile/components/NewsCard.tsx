@@ -168,7 +168,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
         borderRadius: 24,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: colors.surface,
+        backgroundColor: '#FFFFFF',
         overflow: 'hidden',
     },
     logoImage: {

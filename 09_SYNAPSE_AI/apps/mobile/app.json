@@ -40,6 +40,14 @@
                     "icon": "./assets/notification-icon.png",
                     "color": "#7C3AED"
                 }
+            ],
+            [
+                "@sentry/react-native/expo",
+                {
+                    "url": "https://sentry.io/",
+                    "organization": "tesivil",
+                    "project": "synapse-mobile"
+                }
             ]
         ],
         "scheme": "synapse",

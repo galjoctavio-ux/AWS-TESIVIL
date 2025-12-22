@@ -5,7 +5,7 @@ import {
     ScrollView,
     TouchableOpacity,
     StyleSheet,
-    Linking,
+    Image,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -15,6 +15,8 @@ import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemeColors } from '@/constants/themes';
 import { SPACING, RADIUS } from '@/constants/config';
+import { PaletteIcon, FeedIcon, TrophyIcon, RocketIcon } from '@/components/OnboardingIcons';
+import { LegalDocumentModal } from '@/components/LegalDocumentModal';
 
 const ONBOARDING_COMPLETE_KEY = '@synapse_onboarding_complete';
 
@@ -24,6 +26,7 @@ export default function OnboardingScreen() {
     const { colors, isDark } = useTheme();
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [privacyAccepted, setPrivacyAccepted] = useState(false);
+    const [legalModalType, setLegalModalType] = useState<'terms' | 'privacy' | null>(null);
 
     const styles = createStyles(colors);
     const canContinue = termsAccepted && privacyAccepted;
@@ -39,21 +42,26 @@ export default function OnboardingScreen() {
         try {
             await AsyncStorage.setItem(ONBOARDING_COMPLETE_KEY, 'true');
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            // Use push instead of replace to avoid race condition with layout effect
-            router.push('/(tabs)/engine');
+            // Use replace to prevent going back to onboarding
+            // Small delay to ensure AsyncStorage write is complete before navigation
+            setTimeout(() => {
+                router.replace('/(tabs)/engine');
+            }, 100);
         } catch (error) {
             console.error('Error saving onboarding state:', error);
         }
     };
 
     const handleOpenTerms = () => {
-        // TODO: Replace with actual terms URL
-        Linking.openURL('https://synapse.ai/terms');
+        setLegalModalType('terms');
     };
 
     const handleOpenPrivacy = () => {
-        // TODO: Replace with actual privacy URL
-        Linking.openURL('https://synapse.ai/privacy');
+        setLegalModalType('privacy');
+    };
+
+    const handleCloseLegalModal = () => {
+        setLegalModalType(null);
     };
 
     return (
@@ -69,7 +77,13 @@ export default function OnboardingScreen() {
                 >
                     {/* Logo/Header */}
                     <View style={styles.header}>
-                        <Text style={styles.logo}>✨</Text>
+                        <View style={styles.logoContainer}>
+                            <Image
+                                source={require('@/assets/images/placeholder-logo.png')}
+                                style={styles.logoImage}
+                                resizeMode="contain"
+                            />
+                        </View>
                         <Text style={styles.title}>SYNAPSE AI</Text>
                         <Text style={styles.subtitle}>
                             Tu asistente de prompts inteligente
@@ -79,7 +93,9 @@ export default function OnboardingScreen() {
                     {/* Features */}
                     <View style={styles.features}>
                         <View style={styles.feature}>
-                            <Text style={styles.featureIcon}>🎨</Text>
+                            <View style={styles.featureIconContainer}>
+                                <PaletteIcon size={28} color={colors.primary} />
+                            </View>
                             <View style={styles.featureContent}>
                                 <Text style={styles.featureTitle}>Generador de Prompts</Text>
                                 <Text style={styles.featureDesc}>
@@ -88,7 +104,9 @@ export default function OnboardingScreen() {
                             </View>
                         </View>
                         <View style={styles.feature}>
-                            <Text style={styles.featureIcon}>📰</Text>
+                            <View style={styles.featureIconContainer}>
+                                <FeedIcon size={28} color={colors.primary} />
+                            </View>
                             <View style={styles.featureContent}>
                                 <Text style={styles.featureTitle}>Noticias de IA</Text>
                                 <Text style={styles.featureDesc}>
@@ -97,7 +115,9 @@ export default function OnboardingScreen() {
                             </View>
                         </View>
                         <View style={styles.feature}>
-                            <Text style={styles.featureIcon}>🏆</Text>
+                            <View style={styles.featureIconContainer}>
+                                <TrophyIcon size={28} color={colors.primary} />
+                            </View>
                             <View style={styles.featureContent}>
                                 <Text style={styles.featureTitle}>Ranking de Modelos</Text>
                                 <Text style={styles.featureDesc}>
@@ -157,13 +177,23 @@ export default function OnboardingScreen() {
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 0 }}
                         >
-                            <Text style={styles.buttonText}>
-                                Comenzar 🚀
-                            </Text>
+                            <View style={styles.buttonContent}>
+                                <Text style={styles.buttonText}>Comenzar</Text>
+                                <RocketIcon size={22} color="#FFFFFF" />
+                            </View>
                         </LinearGradient>
                     </TouchableOpacity>
                 </View>
             </LinearGradient>
+
+            {/* Legal Document Modal */}
+            {legalModalType && (
+                <LegalDocumentModal
+                    visible={true}
+                    onClose={handleCloseLegalModal}
+                    type={legalModalType}
+                />
+            )}
         </View>
     );
 }
@@ -188,9 +218,22 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
         marginTop: 40,
         marginBottom: 40,
     },
-    logo: {
-        fontSize: 64,
+    logoContainer: {
+        width: 100,
+        height: 100,
         marginBottom: 16,
+        borderRadius: 24,
+        overflow: 'hidden',
+        backgroundColor: '#FFFFFF',
+        shadowColor: colors.primary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 12,
+        elevation: 8,
+    },
+    logoImage: {
+        width: '100%',
+        height: '100%',
     },
     title: {
         fontSize: 32,
@@ -217,8 +260,13 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
         borderColor: `${colors.primary}30`,
         gap: 12,
     },
-    featureIcon: {
-        fontSize: 24,
+    featureIconContainer: {
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        backgroundColor: `${colors.primary}25`,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     featureContent: {
         flex: 1,
@@ -299,6 +347,11 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     buttonGradient: {
         paddingVertical: 18,
         alignItems: 'center',
+    },
+    buttonContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
     },
     buttonText: {
         fontSize: 18,
