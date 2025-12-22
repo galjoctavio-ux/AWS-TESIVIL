@@ -15,13 +15,13 @@ const GenerateSchema = z.object({
     description: z.string().min(3).max(500),
     style: z.enum([
         'fotorealismo',
+        'arquitectura',
+        'minimalismo',
         'anime',
         '3d_pixar',
         'cyberpunk',
         'oleo',
         'arte_digital',
-        'minimalista',
-        'acuarela',
     ]),
     lighting: z.string().optional().default('natural'),
     lensOrTechnique: z.string().optional(),
@@ -139,7 +139,7 @@ const promptsRoutes: FastifyPluginAsync = async (fastify) => {
             const data = SaveSchema.parse(request.body);
 
             const { data: saved, error } = await supabaseAdmin
-                .from('prompt_history')
+                .from('prompt_builder_history')
                 .insert({
                     user_id: userId,
                     raw_input: data.rawInput,
@@ -201,7 +201,7 @@ const promptsRoutes: FastifyPluginAsync = async (fastify) => {
             const limit = Math.min(parseInt(query.limit || '5'), 100);
 
             const { data: history, error } = await supabaseAdmin
-                .from('prompt_history')
+                .from('prompt_builder_history')
                 .select('*')
                 .eq('user_id', userId)
                 .order('created_at', { ascending: false })

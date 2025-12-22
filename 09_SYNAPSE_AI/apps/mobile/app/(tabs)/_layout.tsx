@@ -1,16 +1,52 @@
 import { Tabs } from 'expo-router';
 import { View, Text, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Icon, IconName } from '@/components/icons/Icon';
+import { useTheme } from '@/contexts/ThemeContext';
+import { ThemeColors } from '@/constants/themes';
 
-// Tab icons (using Unicode for now, replace with proper icons later)
-function TabIcon({ icon, label, focused }: { icon: string; label: string; focused: boolean }) {
+// Tab configuration with Lucide icons (colors will be dynamic)
+const getTabConfig = (colors: ThemeColors): Record<string, { icon: IconName; label: string; color: string }> => ({
+    engine: { icon: 'Sparkles', label: 'Prompt+', color: colors.engine },
+    feed: { icon: 'Newspaper', label: 'Noticias', color: colors.feed },
+    pulse: { icon: 'BarChart3', label: 'Ranking', color: colors.pulse },
+    showcase: { icon: 'Rocket', label: 'Showcase', color: colors.showcase },
+    academy: { icon: 'GraduationCap', label: 'Academia', color: colors.academy },
+    profile: { icon: 'User', label: 'Perfil', color: colors.primary },
+});
+
+// Tab icon component with glow effect for active state
+function TabIcon({
+    tabName,
+    focused,
+    colors,
+}: {
+    tabName: string;
+    focused: boolean;
+    colors: ThemeColors;
+}) {
+    const tabConfig = getTabConfig(colors);
+    const config = tabConfig[tabName];
+    if (!config) return null;
+
+    const color = focused ? config.color : colors.textMuted;
+    const styles = createStyles(colors);
+
     return (
         <View style={styles.tabIconContainer}>
-            <Text style={[styles.tabIcon, focused && styles.tabIconFocused]}>
-                {icon}
-            </Text>
-            <Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>
-                {label}
+            <Icon
+                name={config.icon}
+                size={24}
+                color={color}
+                strokeWidth={focused ? 2 : 1.5}
+                glow={focused}
+                glowColor={config.color}
+            />
+            <Text style={[
+                styles.tabLabel,
+                focused && { color: config.color, fontWeight: '600' }
+            ]}>
+                {config.label}
             </Text>
         </View>
     );
@@ -18,21 +54,22 @@ function TabIcon({ icon, label, focused }: { icon: string; label: string; focuse
 
 export default function TabsLayout() {
     const insets = useSafeAreaInsets();
+    const { colors } = useTheme();
 
     return (
         <Tabs
             screenOptions={{
                 headerShown: false,
                 tabBarStyle: {
-                    backgroundColor: '#16162A',
-                    borderTopColor: '#2E1065',
+                    backgroundColor: colors.surface,
+                    borderTopColor: colors.surfaceBorder,
                     borderTopWidth: 1,
                     height: 70 + insets.bottom,
                     paddingBottom: insets.bottom,
                     paddingTop: 8,
                 },
-                tabBarActiveTintColor: '#8B5CF6',
-                tabBarInactiveTintColor: '#6B7280',
+                tabBarActiveTintColor: colors.primary,
+                tabBarInactiveTintColor: colors.textMuted,
                 tabBarShowLabel: false,
             }}
         >
@@ -40,7 +77,7 @@ export default function TabsLayout() {
                 name="engine"
                 options={{
                     tabBarIcon: ({ focused }) => (
-                        <TabIcon icon="✨" label="Engine" focused={focused} />
+                        <TabIcon tabName="engine" focused={focused} colors={colors} />
                     ),
                 }}
             />
@@ -48,7 +85,7 @@ export default function TabsLayout() {
                 name="feed"
                 options={{
                     tabBarIcon: ({ focused }) => (
-                        <TabIcon icon="📰" label="Feed" focused={focused} />
+                        <TabIcon tabName="feed" focused={focused} colors={colors} />
                     ),
                 }}
             />
@@ -56,7 +93,7 @@ export default function TabsLayout() {
                 name="pulse"
                 options={{
                     tabBarIcon: ({ focused }) => (
-                        <TabIcon icon="📊" label="Pulse" focused={focused} />
+                        <TabIcon tabName="pulse" focused={focused} colors={colors} />
                     ),
                 }}
             />
@@ -64,7 +101,15 @@ export default function TabsLayout() {
                 name="showcase"
                 options={{
                     tabBarIcon: ({ focused }) => (
-                        <TabIcon icon="🚀" label="Showcase" focused={focused} />
+                        <TabIcon tabName="showcase" focused={focused} colors={colors} />
+                    ),
+                }}
+            />
+            <Tabs.Screen
+                name="academy"
+                options={{
+                    tabBarIcon: ({ focused }) => (
+                        <TabIcon tabName="academy" focused={focused} colors={colors} />
                     ),
                 }}
             />
@@ -72,7 +117,7 @@ export default function TabsLayout() {
                 name="profile"
                 options={{
                     tabBarIcon: ({ focused }) => (
-                        <TabIcon icon="👤" label="Perfil" focused={focused} />
+                        <TabIcon tabName="profile" focused={focused} colors={colors} />
                     ),
                 }}
             />
@@ -80,26 +125,15 @@ export default function TabsLayout() {
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
     tabIconContainer: {
         alignItems: 'center',
         justifyContent: 'center',
         gap: 4,
     },
-    tabIcon: {
-        fontSize: 22,
-        opacity: 0.6,
-    },
-    tabIconFocused: {
-        opacity: 1,
-    },
     tabLabel: {
         fontSize: 10,
-        color: '#6B7280',
+        color: colors.textMuted,
         fontWeight: '500',
-    },
-    tabLabelFocused: {
-        color: '#8B5CF6',
-        fontWeight: '600',
     },
 });

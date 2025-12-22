@@ -23,9 +23,9 @@ export async function apiFetch<T = any>(
     const { requiresAuth = false, ...fetchOptions } = options;
 
     // Build headers
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
         'Content-Type': 'application/json',
-        ...fetchOptions.headers,
+        ...(fetchOptions.headers as Record<string, string> || {}),
     };
 
     // Add auth header if required
@@ -85,6 +85,7 @@ export async function generatePrompt(config: {
     description: string;
     style: string;
     lighting?: string;
+    lensOrTechnique?: string;
     aspectRatio?: string;
     targetEngine?: string;
 }) {

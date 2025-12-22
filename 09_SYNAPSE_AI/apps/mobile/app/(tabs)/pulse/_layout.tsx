@@ -4,11 +4,24 @@ export default function PulseLayout() {
     return (
         <Stack
             screenOptions={{
-                headerShown: false,
-                contentStyle: { backgroundColor: '#0F0F23' },
+                headerShown: true,
+                headerStyle: { backgroundColor: '#0B0E14' },
+                headerTintColor: '#FFFFFF',
+                headerTitleStyle: { fontWeight: '600' },
+                contentStyle: { backgroundColor: '#0B0E14' },
             }}
         >
-            <Stack.Screen name="index" />
+            <Stack.Screen
+                name="index"
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="[id]"
+                options={{
+                    headerShown: true,
+                    title: 'Detalle del Modelo',
+                }}
+            />
         </Stack>
     );
 }

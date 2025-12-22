@@ -13,6 +13,9 @@ import promptsRoutes from './routes/prompts';
 import modelsRoutes from './routes/models';
 import newsRoutes from './routes/news';
 import projectsRoutes from './routes/projects';
+import adminRoutes from './routes/admin';
+import academyRoutes from './routes/academy';
+
 
 // Cron Jobs
 import { initCronJobs } from './jobs';
@@ -38,6 +41,8 @@ fastify.register(promptsRoutes, { prefix: '/api/prompts' });
 fastify.register(modelsRoutes, { prefix: '/api/models' });
 fastify.register(newsRoutes, { prefix: '/api/news' });
 fastify.register(projectsRoutes, { prefix: '/api/projects' });
+fastify.register(adminRoutes, { prefix: '/api/admin' });
+fastify.register(academyRoutes, { prefix: '/api/academy' });
 
 // Health check
 fastify.get('/health', async () => {

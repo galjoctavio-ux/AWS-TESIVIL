@@ -105,12 +105,14 @@ export async function assemblePrompt(
 
     // Get negative prompt from config (defined in assembler file)
     const negativePrompts: Record<string, string> = {
-        fotorealismo: '--no cartoon, drawing, anime',
-        anime: '--no realistic, photo, 3d',
-        '3d_pixar': '--no 2d, flat, sketch',
-        cyberpunk: '--no daylight, natural, vintage',
-        oleo: '--no photo, digital, sharp',
-        arte_digital: '--no photo, traditional',
+        fotorealismo: '--no cartoon, drawing, anime, text, watermark',
+        arquitectura: '--no cartoon, illustration, people, text',
+        minimalismo: '--no busy, cluttered, detailed, noise',
+        anime: '--no realistic, photo, 3d, western',
+        '3d_pixar': '--no 2d, flat, sketch, realistic',
+        cyberpunk: '--no daylight, natural, vintage, old',
+        oleo: '--no photo, digital, sharp, modern',
+        arte_digital: '--no photo, traditional, noise, blur',
     };
 
     return {
@@ -126,22 +128,46 @@ export async function assemblePrompt(
 export async function refineModels(rawModels: any[]): Promise<any[]> {
     const systemPrompt = loadPrompt('pulse/model_refiner.txt');
 
-    const response = await getGroq().chat.completions.create({
-        model: 'llama-3.3-70b-versatile',
-        temperature: 0.2,
-        max_tokens: 2000,
-        messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: JSON.stringify(rawModels) },
-        ],
-    });
-
     try {
+        const response = await getGroq().chat.completions.create({
+            model: 'llama-3.3-70b-versatile',
+            temperature: 0.1,
+            max_tokens: 4000,
+            messages: [
+                { role: 'system', content: systemPrompt + '\n\nIMPORTANT: Respond ONLY with a valid JSON array, no extra text.' },
+                { role: 'user', content: JSON.stringify(rawModels) },
+            ],
+        });
+
         const content = response.choices[0]?.message?.content || '[]';
-        return JSON.parse(content);
+
+        // Try to extract JSON array from response
+        const jsonMatch = content.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+            return JSON.parse(jsonMatch[0]);
+        }
+
+        // If no JSON array found, return raw models with default scores
+        console.warn('No JSON array in Groq response, using raw models with defaults');
+        return rawModels.map(m => ({
+            ...m,
+            score_overall: 70,
+            score_reasoning: null,
+            score_coding: null,
+            score_creative: null,
+            score_speed: null,
+            trend: 'stable',
+            is_new: false,
+        }));
     } catch (error) {
-        console.error('Failed to parse refined models:', error);
-        return [];
+        console.error('Failed to refine models with Groq:', error);
+        // Return raw models with defaults as fallback
+        return rawModels.map(m => ({
+            ...m,
+            score_overall: 70,
+            trend: 'stable',
+            is_new: false,
+        }));
     }
 }
 

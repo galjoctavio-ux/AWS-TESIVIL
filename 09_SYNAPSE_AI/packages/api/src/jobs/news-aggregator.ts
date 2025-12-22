@@ -21,18 +21,8 @@ const RSS_FEEDS = [
         url: 'https://openai.com/blog/rss.xml',
         priority: 1,
     },
-    {
-        name: 'Google AI Blog',
-        url: 'https://ai.googleblog.com/feeds/posts/default?alt=rss',
-        priority: 1,
-    },
-    {
-        name: 'Anthropic',
-        url: 'https://www.anthropic.com/rss.xml',
-        priority: 1,
-    },
 
-    // Tech News
+    // Tech News (verified working)
     {
         name: 'TechCrunch AI',
         url: 'https://techcrunch.com/category/artificial-intelligence/feed/',
@@ -44,8 +34,8 @@ const RSS_FEEDS = [
         priority: 2,
     },
     {
-        name: 'Ars Technica AI',
-        url: 'https://feeds.arstechnica.com/arstechnica/ai-ml',
+        name: 'Wired AI',
+        url: 'https://www.wired.com/feed/tag/ai/latest/rss',
         priority: 2,
     },
 
@@ -75,7 +65,7 @@ async function isDuplicate(
     const { data: existingByUrl } = await supabaseAdmin
         .from('news_articles')
         .select('id')
-        .eq('original_url', url)
+        .eq('url_original', url)
         .limit(1);
 
     if (existingByUrl && existingByUrl.length > 0) {
@@ -86,7 +76,7 @@ async function isDuplicate(
     const { data: existingByTitle } = await supabaseAdmin
         .from('news_articles')
         .select('id')
-        .ilike('original_title', title)
+        .ilike('title', title)
         .limit(1);
 
     if (existingByTitle && existingByTitle.length > 0) {
@@ -136,7 +126,7 @@ export async function aggregateNews(): Promise<number> {
                     const { data: existing } = await supabaseAdmin
                         .from('news_articles')
                         .select('id')
-                        .or(`original_url.eq.${item.link},original_title.ilike.${item.title}`)
+                        .or(`url_original.eq.${item.link},title.ilike.${item.title}`)
                         .limit(1);
 
                     if (existing && existing.length > 0) {
@@ -151,11 +141,15 @@ export async function aggregateNews(): Promise<number> {
                         Summary: ${item.contentSnippet || item.content || 'No content available'}
                     `;
 
+                    // Add delay to prevent Gemini rate limiting (1.5 seconds)
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
                     // Process with Gemini
                     const processed = await processNewsArticle(rawContent);
 
                     if (!processed) {
                         console.log(`    ⚠️ Failed to process: ${item.title?.slice(0, 50)}...`);
+                        errorCount++;
                         continue;
                     }
 
@@ -166,21 +160,36 @@ export async function aggregateNews(): Promise<number> {
                     }
 
                     // Insert into database
+                    // Derive simple category from topic_id for filtering
+                    const topicLower = (processed.topic_id || '').toLowerCase();
+                    let category = 'general';
+                    if (topicLower.includes('model') || topicLower.includes('gpt') || topicLower.includes('llm') || topicLower.includes('claude') || topicLower.includes('gemini')) {
+                        category = 'models';
+                    } else if (topicLower.includes('research') || topicLower.includes('paper') || topicLower.includes('study')) {
+                        category = 'research';
+                    } else if (topicLower.includes('tool') || topicLower.includes('api') || topicLower.includes('sdk') || topicLower.includes('library')) {
+                        category = 'tools';
+                    } else if (topicLower.includes('business') || topicLower.includes('funding') || topicLower.includes('acquisition') || topicLower.includes('startup')) {
+                        category = 'business';
+                    }
+
                     const { error } = await supabaseAdmin
                         .from('news_articles')
                         .insert({
+                            title: processed.title || item.title,
                             source_name: feed.name,
-                            source_url: feed.url,
-                            original_title: item.title,
-                            original_url: item.link,
-                            processed_title: processed.title,
-                            bullets: processed.bullets,
-                            why_it_matters: processed.why_it_matters,
-                            topic_id: processed.topic_id,
-                            importance: processed.importance,
-                            is_breaking: processed.importance >= 9,
+                            url_original: item.link,
+                            topic_id: processed.topic_id || 'general',
+                            category: category,
+                            importance: processed.importance || 5,
+                            summary_json: {
+                                original_title: item.title,
+                                processed_title: processed.title,
+                                bullets: processed.bullets,
+                                why_it_matters: processed.why_it_matters,
+                            },
+                            image_url: null,
                             published_at: item.pubDate ? new Date(item.pubDate).toISOString() : null,
-                            processed_at: new Date().toISOString(),
                         });
 
                     if (!error) {

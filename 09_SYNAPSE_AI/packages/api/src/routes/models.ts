@@ -8,10 +8,10 @@ import { supabaseAdmin, AIModel } from '../lib/supabase';
 
 const ReviewSchema = z.object({
     modelId: z.string().uuid(),
-    creativity: z.number().min(1).max(5),
-    speed: z.number().min(1).max(5),
-    accuracy: z.number().min(1).max(5),
-    tag: z.enum(['trabajo', 'hobby', 'estudio']).optional(),
+    starsSpeed: z.number().min(1).max(5),
+    starsPrecision: z.number().min(1).max(5),
+    starsHallucination: z.number().min(1).max(5),
+    useCaseTag: z.enum(['#Código', '#Resumen', '#Análisis', '#Creatividad']).optional(),
     comment: z.string().max(500).optional(),
 });
 
@@ -166,7 +166,7 @@ const modelsRoutes: FastifyPluginAsync = async (fastify) => {
 
             // Get review stats
             const { data: reviews, error: reviewsError } = await supabaseAdmin
-                .from('model_reviews')
+                .from('ai_reviews')
                 .select('*')
                 .eq('model_id', id);
 
@@ -179,13 +179,13 @@ const modelsRoutes: FastifyPluginAsync = async (fastify) => {
             };
 
             if (reviews && reviews.length > 0) {
-                stats.avgCreativity = reviews.reduce((sum, r) => sum + r.creativity, 0) / reviews.length;
-                stats.avgSpeed = reviews.reduce((sum, r) => sum + r.speed, 0) / reviews.length;
-                stats.avgAccuracy = reviews.reduce((sum, r) => sum + r.accuracy, 0) / reviews.length;
+                stats.avgCreativity = reviews.reduce((sum, r) => sum + r.stars_hallucination, 0) / reviews.length;
+                stats.avgSpeed = reviews.reduce((sum, r) => sum + r.stars_speed, 0) / reviews.length;
+                stats.avgAccuracy = reviews.reduce((sum, r) => sum + r.stars_precision, 0) / reviews.length;
 
                 reviews.forEach((r) => {
-                    if (r.tag) {
-                        stats.tagDistribution[r.tag] = (stats.tagDistribution[r.tag] || 0) + 1;
+                    if (r.use_case_tag) {
+                        stats.tagDistribution[r.use_case_tag] = (stats.tagDistribution[r.use_case_tag] || 0) + 1;
                     }
                 });
             }
@@ -211,7 +211,7 @@ const modelsRoutes: FastifyPluginAsync = async (fastify) => {
             const { id } = request.params as { id: string };
 
             const { data: reviews, error } = await supabaseAdmin
-                .from('model_reviews')
+                .from('ai_reviews')
                 .select(`
                     *,
                     profiles (alias, photo_url)
@@ -260,7 +260,7 @@ const modelsRoutes: FastifyPluginAsync = async (fastify) => {
 
             // Check if user already reviewed this model
             const { data: existing, error: checkError } = await supabaseAdmin
-                .from('model_reviews')
+                .from('ai_reviews')
                 .select('id')
                 .eq('model_id', id)
                 .eq('user_id', userId)
@@ -274,14 +274,14 @@ const modelsRoutes: FastifyPluginAsync = async (fastify) => {
             }
 
             const { data: review, error } = await supabaseAdmin
-                .from('model_reviews')
+                .from('ai_reviews')
                 .insert({
                     model_id: id,
                     user_id: userId,
-                    creativity: data.creativity,
-                    speed: data.speed,
-                    accuracy: data.accuracy,
-                    tag: data.tag,
+                    stars_speed: data.starsSpeed,
+                    stars_precision: data.starsPrecision,
+                    stars_hallucination: data.starsHallucination,
+                    use_case_tag: data.useCaseTag,
                     comment: data.comment,
                 })
                 .select()
@@ -364,6 +364,132 @@ const modelsRoutes: FastifyPluginAsync = async (fastify) => {
             return reply.status(500).send({
                 success: false,
                 error: 'Failed to compare models',
+            });
+        }
+    });
+
+    // ───────────────────────────────────────────────────────────────
+    // POST /api/reviews/:reviewId/vote - Vote on a review
+    // ───────────────────────────────────────────────────────────────
+    fastify.post('/reviews/:reviewId/vote', async (request, reply) => {
+        try {
+            const { reviewId } = request.params as { reviewId: string };
+            const userId = (request.headers['x-user-id'] as string) || null;
+            const body = request.body as { voteType: 'upvote' | 'downvote' };
+
+            if (!userId) {
+                return reply.status(401).send({
+                    success: false,
+                    error: 'Authentication required',
+                });
+            }
+
+            if (!body.voteType || !['upvote', 'downvote'].includes(body.voteType)) {
+                return reply.status(400).send({
+                    success: false,
+                    error: 'voteType must be "upvote" or "downvote"',
+                });
+            }
+
+            // Check if review exists
+            const { data: review, error: reviewError } = await supabaseAdmin
+                .from('ai_reviews')
+                .select('id')
+                .eq('id', reviewId)
+                .single();
+
+            if (reviewError || !review) {
+                return reply.status(404).send({
+                    success: false,
+                    error: 'Review not found',
+                });
+            }
+
+            // Upsert vote (update if exists, insert if not)
+            const { data: vote, error: voteError } = await supabaseAdmin
+                .from('ai_votes')
+                .upsert(
+                    {
+                        review_id: reviewId,
+                        user_id: userId,
+                        vote_type: body.voteType,
+                    },
+                    { onConflict: 'review_id,user_id' }
+                )
+                .select()
+                .single();
+
+            if (voteError) {
+                fastify.log.error(voteError);
+                return reply.status(500).send({
+                    success: false,
+                    error: 'Failed to save vote',
+                });
+            }
+
+            // Get updated vote count
+            const { data: counts } = await supabaseAdmin
+                .from('ai_votes')
+                .select('vote_type')
+                .eq('review_id', reviewId);
+
+            const upvotes = counts?.filter(v => v.vote_type === 'upvote').length || 0;
+            const downvotes = counts?.filter(v => v.vote_type === 'downvote').length || 0;
+
+            return {
+                success: true,
+                data: {
+                    vote,
+                    helpfulCount: upvotes - downvotes,
+                },
+            };
+        } catch (error: any) {
+            fastify.log.error(error);
+            return reply.status(500).send({
+                success: false,
+                error: 'Failed to process vote',
+            });
+        }
+    });
+
+    // ───────────────────────────────────────────────────────────────
+    // DELETE /api/reviews/:reviewId/vote - Remove vote from review
+    // ───────────────────────────────────────────────────────────────
+    fastify.delete('/reviews/:reviewId/vote', async (request, reply) => {
+        try {
+            const { reviewId } = request.params as { reviewId: string };
+            const userId = (request.headers['x-user-id'] as string) || null;
+
+            if (!userId) {
+                return reply.status(401).send({
+                    success: false,
+                    error: 'Authentication required',
+                });
+            }
+
+            const { error } = await supabaseAdmin
+                .from('ai_votes')
+                .delete()
+                .eq('review_id', reviewId)
+                .eq('user_id', userId);
+
+            if (error) {
+                fastify.log.error(error);
+                return reply.status(500).send({
+                    success: false,
+                    error: 'Failed to remove vote',
+                });
+            }
+
+            return {
+                success: true,
+                message: 'Vote removed',
+            };
+        } catch (error: any) {
+            fastify.log.error(error);
+            return reply.status(500).send({
+                success: false,
+                error: 'Failed to remove vote',
             });
         }
     });

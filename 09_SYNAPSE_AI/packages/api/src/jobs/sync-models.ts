@@ -70,18 +70,18 @@ export async function syncModels(): Promise<number> {
 
         // Transform to our schema
         const transformedModels = relevantModels.map((m) => ({
-            slug: m.id,
+            id: m.id,
             name: m.name,
-            provider_id: m.id.split('/')[0] || 'unknown',
+            brand: m.id.split('/')[0] || 'unknown',
             category: categorizeModel(m),
-            description: m.description || null,
-            pricing_input: parseFloat(m.pricing.prompt) || 0,
-            pricing_output: parseFloat(m.pricing.completion) || 0,
-            context_length: m.context_length || m.top_provider?.context_length || null,
+            version: m.name.match(/[\d.]+/)?.[0] || null,
+            pricing_input_1m: parseFloat(m.pricing.prompt) * 1000000 || 0,
+            pricing_output_1m: parseFloat(m.pricing.completion) * 1000000 || 0,
+            context_window: m.context_length || m.top_provider?.context_length || null,
         }));
 
-        // Refine with Groq (adds scores, trends, etc.)
-        const refinedModels = await refineModels(transformedModels.slice(0, 20));
+        // Refine with Groq (adds scores, trends, etc.) - process up to 50 models
+        const refinedModels = await refineModels(transformedModels.slice(0, 50));
 
         console.log(`✨ Refined ${refinedModels.length} models with Groq`);
 
@@ -90,37 +90,56 @@ export async function syncModels(): Promise<number> {
 
         for (const model of refinedModels) {
             try {
+                // Upsert model
                 const { error } = await supabaseAdmin
                     .from('ai_models')
                     .upsert(
                         {
-                            slug: model.slug,
+                            id: model.id,
                             name: model.name,
-                            provider_id: model.provider_id,
-                            category: model.category || 'general',
-                            description: model.description,
-                            pricing_input: model.pricing_input || 0,
-                            pricing_output: model.pricing_output || 0,
-                            context_length: model.context_length,
-                            score_overall: model.score_overall || 0,
+                            brand: model.brand,
+                            version: model.version,
+                            category: model.category || 'pro',
+                            pricing_input_1m: model.pricing_input_1m || 0,
+                            pricing_output_1m: model.pricing_output_1m || 0,
+                            context_window: model.context_window,
+                            score_overall: model.score_overall || 75,
                             score_reasoning: model.score_reasoning || null,
                             score_coding: model.score_coding || null,
                             score_creative: model.score_creative || null,
                             score_speed: model.score_speed || null,
                             trend: model.trend || 'stable',
                             is_new: model.is_new || false,
-                            synced_at: new Date().toISOString(),
+                            is_active: true,
+                            updated_at: new Date().toISOString(),
                         },
-                        { onConflict: 'slug' }
+                        { onConflict: 'id' }
                     );
 
                 if (!error) {
                     upsertedCount++;
+
+                    // Create/update ai_stats entry for this model
+                    await supabaseAdmin
+                        .from('ai_stats')
+                        .upsert(
+                            {
+                                model_id: model.id,
+                                benchmark_score: model.score_overall || 75,
+                                community_score: null,
+                                avg_speed: null,
+                                avg_precision: null,
+                                avg_hallucination: null,
+                                reviews_count: 0,
+                                updated_at: new Date().toISOString(),
+                            },
+                            { onConflict: 'model_id' }
+                        );
                 } else {
-                    console.error(`Failed to upsert model ${model.slug}:`, error);
+                    console.error(`Failed to upsert model ${model.id}:`, error);
                 }
             } catch (err) {
-                console.error(`Error upserting model ${model.slug}:`, err);
+                console.error(`Error upserting model ${model.id}:`, err);
             }
         }
 

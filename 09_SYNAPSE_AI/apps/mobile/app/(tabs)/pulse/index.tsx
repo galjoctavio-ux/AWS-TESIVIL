@@ -6,12 +6,20 @@ import {
     ActivityIndicator,
     RefreshControl,
     StyleSheet,
-    TouchableOpacity,
+    Pressable,
+    TextInput,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
-import { COLORS, SPACING, RADIUS, API_URL } from '@/constants/config';
+import { LinearGradient } from 'expo-linear-gradient';
+import { SPACING, RADIUS, API_URL } from '@/constants/config';
+import { useTheme } from '@/contexts/ThemeContext';
+import { ThemeColors } from '@/constants/themes';
 import { ModelCard, Podium } from '@/components/ModelCard';
+import { Icon } from '@/components/icons/Icon';
+import { EmptyState } from '@/components/EmptyState';
+import { SkeletonList } from '@/components/SkeletonCard';
 
 // Fetch models from API
 async function fetchModels(category?: string): Promise<any[]> {
@@ -26,7 +34,7 @@ async function fetchModels(category?: string): Promise<any[]> {
     const data = await response.json();
 
     if (!data.success) {
-        throw new Error(data.error || 'Failed to fetch models');
+        throw new Error(data.error || 'Error al cargar modelos');
     }
 
     return data.data || [];
@@ -38,24 +46,29 @@ async function fetchTopModels(): Promise<any[]> {
     const data = await response.json();
 
     if (!data.success) {
-        throw new Error(data.error || 'Failed to fetch top models');
+        throw new Error(data.error || 'Error al cargar top modelos');
     }
 
     return data.data || [];
 }
 
-// Categories filter
+// Categories filter with Lucide icons
 const CATEGORIES = [
-    { id: 'all', label: 'Todos', icon: '🏆' },
-    { id: 'chat', label: 'Chat', icon: '💬' },
-    { id: 'code', label: 'Código', icon: '👨‍💻' },
-    { id: 'image', label: 'Imagen', icon: '🎨' },
-    { id: 'audio', label: 'Audio', icon: '🎵' },
+    { id: 'all', label: 'Todos', icon: 'Trophy' as const },
+    { id: 'chat', label: 'Chat', icon: 'MessageSquare' as const },
+    { id: 'code', label: 'Código', icon: 'Terminal' as const },
+    { id: 'image', label: 'Imagen', icon: 'Palette' as const },
+    { id: 'audio', label: 'Audio', icon: 'Music' as const },
 ];
 
 export default function PulseScreen() {
     const insets = useSafeAreaInsets();
+    const router = useRouter();
+    const { colors } = useTheme();
     const [selectedCategory, setSelectedCategory] = useState('all');
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const styles = createStyles(colors);
 
     // Query for top 3 models
     const topModelsQuery = useQuery({
@@ -72,11 +85,18 @@ export default function PulseScreen() {
     const topModels = topModelsQuery.data || [];
     const models = modelsQuery.data || [];
 
+    // Filter models by search
+    const filteredModels = searchQuery
+        ? models.filter((m: any) =>
+            m.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            m.provider_id?.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        : models;
+
     // Handle model press
     const handleModelPress = useCallback((model: any) => {
-        // TODO: Navigate to model detail
-        console.log('Model pressed:', model.name);
-    }, []);
+        router.push(`/pulse/${model.id}`);
+    }, [router]);
 
     // Handle refresh
     const handleRefresh = () => {
@@ -103,8 +123,25 @@ export default function PulseScreen() {
     // Header with podium
     const renderHeader = () => (
         <View>
+            {/* Search Bar */}
+            <View style={styles.searchContainer}>
+                <Icon name="Search" size={18} color={colors.textMuted} />
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder="Buscar modelo..."
+                    placeholderTextColor={colors.textMuted}
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                />
+                {searchQuery.length > 0 && (
+                    <Pressable onPress={() => setSearchQuery('')}>
+                        <Icon name="X" size={18} color={colors.textMuted} />
+                    </Pressable>
+                )}
+            </View>
+
             {/* Podium */}
-            {topModels.length >= 3 && (
+            {topModels.length >= 3 && !searchQuery && (
                 <Podium models={topModels} onModelPress={handleModelPress} />
             )}
 
@@ -112,23 +149,33 @@ export default function PulseScreen() {
             <View style={styles.rankingsHeader}>
                 <Text style={styles.rankingsTitle}>Rankings</Text>
                 <Text style={styles.rankingsSubtitle}>
-                    {models.length} modelos
+                    {filteredModels.length} modelos
                 </Text>
             </View>
         </View>
     );
 
-    // Empty state
+    // Empty state with action button
     const renderEmpty = () => {
         if (modelsQuery.isLoading) return null;
         return (
-            <View style={styles.emptyContainer}>
-                <Text style={styles.emptyIcon}>🤖</Text>
-                <Text style={styles.emptyTitle}>No hay modelos</Text>
-                <Text style={styles.emptySubtitle}>
-                    No se encontraron modelos en esta categoría.
-                </Text>
-            </View>
+            <EmptyState
+                icon="Brain"
+                iconColor={colors.pulse}
+                title="No hay modelos"
+                subtitle={searchQuery
+                    ? `No se encontraron modelos que coincidan con "${searchQuery}"`
+                    : "No se encontraron modelos en esta categoría."
+                }
+                actionLabel={searchQuery ? "Limpiar búsqueda" : "Explorar todas las categorías"}
+                onAction={() => {
+                    if (searchQuery) {
+                        setSearchQuery('');
+                    } else {
+                        setSelectedCategory('all');
+                    }
+                }}
+            />
         );
     };
 
@@ -139,12 +186,15 @@ export default function PulseScreen() {
         <View style={[styles.container, { paddingTop: insets.top }]}>
             {/* Header */}
             <View style={styles.header}>
-                <Text style={styles.title}>📊 Pulse</Text>
+                <View style={styles.headerTitle}>
+                    <Icon name="BarChart3" size={28} color={colors.pulse} />
+                    <Text style={styles.title}>Ranking</Text>
+                </View>
                 <Text style={styles.subtitle}>Rankings de modelos de IA</Text>
             </View>
 
-            {/* Categories Filter */}
-            <View style={styles.categoriesContainer}>
+            {/* Categories Filter with fade edges */}
+            <View style={styles.categoriesWrapper}>
                 <FlatList
                     horizontal
                     data={CATEGORIES}
@@ -152,14 +202,20 @@ export default function PulseScreen() {
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={styles.categoriesList}
                     renderItem={({ item }) => (
-                        <TouchableOpacity
-                            style={[
+                        <Pressable
+                            style={({ pressed }) => [
                                 styles.categoryChip,
                                 selectedCategory === item.id && styles.categoryChipSelected,
+                                pressed && styles.chipPressed,
                             ]}
                             onPress={() => setSelectedCategory(item.id)}
                         >
-                            <Text style={styles.categoryIcon}>{item.icon}</Text>
+                            <Icon
+                                name={item.icon}
+                                size={16}
+                                color={selectedCategory === item.id ? colors.pulse : colors.textSecondary}
+                                strokeWidth={selectedCategory === item.id ? 2 : 1.5}
+                            />
                             <Text
                                 style={[
                                     styles.categoryLabel,
@@ -168,23 +224,37 @@ export default function PulseScreen() {
                             >
                                 {item.label}
                             </Text>
-                        </TouchableOpacity>
+                        </Pressable>
                     )}
+                />
+                {/* Fade edges */}
+                <LinearGradient
+                    colors={[colors.background, 'transparent']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.fadeLeft}
+                    pointerEvents="none"
+                />
+                <LinearGradient
+                    colors={['transparent', colors.background]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.fadeRight}
+                    pointerEvents="none"
                 />
             </View>
 
             {/* Loading State */}
             {isLoading && (
                 <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color={COLORS.pulse} />
-                    <Text style={styles.loadingText}>Cargando rankings...</Text>
+                    <SkeletonList count={5} variant="model" />
                 </View>
             )}
 
             {/* Models List */}
             {!isLoading && (
                 <FlatList
-                    data={models.slice(3)} // Skip top 3 (shown in podium)
+                    data={filteredModels.slice(searchQuery ? 0 : 3)} // Skip top 3 if not searching
                     keyExtractor={(item) => item.id}
                     renderItem={renderModel}
                     contentContainerStyle={styles.listContent}
@@ -195,8 +265,8 @@ export default function PulseScreen() {
                         <RefreshControl
                             refreshing={isRefetching}
                             onRefresh={handleRefresh}
-                            tintColor={COLORS.pulse}
-                            colors={[COLORS.pulse]}
+                            tintColor={colors.pulse}
+                            colors={[colors.pulse]}
                         />
                     }
                 />
@@ -205,27 +275,34 @@ export default function PulseScreen() {
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.background,
+        backgroundColor: colors.background,
     },
     header: {
         paddingHorizontal: SPACING.lg,
         paddingTop: SPACING.md,
         paddingBottom: SPACING.sm,
     },
+    headerTitle: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: SPACING.sm,
+    },
     title: {
         fontSize: 28,
         fontWeight: '700',
-        color: COLORS.textPrimary,
+        color: colors.textPrimary,
     },
     subtitle: {
         fontSize: 14,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         marginTop: 4,
+        marginLeft: SPACING.sm + 28,
     },
-    categoriesContainer: {
+    categoriesWrapper: {
+        position: 'relative',
         marginBottom: SPACING.sm,
     },
     categoriesList: {
@@ -235,29 +312,64 @@ const styles = StyleSheet.create({
     categoryChip: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: COLORS.surface,
-        paddingVertical: SPACING.sm,
-        paddingHorizontal: SPACING.md,
+        backgroundColor: colors.surface,
+        paddingVertical: SPACING.sm + 2,
+        paddingHorizontal: SPACING.md + 4,
         borderRadius: RADIUS.full,
         borderWidth: 1,
-        borderColor: COLORS.surfaceBorder,
+        borderColor: colors.surfaceBorder,
         marginRight: SPACING.sm,
+        gap: 8,
+        minWidth: 90,
+        justifyContent: 'center',
     },
     categoryChipSelected: {
-        backgroundColor: `${COLORS.pulse}20`,
-        borderColor: COLORS.pulse,
+        backgroundColor: `${colors.pulse}20`,
+        borderColor: colors.pulse,
     },
-    categoryIcon: {
-        fontSize: 14,
-        marginRight: 4,
+    chipPressed: {
+        opacity: 0.7,
+        transform: [{ scale: 0.97 }],
     },
     categoryLabel: {
         fontSize: 13,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         fontWeight: '500',
     },
     categoryLabelSelected: {
-        color: COLORS.pulse,
+        color: colors.pulse,
+    },
+    fadeLeft: {
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        bottom: 0,
+        width: 20,
+    },
+    fadeRight: {
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        bottom: 0,
+        width: 20,
+    },
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: colors.surface,
+        borderRadius: RADIUS.lg,
+        paddingHorizontal: SPACING.md,
+        paddingVertical: SPACING.sm,
+        marginBottom: SPACING.md,
+        marginHorizontal: SPACING.lg,
+        gap: SPACING.sm,
+        borderWidth: 1,
+        borderColor: colors.surfaceBorder,
+    },
+    searchInput: {
+        flex: 1,
+        fontSize: 14,
+        color: colors.textPrimary,
     },
     rankingsHeader: {
         flexDirection: 'row',
@@ -269,11 +381,11 @@ const styles = StyleSheet.create({
     rankingsTitle: {
         fontSize: 18,
         fontWeight: '600',
-        color: COLORS.textPrimary,
+        color: colors.textPrimary,
     },
     rankingsSubtitle: {
         fontSize: 12,
-        color: COLORS.textMuted,
+        color: colors.textMuted,
     },
     listContent: {
         paddingHorizontal: SPACING.lg,
@@ -281,33 +393,7 @@ const styles = StyleSheet.create({
     },
     loadingContainer: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    loadingText: {
-        marginTop: SPACING.md,
-        color: COLORS.textMuted,
-        fontSize: 14,
-    },
-    emptyContainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: SPACING.xl,
-        marginTop: SPACING.xl,
-    },
-    emptyIcon: {
-        fontSize: 64,
-        marginBottom: SPACING.md,
-    },
-    emptyTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: COLORS.textPrimary,
-    },
-    emptySubtitle: {
-        fontSize: 14,
-        color: COLORS.textMuted,
-        textAlign: 'center',
-        marginTop: SPACING.sm,
+        paddingHorizontal: SPACING.lg,
+        paddingTop: SPACING.md,
     },
 });

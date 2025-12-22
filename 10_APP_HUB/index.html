@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Catálogo de aplicaciones del ecosistema TESIVIL. Descubre todas nuestras apps Android, Web y herramientas de desarrollo.">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/main.css">
+    
+    <title>TESIVIL App Hub - Catálogo de Aplicaciones</title>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-content">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">T</div>
+                <span class="logo-text">TESIVIL <span>App Hub</span></span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <h1 class="hero-title">Ecosistema TESIVIL</h1>
+                <p class="hero-subtitle">
+                    Descubre todas nuestras aplicaciones. Soluciones Android, Web Apps y 
+                    herramientas de desarrollo para potenciar tu productividad.
+                </p>
+            </div>
+        </section>
+
+        <!-- Category Filter -->
+        <section class="container">
+            <div class="category-filter" role="tablist" aria-label="Filtrar por categoría">
+                <button class="filter-btn active" data-category="all" role="tab" aria-selected="true">
+                    Todas
+                </button>
+                <button class="filter-btn" data-category="android" role="tab" aria-selected="false">
+                    📱 Android
+                </button>
+                <button class="filter-btn" data-category="web" role="tab" aria-selected="false">
+                    🌐 Web App
+                </button>
+                <button class="filter-btn" data-category="desktop" role="tab" aria-selected="false">
+                    💻 Desktop
+                </button>
+                <button class="filter-btn" data-category="api" role="tab" aria-selected="false">
+                    🔧 API/Servicio
+                </button>
+            </div>
+        </section>
+
+        <!-- Apps Grid -->
+        <section class="container">
+            <div id="apps-container" class="apps-grid" role="feed" aria-label="Lista de aplicaciones">
+                <!-- Dynamic content loaded by JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <span class="footer-logo">TESIVIL <span>App Hub</span></span>
+            <p>&copy; 2024 TESIVIL. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <!-- Supabase Client CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- App Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/home.js"></script>
+</body>
+</html>

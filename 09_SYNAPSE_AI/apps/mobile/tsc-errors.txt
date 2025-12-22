@@ -1,0 +1,10 @@
+﻿app/(tabs)/engine/index.tsx(108,17): error TS2304: Cannot find name 'alert'.
+app/(tabs)/engine/index.tsx(112,13): error TS2304: Cannot find name 'alert'.
+app/(tabs)/engine/index.tsx(122,17): error TS2353: Object literal may only specify known properties, and 'lensOrTechnique' does not exist in type '{ description: string; style: string; lighting?: string | undefined; aspectRatio?: string | undefined; targetEngine?: string | undefined; }'.
+app/(tabs)/engine/index.tsx(133,17): error TS2304: Cannot find name 'alert'.
+app/(tabs)/engine/index.tsx(137,13): error TS2304: Cannot find name 'alert'.
+app/(tabs)/showcase/index.tsx(508,30): error TS2339: Property 'xs' does not exist on type '{ sm: number; md: number; lg: number; xl: number; xxl: number; full: number; }'.
+components/ProjectDetailSheet.tsx(108,13): error TS2304: Cannot find name 'alert'.
+components/ProjectDetailSheet.tsx(118,13): error TS2304: Cannot find name 'alert'.
+components/ProjectDetailSheet.tsx(576,30): error TS2339: Property 'xs' does not exist on type '{ sm: number; md: number; lg: number; xl: number; xxl: number; full: number; }'.
+lib/api.ts(26,20): error TS2552: Cannot find name 'HeadersInit'. Did you mean 'HeadersInit_'?

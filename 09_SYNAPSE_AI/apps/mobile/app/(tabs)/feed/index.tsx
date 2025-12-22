@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
     View,
     Text,
@@ -7,25 +7,47 @@ import {
     RefreshControl,
     StyleSheet,
     TouchableOpacity,
+    Pressable,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { COLORS, SPACING, RADIUS, API_URL } from '@/constants/config';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import BottomSheet from '@gorhom/bottom-sheet';
+import { LinearGradient } from 'expo-linear-gradient';
+import { SPACING, RADIUS, API_URL } from '@/constants/config';
+import { useTheme } from '@/contexts/ThemeContext';
+import { ThemeColors } from '@/constants/themes';
 import { NewsCard } from '@/components/NewsCard';
+import NewsDetailSheet from '@/components/NewsDetailSheet';
+import { Icon } from '@/components/icons/Icon';
+import { EmptyState } from '@/components/EmptyState';
+import { SkeletonList } from '@/components/SkeletonCard';
 
 // Fetch news from API
-async function fetchNews({ pageParam = 0 }): Promise<{
+async function fetchNews({ pageParam = 0, queryKey }: { pageParam?: number; queryKey: string[] }): Promise<{
     articles: any[];
     nextOffset: number | null;
 }> {
     const limit = 10;
-    const response = await fetch(
-        `${API_URL}/api/news?limit=${limit}&offset=${pageParam}`
-    );
+    const topic = queryKey[1] || 'all'; // Get topic from queryKey ['news', selectedTopic]
+
+    let url = `${API_URL}/api/news?limit=${limit}&offset=${pageParam}`;
+
+    // Add topic filter (skip for 'all' and 'top')
+    if (topic && topic !== 'all' && topic !== 'top') {
+        url += `&topic=${topic}`;
+    }
+
+    // Add sort parameter for 'top' filter
+    if (topic === 'top') {
+        url += '&sort=top';
+    }
+
+    const response = await fetch(url);
     const data = await response.json();
 
     if (!data.success) {
-        throw new Error(data.error || 'Failed to fetch news');
+        throw new Error(data.error || 'Error al cargar noticias');
     }
 
     return {
@@ -34,19 +56,25 @@ async function fetchNews({ pageParam = 0 }): Promise<{
     };
 }
 
-// Topics filter
+// Topics filter with Lucide icons
 const TOPICS = [
-    { id: 'all', label: 'Todo', icon: '📰' },
-    { id: 'models', label: 'Modelos', icon: '🤖' },
-    { id: 'research', label: 'Research', icon: '🔬' },
-    { id: 'tools', label: 'Tools', icon: '🛠️' },
-    { id: 'business', label: 'Business', icon: '💼' },
+    { id: 'all', label: 'Todo', icon: 'LayoutGrid' as const, sort: 'recent' },
+    { id: 'top', label: 'Top', icon: 'TrendingUp' as const, sort: 'top' },
+    { id: 'models', label: 'Modelos', icon: 'Cpu' as const, sort: 'recent' },
+    { id: 'research', label: 'Research', icon: 'FlaskConical' as const, sort: 'recent' },
+    { id: 'tools', label: 'Tools', icon: 'Wrench' as const, sort: 'recent' },
+    { id: 'business', label: 'Business', icon: 'Briefcase' as const, sort: 'recent' },
 ];
 
 export default function FeedScreen() {
     const insets = useSafeAreaInsets();
+    const { colors } = useTheme();
     const [selectedTopic, setSelectedTopic] = useState('all');
-    const [selectedArticle, setSelectedArticle] = useState<any>(null);
+    const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
+    const [isRetrying, setIsRetrying] = useState(false);
+    const bottomSheetRef = useRef<BottomSheet>(null);
+
+    const styles = createStyles(colors);
 
     // Infinite query for news
     const {
@@ -69,10 +97,15 @@ export default function FeedScreen() {
     // Flatten pages into single array
     const articles = data?.pages.flatMap((page) => page.articles) || [];
 
-    // Handle article press
+    // Handle article press - open bottom sheet
     const handleArticlePress = useCallback((article: any) => {
-        setSelectedArticle(article);
-        // TODO: Open bottom sheet with full article
+        setSelectedArticleId(article.id);
+        bottomSheetRef.current?.snapToIndex(0);
+    }, []);
+
+    // Handle close bottom sheet
+    const handleCloseSheet = useCallback(() => {
+        setSelectedArticleId(null);
     }, []);
 
     // Handle load more
@@ -80,6 +113,13 @@ export default function FeedScreen() {
         if (hasNextPage && !isFetchingNextPage) {
             fetchNextPage();
         }
+    };
+
+    // Handle retry with loading state
+    const handleRetry = async () => {
+        setIsRetrying(true);
+        await refetch();
+        setIsRetrying(false);
     };
 
     // Render article card
@@ -92,6 +132,8 @@ export default function FeedScreen() {
             publishedAt={item.published_at || item.created_at}
             importance={item.importance || 5}
             isBreaking={item.is_breaking}
+            likeCount={item.like_count || 0}
+            commentCount={item.comment_count || 0}
             onPress={() => handleArticlePress(item)}
         />
     );
@@ -101,132 +143,188 @@ export default function FeedScreen() {
         if (!isFetchingNextPage) return null;
         return (
             <View style={styles.footer}>
-                <ActivityIndicator color={COLORS.feed} />
+                <ActivityIndicator color={colors.feed} />
             </View>
         );
     };
 
-    // Empty state
+    // Empty state with action button
     const renderEmpty = () => {
         if (isLoading) return null;
         return (
-            <View style={styles.emptyContainer}>
-                <Text style={styles.emptyIcon}>📭</Text>
-                <Text style={styles.emptyTitle}>No hay noticias</Text>
-                <Text style={styles.emptySubtitle}>
-                    Aún no hay noticias disponibles. Vuelve más tarde.
-                </Text>
-            </View>
+            <EmptyState
+                icon="Search"
+                iconColor={colors.feed}
+                title="No hay noticias"
+                subtitle="Aún no hay noticias disponibles en esta categoría."
+                actionLabel="Actualizar Feed"
+                onAction={() => refetch()}
+                secondaryLabel="Explorar todas"
+                onSecondaryAction={() => setSelectedTopic('all')}
+            />
         );
     };
 
     return (
-        <View style={[styles.container, { paddingTop: insets.top }]}>
-            {/* Header */}
-            <View style={styles.header}>
-                <Text style={styles.title}>📰 Feed</Text>
-                <Text style={styles.subtitle}>Noticias de IA en 30 segundos</Text>
-            </View>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <View style={[styles.container, { paddingTop: insets.top }]}>
+                {/* Header */}
+                <View style={styles.header}>
+                    <View style={styles.headerTitle}>
+                        <Icon name="Newspaper" size={28} color={colors.feed} />
+                        <Text style={styles.title}>Noticias</Text>
+                    </View>
+                    <Text style={styles.subtitle}>Noticias de IA en 30 segundos</Text>
+                </View>
 
-            {/* Topics Filter */}
-            <View style={styles.topicsContainer}>
-                <FlatList
-                    horizontal
-                    data={TOPICS}
-                    keyExtractor={(item) => item.id}
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.topicsList}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity
-                            style={[
-                                styles.topicChip,
-                                selectedTopic === item.id && styles.topicChipSelected,
-                            ]}
-                            onPress={() => setSelectedTopic(item.id)}
-                        >
-                            <Text style={styles.topicIcon}>{item.icon}</Text>
-                            <Text
-                                style={[
-                                    styles.topicLabel,
-                                    selectedTopic === item.id && styles.topicLabelSelected,
+                {/* Topics Filter with fade edges */}
+                <View style={styles.topicsWrapper}>
+                    <FlatList
+                        horizontal
+                        data={TOPICS}
+                        keyExtractor={(item) => item.id}
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.topicsList}
+                        renderItem={({ item }) => (
+                            <Pressable
+                                style={({ pressed }) => [
+                                    styles.topicChip,
+                                    selectedTopic === item.id && styles.topicChipSelected,
+                                    pressed && styles.chipPressed,
                                 ]}
+                                onPress={() => setSelectedTopic(item.id)}
                             >
-                                {item.label}
-                            </Text>
-                        </TouchableOpacity>
-                    )}
-                />
+                                <Icon
+                                    name={item.icon}
+                                    size={16}
+                                    color={selectedTopic === item.id ? colors.feed : colors.textSecondary}
+                                    strokeWidth={selectedTopic === item.id ? 2 : 1.5}
+                                />
+                                <Text
+                                    style={[
+                                        styles.topicLabel,
+                                        selectedTopic === item.id && styles.topicLabelSelected,
+                                    ]}
+                                >
+                                    {item.label}
+                                </Text>
+                            </Pressable>
+                        )}
+                    />
+                    {/* Fade edges */}
+                    <LinearGradient
+                        colors={[colors.background, 'transparent']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={styles.fadeLeft}
+                        pointerEvents="none"
+                    />
+                    <LinearGradient
+                        colors={['transparent', colors.background]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={styles.fadeRight}
+                        pointerEvents="none"
+                    />
+                </View>
+
+                {/* Loading State with Skeletons */}
+                {isLoading && (
+                    <View style={styles.loadingContainer}>
+                        <SkeletonList count={4} variant="news" />
+                    </View>
+                )}
+
+                {/* Error State */}
+                {isError && (
+                    <View style={styles.errorContainer}>
+                        <Icon name="AlertTriangle" size={48} color={colors.error} />
+                        <Text style={styles.errorTitle}>Error al cargar</Text>
+                        <Text style={styles.errorMessage}>
+                            {error instanceof Error ? error.message : 'Error desconocido'}
+                        </Text>
+                        <Pressable
+                            style={({ pressed }) => [
+                                styles.retryButton,
+                                pressed && styles.retryButtonPressed,
+                            ]}
+                            onPress={handleRetry}
+                            disabled={isRetrying}
+                        >
+                            {isRetrying ? (
+                                <ActivityIndicator color="#fff" size="small" />
+                            ) : (
+                                <>
+                                    <Icon name="RefreshCw" size={16} color="#fff" />
+                                    <Text style={styles.retryText}>Reintentar</Text>
+                                </>
+                            )}
+                        </Pressable>
+                    </View>
+                )}
+
+                {/* News List */}
+                {!isLoading && !isError && (
+                    <FlatList
+                        data={articles}
+                        keyExtractor={(item) => item.id}
+                        renderItem={renderArticle}
+                        contentContainerStyle={styles.listContent}
+                        showsVerticalScrollIndicator={false}
+                        onEndReached={handleLoadMore}
+                        onEndReachedThreshold={0.5}
+                        ListFooterComponent={renderFooter}
+                        ListEmptyComponent={renderEmpty}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={isRefetching}
+                                onRefresh={refetch}
+                                tintColor={colors.feed}
+                                colors={[colors.feed]}
+                            />
+                        }
+                    />
+                )}
             </View>
 
-            {/* Loading State */}
-            {isLoading && (
-                <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color={COLORS.feed} />
-                    <Text style={styles.loadingText}>Cargando noticias...</Text>
-                </View>
-            )}
-
-            {/* Error State */}
-            {isError && (
-                <View style={styles.errorContainer}>
-                    <Text style={styles.errorIcon}>⚠️</Text>
-                    <Text style={styles.errorTitle}>Error al cargar</Text>
-                    <Text style={styles.errorMessage}>
-                        {error instanceof Error ? error.message : 'Error desconocido'}
-                    </Text>
-                    <TouchableOpacity style={styles.retryButton} onPress={() => refetch()}>
-                        <Text style={styles.retryText}>Reintentar</Text>
-                    </TouchableOpacity>
-                </View>
-            )}
-
-            {/* News List */}
-            {!isLoading && !isError && (
-                <FlatList
-                    data={articles}
-                    keyExtractor={(item) => item.id}
-                    renderItem={renderArticle}
-                    contentContainerStyle={styles.listContent}
-                    showsVerticalScrollIndicator={false}
-                    onEndReached={handleLoadMore}
-                    onEndReachedThreshold={0.5}
-                    ListFooterComponent={renderFooter}
-                    ListEmptyComponent={renderEmpty}
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={isRefetching}
-                            onRefresh={refetch}
-                            tintColor={COLORS.feed}
-                            colors={[COLORS.feed]}
-                        />
-                    }
-                />
-            )}
-        </View>
+            {/* News Detail Bottom Sheet */}
+            <NewsDetailSheet
+                ref={bottomSheetRef}
+                articleId={selectedArticleId}
+                onClose={handleCloseSheet}
+            />
+        </GestureHandlerRootView>
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.background,
+        backgroundColor: colors.background,
     },
     header: {
         paddingHorizontal: SPACING.lg,
         paddingTop: SPACING.md,
         paddingBottom: SPACING.sm,
     },
+    headerTitle: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: SPACING.sm,
+    },
     title: {
         fontSize: 28,
         fontWeight: '700',
-        color: COLORS.textPrimary,
+        color: colors.textPrimary,
     },
     subtitle: {
         fontSize: 14,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         marginTop: 4,
+        marginLeft: SPACING.sm + 28,
     },
-    topicsContainer: {
+    topicsWrapper: {
+        position: 'relative',
         marginBottom: SPACING.md,
     },
     topicsList: {
@@ -236,29 +334,46 @@ const styles = StyleSheet.create({
     topicChip: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: COLORS.surface,
-        paddingVertical: SPACING.sm,
-        paddingHorizontal: SPACING.md,
+        backgroundColor: colors.surface,
+        paddingVertical: SPACING.sm + 2,
+        paddingHorizontal: SPACING.md + 4,
         borderRadius: RADIUS.full,
         borderWidth: 1,
-        borderColor: COLORS.surfaceBorder,
+        borderColor: colors.surfaceBorder,
         marginRight: SPACING.sm,
+        gap: 8,
+        minWidth: 90,
+        justifyContent: 'center',
     },
     topicChipSelected: {
-        backgroundColor: `${COLORS.feed}20`,
-        borderColor: COLORS.feed,
+        backgroundColor: `${colors.feed}20`,
+        borderColor: colors.feed,
     },
-    topicIcon: {
-        fontSize: 14,
-        marginRight: 4,
+    chipPressed: {
+        opacity: 0.7,
+        transform: [{ scale: 0.97 }],
     },
     topicLabel: {
         fontSize: 13,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         fontWeight: '500',
     },
     topicLabelSelected: {
-        color: COLORS.feed,
+        color: colors.feed,
+    },
+    fadeLeft: {
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        bottom: 0,
+        width: 20,
+    },
+    fadeRight: {
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        bottom: 0,
+        width: 20,
     },
     listContent: {
         paddingHorizontal: SPACING.lg,
@@ -266,67 +381,46 @@ const styles = StyleSheet.create({
     },
     loadingContainer: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    loadingText: {
-        marginTop: SPACING.md,
-        color: COLORS.textMuted,
-        fontSize: 14,
+        paddingHorizontal: SPACING.lg,
+        paddingTop: SPACING.md,
     },
     errorContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         padding: SPACING.xl,
-    },
-    errorIcon: {
-        fontSize: 48,
-        marginBottom: SPACING.md,
+        gap: SPACING.sm,
     },
     errorTitle: {
         fontSize: 18,
         fontWeight: '600',
-        color: COLORS.textPrimary,
+        color: colors.textPrimary,
+        marginTop: SPACING.sm,
     },
     errorMessage: {
         fontSize: 14,
-        color: COLORS.textMuted,
+        color: colors.textMuted,
         textAlign: 'center',
-        marginTop: SPACING.sm,
     },
     retryButton: {
-        marginTop: SPACING.lg,
-        backgroundColor: COLORS.feed,
+        marginTop: SPACING.md,
+        backgroundColor: colors.feed,
         paddingVertical: SPACING.sm,
         paddingHorizontal: SPACING.lg,
         borderRadius: RADIUS.md,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: SPACING.sm,
+        minWidth: 120,
+        justifyContent: 'center',
+    },
+    retryButtonPressed: {
+        opacity: 0.8,
+        transform: [{ scale: 0.97 }],
     },
     retryText: {
         color: '#fff',
         fontWeight: '600',
-    },
-    emptyContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: SPACING.xl,
-        marginTop: SPACING.xxl,
-    },
-    emptyIcon: {
-        fontSize: 64,
-        marginBottom: SPACING.md,
-    },
-    emptyTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: COLORS.textPrimary,
-    },
-    emptySubtitle: {
-        fontSize: 14,
-        color: COLORS.textMuted,
-        textAlign: 'center',
-        marginTop: SPACING.sm,
     },
     footer: {
         paddingVertical: SPACING.lg,

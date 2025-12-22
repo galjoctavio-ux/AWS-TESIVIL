@@ -57,8 +57,19 @@ FCM_SERVER_KEY=AAAAxxxxxxxxxxxxxxxxxxxxxxx
 # ADMOB_BANNER_ID=ca-app-pub-xxxxxxxxxxxxxxxx/xxxxxxxxxx
 
 # ───────────────────────────────────────────────────────────────
+# STRIPE (Academy Payments)
+# Get from: https://dashboard.stripe.com/apikeys
+# ───────────────────────────────────────────────────────────────
+STRIPE_SECRET_KEY=sk_test_xxxxxxxxxxxxxxxxxxxxxxx
+STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxxxx
+
+# App URL for Stripe redirects
+APP_URL=https://synapse.app
+
+# ───────────────────────────────────────────────────────────────
 # DEVELOPMENT
 # ───────────────────────────────────────────────────────────────
 NODE_ENV=development
 API_PORT=3000
 LOG_LEVEL=debug
+

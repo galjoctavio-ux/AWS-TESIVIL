@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { COLORS, SPACING, RADIUS } from '@/constants/config';
+import { SPACING, RADIUS } from '@/constants/config';
+import { useTheme } from '@/contexts/ThemeContext';
+import { ThemeColors } from '@/constants/themes';
 
 interface ModelCardProps {
     id: string;
@@ -26,6 +28,9 @@ export function ModelCard({
     isFeatured,
     onPress,
 }: ModelCardProps) {
+    const { colors } = useTheme();
+    const styles = createStyles(colors);
+
     // Get trend icon
     const getTrendIcon = () => {
         switch (trend) {
@@ -43,24 +48,29 @@ export function ModelCard({
         if (rank === 1) return '#FFD700'; // Gold
         if (rank === 2) return '#C0C0C0'; // Silver
         if (rank === 3) return '#CD7F32'; // Bronze
-        return COLORS.textMuted;
+        return colors.textMuted;
     };
 
     // Get category color
     const getCategoryColor = () => {
         switch (category) {
             case 'chat':
-                return COLORS.primary;
+                return colors.primary;
             case 'code':
-                return COLORS.showcase;
+                return colors.showcase;
             case 'image':
-                return COLORS.pulse;
+                return colors.pulse;
             case 'audio':
-                return COLORS.feed;
+                return colors.feed;
             default:
-                return COLORS.textMuted;
+                return colors.textMuted;
         }
     };
+
+    // Format score with fallback
+    const displayScore = scoreOverall != null && !isNaN(scoreOverall)
+        ? scoreOverall.toFixed(1)
+        : 'N/A';
 
     return (
         <TouchableOpacity
@@ -79,7 +89,7 @@ export function ModelCard({
             <View style={styles.info}>
                 <View style={styles.nameRow}>
                     <Text style={styles.name} numberOfLines={1}>
-                        {name}
+                        {name || 'Modelo sin nombre'}
                     </Text>
                     {isNew && (
                         <View style={styles.newBadge}>
@@ -87,16 +97,16 @@ export function ModelCard({
                         </View>
                     )}
                 </View>
-                <Text style={styles.provider}>{provider}</Text>
+                <Text style={styles.provider}>{provider || 'Proveedor desconocido'}</Text>
                 <View style={styles.categoryRow}>
                     <View style={[styles.categoryDot, { backgroundColor: getCategoryColor() }]} />
-                    <Text style={styles.categoryText}>{category}</Text>
+                    <Text style={styles.categoryText}>{category || 'General'}</Text>
                 </View>
             </View>
 
             {/* Score & Trend */}
             <View style={styles.scoreContainer}>
-                <Text style={styles.score}>{scoreOverall.toFixed(1)}</Text>
+                <Text style={styles.score}>{displayScore}</Text>
                 <Text style={styles.trend}>{getTrendIcon()}</Text>
             </View>
         </TouchableOpacity>
@@ -111,13 +121,16 @@ export function Podium({
     models: any[];
     onModelPress: (model: any) => void;
 }) {
+    const { colors } = useTheme();
+    const styles = createStyles(colors);
+
     if (models.length < 3) return null;
 
     const [first, second, third] = models;
 
     const renderPodiumItem = (model: any, position: 1 | 2 | 3) => {
         const heights = { 1: 100, 2: 80, 3: 60 };
-        const colors = { 1: '#FFD700', 2: '#C0C0C0', 3: '#CD7F32' };
+        const podiumColors = { 1: '#FFD700', 2: '#C0C0C0', 3: '#CD7F32' };
         const emojis = { 1: '🥇', 2: '🥈', 3: '🥉' };
 
         return (
@@ -133,7 +146,7 @@ export function Podium({
                 <View
                     style={[
                         styles.podiumBar,
-                        { height: heights[position], backgroundColor: colors[position] },
+                        { height: heights[position], backgroundColor: podiumColors[position] },
                     ]}
                 >
                     <Text style={styles.podiumRank}>{position}</Text>
@@ -151,19 +164,19 @@ export function Podium({
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
     container: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: COLORS.surface,
+        backgroundColor: colors.surface,
         borderRadius: RADIUS.lg,
         padding: SPACING.md,
         marginBottom: SPACING.sm,
         borderWidth: 1,
-        borderColor: COLORS.surfaceBorder,
+        borderColor: colors.surfaceBorder,
     },
     featuredContainer: {
-        borderColor: COLORS.pulse,
+        borderColor: colors.pulse,
         borderWidth: 2,
     },
     rankContainer: {
@@ -190,11 +203,11 @@ const styles = StyleSheet.create({
     name: {
         fontSize: 15,
         fontWeight: '600',
-        color: COLORS.textPrimary,
+        color: colors.textPrimary,
         flex: 1,
     },
     newBadge: {
-        backgroundColor: COLORS.success,
+        backgroundColor: colors.success,
         paddingHorizontal: 6,
         paddingVertical: 2,
         borderRadius: RADIUS.sm,
@@ -206,7 +219,7 @@ const styles = StyleSheet.create({
     },
     provider: {
         fontSize: 12,
-        color: COLORS.textMuted,
+        color: colors.textMuted,
         marginTop: 2,
     },
     categoryRow: {
@@ -222,7 +235,7 @@ const styles = StyleSheet.create({
     },
     categoryText: {
         fontSize: 11,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         textTransform: 'capitalize',
     },
     scoreContainer: {
@@ -231,7 +244,7 @@ const styles = StyleSheet.create({
     score: {
         fontSize: 20,
         fontWeight: '700',
-        color: COLORS.pulse,
+        color: colors.pulse,
     },
     trend: {
         fontSize: 12,
@@ -258,14 +271,14 @@ const styles = StyleSheet.create({
     podiumName: {
         fontSize: 12,
         fontWeight: '600',
-        color: COLORS.textPrimary,
+        color: colors.textPrimary,
         textAlign: 'center',
         marginBottom: 2,
     },
     podiumScore: {
         fontSize: 14,
         fontWeight: '700',
-        color: COLORS.pulse,
+        color: colors.pulse,
         marginBottom: SPACING.xs,
     },
     podiumBar: {

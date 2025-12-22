@@ -1,6 +1,9 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { COLORS, SPACING, RADIUS } from '@/constants/config';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { SPACING, RADIUS } from '@/constants/config';
+import { useTheme } from '@/contexts/ThemeContext';
+import { ThemeColors } from '@/constants/themes';
+import { Icon } from '@/components/icons/Icon';
 
 interface NewsCardProps {
     id: string;
@@ -10,6 +13,8 @@ interface NewsCardProps {
     publishedAt: string;
     importance: number;
     isBreaking?: boolean;
+    likeCount?: number;
+    commentCount?: number;
     onPress: () => void;
 }
 
@@ -20,8 +25,13 @@ export function NewsCard({
     publishedAt,
     importance,
     isBreaking,
+    likeCount = 0,
+    commentCount = 0,
     onPress,
 }: NewsCardProps) {
+    const { colors } = useTheme();
+    const styles = createStyles(colors);
+
     // Format relative time
     const getRelativeTime = (dateStr: string) => {
         const date = new Date(dateStr);
@@ -31,17 +41,19 @@ export function NewsCard({
         const diffHours = Math.floor(diffMs / 3600000);
         const diffDays = Math.floor(diffMs / 86400000);
 
-        if (diffMins < 60) return `${diffMins}m`;
-        if (diffHours < 24) return `${diffHours}h`;
-        return `${diffDays}d`;
+        if (diffMins < 60) return `hace ${diffMins}m`;
+        if (diffHours < 24) return `hace ${diffHours}h`;
+        return `hace ${diffDays}d`;
     };
 
-    // Get importance color
-    const getImportanceColor = () => {
-        if (importance >= 9) return COLORS.error;
-        if (importance >= 7) return COLORS.warning;
-        return COLORS.feed;
+    // Get importance color and icon
+    const getImportanceConfig = () => {
+        if (importance >= 9) return { color: colors.error, icon: 'AlertTriangle' as const };
+        if (importance >= 7) return { color: colors.warning, icon: 'TrendingUp' as const };
+        return { color: colors.feed, icon: 'Newspaper' as const };
     };
+
+    const importanceConfig = getImportanceConfig();
 
     return (
         <TouchableOpacity
@@ -56,62 +68,112 @@ export function NewsCard({
                 </View>
             )}
 
+            {/* Logo area at top */}
+            <View style={styles.iconArea}>
+                <View style={[styles.iconCircle, { borderColor: importanceConfig.color, borderWidth: 2 }]}>
+                    <Image
+                        source={require('@/assets/images/placeholder-logo.png')}
+                        style={styles.logoImage}
+                        resizeMode="contain"
+                    />
+                </View>
+            </View>
+
             {/* Header */}
             <View style={styles.header}>
-                <View style={[styles.importanceDot, { backgroundColor: getImportanceColor() }]} />
-                <Text style={styles.source}>{source}</Text>
+                <View style={[styles.importanceDot, { backgroundColor: importanceConfig.color }]} />
+                <Text style={styles.source}>{source || 'AI News'}</Text>
                 <Text style={styles.time}>• {getRelativeTime(publishedAt)}</Text>
             </View>
 
             {/* Title */}
             <Text style={styles.title} numberOfLines={2}>
-                {title}
+                {title || 'Sin título disponible'}
             </Text>
 
             {/* Bullets */}
-            <View style={styles.bullets}>
-                {bullets.slice(0, 2).map((bullet, index) => (
-                    <View key={index} style={styles.bulletRow}>
-                        <Text style={styles.bulletDot}>•</Text>
-                        <Text style={styles.bulletText} numberOfLines={1}>
-                            {bullet}
-                        </Text>
-                    </View>
-                ))}
-            </View>
+            {bullets && bullets.length > 0 ? (
+                <View style={styles.bullets}>
+                    {bullets.slice(0, 2).map((bullet, index) => (
+                        <View key={index} style={styles.bulletRow}>
+                            <Text style={styles.bulletDot}>•</Text>
+                            <Text style={styles.bulletText} numberOfLines={2}>
+                                {bullet}
+                            </Text>
+                        </View>
+                    ))}
+                </View>
+            ) : (
+                <Text style={styles.noContent}>
+                    Toca para leer la noticia completa
+                </Text>
+            )}
 
-            {/* Read more indicator */}
-            <Text style={styles.readMore}>Leer más →</Text>
+            {/* Footer with stats and read more */}
+            <View style={styles.footer}>
+                <View style={styles.statsRow}>
+                    <View style={styles.statItem}>
+                        <Icon name="Heart" size={14} color={colors.textMuted} />
+                        <Text style={styles.statText}>{likeCount}</Text>
+                    </View>
+                    <View style={styles.statItem}>
+                        <Icon name="MessageCircle" size={14} color={colors.textMuted} />
+                        <Text style={styles.statText}>{commentCount}</Text>
+                    </View>
+                </View>
+                <View style={styles.readMoreRow}>
+                    <Text style={styles.readMore}>Leer más</Text>
+                    <Icon name="ArrowRight" size={14} color={colors.feed} />
+                </View>
+            </View>
         </TouchableOpacity>
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
     container: {
-        backgroundColor: COLORS.surface,
+        backgroundColor: colors.surface,
         borderRadius: RADIUS.lg,
         padding: SPACING.md,
         marginBottom: SPACING.md,
         borderWidth: 1,
-        borderColor: COLORS.surfaceBorder,
+        borderColor: colors.surfaceBorder,
+        minHeight: 180,
     },
     breakingContainer: {
-        borderColor: COLORS.error,
+        borderColor: colors.error,
         borderWidth: 2,
     },
     breakingBadge: {
         position: 'absolute',
         top: -8,
         right: SPACING.md,
-        backgroundColor: COLORS.error,
+        backgroundColor: colors.error,
         paddingHorizontal: SPACING.sm,
         paddingVertical: 2,
         borderRadius: RADIUS.sm,
+        zIndex: 10,
     },
     breakingText: {
         color: '#fff',
         fontSize: 10,
         fontWeight: '700',
+    },
+    iconArea: {
+        marginBottom: SPACING.sm,
+    },
+    iconCircle: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: colors.surface,
+        overflow: 'hidden',
+    },
+    logoImage: {
+        width: 32,
+        height: 32,
     },
     header: {
         flexDirection: 'row',
@@ -119,30 +181,30 @@ const styles = StyleSheet.create({
         marginBottom: SPACING.sm,
     },
     importanceDot: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
+        width: 8,
+        height: 8,
+        borderRadius: 4,
         marginRight: SPACING.xs,
     },
     source: {
         fontSize: 12,
         fontWeight: '600',
-        color: COLORS.feed,
+        color: colors.feed,
     },
     time: {
         fontSize: 12,
-        color: COLORS.textMuted,
+        color: colors.textMuted,
         marginLeft: SPACING.xs,
     },
     title: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: COLORS.textPrimary,
-        lineHeight: 22,
+        fontSize: 17,
+        fontWeight: '700',
+        color: colors.textPrimary,
+        lineHeight: 24,
         marginBottom: SPACING.sm,
     },
     bullets: {
-        gap: 4,
+        gap: 6,
         marginBottom: SPACING.sm,
     },
     bulletRow: {
@@ -150,21 +212,52 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
     },
     bulletDot: {
-        fontSize: 12,
-        color: COLORS.textMuted,
+        fontSize: 14,
+        color: colors.feed,
         marginRight: SPACING.xs,
-        lineHeight: 18,
+        lineHeight: 20,
     },
     bulletText: {
         flex: 1,
-        fontSize: 13,
-        color: COLORS.textSecondary,
-        lineHeight: 18,
+        fontSize: 14,
+        color: colors.textSecondary,
+        lineHeight: 20,
+    },
+    noContent: {
+        fontSize: 14,
+        color: colors.textMuted,
+        fontStyle: 'italic',
+        marginBottom: SPACING.sm,
+    },
+    footer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginTop: 'auto',
+    },
+    statsRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: SPACING.md,
+    },
+    statItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
+    statText: {
+        fontSize: 12,
+        color: colors.textMuted,
+    },
+    readMoreRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
     },
     readMore: {
-        fontSize: 12,
-        color: COLORS.feed,
-        fontWeight: '500',
+        fontSize: 13,
+        color: colors.feed,
+        fontWeight: '600',
     },
 });
 

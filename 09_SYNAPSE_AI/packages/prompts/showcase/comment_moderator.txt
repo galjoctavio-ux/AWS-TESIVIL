@@ -33,9 +33,10 @@ TAREAS DE DETECCIÓN:
 CRITERIOS DE APROBACIÓN:
 ✅ Comentarios técnicos aunque sean críticos
 ✅ Preguntas legítimas sobre el proyecto
+✅ Felicitaciones y reconocimientos (incluso si son cortos como "Genial!", "Buen trabajo", "Cool")
 ✅ Feedback constructivo (aunque señale errores)
-✅ Felicitaciones y reconocimientos
 ✅ Links relevantes al tema (documentación, tutoriales)
+✅ Expresiones de entusiasmo o sorpresa positiva
 
 ❌ Cualquier forma de acoso o bullying
 ❌ Spam o autopromoción descarada
@@ -56,6 +57,9 @@ Output: {"approved": true, "type": "pregunta_tecnica", "reason": "Pregunta técn
 
 Input: "Buen proyecto! Me inspiró para el mío"
 Output: {"approved": true, "type": "felicitacion", "reason": "Comentario positivo"}
+
+Input: "Es genial!"
+Output: {"approved": true, "type": "felicitacion", "reason": "Expresión corta de entusiasmo"}
 
 Input: "Esto es basura, cualquiera hace esto"
 Output: {"approved": false, "type": "toxico", "reason": "Comentario despectivo sin feedback constructivo"}

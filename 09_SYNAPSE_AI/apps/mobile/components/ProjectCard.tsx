@@ -1,6 +1,9 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
-import { COLORS, SPACING, RADIUS } from '@/constants/config';
+import { SPACING, RADIUS } from '@/constants/config';
+import { useTheme } from '@/contexts/ThemeContext';
+import { ThemeColors } from '@/constants/themes';
+import { Icon } from '@/components/icons/Icon';
 
 interface ProjectCardProps {
     id: string;
@@ -28,6 +31,9 @@ export function ProjectCard({
     onPress,
     onVote,
 }: ProjectCardProps) {
+    const { colors } = useTheme();
+    const styles = createStyles(colors);
+
     // Format numbers (1000 -> 1K)
     const formatNumber = (num: number): string => {
         if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
@@ -73,7 +79,11 @@ export function ProjectCard({
                     />
                 ) : (
                     <View style={styles.placeholderImage}>
-                        <Text style={styles.placeholderEmoji}>🚀</Text>
+                        <Image
+                            source={require('@/assets/images/placeholder-logo.png')}
+                            style={{ width: 80, height: 80, opacity: 0.9 }}
+                            resizeMode="contain"
+                        />
                     </View>
                 )}
             </View>
@@ -123,7 +133,7 @@ export function ProjectCard({
 
                         {/* Upvotes */}
                         <TouchableOpacity style={styles.upvoteButton} onPress={onVote}>
-                            <Text style={styles.upvoteIcon}>🔥</Text>
+                            <Icon name="ThumbsUp" size={14} color={colors.showcase} />
                             <Text style={styles.upvoteValue}>{formatNumber(upvoteCount)}</Text>
                         </TouchableOpacity>
                     </View>
@@ -133,24 +143,24 @@ export function ProjectCard({
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
     container: {
-        backgroundColor: COLORS.surface,
+        backgroundColor: colors.surface,
         borderRadius: RADIUS.lg,
         overflow: 'hidden',
         marginBottom: SPACING.md,
         borderWidth: 1,
-        borderColor: COLORS.surfaceBorder,
+        borderColor: colors.surfaceBorder,
     },
     featuredContainer: {
-        borderColor: COLORS.showcase,
+        borderColor: colors.showcase,
         borderWidth: 2,
     },
     featuredBadge: {
         position: 'absolute',
         top: SPACING.sm,
         left: SPACING.sm,
-        backgroundColor: COLORS.showcase,
+        backgroundColor: colors.showcase,
         paddingHorizontal: SPACING.sm,
         paddingVertical: 2,
         borderRadius: RADIUS.sm,
@@ -163,7 +173,7 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         height: 160,
-        backgroundColor: COLORS.surfaceLight,
+        backgroundColor: colors.surfaceLight,
     },
     image: {
         width: '100%',
@@ -173,7 +183,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: `${COLORS.showcase}20`,
+        backgroundColor: `${colors.showcase}20`,
     },
     placeholderEmoji: {
         fontSize: 48,
@@ -184,12 +194,12 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 16,
         fontWeight: '600',
-        color: COLORS.textPrimary,
+        color: colors.textPrimary,
         lineHeight: 22,
     },
     description: {
         fontSize: 13,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         marginTop: 4,
         lineHeight: 18,
     },
@@ -202,7 +212,7 @@ const styles = StyleSheet.create({
     toolChip: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: COLORS.surfaceLight,
+        backgroundColor: colors.surfaceLight,
         paddingVertical: 4,
         paddingHorizontal: 8,
         borderRadius: RADIUS.full,
@@ -213,11 +223,11 @@ const styles = StyleSheet.create({
     },
     toolName: {
         fontSize: 11,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
     },
     moreTools: {
         fontSize: 11,
-        color: COLORS.textMuted,
+        color: colors.textMuted,
         marginLeft: 4,
     },
     footer: {
@@ -228,7 +238,7 @@ const styles = StyleSheet.create({
     },
     author: {
         fontSize: 12,
-        color: COLORS.showcase,
+        color: colors.showcase,
         fontWeight: '500',
     },
     stats: {
@@ -246,12 +256,12 @@ const styles = StyleSheet.create({
     },
     statValue: {
         fontSize: 12,
-        color: COLORS.textMuted,
+        color: colors.textMuted,
     },
     upvoteButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: `${COLORS.showcase}20`,
+        backgroundColor: `${colors.showcase}20`,
         paddingVertical: 4,
         paddingHorizontal: 8,
         borderRadius: RADIUS.sm,
@@ -262,7 +272,7 @@ const styles = StyleSheet.create({
     },
     upvoteValue: {
         fontSize: 12,
-        color: COLORS.showcase,
+        color: colors.showcase,
         fontWeight: '600',
     },
 });

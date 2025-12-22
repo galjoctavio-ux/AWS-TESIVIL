@@ -10,14 +10,15 @@ import { moderateComment } from '../services/groq';
 const CreateProjectSchema = z.object({
     title: z.string().min(3).max(100),
     description: z.string().max(2000).optional(),
-    repoUrl: z.string().url().optional(),
-    demoUrl: z.string().url().optional(),
+    repoUrl: z.string().optional().nullable(),
+    demoUrl: z.string().optional().nullable(),
     toolsUsed: z.array(z.string()).max(10).default([]),
-    images: z.array(z.string().url()).max(3).default([]),
+    images: z.array(z.string()).max(3).default([]),
 });
 
 const CommentSchema = z.object({
     content: z.string().min(1).max(1000),
+    parentId: z.string().uuid().optional().nullable(), // For replies
 });
 
 // ═══════════════════════════════════════════════════════════════
@@ -44,30 +45,31 @@ const projectsRoutes: FastifyPluginAsync = async (fastify) => {
                     *,
                     profiles (alias, photo_url)
                 `)
-                .eq('is_hidden', false)
-                .eq('moderation_status', 'approved');
+                .eq('is_hidden', false);
 
-            // Filter by tool
+            // Filter by tool (column is tools_array in DB)
             if (query.tool) {
-                dbQuery = dbQuery.contains('tools_used', [query.tool]);
+                dbQuery = dbQuery.contains('tools_array', [query.tool]);
             }
 
-            // Filter featured
+            // Filter featured (column is is_featured_until in DB)
             if (query.featured === 'true') {
-                dbQuery = dbQuery.eq('is_featured', true);
+                dbQuery = dbQuery.not('is_featured_until', 'is', null);
             }
 
-            // Sorting
+            // Sorting (use correct column names: upvotes_count, views_count, hot_score)
+            // hot = time-decay algorithm (new + popular rise faster)
+            // top = most upvotes of all time
+            // recent = newest first
             const sortMap: Record<string, string> = {
                 recent: 'created_at',
-                popular: 'upvote_count',
-                views: 'view_count',
+                top: 'upvotes_count',
+                hot: 'hot_score', // Time-decay algorithm: new posts with upvotes rise faster
+                popular: 'upvotes_count',
+                views: 'views_count',
             };
             const sortField = sortMap[query.sort || 'recent'] || 'created_at';
             dbQuery = dbQuery.order(sortField, { ascending: false });
-
-            // Featured projects first
-            dbQuery = dbQuery.order('is_featured', { ascending: false });
 
             // Pagination
             const limit = Math.min(parseInt(query.limit || '20'), 50);
@@ -107,28 +109,34 @@ const projectsRoutes: FastifyPluginAsync = async (fastify) => {
     // ───────────────────────────────────────────────────────────────
     fastify.post('/', async (request, reply) => {
         try {
-            const userId = (request.headers['x-user-id'] as string) || null;
-
-            if (!userId) {
-                return reply.status(401).send({
-                    success: false,
-                    error: 'Authentication required',
-                });
-            }
+            // Get user ID from header (optional for now - allow anonymous posts)
+            const userIdHeader = request.headers['x-user-id'] as string | undefined;
+            // Only use if it looks like a valid UUID
+            const userId = userIdHeader && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userIdHeader)
+                ? userIdHeader
+                : null;
 
             const data = CreateProjectSchema.parse(request.body);
+
+            // Filter out empty URLs
+            const repoUrl = data.repoUrl && data.repoUrl.trim() !== '' ? data.repoUrl : null;
+            const demoUrl = data.demoUrl && data.demoUrl.trim() !== '' ? data.demoUrl : null;
+
+            // Filter out local file URIs from images (only keep http/https URLs)
+            const filteredImages = data.images.filter(img => img.startsWith('http://') || img.startsWith('https://'));
 
             const { data: project, error } = await supabaseAdmin
                 .from('projects')
                 .insert({
-                    user_id: userId,
+                    user_id: userId, // Can be null for anonymous
                     title: data.title,
                     description: data.description,
-                    repo_url: data.repoUrl,
-                    demo_url: data.demoUrl,
-                    tools_used: data.toolsUsed,
-                    images: data.images,
-                    moderation_status: 'pending', // Will need approval
+                    project_url: repoUrl || demoUrl,
+                    action_type: repoUrl ? 'download' : (demoUrl ? 'visit' : 'inspiration'),
+                    tools_array: data.toolsUsed,
+                    image_urls: filteredImages,
+                    moderation_status: 'approved', // Auto-approve for now
+                    is_hidden: false,
                 })
                 .select()
                 .single();
@@ -214,66 +222,53 @@ const projectsRoutes: FastifyPluginAsync = async (fastify) => {
         try {
             const { id } = request.params as { id: string };
 
+            fastify.log.info(`Registering view for project: ${id}`);
+
             const { error } = await supabaseAdmin.rpc('increment_project_views', {
-                project_id: id,
+                p_project_id: id,
             });
 
             if (error) {
-                fastify.log.error(error);
+                fastify.log.error(`Failed to increment views for ${id}: ${error.message}`);
+                fastify.log.error(JSON.stringify(error));
+            } else {
+                fastify.log.info(`View registered successfully for project: ${id}`);
             }
 
             return { success: true };
         } catch (error: any) {
-            fastify.log.error(error);
+            fastify.log.error(`Exception in view endpoint: ${error?.message || error}`);
             return { success: true }; // Don't fail on view tracking errors
         }
     });
 
     // ───────────────────────────────────────────────────────────────
-    // POST /api/projects/:id/vote - Upvote/downvote project
+    // POST /api/projects/:id/vote - Upvote project (simplified - just increment)
     // ───────────────────────────────────────────────────────────────
     fastify.post('/:id/vote', async (request, reply) => {
         try {
             const { id } = request.params as { id: string };
-            const userId = (request.headers['x-user-id'] as string) || null;
 
-            if (!userId) {
-                return reply.status(401).send({
-                    success: false,
-                    error: 'Authentication required',
-                });
-            }
-
-            // Check if user already voted
-            const { data: existingVote, error: checkError } = await supabaseAdmin
-                .from('project_votes')
-                .select('id')
-                .eq('project_id', id)
-                .eq('user_id', userId)
+            // Simply increment the upvote count (no auth/tracking for now)
+            const { data: project, error: fetchError } = await supabaseAdmin
+                .from('projects')
+                .select('upvotes_count')
+                .eq('id', id)
                 .single();
 
-            if (existingVote) {
-                // Remove vote (toggle)
-                await supabaseAdmin
-                    .from('project_votes')
-                    .delete()
-                    .eq('id', existingVote.id);
-
-                await supabaseAdmin.rpc('decrement_project_upvotes', { project_id: id });
-
-                return {
-                    success: true,
-                    data: { voted: false },
-                };
+            if (fetchError || !project) {
+                return reply.status(404).send({
+                    success: false,
+                    error: 'Project not found',
+                });
             }
 
-            // Add vote
+            const newCount = (project.upvotes_count || 0) + 1;
+
             const { error } = await supabaseAdmin
-                .from('project_votes')
-                .insert({
-                    project_id: id,
-                    user_id: userId,
-                });
+                .from('projects')
+                .update({ upvotes_count: newCount })
+                .eq('id', id);
 
             if (error) {
                 fastify.log.error(error);
@@ -283,11 +278,9 @@ const projectsRoutes: FastifyPluginAsync = async (fastify) => {
                 });
             }
 
-            await supabaseAdmin.rpc('increment_project_upvotes', { project_id: id });
-
             return {
                 success: true,
-                data: { voted: true },
+                data: { voted: true, newCount },
             };
         } catch (error: any) {
             fastify.log.error(error);
@@ -312,7 +305,7 @@ const projectsRoutes: FastifyPluginAsync = async (fastify) => {
                     profiles (alias, photo_url)
                 `)
                 .eq('project_id', id)
-                .eq('is_approved', true)
+                .eq('is_moderated', true)
                 .order('created_at', { ascending: false })
                 .limit(100);
 
@@ -324,9 +317,19 @@ const projectsRoutes: FastifyPluginAsync = async (fastify) => {
                 });
             }
 
+            // Organize comments into threads (parent comments with nested replies)
+            const parentComments = (comments || []).filter((c: any) => !c.parent_id);
+            const replies = (comments || []).filter((c: any) => c.parent_id);
+
+            const threaded = parentComments.map((parent: any) => ({
+                ...parent,
+                replies: replies.filter((r: any) => r.parent_id === parent.id)
+                    .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
+            }));
+
             return {
                 success: true,
-                data: comments,
+                data: threaded,
             };
         } catch (error: any) {
             fastify.log.error(error);
@@ -343,37 +346,42 @@ const projectsRoutes: FastifyPluginAsync = async (fastify) => {
     fastify.post('/:id/comments', async (request, reply) => {
         try {
             const { id } = request.params as { id: string };
-            const userId = (request.headers['x-user-id'] as string) || null;
 
-            if (!userId) {
-                return reply.status(401).send({
-                    success: false,
-                    error: 'Authentication required',
-                });
-            }
+            // Get user ID from header (optional - allow anonymous comments)
+            const userIdHeader = request.headers['x-user-id'] as string | undefined;
+            const userId = userIdHeader && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userIdHeader)
+                ? userIdHeader
+                : null;
 
             const data = CommentSchema.parse(request.body);
 
-            // Moderate comment with Groq
-            const moderation = await moderateComment(data.content);
-
-            if (!moderation.approved) {
-                return reply.status(400).send({
-                    success: false,
-                    error: 'Comment was not approved',
-                    reason: moderation.reason,
-                    type: moderation.type,
-                });
+            // Try to moderate comment with Groq, but don't fail if moderation fails
+            let commentType = 'general';
+            try {
+                const moderation = await moderateComment(data.content);
+                if (!moderation.approved) {
+                    return reply.status(400).send({
+                        success: false,
+                        error: 'Comentario no aprobado',
+                        reason: moderation.reason,
+                        type: moderation.type,
+                    });
+                }
+                commentType = moderation.type || 'general';
+            } catch (moderationError) {
+                fastify.log.warn('Moderation failed, allowing comment');
+                // Continue without moderation
             }
 
             const { data: comment, error } = await supabaseAdmin
                 .from('project_comments')
                 .insert({
                     project_id: id,
-                    user_id: userId,
+                    user_id: userId, // Can be null for anonymous
+                    parent_id: data.parentId || null, // For replies
                     content: data.content,
-                    comment_type: moderation.type,
-                    is_approved: true,
+                    comment_type: commentType,
+                    is_moderated: true,
                 })
                 .select(`
                     *,
@@ -389,8 +397,12 @@ const projectsRoutes: FastifyPluginAsync = async (fastify) => {
                 });
             }
 
-            // Update comment count
-            await supabaseAdmin.rpc('increment_project_comments', { project_id: id });
+            // Update comment count (ignore errors)
+            try {
+                await supabaseAdmin.rpc('increment_project_comments', { p_project_id: id });
+            } catch (e: any) {
+                fastify.log.warn(`Failed to increment comment count: ${e?.message || e}`);
+            }
 
             return {
                 success: true,
@@ -414,53 +426,19 @@ const projectsRoutes: FastifyPluginAsync = async (fastify) => {
     });
 
     // ───────────────────────────────────────────────────────────────
-    // POST /api/projects/:id/report - Report a project
+    // POST /api/projects/:id/report - Report a project (anonymous allowed)
     // ───────────────────────────────────────────────────────────────
     fastify.post('/:id/report', async (request, reply) => {
         try {
             const { id } = request.params as { id: string };
-            const userId = (request.headers['x-user-id'] as string) || null;
 
-            if (!userId) {
-                return reply.status(401).send({
-                    success: false,
-                    error: 'Authentication required',
-                });
-            }
+            // Get user ID if available (optional)
+            const userIdHeader = request.headers['x-user-id'] as string | undefined;
+            const userId = userIdHeader && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userIdHeader)
+                ? userIdHeader
+                : null;
 
             const { reason } = request.body as { reason?: string };
-
-            // Check if user already reported
-            const { data: existingReport } = await supabaseAdmin
-                .from('project_reports')
-                .select('id')
-                .eq('project_id', id)
-                .eq('user_id', userId)
-                .single();
-
-            if (existingReport) {
-                return reply.status(409).send({
-                    success: false,
-                    error: 'You have already reported this project',
-                });
-            }
-
-            // Add report
-            const { error } = await supabaseAdmin
-                .from('project_reports')
-                .insert({
-                    project_id: id,
-                    user_id: userId,
-                    reason: reason || 'No reason provided',
-                });
-
-            if (error) {
-                fastify.log.error(error);
-                return reply.status(500).send({
-                    success: false,
-                    error: 'Failed to submit report',
-                });
-            }
 
             // Increment report count and auto-hide if >= 3
             const { data: project } = await supabaseAdmin
@@ -469,7 +447,14 @@ const projectsRoutes: FastifyPluginAsync = async (fastify) => {
                 .eq('id', id)
                 .single();
 
-            const newCount = (project?.report_count || 0) + 1;
+            if (!project) {
+                return reply.status(404).send({
+                    success: false,
+                    error: 'Project not found',
+                });
+            }
+
+            const newCount = (project.report_count || 0) + 1;
 
             await supabaseAdmin
                 .from('projects')
@@ -479,9 +464,24 @@ const projectsRoutes: FastifyPluginAsync = async (fastify) => {
                 })
                 .eq('id', id);
 
+            // Try to save the report detail (may fail if no user_id)
+            if (userId) {
+                try {
+                    await supabaseAdmin
+                        .from('project_reports')
+                        .insert({
+                            project_id: id,
+                            user_id: userId,
+                            reason: reason || 'No reason provided',
+                        });
+                } catch (e) {
+                    // Ignore - just increment count
+                }
+            }
+
             return {
                 success: true,
-                message: 'Report submitted successfully',
+                message: 'Reporte enviado correctamente',
             };
         } catch (error: any) {
             fastify.log.error(error);

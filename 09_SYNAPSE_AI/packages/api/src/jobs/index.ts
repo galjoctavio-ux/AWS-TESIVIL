@@ -2,6 +2,7 @@ import cron from 'node-cron';
 import { syncModels } from './sync-models';
 import { syncBenchmarks } from './sync-benchmarks';
 import { aggregateNews } from './news-aggregator';
+import { updateHotScores } from './update-hot-scores';
 
 export function initCronJobs() {
     console.log('🕐 Initializing cron jobs...');
@@ -49,8 +50,25 @@ export function initCronJobs() {
         }
     });
 
+    // ═══════════════════════════════════════════════════════════════
+    // UPDATE HOT SCORES - Every hour
+    // Recalculates time-decay scores for Showcase projects
+    // Ensures rankings stay fresh even without new votes
+    // ═══════════════════════════════════════════════════════════════
+    cron.schedule('30 * * * *', async () => {
+        console.log('🔥 [CRON] Starting hot score update...');
+        try {
+            const updated = await updateHotScores();
+            console.log(`✅ [CRON] Hot score update completed: ${updated} projects`);
+        } catch (error) {
+            console.error('❌ [CRON] Hot score update failed:', error);
+        }
+    });
+
     console.log('✅ Cron jobs initialized:');
     console.log('   • Model sync: Sundays 2:00 AM');
     console.log('   • Benchmark sync: 1st of month 3:00 AM');
     console.log('   • News aggregator: Hourly 7am-11pm');
+    console.log('   • Hot score update: Every hour at :30');
 }
+
