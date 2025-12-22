@@ -1,5 +1,5 @@
 """
-Script para generar mrfrio.db desde seed_full_database.sql
+Script para generar qrclima.db desde seed_full_database.sql
 Adapta la sintaxis PostgreSQL a SQLite
 """
 import sqlite3
@@ -9,7 +9,7 @@ import os
 # Paths
 script_dir = os.path.dirname(os.path.abspath(__file__))
 sql_file = os.path.join(script_dir, 'output', 'seed_full_database.sql')
-db_file = os.path.join(script_dir, '..', 'assets', 'database', 'mrfrio.db')
+db_file = os.path.join(script_dir, '..', 'assets', 'database', 'qrclima.db')
 
 # Create tables (SQLite compatible)
 create_tables_sql = """

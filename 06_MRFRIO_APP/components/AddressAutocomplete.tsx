@@ -33,6 +33,8 @@ export default function AddressAutocomplete({
                     const address = data.description;
                     const location = details?.geometry?.location;
                     onAddressSelect(address, location ? { lat: location.lat, lng: location.lng } : undefined);
+                    // Clear the suggestions list by setting the address text
+                    ref.current?.setAddressText(address);
                 }}
                 query={{
                     key: apiKey,
@@ -90,6 +92,9 @@ export default function AddressAutocomplete({
                 }}
                 debounce={300}
                 minLength={3}
+                disableScroll={true}
+                listViewDisplayed="auto"
+                keyboardShouldPersistTaps="handled"
                 nearbyPlacesAPI="GooglePlacesSearch"
                 GooglePlacesSearchQuery={{
                     rankby: 'distance',

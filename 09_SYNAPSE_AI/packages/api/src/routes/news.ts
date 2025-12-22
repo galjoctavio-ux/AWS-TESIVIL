@@ -118,12 +118,16 @@ const newsRoutes: FastifyPluginAsync = async (fastify) => {
             }
 
             // Increment read count in background
-            supabaseAdmin
-                .from('news_articles')
-                .update({ read_count: (article.read_count || 0) + 1 })
-                .eq('id', id)
-                .then(() => { })
-                .catch((err) => fastify.log.error('Failed to update read count:', err));
+            (async () => {
+                try {
+                    await supabaseAdmin
+                        .from('news_articles')
+                        .update({ read_count: (article.read_count || 0) + 1 })
+                        .eq('id', id);
+                } catch (err) {
+                    fastify.log.error({ err }, 'Failed to update read count');
+                }
+            })();
 
             // Flatten article data for frontend compatibility
             // summary_json contains: { original_title, processed_title, bullets, why_it_matters }
@@ -242,9 +246,13 @@ const newsRoutes: FastifyPluginAsync = async (fastify) => {
             }
 
             // Update comment count
-            supabaseAdmin.rpc('increment_news_comment_count', { article_id: id })
-                .then(() => { })
-                .catch((err) => fastify.log.error('Failed to update comment count:', err));
+            (async () => {
+                try {
+                    await supabaseAdmin.rpc('increment_news_comment_count', { article_id: id });
+                } catch (err) {
+                    fastify.log.error({ err }, 'Failed to update comment count');
+                }
+            })();
 
             return {
                 success: true,

@@ -1,4 +1,4 @@
-# PLANNING.md - Estrategia de Implementación "Mr. Frío"
+# PLANNING.md - Estrategia de Implementación "QRClima"
 
 ## 1. Arquitectura & Stack Tecnológico
 
@@ -33,9 +33,9 @@ Dado que `seed_full_database.sql` es un dump SQL estándar (PostgreSQL syntax), 
 1.  **Conversión ETL (Extract-Transform-Load):**
     -   Crearemos un script en Node.js (`scripts/generate-sqlite-db.js`) que lea el archivo SQL.
     -   Limpiará sintaxis no compatible (ej. `NOW()` -> `datetime('now')`, `ON CONFLICT` -> `INSERT OR IGNORE`).
-    -   Generará un archivo binario `mrfrio_master.db`.
+    -   Generará un archivo binario `qrclima_master.db`.
 2.  **Bundling:**
-    -   El archivo `mrfrio_master.db` se incluirá en la carpeta `assets/` de la app.
+    -   El archivo `qrclima_master.db` se incluirá en la carpeta `assets/` de la app.
 3.  **Hidratación en Runtime:**
     -   Al iniciar la app por primera vez, un servicio de sistema (`DatabaseService`) copiará el archivo desde los assets nativos al `FileSystem.documentDirectory` del dispositivo.
     -   Las consultas futuras se harán directamente a este archivo local.

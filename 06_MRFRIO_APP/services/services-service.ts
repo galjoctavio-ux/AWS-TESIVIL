@@ -17,6 +17,7 @@ export interface ServiceData {
         brand: string;
         model: string;
         type: string;
+        capacityBTU?: string; // New field
         qrId?: string;
     };
     tasks?: string[];

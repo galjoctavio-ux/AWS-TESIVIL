@@ -3,8 +3,8 @@ const fs = require('fs-extra');
 const path = require('path');
 
 const SQL_FILE = path.join(__dirname, '../../data_mining/output/seed_full_database.sql');
-const OUTPUT_DB = path.join(__dirname, 'mrfrio.db');
-const FINAL_PATH = path.join(__dirname, '../../assets/database/mrfrio.db');
+const OUTPUT_DB = path.join(__dirname, 'qrclima.db');
+const FINAL_PATH = path.join(__dirname, '../../assets/database/qrclima.db');
 
 async function build() {
     console.log('--- Iniciando construcción de BD ---');
@@ -73,7 +73,7 @@ async function build() {
     console.log('Moviendo a assets...');
     fs.moveSync(OUTPUT_DB, FINAL_PATH, { overwrite: true });
 
-    console.log(`Base de datos generada exitosamente en assets/database/mrfrio.db`);
+    console.log(`Base de datos generada exitosamente en assets/database/qrclima.db`);
 }
 
 build().catch(console.error);

@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { loadDatabase } from '../services/database-service';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import { ThemeProvider } from '../context/ThemeContext';
+import { SettingsProvider } from '../context/SettingsContext';
 import "../global.css";
 
 // Mantener el Splash Screen visible hasta que terminemos de cargar
@@ -93,9 +94,11 @@ export default function Layout() {
     return (
         <SafeAreaProvider>
             <ThemeProvider>
-                <AuthProvider>
-                    <InitialLayout />
-                </AuthProvider>
+                <SettingsProvider>
+                    <AuthProvider>
+                        <InitialLayout />
+                    </AuthProvider>
+                </SettingsProvider>
             </ThemeProvider>
         </SafeAreaProvider>
     );

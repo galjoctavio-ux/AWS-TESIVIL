@@ -169,7 +169,7 @@ export default function ConceptsScreen() {
                     pathname: '/(app)/cotizador/add-concept',
                     params: { defaultType: activeTab }
                 })}
-                className={`absolute bottom-8 right-6 w-14 h-14 rounded-full items-center justify-center shadow-lg ${activeTab === 'MO' ? 'bg-purple-600' : 'bg-orange-500'}`}
+                className={`absolute bottom-20 right-6 w-14 h-14 rounded-full items-center justify-center shadow-lg ${activeTab === 'MO' ? 'bg-purple-600' : 'bg-orange-500'}`}
                 style={{ elevation: 5 }}
             >
                 <Ionicons name="add" size={32} color="white" />

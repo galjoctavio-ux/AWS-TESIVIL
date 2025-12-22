@@ -203,6 +203,24 @@ export default function ProfileScreen() {
                     ))}
                 </View>
 
+                {/* Settings Section */}
+                <View className="px-4 mb-6">
+                    <Text className="text-gray-700 font-bold mb-3">Configuración</Text>
+                    <TouchableOpacity
+                        onPress={() => router.push('/(app)/profile/settings')}
+                        className="bg-white p-4 rounded-2xl border border-gray-100 flex-row items-center active:bg-gray-50"
+                    >
+                        <View className="bg-gray-100 w-12 h-12 rounded-xl items-center justify-center mr-4">
+                            <Ionicons name="settings" size={24} color="#6B7280" />
+                        </View>
+                        <View className="flex-1">
+                            <Text className="font-bold text-gray-800">Ajustes</Text>
+                            <Text className="text-gray-500 text-sm">Recordatorios, notificaciones</Text>
+                        </View>
+                        <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+                    </TouchableOpacity>
+                </View>
+
                 {/* Logout */}
                 <View className="px-4 mb-6">
                     <TouchableOpacity

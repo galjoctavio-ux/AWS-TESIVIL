@@ -469,7 +469,7 @@ El sistema toma los inputs y cruza la información con la siguiente matriz de de
             -   40 °C: ~65 – 90 psig (≈ 4.5 – 6.2 bar)
 
 #### 3.5.3 Biblioteca de Errores (Offline)
-**Recurso Base**: `seed_full_database.sql` (Base de Datos Relacional Local) (en `C:\TESIVIL\AWS-TESIVIL\AWS-TESIVIL\06_MRFRIO_APP\data_mining\output\seed_full_database.sql`).
+**Recurso Base**: `seed_full_database.sql` (Base de Datos Relacional Local) (en `C:\TESIVIL\AWS-TESIVIL\AWS-TESIVIL\06_QRCLIMA\data_mining\output\seed_full_database.sql`).
 **Objetivo**: Diagnóstico instantáneo y **OFFLINE**. El técnico debe poder identificar el error en una azotea sin señal de internet en menos de 10 segundos.
 
 1.  **Arquitectura de Datos (Implementación Técnica)**

@@ -53,7 +53,7 @@ export default function QuoteSummaryScreen() {
                 items,
                 subtotal: total,
                 total: total,
-                notes: notes.trim() || undefined,
+                notes: notes.trim(),
                 status: 'Sent'
             });
 
@@ -73,7 +73,7 @@ export default function QuoteSummaryScreen() {
                         items,
                         subtotal: total,
                         total,
-                        notes: notes.trim() || undefined,
+                        notes: notes.trim(),
                         status: 'Sent'
                     },
                     client: client,
@@ -109,7 +109,7 @@ export default function QuoteSummaryScreen() {
                 items,
                 subtotal: total,
                 total: total,
-                notes: notes.trim() || undefined,
+                notes: notes.trim(),
                 status: 'Draft'
             });
 

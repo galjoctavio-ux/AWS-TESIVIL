@@ -130,7 +130,7 @@ export default function AddConceptScreen() {
                 <View style={{ width: 24 }} />
             </View>
 
-            <ScrollView className="flex-1 px-4 pt-6">
+            <ScrollView className="flex-1 px-4 pt-6" keyboardShouldPersistTaps="handled">
                 {/* Type Selector - Only for new concepts */}
                 {!isEditing && (
                     <View className="mb-6">

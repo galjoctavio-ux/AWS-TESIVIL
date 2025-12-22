@@ -1,16 +1,19 @@
 import { View, Text, TouchableOpacity, TextInput, FlatList, ScrollView, Alert, KeyboardAvoidingView, Platform, Image, ActivityIndicator, Switch } from 'react-native';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'expo-router';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { useAuth } from '../../../context/AuthContext';
+import { useSettings } from '../../../context/SettingsContext';
 import { getClients } from '../../../services/clients-service';
 import { searchError, getBrands, getModelsByBrand, BrandData, ModelData } from '../../../services/database-service';
 import { addService } from '../../../services/services-service';
+import { getUserProfile } from '../../../services/user-service';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 
 export default function NewService() {
     const router = useRouter();
     const { user } = useAuth();
+    const { settings } = useSettings();
 
     // Steps: 1=Client, 2=Type, 3=Equipment, 4=Details/Review
     const [step, setStep] = useState(1);
@@ -36,7 +39,9 @@ export default function NewService() {
     const [checklistData, setChecklistData] = useState<{ [key: string]: boolean }>({});
     const [photos, setPhotos] = useState<string[]>([]);
     const [notes, setNotes] = useState('');
-    const [reminderEnabled, setReminderEnabled] = useState(true); // Default to true for PRO feel
+    const [reminderEnabled, setReminderEnabled] = useState(false); // Default to false, will be set based on isPro
+    const [isPro, setIsPro] = useState(false); // Track if user is PRO
+    const [capacityBTU, setCapacityBTU] = useState(''); // BTU capacity
 
     // Diagnosis (Only for Repair)
     const [errorCode, setErrorCode] = useState('');
@@ -46,13 +51,21 @@ export default function NewService() {
 
     const [saving, setSaving] = useState(false);
 
-    // LOAD INITIAL DATA
-    useEffect(() => {
-        if (user) {
-            loadClients();
-        }
-        loadBrands();
-    }, [user]);
+    // LOAD INITIAL DATA - Use useFocusEffect to reload clients when returning from add client
+    useFocusEffect(
+        useCallback(() => {
+            if (user) {
+                loadClients();
+                // Check if user is PRO
+                getUserProfile(user.uid).then(profile => {
+                    const userIsPro = profile?.rank === 'Pro' || profile?.subscription === 'premium';
+                    setIsPro(userIsPro);
+                    setReminderEnabled(userIsPro); // Enable reminder by default only for PRO users
+                });
+            }
+            loadBrands();
+        }, [user])
+    );
 
     const loadClients = async () => {
         const fetched = await getClients(user!.uid);
@@ -70,9 +83,11 @@ export default function NewService() {
         if (clientSearch === '') {
             setFilteredClients(clients);
         } else {
+            const searchLower = clientSearch.toLowerCase();
             setFilteredClients(clients.filter(c =>
-                c.name.toLowerCase().includes(clientSearch.toLowerCase()) ||
-                (c.address && c.address.toLowerCase().includes(clientSearch.toLowerCase()))
+                c.name.toLowerCase().includes(searchLower) ||
+                (c.address && c.address.toLowerCase().includes(searchLower)) ||
+                (c.phone && c.phone.toLowerCase().includes(searchLower))
             ));
         }
     }, [clientSearch, clients]);
@@ -147,13 +162,16 @@ export default function NewService() {
         try {
             setSaving(true);
 
-            // Calculate next service date
+            // Calculate next service date using configurable reminder time
             const nextDate = new Date();
-            if (serviceType === 'Mantenimiento') nextDate.setMonth(nextDate.getMonth() + 6);
-            else if (serviceType === 'Instalación') nextDate.setFullYear(nextDate.getFullYear() + 1);
-            else nextDate.setMonth(nextDate.getMonth() + 3); // Reparación default
+            if (serviceType === 'Instalación') {
+                nextDate.setFullYear(nextDate.getFullYear() + 1);
+            } else {
+                nextDate.setMonth(nextDate.getMonth() + settings.reminderMonths);
+            }
 
-            await addService({
+            // Prepare payload to avoid undefined values which Firebase rejects
+            const servicePayload: any = {
                 clientId: selectedClient.id,
                 technicianId: user?.uid || '',
                 type: serviceType,
@@ -163,21 +181,27 @@ export default function NewService() {
                     brand: selectedBrand.name,
                     model: selectedModel.name,
                     type: selectedModel.type,
+                    capacityBTU: capacityBTU || '', // Save capacity
                 },
                 tasks: selectedTasks,
                 checklist: checklistData,
                 photos: photos,
-
-                diagnosis: selectedError ? {
-                    errorCode: selectedError.code,
-                    description: selectedError.description,
-                    cause: selectedError.solution || ''
-                } : undefined,
                 notes: notes,
                 nextServiceDate: reminderEnabled ? nextDate : null,
                 reminderEnabled: reminderEnabled,
                 cost: 0 // Placeholder
-            });
+            };
+
+            // Only add diagnosis if it exists (repair only)
+            if (serviceType === 'Reparación' && errorCode) {
+                servicePayload.diagnosis = {
+                    errorCode: 'MANUAL',
+                    description: errorCode, // Using errorCode state for description text
+                    cause: ''
+                };
+            }
+
+            await addService(servicePayload);
 
             Alert.alert('Éxito', 'Servicio registrado correctamente', [
                 { text: 'OK', onPress: () => router.back() }
@@ -223,24 +247,41 @@ export default function NewService() {
 
 
             {/* PRO Feature: Automatic Reminder */}
-            <View className="bg-indigo-50 p-4 rounded-xl mb-6 border border-indigo-100 flex-row items-center justify-between">
+            <View className={`p-4 rounded-xl mb-6 border flex-row items-center justify-between ${isPro ? 'bg-indigo-50 border-indigo-100' : 'bg-gray-100 border-gray-200'}`}>
                 <View className="flex-1 mr-4">
                     <View className="flex-row items-center mb-1">
-                        <Ionicons name="notifications" size={18} color="#4F46E5" />
-                        <Text className="font-bold text-indigo-900 ml-2">Recordatorio Automático</Text>
+                        <Ionicons name="notifications" size={18} color={isPro ? '#4F46E5' : '#9CA3AF'} />
+                        <Text className={`font-bold ml-2 ${isPro ? 'text-indigo-900' : 'text-gray-500'}`}>Recordatorio Automático</Text>
                         <View className="bg-indigo-600 px-2 py-0.5 rounded ml-2">
                             <Text className="text-white text-[10px] font-bold">PRO</Text>
                         </View>
                     </View>
-                    <Text className="text-indigo-700 text-xs">
-                        Notificar al cliente para su próximo servicio ({serviceType === 'Instalación' ? '1 año' : '6 meses'}).
+                    <Text className={`text-xs ${isPro ? 'text-indigo-700' : 'text-gray-400'}`}>
+                        {isPro
+                            ? `Notificar al cliente para su próximo servicio (${serviceType === 'Instalación' ? '1 año' : `${settings.reminderMonths} ${settings.reminderMonths === 1 ? 'mes' : 'meses'}`}).`
+                            : 'Función exclusiva para usuarios PRO'
+                        }
                     </Text>
                 </View>
                 <Switch
                     value={reminderEnabled}
-                    onValueChange={setReminderEnabled}
-                    trackColor={{ false: '#C7D2FE', true: '#818CF8' }}
-                    thumbColor={reminderEnabled ? '#4F46E5' : '#EEF2FF'}
+                    onValueChange={(value) => {
+                        if (!isPro && value) {
+                            Alert.alert(
+                                'Función PRO',
+                                'Los recordatorios automáticos son una función exclusiva para usuarios PRO. ¿Deseas actualizar tu plan?',
+                                [
+                                    { text: 'Más tarde', style: 'cancel' },
+                                    { text: 'Ver planes', onPress: () => router.push('/(app)/store') }
+                                ]
+                            );
+                            return;
+                        }
+                        setReminderEnabled(value);
+                    }}
+                    trackColor={{ false: '#D1D5DB', true: '#818CF8' }}
+                    thumbColor={reminderEnabled && isPro ? '#4F46E5' : '#9CA3AF'}
+                    disabled={!isPro}
                 />
             </View>
 
@@ -310,6 +351,49 @@ export default function NewService() {
         </View>
     );
 
+    // Brand logos mapping (local assets)
+    const BRAND_LOGOS: { [key: string]: any } = {
+        'MIRAGE': require('../../../data_mining/downloaded_assets/logos/Mirage-Logo.png'),
+        'YORK': require('../../../data_mining/downloaded_assets/logos/york_logo.png'),
+        'LG': require('../../../data_mining/downloaded_assets/logos/logo_lg.png'),
+        'CARRIER': require('../../../data_mining/downloaded_assets/logos/carrier_logo.png'),
+    };
+
+    // State for custom brand
+    const [customBrandName, setCustomBrandName] = useState('');
+    const [customModelName, setCustomModelName] = useState('');
+    const [showCustomBrandModal, setShowCustomBrandModal] = useState(false);
+
+    const handleSelectOtherBrand = () => {
+        setShowCustomBrandModal(true);
+    };
+
+    const handleConfirmCustomBrand = () => {
+        if (!customBrandName.trim() || !customModelName.trim()) {
+            Alert.alert('Error', 'Ingresa la marca y el modelo');
+            return;
+        }
+        // Create a custom brand and model
+        const customBrand: BrandData = {
+            name: customBrandName.trim().toUpperCase(),
+            displayName: customBrandName.trim(),
+            logo_url: '',
+            model_count: 0
+        };
+        const customModel: ModelData = {
+            id: -1, // Custom ID
+            name: customModelName.trim(),
+            reference_id: 'custom',
+            image_url: '',
+            logo_url: '',
+            type: 'Minisplit'
+        };
+        setSelectedBrand(customBrand);
+        setSelectedModel(customModel);
+        setShowCustomBrandModal(false);
+        setStep(4);
+    };
+
     // STEP 3: EQUIPMENT
     const renderStep3 = () => (
         <View className="flex-1">
@@ -317,24 +401,92 @@ export default function NewService() {
                 <>
                     <Text className="text-lg font-bold text-gray-800 mb-4">Selecciona la Marca</Text>
                     {loading ? <ActivityIndicator size="large" color="#2563EB" /> : (
-                        <FlatList
-                            data={brands}
-                            keyExtractor={item => item.name}
-                            numColumns={3}
-                            renderItem={({ item }) => (
-                                <TouchableOpacity
-                                    onPress={() => setSelectedBrand(item)}
-                                    className="flex-1 m-1 bg-white p-3 rounded-lg border border-gray-100 items-center justify-center aspect-square"
+                        <>
+                            <FlatList
+                                data={brands}
+                                keyExtractor={item => item.name}
+                                numColumns={2}
+                                renderItem={({ item }) => (
+                                    <TouchableOpacity
+                                        onPress={() => setSelectedBrand(item)}
+                                        className="flex-1 m-2 bg-white p-4 rounded-xl border border-gray-100 items-center justify-center shadow-sm"
+                                        style={{ minHeight: 100 }}
+                                    >
+                                        {BRAND_LOGOS[item.name] ? (
+                                            <Image
+                                                source={BRAND_LOGOS[item.name]}
+                                                className="w-16 h-16"
+                                                resizeMode="contain"
+                                            />
+                                        ) : (
+                                            <Ionicons name="cube" size={32} color="#CBD5E1" />
+                                        )}
+                                        <Text className="text-sm text-center mt-2 text-gray-700 font-medium">{item.displayName}</Text>
+                                    </TouchableOpacity>
+                                )}
+                                ListFooterComponent={
+                                    <TouchableOpacity
+                                        onPress={handleSelectOtherBrand}
+                                        className="m-2 bg-gray-100 p-4 rounded-xl border-2 border-dashed border-gray-300 items-center justify-center"
+                                        style={{ minHeight: 100 }}
+                                    >
+                                        <Ionicons name="add-circle-outline" size={32} color="#6B7280" />
+                                        <Text className="text-sm text-center mt-2 text-gray-600 font-medium">Otra Marca</Text>
+                                        <Text className="text-xs text-gray-400">Marca no listada</Text>
+                                    </TouchableOpacity>
+                                }
+                            />
+                        </>
+                    )}
+
+                    {/* Custom Brand Modal */}
+                    {showCustomBrandModal && (
+                        <View className="absolute inset-0 bg-black/50 items-center justify-center" style={{ zIndex: 1000 }}>
+                            <KeyboardAvoidingView
+                                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                                className="w-80"
+                            >
+                                <ScrollView
+                                    keyboardShouldPersistTaps="handled"
+                                    contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
                                 >
-                                    {item.logo_url ? (
-                                        <Image source={{ uri: 'https://mrfrio-assets.com/logos/' + item.name + '.png' }} className="w-12 h-12" resizeMode="contain" /> // Mock URL logic or use local if available
-                                    ) : (
-                                        <Ionicons name="cube" size={24} color="#CBD5E1" />
-                                    )}
-                                    <Text className="text-xs text-center mt-2 text-gray-600 font-medium">{item.name}</Text>
-                                </TouchableOpacity>
-                            )}
-                        />
+                                    <View className="bg-white rounded-2xl p-6">
+                                        <Text className="text-lg font-bold text-gray-800 mb-4">Marca Personalizada</Text>
+
+                                        <Text className="text-sm text-gray-600 mb-2">Nombre de la Marca</Text>
+                                        <TextInput
+                                            className="bg-gray-50 p-3 rounded-xl border border-gray-200 mb-4"
+                                            placeholder="Ej. Samsung, Hisense..."
+                                            value={customBrandName}
+                                            onChangeText={setCustomBrandName}
+                                        />
+
+                                        <Text className="text-sm text-gray-600 mb-2">Modelo del Equipo</Text>
+                                        <TextInput
+                                            className="bg-gray-50 p-3 rounded-xl border border-gray-200 mb-4"
+                                            placeholder="Ej. AR12TXCA..."
+                                            value={customModelName}
+                                            onChangeText={setCustomModelName}
+                                        />
+
+                                        <View className="flex-row">
+                                            <TouchableOpacity
+                                                onPress={() => setShowCustomBrandModal(false)}
+                                                className="flex-1 py-3 mr-2 rounded-xl border border-gray-300"
+                                            >
+                                                <Text className="text-center text-gray-600 font-medium">Cancelar</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity
+                                                onPress={handleConfirmCustomBrand}
+                                                className="flex-1 py-3 bg-blue-600 rounded-xl"
+                                            >
+                                                <Text className="text-center text-white font-bold">Confirmar</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                </ScrollView>
+                            </KeyboardAvoidingView>
+                        </View>
                     )}
                 </>
             ) : (
@@ -343,34 +495,108 @@ export default function NewService() {
                         <TouchableOpacity onPress={() => setSelectedBrand(null)} className="mr-3">
                             <Ionicons name="arrow-back" size={24} color="#374151" />
                         </TouchableOpacity>
-                        <Text className="text-lg font-bold text-gray-800">Modelos {selectedBrand.name}</Text>
+                        <Text className="text-lg font-bold text-gray-800">{selectedBrand.displayName || selectedBrand.name}</Text>
                     </View>
 
-                    {loading ? <ActivityIndicator size="large" color="#2563EB" /> : (
-                        <FlatList
-                            data={models}
-                            keyExtractor={item => item.id.toString()}
-                            renderItem={({ item }) => (
-                                <TouchableOpacity
-                                    onPress={() => { setSelectedModel(item); setStep(4); }}
-                                    className="bg-white p-4 rounded-xl mb-3 border border-gray-100 flex-row items-center shadow-sm"
-                                >
-                                    <View className="w-16 h-16 bg-gray-50 rounded-lg mr-4 items-center justify-center">
-                                        <Ionicons name="hardware-chip" size={30} color="#94A3B8" />
-                                    </View>
-                                    <View className="flex-1">
-                                        <Text className="font-bold text-gray-800 text-base">{item.name}</Text>
-                                        <Text className="text-blue-600 font-medium text-xs bg-blue-50 self-start px-2 py-1 rounded mt-1">{item.type}</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            )}
-                        />
-                    )}
+                    {/* Manual Model Input */}
+                    <ScrollView
+                        className="flex-1"
+                        keyboardShouldPersistTaps="handled"
+                        showsVerticalScrollIndicator={false}
+                    >
+                        <View className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm mb-4">
+                            <Text className="text-sm font-medium text-gray-700 mb-2">Modelo del Equipo *</Text>
+                            <TextInput
+                                className="bg-gray-50 p-3 rounded-xl border border-gray-200 mb-4"
+                                placeholder="Ej. Magnum 19, XPower Ultra, etc."
+                                value={customModelName}
+                                onChangeText={setCustomModelName}
+                            />
+
+                            <Text className="text-sm font-medium text-gray-700 mb-2">Tipo de Equipo</Text>
+                            <View className="flex-row flex-wrap mb-4">
+                                {['Minisplit', 'Cassette', 'Piso Techo', 'VRF', 'Chiller', 'Otro'].map(type => (
+                                    <TouchableOpacity
+                                        key={type}
+                                        onPress={() => setSelectedModel({
+                                            id: -1,
+                                            name: customModelName || 'Sin especificar',
+                                            reference_id: 'manual',
+                                            image_url: '',
+                                            logo_url: '',
+                                            type: type
+                                        })}
+                                        className={`px-3 py-2 rounded-full mr-2 mb-2 border ${selectedModel?.type === type
+                                            ? 'bg-blue-600 border-blue-600'
+                                            : 'bg-white border-gray-300'
+                                            }`}
+                                    >
+                                        <Text className={selectedModel?.type === type ? 'text-white font-medium' : 'text-gray-600'}>
+                                            {type}
+                                        </Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+
+                            <Text className="text-sm font-medium text-gray-700 mb-2">Capacidad (BTU)</Text>
+                            <View className="flex-row flex-wrap mb-2">
+                                {['12,000', '18,000', '24,000', '36,000', '48,000', '60,000'].map(btu => (
+                                    <TouchableOpacity
+                                        key={btu}
+                                        onPress={() => setCapacityBTU(btu)}
+                                        className={`px-3 py-2 rounded-full mr-2 mb-2 border ${capacityBTU === btu
+                                            ? 'bg-green-600 border-green-600'
+                                            : 'bg-white border-gray-300'
+                                            }`}
+                                    >
+                                        <Text className={capacityBTU === btu ? 'text-white font-medium' : 'text-gray-600'}>
+                                            {btu}
+                                        </Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                            <TextInput
+                                className="bg-gray-50 p-3 rounded-xl border border-gray-200"
+                                placeholder="O escribe otra capacidad..."
+                                value={capacityBTU}
+                                onChangeText={setCapacityBTU}
+                                keyboardType="numeric"
+                            />
+                        </View>
+
+                        <TouchableOpacity
+                            onPress={() => {
+                                if (!customModelName.trim()) {
+                                    Alert.alert('Error', 'Ingresa el modelo del equipo');
+                                    return;
+                                }
+                                const finalModel: ModelData = {
+                                    id: -1,
+                                    name: customModelName.trim(),
+                                    reference_id: 'manual',
+                                    image_url: '',
+                                    logo_url: '',
+                                    type: selectedModel?.type || 'Minisplit'
+                                };
+                                setSelectedModel(finalModel);
+                                setStep(4);
+                            }}
+                            className="bg-blue-600 p-4 rounded-xl items-center shadow-lg mb-4"
+                        >
+                            <Text className="text-white font-bold text-lg">Continuar</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={() => setStep(2)} className="px-4 py-3 items-center mb-20">
+                            <Text className="text-gray-400">Volver a Tipos</Text>
+                        </TouchableOpacity>
+                    </ScrollView>
                 </>
             )}
-            <TouchableOpacity onPress={() => setStep(2)} className="mt-4 px-4 py-3 items-center">
-                <Text className="text-gray-400">Volver a Tipos</Text>
-            </TouchableOpacity>
+            {!selectedBrand && (
+                <TouchableOpacity onPress={() => setStep(2)} className="mt-4 px-4 py-3 items-center mb-20">
+                    <Text className="text-gray-400">Volver a Tipos</Text>
+                </TouchableOpacity>
+            )}
         </View>
     );
 
@@ -391,7 +617,11 @@ export default function NewService() {
             serviceType === 'Mantenimiento' ? maintChecklist : repairChecklist;
 
         return (
-            <ScrollView className="flex-1">
+            <ScrollView
+                className="flex-1"
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 100 }}
+            >
                 {/* INFO CARD */}
                 <View className="bg-blue-50 p-4 rounded-xl mb-6 border border-blue-100">
                     <Text className="font-bold text-blue-900 text-lg">{selectedClient?.name}</Text>
@@ -401,30 +631,16 @@ export default function NewService() {
                 {/* DIAGNOSIS IF REPAIR */}
                 {serviceType === 'Reparación' && (
                     <View className="mb-6">
-                        <Text className="text-lg font-bold text-gray-800 mb-2">Diagnóstico</Text>
+                        <Text className="text-lg font-bold text-gray-800 mb-2">Diagnóstico de Falla</Text>
                         <TextInput
                             className="bg-white p-3 rounded-lg border border-gray-200"
-                            placeholder="Buscar código (ej. E1)..."
+                            placeholder="Describe el problema o código de error..."
                             value={errorCode}
                             onChangeText={setErrorCode}
+                            multiline
+                            numberOfLines={2}
+                            textAlignVertical="top"
                         />
-                        {searchingErrors && <Text className="text-xs text-gray-400 mt-1">Buscando...</Text>}
-                        {possibleErrors.length > 0 && (
-                            <View className="bg-white border border-gray-100 rounded-lg mt-1 max-h-40">
-                                {possibleErrors.map(err => (
-                                    <TouchableOpacity
-                                        key={err.id}
-                                        onPress={() => { setErrorCode(err.code); setSelectedError(err); setPossibleErrors([]); }}
-                                        className="p-3 border-b border-gray-50"
-                                    >
-                                        <Text className="font-bold text-gray-800">{err.code} - {err.description.substring(0, 30)}...</Text>
-                                    </TouchableOpacity>
-                                ))}
-                            </View>
-                        )}
-                        {selectedError && (
-                            <Text className="text-green-600 text-xs mt-2 font-medium">✅ Diagnóstico: {selectedError.description}</Text>
-                        )}
                     </View>
                 )}
 
@@ -466,7 +682,10 @@ export default function NewService() {
                 </View>
 
                 {/* EVIDENCE/PHOTOS */}
-                <Text className="text-lg font-bold text-gray-800 mb-3">Evidencia</Text>
+                <View className="flex-row items-center mb-3">
+                    <Text className="text-lg font-bold text-gray-800">Evidencia</Text>
+                    <Text className="text-xs text-gray-400 ml-2">(opcional, pero recomendada)</Text>
+                </View>
                 <ScrollView horizontal className="mb-6" showsHorizontalScrollIndicator={false}>
                     <TouchableOpacity
                         onPress={pickImage}

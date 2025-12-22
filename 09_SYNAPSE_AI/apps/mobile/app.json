@@ -35,7 +35,6 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-web-browser",
       [
         "expo-notifications",
         {
@@ -48,9 +47,11 @@
         {
           "url": "https://sentry.io/",
           "organization": "tesivil",
-          "project": "synapse-mobile"
+          "project": "synapse-mobile",
+          "autoUploadSourceMaps": false
         }
-      ]
+      ],
+      "expo-asset"
     ],
     "scheme": "synapse",
     "experiments": {

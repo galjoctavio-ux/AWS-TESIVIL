@@ -78,8 +78,8 @@ export async function syncBenchmarks(): Promise<number> {
                             brand: brand,
                             category: category,
                             score_overall: entry.normalized_score,
-                            score_reasoning: entry.mmlu_score || null,
-                            score_coding: entry.humaneval_score || null,
+                            score_reasoning: null,
+                            score_coding: null,
                             score_creative: null,
                             score_speed: null,
                             trend: 'stable',
@@ -93,7 +93,7 @@ export async function syncBenchmarks(): Promise<number> {
                 if (!modelError) {
                     upsertedCount++;
 
-                    // Insert benchmark entries
+                    // Insert benchmark entries (only arena_elo is available from curated data)
                     const benchmarks = [];
 
                     if (entry.arena_elo) {
@@ -102,46 +102,6 @@ export async function syncBenchmarks(): Promise<number> {
                             category: 'arena_elo',
                             source: entry.source,
                             score: entry.arena_elo,
-                            updated_at: new Date().toISOString(),
-                        });
-                    }
-
-                    if (entry.mmlu_score) {
-                        benchmarks.push({
-                            model_id: entry.model_id,
-                            category: 'mmlu',
-                            source: entry.source,
-                            score: entry.mmlu_score,
-                            updated_at: new Date().toISOString(),
-                        });
-                    }
-
-                    if (entry.humaneval_score) {
-                        benchmarks.push({
-                            model_id: entry.model_id,
-                            category: 'humaneval',
-                            source: entry.source,
-                            score: entry.humaneval_score,
-                            updated_at: new Date().toISOString(),
-                        });
-                    }
-
-                    if (entry.mt_bench_score) {
-                        benchmarks.push({
-                            model_id: entry.model_id,
-                            category: 'mt_bench',
-                            source: entry.source,
-                            score: entry.mt_bench_score,
-                            updated_at: new Date().toISOString(),
-                        });
-                    }
-
-                    if (entry.wer_score) {
-                        benchmarks.push({
-                            model_id: entry.model_id,
-                            category: 'wer',
-                            source: entry.source,
-                            score: entry.wer_score,
                             updated_at: new Date().toISOString(),
                         });
                     }

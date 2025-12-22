@@ -249,7 +249,7 @@ const academyRoutes: FastifyPluginAsync = async (fastify) => {
                     .eq('stripe_checkout_session_id', checkoutSession.id);
 
                 if (error) {
-                    fastify.log.error('Error updating payment:', error);
+                    fastify.log.error({ err: error }, 'Error updating payment');
                 }
 
                 // Track analytics

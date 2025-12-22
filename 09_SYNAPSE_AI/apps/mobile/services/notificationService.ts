@@ -1,9 +1,12 @@
 import { Platform } from 'react-native';
 import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 
-// Configure how notifications behave when the app is in foreground
+// TEMPORARILY DISABLED: Push notifications don't work in Expo Go SDK 53+
+// When ready for production, uncomment the import below and the function body
+// import * as Notifications from 'expo-notifications';
+
+/*
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
         shouldShowAlert: true,
@@ -11,8 +14,14 @@ Notifications.setNotificationHandler({
         shouldSetBadge: false,
     }),
 });
+*/
 
-export async function registerForPushNotificationsAsync() {
+export async function registerForPushNotificationsAsync(): Promise<string | null> {
+    // TEMPORARILY DISABLED: Return early for Expo Go testing
+    console.log('[Notifications] Temporarily disabled for Expo Go testing');
+    return null;
+
+    /* PRODUCTION CODE - Uncomment when building APK/AAB
     if (Platform.OS === 'android') {
         await Notifications.setNotificationChannelAsync('default', {
             name: 'default',
@@ -24,7 +33,7 @@ export async function registerForPushNotificationsAsync() {
 
     if (!Device.isDevice) {
         console.log('Must use physical device for Push Notifications');
-        return;
+        return null;
     }
 
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
@@ -37,10 +46,9 @@ export async function registerForPushNotificationsAsync() {
 
     if (finalStatus !== 'granted') {
         console.log('Failed to get push token for push notification!');
-        return;
+        return null;
     }
 
-    // Get the token that uniquely identifies this device
     const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
 
     try {
@@ -48,11 +56,11 @@ export async function registerForPushNotificationsAsync() {
             projectId,
         })).data;
 
-        // In a real app, you'd send this token to your backend (Supabase)
-        // For now, we print it to console for debugging
         console.log('Expo Push Token:', token);
         return token;
     } catch (e) {
         console.error('Error getting push token', e);
+        return null;
     }
+    */
 }
