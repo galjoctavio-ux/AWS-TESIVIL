@@ -16,7 +16,7 @@ async function initDetailPage() {
     const id = urlParams.get('id');
 
     if (!slug && !id) {
-        showError('No se especificó una aplicación');
+        showError(i18n.t('appNotFound'));
         return;
     }
 
@@ -32,7 +32,7 @@ async function initDetailPage() {
     }
 
     if (!app) {
-        showError('Aplicación no encontrada');
+        showError(i18n.t('appNotFound'));
         return;
     }
 
@@ -68,9 +68,9 @@ function showError(message) {
                 <line x1="12" y1="16" x2="12.01" y2="16"/>
             </svg>
             <h3>${message}</h3>
-            <p>Verifica el enlace e intenta de nuevo.</p>
+            <p>${i18n.t('errorDesc')}</p>
             <a href="index.html" class="btn-primary">
-                Volver al catálogo
+                ${i18n.t('backToCatalog')}
             </a>
         </div>
     `;
@@ -87,6 +87,11 @@ function renderAppDetail(app) {
     // Construir features
     const features = app.features ?
         (typeof app.features === 'string' ? JSON.parse(app.features) : app.features) :
+        [];
+
+    // Construir screenshots
+    const screenshots = app.screenshots ?
+        (typeof app.screenshots === 'string' ? JSON.parse(app.screenshots) : app.screenshots) :
         [];
 
     // Construir CTAs
@@ -119,7 +124,7 @@ function renderAppDetail(app) {
         
         <!-- Description -->
         <section class="detail-section">
-            <h2>Descripción</h2>
+            <h2 data-i18n="description">${i18n.t('description')}</h2>
             <div class="detail-description">
                 ${formatDescription(app.descripcion_larga || app.descripcion_corta || 'Sin descripción disponible.')}
             </div>
@@ -128,8 +133,22 @@ function renderAppDetail(app) {
         <!-- Features -->
         ${features.length > 0 ? `
             <section class="detail-section">
-                <h2>Funcionalidades</h2>
+                <h2 data-i18n="features">${i18n.t('features')}</h2>
                 ${Components.featuresList(features)}
+            </section>
+        ` : ''}
+        
+        <!-- Screenshots Gallery -->
+        ${screenshots.length > 0 ? `
+            <section class="detail-section">
+                <h2 data-i18n="screenshots">${i18n.t('screenshots')}</h2>
+                <div class="screenshots-gallery">
+                    ${screenshots.map((url, index) => `
+                        <div class="screenshot-item" onclick="openLightbox('${url}')">
+                            <img src="${url}" alt="Screenshot ${index + 1}" loading="lazy" />
+                        </div>
+                    `).join('')}
+                </div>
             </section>
         ` : ''}
         
@@ -161,7 +180,7 @@ function buildCTAButtons(app) {
                     <polyline points="7 10 12 15 17 10"/>
                     <line x1="12" y1="15" x2="12" y2="3"/>
                 </svg>
-                Descargar APK
+                <span data-i18n="downloadApk">${i18n.t('downloadApk')}</span>
             </a>
         `);
     }
@@ -175,7 +194,7 @@ function buildCTAButtons(app) {
                     <line x1="2" y1="12" x2="22" y2="12"/>
                     <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
                 </svg>
-                Visitar Web App
+                <span data-i18n="visitWebApp">${i18n.t('visitWebApp')}</span>
             </a>
         `);
     }
@@ -187,7 +206,7 @@ function buildCTAButtons(app) {
                 <line x1="19" y1="12" x2="5" y2="12"/>
                 <polyline points="12 19 5 12 12 5"/>
             </svg>
-            Volver al catálogo
+            <span data-i18n="backToCatalog">${i18n.t('backToCatalog')}</span>
         </a>
     `);
 
@@ -211,3 +230,36 @@ function formatDescription(text) {
 
     return formatted;
 }
+
+// =============================================================================
+// Lightbox Functions
+// =============================================================================
+
+/**
+ * Abre el lightbox con una imagen
+ * @param {string} src - URL de la imagen
+ */
+function openLightbox(src) {
+    const lightbox = document.getElementById('lightbox');
+    const image = document.getElementById('lightbox-image');
+
+    image.src = src;
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+/**
+ * Cierra el lightbox
+ */
+function closeLightbox() {
+    const lightbox = document.getElementById('lightbox');
+    lightbox.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Cerrar lightbox con Escape
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeLightbox();
+    }
+});

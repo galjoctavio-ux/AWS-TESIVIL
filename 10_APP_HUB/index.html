@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -30,6 +30,28 @@
                 <div class="logo-icon">T</div>
                 <span class="logo-text">TESIVIL <span>App Hub</span></span>
             </a>
+
+            <!-- Controls -->
+            <div class="header-controls">
+                <button id="lang-toggle" class="control-btn lang-btn" onclick="i18n.toggle()"
+                    aria-label="Cambiar idioma">
+                    ES
+                </button>
+                <button id="theme-toggle" class="control-btn" onclick="ThemeManager.toggle()" aria-label="Cambiar tema">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5" />
+                        <line x1="12" y1="1" x2="12" y2="3" />
+                        <line x1="12" y1="21" x2="12" y2="23" />
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                        <line x1="1" y1="12" x2="3" y2="12" />
+                        <line x1="21" y1="12" x2="23" y2="12" />
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                    </svg>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -38,8 +60,8 @@
         <!-- Hero Section -->
         <section class="hero">
             <div class="container">
-                <h1 class="hero-title">Ecosistema TESIVIL</h1>
-                <p class="hero-subtitle">
+                <h1 class="hero-title" data-i18n="heroTitle">Ecosistema TESIVIL</h1>
+                <p class="hero-subtitle" data-i18n="heroSubtitle">
                     Descubre todas nuestras aplicaciones. Soluciones Android, Web Apps y
                     herramientas de desarrollo para potenciar tu productividad.
                 </p>
@@ -49,19 +71,22 @@
         <!-- Category Filter -->
         <section class="container">
             <div class="category-filter" role="tablist" aria-label="Filtrar por categoría">
-                <button class="filter-btn active" data-category="all" role="tab" aria-selected="true">
+                <button class="filter-btn active" data-category="all" role="tab" aria-selected="true"
+                    data-i18n="filterAll">
                     Todas
                 </button>
-                <button class="filter-btn" data-category="android" role="tab" aria-selected="false">
+                <button class="filter-btn" data-category="android" role="tab" aria-selected="false"
+                    data-i18n="filterAndroid">
                     📱 Android
                 </button>
-                <button class="filter-btn" data-category="web" role="tab" aria-selected="false">
+                <button class="filter-btn" data-category="web" role="tab" aria-selected="false" data-i18n="filterWeb">
                     🌐 Web App
                 </button>
-                <button class="filter-btn" data-category="desktop" role="tab" aria-selected="false">
+                <button class="filter-btn" data-category="desktop" role="tab" aria-selected="false"
+                    data-i18n="filterDesktop">
                     💻 Desktop
                 </button>
-                <button class="filter-btn" data-category="api" role="tab" aria-selected="false">
+                <button class="filter-btn" data-category="api" role="tab" aria-selected="false" data-i18n="filterApi">
                     🔧 API/Servicio
                 </button>
             </div>
@@ -79,7 +104,8 @@
     <footer class="footer">
         <div class="container footer-content">
             <span class="footer-logo">TESIVIL <span>App Hub</span></span>
-            <p>&copy; <span id="year"></span> TESIVIL. Todos los derechos reservados.</p>
+            <p>&copy; <span id="year"></span> TESIVIL. <span data-i18n="copyright">Todos los derechos reservados.</span>
+            </p>
             <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
         </div>
     </footer>
@@ -90,6 +116,7 @@
 
     <!-- App Scripts -->
     <script src="js/config.js"></script>
+    <script src="js/theme-i18n.js"></script>
     <script src="js/supabase-client.js"></script>
     <script src="js/components.js"></script>
     <script src="js/home.js"></script>
