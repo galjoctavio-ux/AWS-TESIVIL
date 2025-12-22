@@ -553,3 +553,312 @@ export const generateQuotePDF = async (data: QuotePDFData): Promise<void> => {
         throw error;
     }
 };
+
+// ============================================
+// COTIZADOR FREE PDF GENERATION
+// ============================================
+
+import { CotizadorQuote, CotizadorQuoteItem, formatCurrency as formatCotizadorCurrency } from './cotizador-service';
+
+interface CotizadorPDFData {
+    quote: CotizadorQuote & { id: string };
+    client: ClientData & { id: string };
+    technicianName?: string;
+}
+
+/**
+ * Generates a professional PDF for the Free Cotizador module.
+ * Includes watermark: "Elaborado con QRclima powered by TESIVIL"
+ */
+export const generateCotizadorPDF = async (data: CotizadorPDFData): Promise<void> => {
+    const { quote, client, technicianName } = data;
+
+    const currentDate = new Date().toLocaleDateString('es-MX', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
+    // Generate folio
+    const folio = `CF-${new Date().getFullYear()}${quote.id.substring(0, 5).toUpperCase()}`;
+
+    // Separate items by type
+    const moItems = quote.items.filter(item => item.type === 'MO');
+    const mtItems = quote.items.filter(item => item.type === 'MT');
+
+    const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <title>Cotización</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body {
+                font-family: 'Helvetica Neue', Arial, sans-serif;
+                color: #333;
+                line-height: 1.5;
+                padding: 30px;
+                font-size: 12px;
+                position: relative;
+            }
+            .watermark {
+                position: fixed;
+                bottom: 20px;
+                left: 0;
+                right: 0;
+                text-align: center;
+                color: #CBD5E1;
+                font-size: 10px;
+                font-style: italic;
+                letter-spacing: 1px;
+            }
+            .header {
+                text-align: center;
+                border-bottom: 3px solid #10B981;
+                padding-bottom: 15px;
+                margin-bottom: 20px;
+            }
+            .header h1 {
+                color: #10B981;
+                font-size: 24px;
+                margin-bottom: 3px;
+            }
+            .header .subtitle {
+                color: #666;
+                font-size: 16px;
+                font-weight: bold;
+            }
+            .header .folio {
+                color: #999;
+                font-size: 11px;
+                margin-top: 5px;
+            }
+            .client-section {
+                background: #F0FDF4;
+                padding: 15px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                border-left: 4px solid #10B981;
+            }
+            .client-section h3 {
+                color: #10B981;
+                font-size: 12px;
+                margin-bottom: 8px;
+            }
+            .section-title {
+                font-size: 13px;
+                font-weight: bold;
+                margin-bottom: 10px;
+                padding-bottom: 5px;
+                border-bottom: 1px solid #E5E7EB;
+            }
+            .section-title.mo {
+                color: #7C3AED;
+            }
+            .section-title.mt {
+                color: #EA580C;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 20px;
+            }
+            th {
+                background: #F3F4F6;
+                padding: 10px;
+                text-align: left;
+                font-weight: bold;
+                border: 1px solid #E5E7EB;
+                font-size: 11px;
+            }
+            td {
+                padding: 10px;
+                border: 1px solid #E5E7EB;
+            }
+            .text-right {
+                text-align: right;
+            }
+            .text-center {
+                text-align: center;
+            }
+            .code-badge {
+                display: inline-block;
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-size: 9px;
+                font-weight: bold;
+            }
+            .code-mo {
+                background: #EDE9FE;
+                color: #7C3AED;
+            }
+            .code-mt {
+                background: #FFEDD5;
+                color: #EA580C;
+            }
+            .totals-section {
+                background: #1F2937;
+                color: white;
+                padding: 20px;
+                border-radius: 8px;
+                margin-top: 20px;
+            }
+            .totals-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px 0;
+            }
+            .totals-row.final {
+                border-top: 2px solid #4B5563;
+                padding-top: 15px;
+                margin-top: 10px;
+                font-size: 18px;
+                font-weight: bold;
+            }
+            .totals-row .label {
+                color: #9CA3AF;
+            }
+            .totals-row.final .label {
+                color: white;
+            }
+            .totals-row .value {
+                color: #10B981;
+                font-weight: bold;
+            }
+            .notes {
+                background: #F3F4F6;
+                padding: 12px;
+                border-radius: 6px;
+                margin-top: 15px;
+                font-style: italic;
+                color: #666;
+            }
+            .footer {
+                margin-top: 30px;
+                padding-top: 15px;
+                border-top: 1px solid #E5E7EB;
+                text-align: center;
+                color: #666;
+                font-size: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="watermark">Elaborado con QRclima powered by TESIVIL</div>
+
+        <div class="header">
+            <h1>❄️ QRclima</h1>
+            <div class="subtitle">COTIZACIÓN</div>
+            <div class="folio">Folio: ${folio} | Fecha: ${currentDate}</div>
+        </div>
+
+        <div class="client-section">
+            <h3>📋 DATOS DEL CLIENTE</h3>
+            <strong>${client.name}</strong><br>
+            ${client.phone ? `📞 ${client.phone}<br>` : ''}
+            ${client.address ? `📍 ${client.address}` : ''}
+        </div>
+
+        ${moItems.length > 0 ? `
+        <div class="section-title mo">🔧 MANO DE OBRA</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Concepto</th>
+                    <th class="text-center">Cantidad</th>
+                    <th class="text-right">P. Unitario</th>
+                    <th class="text-right">Importe</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${moItems.map(item => `
+                <tr>
+                    <td><span class="code-badge code-mo">${item.code}</span></td>
+                    <td>${item.description}</td>
+                    <td class="text-center">${item.quantity}</td>
+                    <td class="text-right">${formatCotizadorCurrency(item.unitPrice)}</td>
+                    <td class="text-right"><strong>${formatCotizadorCurrency(item.total)}</strong></td>
+                </tr>
+                `).join('')}
+            </tbody>
+        </table>
+        ` : ''}
+
+        ${mtItems.length > 0 ? `
+        <div class="section-title mt">📦 MATERIALES</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Concepto</th>
+                    <th class="text-center">Cantidad</th>
+                    <th class="text-right">P. Unitario</th>
+                    <th class="text-right">Importe</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${mtItems.map(item => `
+                <tr>
+                    <td><span class="code-badge code-mt">${item.code}</span></td>
+                    <td>${item.description}</td>
+                    <td class="text-center">${item.quantity}</td>
+                    <td class="text-right">${formatCotizadorCurrency(item.unitPrice)}</td>
+                    <td class="text-right"><strong>${formatCotizadorCurrency(item.total)}</strong></td>
+                </tr>
+                `).join('')}
+            </tbody>
+        </table>
+        ` : ''}
+
+        <div class="totals-section">
+            <div class="totals-row final">
+                <span class="label">TOTAL A PAGAR</span>
+                <span class="value">${formatCotizadorCurrency(quote.total)}</span>
+            </div>
+            <div style="color: #9CA3AF; font-size: 10px; margin-top: 8px;">* Precios con IVA incluido</div>
+        </div>
+
+        ${quote.notes ? `
+        <div class="notes">
+            <strong>Notas:</strong> ${quote.notes}
+        </div>
+        ` : ''}
+
+        <div class="footer">
+            Técnico: ${technicianName || 'Técnico Certificado'}<br>
+            Documento generado el ${currentDate} por QRclima App
+        </div>
+    </body>
+    </html>
+    `;
+
+    try {
+        // Generate PDF file
+        const { uri } = await Print.printToFileAsync({
+            html,
+            base64: false,
+        });
+
+        console.log('Cotizador PDF generated at:', uri);
+
+        // Check if sharing is available and share
+        if (await Sharing.isAvailableAsync()) {
+            await Sharing.shareAsync(uri, {
+                mimeType: 'application/pdf',
+                dialogTitle: 'Compartir Cotización',
+                UTI: 'com.adobe.pdf',
+            });
+        } else {
+            throw new Error('Compartir no está disponible en este dispositivo');
+        }
+    } catch (error) {
+        console.error('Error generating Cotizador PDF:', error);
+        throw error;
+    }
+};

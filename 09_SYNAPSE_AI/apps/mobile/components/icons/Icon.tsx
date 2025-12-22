@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import {
     Sparkles,
     Newspaper,
@@ -57,6 +57,11 @@ import {
     TrendingUp,
     ArrowRight,
     Eye,
+    // Login
+    Mail,
+    Lock,
+    EyeOff,
+    ArrowLeft,
     type LucideIcon,
 } from 'lucide-react-native';
 import { COLORS } from '@/constants/config';
@@ -131,6 +136,11 @@ const ICONS: Record<string, LucideIcon> = {
     TrendingUp,
     ArrowRight,
     Eye,
+    // Login
+    Mail,
+    Lock,
+    EyeOff,
+    ArrowLeft,
 };
 
 // Icon names type
@@ -143,6 +153,7 @@ interface IconProps {
     strokeWidth?: number;
     glow?: boolean;
     glowColor?: string;
+    style?: StyleProp<ViewStyle>;
 }
 
 export function Icon({
@@ -152,6 +163,7 @@ export function Icon({
     strokeWidth = 1.75,
     glow = false,
     glowColor,
+    style,
 }: IconProps) {
     const IconComponent = ICONS[name];
 
@@ -165,6 +177,7 @@ export function Icon({
             size={size}
             color={color}
             strokeWidth={strokeWidth}
+            style={style}
         />
     );
 

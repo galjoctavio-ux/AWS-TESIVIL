@@ -13,6 +13,7 @@ import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { AliasProvider } from '@/contexts/AliasContext';
 import { initSentry } from '@/services/errorReporting';
+import { registerForPushNotificationsAsync } from '@/services/notificationService';
 
 // Initialize Sentry
 initSentry();
@@ -51,6 +52,7 @@ function RootLayoutNav() {
 
     useEffect(() => {
         checkOnboardingStatus();
+        registerForPushNotificationsAsync();
     }, []);
 
     // Re-check onboarding status when navigating TO onboarding screen

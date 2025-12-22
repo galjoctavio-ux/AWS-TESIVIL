@@ -1,7 +1,6 @@
 import * as Sentry from '@sentry/react-native';
 
-// TODO: Replace with your actual Sentry DSN
-export const SENTRY_DSN = 'https://af23afb4ed4e8d93d226ae8075209447@o4510577429250048.ingest.us.sentry.io/4510577462542336';
+export const SENTRY_DSN = process.env.EXPO_PUBLIC_SENTRY_DSN;
 
 export const initSentry = () => {
     Sentry.init({

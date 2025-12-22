@@ -23,6 +23,7 @@ const MODULES = [
     // Row 1: Primary Actions
     { id: 'new-service', icon: 'construct', label: 'Nuevo Servicio', route: '/(app)/services/new', color: 'bg-blue-600', iconBg: 'bg-blue-500' },
     { id: 'quotes', icon: 'document-text', label: 'Cotizador Pro', route: '/(app)/quotes', color: 'bg-green-600', iconBg: 'bg-green-500' },
+    { id: 'cotizador-free', icon: 'create', label: 'Cotizador Free', route: '/(app)/cotizador', color: 'bg-emerald-500', iconBg: 'bg-emerald-400' },
     // Row 2: Tools
     { id: 'btu', icon: 'calculator', label: 'Calc BTU', route: '/(app)/tools/btu-calculator', color: 'bg-purple-600', iconBg: 'bg-purple-500' },
     { id: 'cables', icon: 'flash', label: 'Guía Cables', route: '/(app)/tools/cable-guide', color: 'bg-yellow-500', iconBg: 'bg-yellow-400' },
@@ -239,17 +240,17 @@ export default function Dashboard() {
 
                 {/* Modules Grid - Overlapping Header */}
                 <View className="px-4 -mt-4">
-                    {/* Primary Actions */}
+                    {/* Primary Actions Row - 3 items */}
                     <View className="flex-row mb-3">
-                        {MODULES.slice(0, 2).map((mod, i) => renderModuleCard(mod, i))}
+                        {MODULES.slice(0, 3).map((mod, i) => renderModuleCard(mod, i))}
                     </View>
                     {/* Tools Row */}
                     <View className="flex-row mb-3">
-                        {MODULES.slice(2, 6).map((mod, i) => renderModuleCard(mod, i))}
+                        {MODULES.slice(3, 7).map((mod, i) => renderModuleCard(mod, i))}
                     </View>
                     {/* Business Row */}
                     <View className="flex-row mb-4">
-                        {MODULES.slice(6, 8).map((mod, i) => renderModuleCard(mod, i))}
+                        {MODULES.slice(7, 9).map((mod, i) => renderModuleCard(mod, i))}
                     </View>
                 </View>
 

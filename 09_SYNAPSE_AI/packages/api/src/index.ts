@@ -6,9 +6,9 @@ dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 import * as Sentry from '@sentry/node';
 
 // Initialize Sentry for API
-// TODO: Replace with your actual Sentry DSN
+// Initialize Sentry for API
 Sentry.init({
-    dsn: "https://93e60bfec53b9c08f44f0eecc3d9a20d@o4510577429250048.ingest.us.sentry.io/4510577468506112",
+    dsn: process.env.SENTRY_DSN,
     tracesSampleRate: 1.0,
 });
 

@@ -63,6 +63,16 @@ const CALCULATION_TOOLS = [
 
 const BUSINESS_TOOLS = [
     {
+        id: 'cotizador-free',
+        icon: 'create',
+        title: 'Cotizador Free',
+        description: 'Crea cotizaciones con tus propios conceptos',
+        route: '/(app)/cotizador',
+        color: 'bg-emerald-500',
+        iconBg: 'bg-emerald-100',
+        iconColor: '#10B981',
+    },
+    {
         id: 'qr-labels',
         icon: 'print',
         title: 'Etiquetas QR',
@@ -154,7 +164,7 @@ export default function ToolsIndex() {
                 </View>
 
                 {/* Business Tools */}
-                <View className="mb-20">
+                <View className="mb-32">
                     <View className="flex-row items-center mb-3">
                         <View className="bg-green-100 p-1.5 rounded-lg mr-2">
                             <Ionicons name="briefcase" size={16} color="#22C55E" />

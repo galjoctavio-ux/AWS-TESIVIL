@@ -163,5 +163,29 @@ service cloud.firestore {
         && request.auth.uid == request.resource.data.technicianId;
       // No update/delete - immutable records
     }
+    
+    // ============================================
+    // COTIZADOR FREE - Conceptos personalizados
+    // ============================================
+    match /cotizador_concepts/{conceptId} {
+      allow read: if request.auth != null 
+        && (resource == null || request.auth.uid == resource.data.technicianId);
+      allow create: if request.auth != null 
+        && request.auth.uid == request.resource.data.technicianId;
+      allow update, delete: if request.auth != null 
+        && request.auth.uid == resource.data.technicianId;
+    }
+    
+    // ============================================
+    // COTIZADOR FREE - Cotizaciones generadas
+    // ============================================
+    match /cotizador_quotes/{quoteId} {
+      allow read: if request.auth != null 
+        && (resource == null || request.auth.uid == resource.data.technicianId);
+      allow create: if request.auth != null 
+        && request.auth.uid == request.resource.data.technicianId;
+      allow update, delete: if request.auth != null 
+        && request.auth.uid == resource.data.technicianId;
+    }
   }
 }
