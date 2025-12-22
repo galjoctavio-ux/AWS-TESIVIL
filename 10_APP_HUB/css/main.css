@@ -865,3 +865,28 @@ button {
 .hidden {
     display: none !important;
 }
+
+/* -----------------------------------------------------------------------------
+   Legal Links
+   ----------------------------------------------------------------------------- */
+.legal-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+    font-size: var(--font-size-sm);
+}
+
+.legal-links a {
+    color: var(--color-text-muted);
+    transition: color var(--transition-fast);
+}
+
+.legal-links a:hover {
+    color: var(--color-primary);
+}
+
+.legal-separator {
+    color: var(--color-surface-border);
+}

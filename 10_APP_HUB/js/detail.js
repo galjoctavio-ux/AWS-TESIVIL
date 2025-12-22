@@ -160,6 +160,9 @@ function renderAppDetail(app) {
 
     // Actualizar título de la página
     document.title = `${app.nombre} - TESIVIL App Hub`;
+
+    // Actualizar links legales en el footer
+    updateLegalLinks(app.slug);
 }
 
 /**
@@ -263,3 +266,42 @@ document.addEventListener('keydown', (e) => {
         closeLightbox();
     }
 });
+
+// =============================================================================
+// Legal Links Functions
+// =============================================================================
+
+/**
+ * Mapeo de slugs de apps a sus documentos legales
+ */
+const LEGAL_DOCS = {
+    'synapse-ai': {
+        terms: 'synapse-ai/terminos.html',
+        privacy: 'synapse-ai/privacidad.html'
+    }
+    // Agregar más apps aquí según sea necesario
+};
+
+/**
+ * Actualiza los links legales en el footer según la app
+ * @param {string} slug - Slug de la aplicación
+ */
+function updateLegalLinks(slug) {
+    const container = document.getElementById('legal-links');
+    if (!container) return;
+
+    const docs = LEGAL_DOCS[slug];
+
+    if (docs) {
+        const termsLabel = i18n.currentLang === 'es' ? 'Términos y Condiciones' : 'Terms & Conditions';
+        const privacyLabel = i18n.currentLang === 'es' ? 'Política de Privacidad' : 'Privacy Policy';
+
+        container.innerHTML = `
+            <a href="${docs.terms}" target="_blank" rel="noopener">${termsLabel}</a>
+            <span class="legal-separator">|</span>
+            <a href="${docs.privacy}" target="_blank" rel="noopener">${privacyLabel}</a>
+        `;
+    } else {
+        container.innerHTML = '';
+    }
+}
