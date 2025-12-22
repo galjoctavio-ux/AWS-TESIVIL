@@ -144,4 +144,4 @@ El sistema generará automáticamente el enlace de descarga directa.
 
 ## 📄 Licencia
 
-© 2024 TESIVIL. Todos los derechos reservados.
+© 2025 TESIVIL. Todos los derechos reservados.

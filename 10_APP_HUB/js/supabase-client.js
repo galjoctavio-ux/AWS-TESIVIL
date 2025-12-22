@@ -2,8 +2,8 @@
 // TESIVIL App Hub - Supabase Client
 // =============================================================================
 
-// Initialize Supabase client
-const supabase = window.supabase.createClient(
+// Initialize Supabase client (nombre diferente para evitar conflicto con CDN global)
+const supabaseClient = window.supabase.createClient(
     CONFIG.SUPABASE_URL,
     CONFIG.SUPABASE_ANON_KEY
 );
@@ -20,7 +20,7 @@ const AppAPI = {
      */
     async getApps(categoria = null) {
         try {
-            let query = supabase
+            let query = supabaseClient
                 .from('apps')
                 .select('*')
                 .order('created_at', { ascending: false });
@@ -46,7 +46,7 @@ const AppAPI = {
      */
     async getAppBySlug(slug) {
         try {
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('apps')
                 .select('*')
                 .eq('slug', slug)
@@ -67,7 +67,7 @@ const AppAPI = {
      */
     async getAppById(id) {
         try {
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('apps')
                 .select('*')
                 .eq('id', id)
