@@ -19,6 +19,7 @@ const CreateProjectSchema = z.object({
 const CommentSchema = z.object({
     content: z.string().min(1).max(1000),
     parentId: z.string().uuid().optional().nullable(), // For replies
+    authorAlias: z.string().max(50).optional(), // User's display alias
 });
 
 // ═══════════════════════════════════════════════════════════════
@@ -382,6 +383,7 @@ const projectsRoutes: FastifyPluginAsync = async (fastify) => {
                     content: data.content,
                     comment_type: commentType,
                     is_moderated: true,
+                    author_alias: data.authorAlias || null, // Store the alias
                 })
                 .select(`
                     *,

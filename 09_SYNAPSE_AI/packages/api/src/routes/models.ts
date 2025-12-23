@@ -7,12 +7,15 @@ import { supabaseAdmin, AIModel } from '../lib/supabase';
 // ═══════════════════════════════════════════════════════════════
 
 const ReviewSchema = z.object({
-    modelId: z.string().uuid(),
-    starsSpeed: z.number().min(1).max(5),
-    starsPrecision: z.number().min(1).max(5),
-    starsHallucination: z.number().min(1).max(5),
-    useCaseTag: z.enum(['#Código', '#Resumen', '#Análisis', '#Creatividad']).optional(),
+    modelId: z.string(),
+    // Frontend sends: speed, accuracy, creativity
+    speed: z.number().min(1).max(5),
+    accuracy: z.number().min(1).max(5),
+    creativity: z.number().min(1).max(5),
+    // Tag can be the internal ID or the display label
+    tag: z.string().optional().nullable(),
     comment: z.string().max(500).optional(),
+    authorAlias: z.string().max(50).optional().nullable(), // User's display alias
 });
 
 // ═══════════════════════════════════════════════════════════════
@@ -322,11 +325,12 @@ const modelsRoutes: FastifyPluginAsync = async (fastify) => {
                 .insert({
                     model_id: id,
                     user_id: userId,
-                    stars_speed: data.starsSpeed,
-                    stars_precision: data.starsPrecision,
-                    stars_hallucination: data.starsHallucination,
-                    use_case_tag: data.useCaseTag,
+                    stars_speed: data.speed,
+                    stars_precision: data.accuracy,
+                    stars_hallucination: data.creativity,
+                    use_case_tag: data.tag || null,
                     comment: data.comment,
+                    author_alias: data.authorAlias || null, // Store the alias
                 })
                 .select()
                 .single();

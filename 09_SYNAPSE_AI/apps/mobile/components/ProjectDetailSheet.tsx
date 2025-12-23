@@ -23,6 +23,7 @@ import { SPACING, RADIUS, API_URL } from '@/constants/config';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemeColors } from '@/constants/themes';
 import { incrementStat } from '@/lib/userStats';
+import { useAlias } from '@/contexts/AliasContext';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -58,15 +59,15 @@ async function fetchComments(projectId: string) {
     return data.data || [];
 }
 
-// Post comment (supports replies with parentId)
-async function postComment(projectId: string, content: string, parentId?: string) {
+// Post comment (supports replies with parentId and authorAlias)
+async function postComment(projectId: string, content: string, parentId?: string, authorAlias?: string) {
     const response = await fetch(`${API_URL}/api/projects/${projectId}/comments`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'x-user-id': 'demo-user', // TODO: Replace with real auth
         },
-        body: JSON.stringify({ content, parentId: parentId || null }),
+        body: JSON.stringify({ content, parentId: parentId || null, authorAlias }),
     });
     const data = await response.json();
     if (!data.success) throw new Error(data.error || data.reason || 'Failed to post comment');
@@ -90,6 +91,7 @@ async function reportProject(projectId: string, reason: string) {
 
 export function ProjectDetailSheet({ project, onClose, onVote }: ProjectDetailSheetProps) {
     const { colors } = useTheme();
+    const { alias } = useAlias();
     const queryClient = useQueryClient();
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [commentText, setCommentText] = useState('');
@@ -130,7 +132,7 @@ export function ProjectDetailSheet({ project, onClose, onVote }: ProjectDetailSh
     // Post comment mutation (supports replies)
     const commentMutation = useMutation({
         mutationFn: (params: { content: string; parentId?: string }) =>
-            postComment(project.id, params.content, params.parentId),
+            postComment(project.id, params.content, params.parentId, alias),
         onSuccess: () => {
             setCommentText('');
             setReplyingTo(null);
@@ -363,7 +365,7 @@ export function ProjectDetailSheet({ project, onClose, onVote }: ProjectDetailSh
                             <View key={comment.id} style={styles.commentCard}>
                                 <View style={styles.commentHeader}>
                                     <Text style={styles.commentAuthor}>
-                                        @{comment.profiles?.alias || 'Anónimo'}
+                                        @{comment.author_alias || comment.profiles?.alias || 'Anónimo'}
                                     </Text>
                                     {comment.comment_type && (
                                         <View style={styles.commentTypeBadge}>
@@ -378,7 +380,7 @@ export function ProjectDetailSheet({ project, onClose, onVote }: ProjectDetailSh
                                     style={styles.replyButton}
                                     onPress={() => setReplyingTo({
                                         id: comment.id,
-                                        alias: comment.profiles?.alias || 'Anónimo'
+                                        alias: comment.author_alias || comment.profiles?.alias || 'Anónimo'
                                     })}
                                 >
                                     <Text style={styles.replyButtonText}>↩️ Responder</Text>
@@ -390,10 +392,10 @@ export function ProjectDetailSheet({ project, onClose, onVote }: ProjectDetailSh
                                         {comment.replies.map((reply: any) => (
                                             <View key={reply.id} style={styles.replyCard}>
                                                 <Text style={styles.replyingToLabel}>
-                                                    ↳ En respuesta a @{comment.profiles?.alias || 'Anónimo'}
+                                                    ↳ En respuesta a @{comment.author_alias || comment.profiles?.alias || 'Anónimo'}
                                                 </Text>
                                                 <Text style={styles.replyAuthor}>
-                                                    @{reply.profiles?.alias || 'Anónimo'}
+                                                    @{reply.author_alias || reply.profiles?.alias || 'Anónimo'}
                                                 </Text>
                                                 <Text style={styles.replyText}>{reply.content}</Text>
                                             </View>

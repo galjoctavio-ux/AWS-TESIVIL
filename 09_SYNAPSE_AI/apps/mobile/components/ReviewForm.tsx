@@ -12,6 +12,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { ThemeColors } from '@/constants/themes';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { incrementStat } from '@/lib/userStats';
+import { useAlias } from '@/contexts/AliasContext';
 
 interface ReviewFormProps {
     modelId: string;
@@ -62,6 +63,7 @@ function StarRating({
 
 export function ReviewForm({ modelId, modelName, onSuccess, onCancel }: ReviewFormProps) {
     const { colors } = useTheme();
+    const { alias } = useAlias();
     const queryClient = useQueryClient();
     const [speed, setSpeed] = useState(3);
     const [precision, setPrecision] = useState(3);
@@ -85,6 +87,7 @@ export function ReviewForm({ modelId, modelName, onSuccess, onCancel }: ReviewFo
                     creativity: hallucination, // Maps to hallucination in our UI
                     tag: selectedTag,
                     comment: comment.trim() || undefined,
+                    authorAlias: alias,
                 }),
             });
             const data = await response.json();

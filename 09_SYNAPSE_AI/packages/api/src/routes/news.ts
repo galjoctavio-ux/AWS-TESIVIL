@@ -9,6 +9,7 @@ import { supabaseAdmin } from '../lib/supabase';
 const CommentSchema = z.object({
     content: z.string().min(1).max(1000),
     parentId: z.string().uuid().optional().nullable(), // For replies
+    authorAlias: z.string().max(50).optional(), // User's display alias
 });
 
 // ═══════════════════════════════════════════════════════════════
@@ -230,6 +231,7 @@ const newsRoutes: FastifyPluginAsync = async (fastify) => {
                     parent_id: data.parentId || null, // For replies
                     content: data.content,
                     is_approved: true, // Auto-approve for MVP, add moderation later
+                    author_alias: data.authorAlias || null, // Store the alias
                 })
                 .select(`
                     *,

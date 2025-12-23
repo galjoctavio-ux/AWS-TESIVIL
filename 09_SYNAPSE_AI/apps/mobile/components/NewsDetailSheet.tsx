@@ -17,6 +17,7 @@ import { SPACING, RADIUS, API_URL } from '@/constants/config';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemeColors } from '@/constants/themes';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAlias } from '@/contexts/AliasContext';
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES
@@ -41,6 +42,7 @@ interface Comment {
     id: string;
     content: string;
     created_at: string;
+    author_alias?: string; // Client-provided alias
     profiles: {
         alias: string;
         photo_url: string | null;
@@ -71,14 +73,14 @@ async function fetchComments(articleId: string): Promise<Comment[]> {
     return data.data || [];
 }
 
-async function postComment(articleId: string, content: string, parentId?: string): Promise<Comment> {
+async function postComment(articleId: string, content: string, parentId?: string, authorAlias?: string): Promise<Comment> {
     const response = await fetch(`${API_URL}/api/news/${articleId}/comments`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'x-user-id': 'demo-user', // TODO: Replace with real auth
         },
-        body: JSON.stringify({ content, parentId: parentId || null }),
+        body: JSON.stringify({ content, parentId: parentId || null, authorAlias }),
     });
     const data = await response.json();
     if (!data.success) throw new Error(data.error || 'Failed to post comment');
@@ -92,6 +94,7 @@ async function postComment(articleId: string, content: string, parentId?: string
 const NewsDetailSheet = forwardRef<BottomSheet, NewsDetailSheetProps>(
     ({ articleId, onClose }, ref) => {
         const { colors } = useTheme();
+        const { alias } = useAlias();
         const queryClient = useQueryClient();
         const [commentText, setCommentText] = useState('');
         const [replyingTo, setReplyingTo] = useState<{ id: string; alias: string } | null>(null);
@@ -123,7 +126,7 @@ const NewsDetailSheet = forwardRef<BottomSheet, NewsDetailSheetProps>(
         // Post comment mutation (supports replies)
         const commentMutation = useMutation({
             mutationFn: (params: { content: string; parentId?: string }) =>
-                postComment(articleId!, params.content, params.parentId),
+                postComment(articleId!, params.content, params.parentId, alias),
             onSuccess: () => {
                 setCommentText('');
                 setReplyingTo(null);
@@ -389,7 +392,7 @@ const NewsDetailSheet = forwardRef<BottomSheet, NewsDetailSheetProps>(
                                             <View key={comment.id} style={styles.commentItem}>
                                                 <View style={styles.commentHeader}>
                                                     <Text style={styles.commentAuthor}>
-                                                        @{comment.profiles?.alias || 'Usuario'}
+                                                        @{comment.author_alias || comment.profiles?.alias || 'Usuario'}
                                                     </Text>
                                                     <Text style={styles.commentTime}>
                                                         {getRelativeTime(comment.created_at)}
@@ -404,7 +407,7 @@ const NewsDetailSheet = forwardRef<BottomSheet, NewsDetailSheetProps>(
                                                     style={styles.replyButton}
                                                     onPress={() => setReplyingTo({
                                                         id: comment.id,
-                                                        alias: comment.profiles?.alias || 'Usuario'
+                                                        alias: comment.author_alias || comment.profiles?.alias || 'Usuario'
                                                     })}
                                                 >
                                                     <Text style={styles.replyButtonText}>↩️ Responder</Text>
@@ -416,10 +419,10 @@ const NewsDetailSheet = forwardRef<BottomSheet, NewsDetailSheetProps>(
                                                         {comment.replies.map((reply) => (
                                                             <View key={reply.id} style={styles.replyCard}>
                                                                 <Text style={styles.replyingToLabel}>
-                                                                    ↳ En respuesta a @{comment.profiles?.alias || 'Usuario'}
+                                                                    ↳ En respuesta a @{comment.author_alias || comment.profiles?.alias || 'Usuario'}
                                                                 </Text>
                                                                 <Text style={styles.replyAuthor}>
-                                                                    @{reply.profiles?.alias || 'Usuario'}
+                                                                    @{reply.author_alias || reply.profiles?.alias || 'Usuario'}
                                                                 </Text>
                                                                 <Text style={styles.replyText}>{reply.content}</Text>
                                                             </View>
