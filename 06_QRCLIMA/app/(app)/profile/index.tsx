@@ -206,6 +206,21 @@ export default function ProfileScreen() {
                 {/* Settings Section */}
                 <View className="px-4 mb-6">
                     <Text className="text-gray-700 font-bold mb-3">Configuración</Text>
+
+                    <TouchableOpacity
+                        onPress={() => router.push('/(app)/profile/signature')}
+                        className="bg-white p-4 rounded-2xl border border-gray-100 flex-row items-center active:bg-gray-50 mb-3"
+                    >
+                        <View className="bg-purple-100 w-12 h-12 rounded-xl items-center justify-center mr-4">
+                            <Ionicons name="create" size={24} color="#7C3AED" />
+                        </View>
+                        <View className="flex-1">
+                            <Text className="font-bold text-gray-800">Mi Firma Digital</Text>
+                            <Text className="text-gray-500 text-sm">Configura tu firma para reportes</Text>
+                        </View>
+                        <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+                    </TouchableOpacity>
+
                     <TouchableOpacity
                         onPress={() => router.push('/(app)/profile/settings')}
                         className="bg-white p-4 rounded-2xl border border-gray-100 flex-row items-center active:bg-gray-50"

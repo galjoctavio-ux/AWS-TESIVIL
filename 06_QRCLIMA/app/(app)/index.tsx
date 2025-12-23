@@ -1,9 +1,10 @@
 import { View, Text, TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter, useFocusEffect } from 'expo-router';
-import { useState, useCallback } from 'react';
-import { getClients } from '../../services/clients-service';
+import { useState, useCallback, useMemo } from 'react';
+import { getClients, ClientData } from '../../services/clients-service';
 import { getUserProfile, UserProfile, UserRank } from '../../services/user-service';
+import { getRecentServices } from '../../services/services-service';
 import { Ionicons } from '@expo/vector-icons';
 import BottomNav from '../../components/BottomNav';
 
@@ -21,19 +22,25 @@ export default function HomeScreen() {
     const router = useRouter();
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [upcomingServices, setUpcomingServices] = useState<any[]>([]);
-    const [todayStats, setTodayStats] = useState({ services: 0, earnings: 0 });
+    const [recentServices, setRecentServices] = useState<any[]>([]);
+    const [clients, setClients] = useState<any[]>([]);
+
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
     const loadData = async () => {
         if (!user) return;
         try {
-            const [profileData, upcomingData] = await Promise.all([
+            const [profileData, upcomingData, recentData, clientsData] = await Promise.all([
                 getUserProfile(user.uid),
-                import('../../services/services-service').then(mod => mod.getUpcomingServices(user.uid))
+                import('../../services/services-service').then(mod => mod.getUpcomingServices(user.uid)),
+                getRecentServices(user.uid, 5),
+                getClients(user.uid)
             ]);
             setProfile(profileData);
             setUpcomingServices(upcomingData);
+            setRecentServices(recentData);
+            setClients(clientsData);
         } catch (err) {
             console.error("Error loading data:", err);
         }
@@ -59,7 +66,7 @@ export default function HomeScreen() {
 
     // Quick actions - reduced to 4 main actions
     const quickActions = [
-        { id: 'service', icon: 'add-circle', label: 'Nuevo Servicio', route: '/(app)/services/new', primary: true },
+        { id: 'service', icon: 'add-circle', label: 'Nuevo Servicio', route: '/(app)/scanner?mode=service', primary: true },
         { id: 'quote', icon: 'document-text', label: 'Cotizar', route: '/(app)/quotes/wizard', accent: true },
         { id: 'scan', icon: 'qr-code', label: 'Escanear QR', route: '/(app)/scanner' },
         { id: 'sos', icon: 'help-buoy', label: 'SOS', route: '/(app)/community', alert: true },
@@ -77,10 +84,10 @@ export default function HomeScreen() {
                 <View className="bg-blue-600 pt-14 pb-24 px-5">
                     <View className="flex-row justify-between items-center">
                         {/* Greeting */}
-                        <View>
+                        <TouchableOpacity onPress={() => router.push('/(app)/profile')}>
                             <Text className="text-blue-200 text-sm">Bienvenido</Text>
                             <Text className="text-white text-2xl font-bold">{displayName}</Text>
-                        </View>
+                        </TouchableOpacity>
 
                         {/* Tokens Badge */}
                         <TouchableOpacity
@@ -129,7 +136,7 @@ export default function HomeScreen() {
 
                         {/* Primary CTA Button */}
                         <TouchableOpacity
-                            onPress={() => router.push('/(app)/services/new')}
+                            onPress={() => router.push('/(app)/scanner?mode=service')}
                             className="bg-blue-600 py-4 rounded-2xl flex-row items-center justify-center"
                         >
                             <Ionicons name="add-circle" size={24} color="white" />
@@ -208,9 +215,55 @@ export default function HomeScreen() {
                 </View>
 
                 {/* ========================================== */}
+                {/* SERVICE HISTORY - Search & Filters */}
+                {/* ========================================== */}
+                {/* ========================================== */}
+                {/* LATEST SERVICE - Summary */}
+                {/* ========================================== */}
+                <View className="px-4 mt-6">
+                    <View className="flex-row justify-between items-center mb-3">
+                        <Text className="text-gray-800 font-bold text-lg">Último Servicio</Text>
+                        <TouchableOpacity onPress={() => router.push('/(app)/services/log')}>
+                            <Text className="text-blue-600 text-sm font-medium">Ver Bitácora →</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {recentServices.length > 0 ? (() => {
+                        const service = recentServices[0];
+                        const client = clients.find(c => c.id === service.clientId);
+                        const infoDate = service.createdAt?.toDate ? service.createdAt.toDate() : new Date(service.createdAt || new Date());
+
+                        return (
+                            <TouchableOpacity
+                                onPress={() => router.push(`/(app)/services/${service.id}`)}
+                                className="bg-white rounded-2xl p-4 border border-gray-100 flex-row items-center shadow-sm"
+                            >
+                                <View className={`w-12 h-12 rounded-full items-center justify-center mr-3 ${service.status === 'Terminado' ? 'bg-green-100' : 'bg-amber-100'}`}>
+                                    <Ionicons name={service.type === 'Instalación' ? 'construct' : 'build'} size={24} color={service.status === 'Terminado' ? '#16A34A' : '#D97706'} />
+                                </View>
+                                <View className="flex-1">
+                                    <View className="flex-row justify-between">
+                                        <Text className="font-bold text-gray-800 text-base">{client?.name || 'Cliente desconocido'}</Text>
+                                        <Text className="text-xs text-gray-400">{infoDate.toLocaleDateString()}</Text>
+                                    </View>
+                                    <Text className="text-gray-600 text-sm">{service.type}</Text>
+                                    {client?.address && (
+                                        <Text className="text-gray-400 text-xs mt-0.5" numberOfLines={1}>{client.address}</Text>
+                                    )}
+                                </View>
+                            </TouchableOpacity>
+                        );
+                    })() : (
+                        <View className="bg-gray-50 rounded-2xl p-6 items-center border border-gray-100">
+                            <Text className="text-gray-400">Sin servicios recientes</Text>
+                        </View>
+                    )}
+                </View>
+
+                {/* ========================================== */}
                 {/* STATUS BAR - Compact Stats */}
                 {/* ========================================== */}
-                <View className="px-4 mt-6 mb-24">
+                <View className="px-4 mt-6 mb-32">
                     <View className="bg-gray-900 rounded-2xl p-4 flex-row items-center justify-between">
                         <View className="flex-row items-center">
                             <Text className="text-2xl mr-2">{rankInfo.icon}</Text>
@@ -228,7 +281,7 @@ export default function HomeScreen() {
                         </TouchableOpacity>
                     </View>
                 </View>
-
+                <View className="h-40" />
             </ScrollView>
 
             {/* Bottom Navigation */}

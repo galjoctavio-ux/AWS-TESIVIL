@@ -9,13 +9,14 @@ interface ReportData {
     service: ServiceData & { id: string };
     client: ClientData & { id: string };
     technicianProfile?: UserProfile;
+    warrantyText?: string;
 }
 
 /**
  * Generates a professional PDF report for a service and opens the share dialog.
  */
 export const generateServiceReport = async (data: ReportData): Promise<void> => {
-    const { service, client, technicianProfile } = data;
+    const { service, client, technicianProfile, warrantyText } = data;
 
     const serviceDate = service.date?.toDate
         ? service.date.toDate().toLocaleDateString('es-MX', {
@@ -32,210 +33,347 @@ export const generateServiceReport = async (data: ReportData): Promise<void> => 
         <meta charset="utf-8">
         <title>Reporte de Servicio</title>
         <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
+            @page { margin: 0; }
             body {
-                font-family: 'Helvetica Neue', Arial, sans-serif;
-                color: #333;
-                line-height: 1.6;
-                padding: 40px;
-            }
-            .header {
-                text-align: center;
-                border-bottom: 3px solid #2563EB;
-                padding-bottom: 20px;
-                margin-bottom: 30px;
-            }
-            .header h1 {
-                color: #2563EB;
-                font-size: 28px;
-                margin-bottom: 5px;
-            }
-            .header .subtitle {
-                color: #666;
-                font-size: 14px;
-            }
-            .technician-info {
-                text-align: center;
-                margin-bottom: 30px;
-                padding: 15px;
-                background: #F8FAFC;
-                border-radius: 8px;
-            }
-            .section {
-                margin-bottom: 25px;
-            }
-            .section-title {
-                color: #2563EB;
-                font-size: 16px;
-                font-weight: bold;
-                margin-bottom: 12px;
-                padding-bottom: 5px;
-                border-bottom: 1px solid #E5E7EB;
-            }
-            .info-table {
-                width: 100%;
-                border-collapse: collapse;
-            }
-            .info-table td {
-                padding: 10px 15px;
-                border: 1px solid #E5E7EB;
-            }
-            .info-table .label {
-                background: #F8FAFC;
-                font-weight: bold;
-                width: 35%;
-                color: #374151;
-            }
-            .info-table .value {
+                font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
                 color: #1F2937;
+                line-height: 1.5;
+                margin: 0;
+                padding: 40px 50px;
+                font-size: 11px;
             }
-            .diagnosis-box {
-                background: #FEF2F2;
-                border: 1px solid #FECACA;
-                border-left: 4px solid #EF4444;
-                padding: 15px;
-                border-radius: 8px;
-            }
-            .diagnosis-box .error-code {
-                font-size: 20px;
-                font-weight: bold;
-                color: #DC2626;
-                margin-bottom: 8px;
-            }
-            .diagnosis-box .description {
-                color: #7F1D1D;
-                margin-bottom: 5px;
-            }
-            .diagnosis-box .cause {
-                font-style: italic;
-                color: #991B1B;
-                font-size: 13px;
-            }
-            .signature-section {
-                margin-top: 60px;
+            .header-container {
+                border-bottom: 2px solid #2563EB;
+                padding-bottom: 20px;
+                margin-bottom: 25px;
                 display: flex;
                 justify-content: space-between;
+                align-items: flex-end;
+            }
+            .brand-section h1 {
+                color: #2563EB;
+                font-size: 24px;
+                margin: 0 0 5px 0;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+            .brand-section .subtitle {
+                color: #6B7280;
+                font-size: 14px;
+                font-weight: 500;
+            }
+            .meta-info {
+                text-align: right;
+                font-size: 10px;
+                color: #6B7280;
+            }
+            .meta-info .date {
+                font-weight: bold;
+                color: #374151;
+                font-size: 12px;
+                margin-top: 4px;
+            }
+            
+            .two-columns {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 25px;
+                gap: 20px;
+            }
+            .column {
+                width: 48%;
+            }
+            
+            .info-box {
+                background: #F9FAFB;
+                border: 1px solid #E5E7EB;
+                border-radius: 8px;
+                padding: 12px;
+                height: 100%;
+            }
+            .box-title {
+                color: #2563EB;
+                font-size: 10px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                font-weight: bold;
+                margin-bottom: 8px;
+                padding-bottom: 4px;
+                border-bottom: 1px solid #E5E7EB;
+            }
+            .info-row {
+                margin-bottom: 4px;
+                display: flex;
+            }
+            .info-label {
+                color: #6B7280;
+                font-size: 10px;
+                width: 65px;
+                flex-shrink: 0;
+            }
+            .info-value {
+                color: #111827;
+                font-weight: 500;
+            }
+
+            .section-title {
+                background: #EFF6FF;
+                color: #1E40AF;
+                padding: 6px 10px;
+                border-radius: 6px;
+                font-weight: bold;
+                font-size: 11px;
+                margin-bottom: 10px;
+                border-left: 3px solid #2563EB;
+                margin-top: 15px;
+            }
+
+            .grid-container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+            .grid-item {
+                background: #F3F4F6;
+                padding: 6px 10px;
+                border-radius: 12px;
+                font-size: 10px;
+                color: #374151;
+                border: 1px solid #E5E7EB;
+            }
+
+            .checklist-container {}
+            .checklist-item {
+                display: flex;
+                align-items: center;
+                margin-bottom: 4px;
+                font-size: 10px;
+            }
+            .check-icon {
+                color: #16A34A;
+                margin-right: 6px;
+                font-weight: bold;
+                font-size: 12px;
+            }
+
+            .photos-grid {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 10px;
+            }
+            .photo-item {
+                width: 31%;
+                height: 100px;
+                border-radius: 4px;
+                border: 1px solid #E5E7EB;
+                object-fit: cover;
+                background: #F3F4F6;
+            }
+
+            .warranty-box {
+                background: #F5F3FF;
+                border: 1px solid #DDD6FE;
+                border-radius: 8px;
+                padding: 12px;
+                margin-top: 20px;
+                page-break-inside: avoid;
+            }
+            .warranty-title {
+                color: #5B21B6;
+                font-weight: bold;
+                margin-bottom: 4px;
+                font-size: 10px;
+                text-transform: uppercase;
+            }
+            .warranty-text {
+                color: #4C1D95;
+                font-size: 10px;
+            }
+
+            .signatures-container {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 40px;
+                page-break-inside: avoid;
             }
             .signature-box {
                 width: 45%;
                 text-align: center;
             }
-            .signature-line {
-                border-top: 1px solid #333;
-                margin-top: 60px;
-                padding-top: 10px;
-                font-size: 12px;
-                color: #666;
+            .signature-image {
+                height: 50px; 
+                margin-bottom: 5px;
+                object-fit: contain;
             }
+            .signature-line {
+                border-top: 1px solid #9CA3AF;
+                padding-top: 6px;
+                color: #4B5563;
+                font-size: 10px;
+                font-weight: 500;
+            }
+            
+            .diagnosis-section {
+                border: 1px solid #FECACA;
+                background: #FEF2F2;
+                border-radius: 8px;
+                padding: 10px;
+                margin-bottom: 15px;
+            }
+
             .footer {
-                margin-top: 40px;
+                position: fixed;
+                bottom: 20px;
+                left: 50px;
+                right: 50px;
                 text-align: center;
                 color: #9CA3AF;
-                font-size: 11px;
-            }
-            .status-badge {
-                display: inline-block;
-                padding: 4px 12px;
-                border-radius: 20px;
-                font-size: 12px;
-                font-weight: bold;
-            }
-            .status-pending {
-                background: #FEF3C7;
-                color: #92400E;
-            }
-            .status-done {
-                background: #D1FAE5;
-                color: #065F46;
+                font-size: 9px;
+                border-top: 1px solid #E5E7EB;
+                padding-top: 8px;
             }
         </style>
     </head>
     <body>
-        <div class="header">
-            <h1>❄️ QRclima</h1>
-            <div class="subtitle">Reporte de Servicio Técnico</div>
+        <div class="header-container">
+            <div class="brand-section">
+                <h1>QRclima</h1>
+                <div class="subtitle">Reporte de Servicio Técnico</div>
+            </div>
+            <div class="meta-info">
+                <div>FOLIO DE SERVICIO</div>
+                <div class="date">#${service.id.substring(0, 8).toUpperCase()}</div>
+                <div style="margin-top: 4px;">Fecha: ${serviceDate}</div>
+            </div>
         </div>
 
-        <div class="technician-info">
-            <strong>Técnico:</strong> ${technicianProfile?.email || 'Técnico Certificado'}
-        </div>
-
-        <div class="section">
-            <div class="section-title">📋 Información del Servicio</div>
-            <table class="info-table">
-                <tr>
-                    <td class="label">Tipo de Servicio</td>
-                    <td class="value">${service.type}</td>
-                </tr>
-                <tr>
-                    <td class="label">Estado</td>
-                    <td class="value">
-                        <span class="status-badge ${service.status === 'Terminado' ? 'status-done' : 'status-pending'}">
-                            ${service.status}
+        <div class="two-columns">
+            <div class="column">
+                <div class="info-box">
+                    <div class="box-title">Cliente</div>
+                    <div class="info-row">
+                        <span class="info-value" style="font-size: 12px;">${client.name}</span>
+                    </div>
+                    ${client.phone ? `
+                    <div class="info-row">
+                        <span class="info-label">Teléfono:</span>
+                        <span class="info-value">${client.phone}</span>
+                    </div>` : ''}
+                    ${client.address ? `
+                    <div class="info-row">
+                        <span class="info-label">Dirección:</span>
+                        <span class="info-value">${client.address}</span>
+                    </div>` : ''}
+                </div>
+            </div>
+            <div class="column">
+                <div class="info-box">
+                    <div class="box-title">Servicio y Equipo</div>
+                    <div class="info-row">
+                        <span class="info-label">Tipo:</span>
+                        <span class="info-value">${service.type}</span>
+                    </div>
+                    ${service.equipment ? `
+                    <div class="info-row">
+                        <span class="info-label">Equipo:</span>
+                        <span class="info-value">${service.equipment.type} ${service.equipment.brand}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Modelo:</span>
+                        <span class="info-value">${service.equipment.model}</span>
+                    </div>
+                    ${service.equipment.capacityBTU ? `
+                    <div class="info-row">
+                        <span class="info-label">Capacidad:</span>
+                        <span class="info-value">${service.equipment.capacityBTU} BTU</span>
+                    </div>` : ''}
+                    ` : ''}
+                    <div class="info-row" style="margin-top: 4px;">
+                        <span class="info-value" style="color: ${service.status === 'Terminado' ? '#166534' : '#92400E'}; font-weight: bold; font-size: 10px;">
+                            ESTADO: ${service.status.toUpperCase()}
                         </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="label">Fecha</td>
-                    <td class="value">${serviceDate}</td>
-                </tr>
-                ${service.notes ? `
-                <tr>
-                    <td class="label">Notas</td>
-                    <td class="value">${service.notes}</td>
-                </tr>
-                ` : ''}
-            </table>
-        </div>
-
-        <div class="section">
-            <div class="section-title">👤 Datos del Cliente</div>
-            <table class="info-table">
-                <tr>
-                    <td class="label">Nombre</td>
-                    <td class="value">${client.name}</td>
-                </tr>
-                ${client.phone ? `
-                <tr>
-                    <td class="label">Teléfono</td>
-                    <td class="value">${client.phone}</td>
-                </tr>
-                ` : ''}
-                ${client.address ? `
-                <tr>
-                    <td class="label">Dirección</td>
-                    <td class="value">${client.address}</td>
-                </tr>
-                ` : ''}
-            </table>
+                    </div>
+                </div>
+            </div>
         </div>
 
         ${service.diagnosis ? `
-        <div class="section">
-            <div class="section-title">🔧 Diagnóstico</div>
-            <div class="diagnosis-box">
-                <div class="error-code">Código: ${service.diagnosis.errorCode}</div>
-                <div class="description">${service.diagnosis.description}</div>
-                ${service.diagnosis.cause ? `<div class="cause">Causa probable: ${service.diagnosis.cause}</div>` : ''}
+        <div class="diagnosis-section">
+            <div style="color: #991B1B; font-weight: bold; font-size: 11px; margin-bottom: 4px;">DIAGNÓSTICO TÉCNICO (${service.diagnosis.errorCode})</div>
+            <div style="color: #7F1D1D;">${service.diagnosis.description}</div>
+            ${service.diagnosis.cause ? `
+                <div style="font-style: italic; margin-top: 4px; color: #991B1B; font-size: 10px;">
+                    Causa: ${service.diagnosis.cause}
+                </div>` : ''}
+        </div>` : ''}
+
+        <div class="two-columns">
+            <div class="column">
+                <div class="section-title">Trabajos Realizados</div>
+                ${service.tasks && service.tasks.length > 0 ? `
+                <div class="grid-container">
+                    ${service.tasks.map(task => `<div class="grid-item">${task}</div>`).join('')}
+                </div>` : '<div style="color: #9CA3AF; font-style: italic;">No especificados</div>'}
+                
+                ${service.notes ? `
+                <div style="margin-top: 10px; font-size: 10px;">
+                    <strong>Notas Adicionales:</strong><br>
+                    ${service.notes}
+                </div>` : ''}
             </div>
+            
+            <div class="column">
+                <div class="section-title">Checklist de Calidad</div>
+                ${service.checklist ? `
+                <div class="checklist-container">
+                    ${Object.entries(service.checklist)
+                .filter(([_, value]) => value === true)
+                .map(([key, _]) => `
+                        <div class="checklist-item">
+                            <span class="check-icon">✓</span> ${key}
+                        </div>`).join('')}
+                </div>` : '<div style="color: #9CA3AF; font-style: italic;">Sin checklist</div>'}
+            </div>
+        </div>
+
+        ${service.photos && service.photos.length > 0 ? `
+        <div class="section-title">Evidencia Fotográfica</div>
+        <div class="photos-grid">
+            ${service.photos.map(photo => `<img src="${photo}" class="photo-item" />`).join('')}
         </div>
         ` : ''}
 
-        <div class="signature-section">
+        ${warrantyText ? `
+        <div class="warranty-box">
+            <div class="warranty-title">Garantía del Servicio</div>
+            <div class="warranty-text">
+                ${warrantyText}
+            </div>
+        </div>` : ''}
+
+        <div class="signatures-container">
             <div class="signature-box">
-                <div class="signature-line">Firma del Técnico</div>
+                ${technicianProfile?.signature ?
+            `<img src="${technicianProfile.signature}" class="signature-image" />` :
+            '<div style="height: 50px;"></div>'}
+                <div class="signature-line">
+                    Firma del Técnico<br>
+                    <span style="font-weight: normal; font-size: 9px;">${technicianProfile?.email || ''}</span>
+                </div>
             </div>
             <div class="signature-box">
-                <div class="signature-line">Firma del Cliente</div>
+                ${service.clientSignature ?
+            `<img src="${service.clientSignature}" class="signature-image" />` :
+            '<div style="height: 50px;"></div>'}
+                <div class="signature-line">Firma de Conformidad del Cliente</div>
             </div>
         </div>
 
         <div class="footer">
-            Documento generado el ${new Date().toLocaleDateString('es-MX')} por QRclima App
+            Este documento es un comprobante de servicio digital generado por QRclima App.<br>
+            Powered by TESIVIL
         </div>
     </body>
     </html>

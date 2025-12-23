@@ -16,7 +16,7 @@ export default function AcademyScreen() {
     const learningPoints = [
         { icon: 'bulb-outline', title: 'Arquitectura con IA', desc: 'Diseña sistemas antes de escribir código' },
         { icon: 'code-slash-outline', title: 'Prompts de Programación', desc: 'Genera código funcional con Cursor + Claude' },
-        { icon: 'rocket-outline', title: 'Deploy en 24h', desc: 'Del concepto a producción en un día' },
+        { icon: 'rocket-outline', title: 'Deploy en 24h*', desc: 'Del concepto a producción en un día' },
         { icon: 'git-branch-outline', title: 'Flujo de Trabajo', desc: 'El proceso completo que uso en cada proyecto' },
     ];
 
@@ -58,6 +58,14 @@ export default function AcademyScreen() {
                             </View>
                         </View>
                     ))}
+                    <View style={{ marginTop: 8, paddingHorizontal: 4 }}>
+                        <Text style={[styles.learnDesc, { fontSize: 11, fontStyle: 'italic' }]}>
+                            * Aplicaciones sencillas
+                        </Text>
+                        <Text style={[styles.learnDesc, { fontSize: 11, fontStyle: 'italic' }]}>
+                            ** Horas de trabajo efectivas
+                        </Text>
+                    </View>
                 </View>
 
                 {/* Próximamente banner */}

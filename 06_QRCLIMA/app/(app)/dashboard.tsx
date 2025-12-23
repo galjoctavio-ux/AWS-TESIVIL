@@ -21,7 +21,7 @@ const getRankInfo = (rank: UserRank | undefined) => {
 // Module definitions for the grid
 const MODULES = [
     // Row 1: Primary Actions
-    { id: 'new-service', icon: 'construct', label: 'Nuevo Servicio', route: '/(app)/services/new', color: 'bg-blue-600', iconBg: 'bg-blue-500' },
+    { id: 'new-service', icon: 'construct', label: 'Nuevo Servicio', route: '/(app)/scanner?mode=service', color: 'bg-blue-600', iconBg: 'bg-blue-500' },
     { id: 'quotes', icon: 'document-text', label: 'Cotizador Pro', route: '/(app)/quotes', color: 'bg-green-600', iconBg: 'bg-green-500' },
     { id: 'cotizador-free', icon: 'create', label: 'Cotizador Free', route: '/(app)/cotizador', color: 'bg-emerald-500', iconBg: 'bg-emerald-400' },
     // Row 2: Tools

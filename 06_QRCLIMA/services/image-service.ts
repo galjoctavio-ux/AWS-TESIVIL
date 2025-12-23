@@ -133,9 +133,9 @@ export const compressImages = async (
  */
 export const compressServicePhoto = async (uri: string): Promise<CompressionResult> => {
     return compressImage(uri, {
-        maxWidth: 1200,
-        maxHeight: 1200,
-        quality: 0.8,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        quality: 0.6,
         format: 'jpeg',
     });
 };
@@ -269,6 +269,33 @@ export const updateProfilePhotoFlow = async (userId: string): Promise<string | n
         return photoURL;
     } catch (error) {
         console.error('Error updating profile photo:', error);
+        throw error;
+    }
+};
+
+/**
+ * Sube múltiples fotos de servicio a Firebase Storage.
+ * @param uris Array de URIs locales de las imágenes
+ * @returns Array de URLs de descarga
+ */
+export const uploadServicePhotos = async (uris: string[]): Promise<string[]> => {
+    try {
+        const uploadPromises = uris.map(async (uri) => {
+            // Check if already a remote URL
+            if (uri.startsWith('http')) return uri;
+
+            const response = await fetch(uri);
+            const blob = await response.blob();
+            const filename = `service_evidence/${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
+            const photoRef = ref(storage, filename);
+
+            await uploadBytes(photoRef, blob);
+            return await getDownloadURL(photoRef);
+        });
+
+        return await Promise.all(uploadPromises);
+    } catch (error) {
+        console.error('Error uploading service photos:', error);
         throw error;
     }
 };

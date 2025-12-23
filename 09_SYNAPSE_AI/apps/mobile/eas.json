@@ -8,7 +8,19 @@
             "distribution": "internal"
         },
         "preview": {
-            "distribution": "internal"
+            "distribution": "internal",
+            "android": {
+                "buildType": "apk"
+            },
+            "node": "20.18.0",
+            "env": {
+                "NPM_CONFIG_LEGACY_PEER_DEPS": "true",
+                "SENTRY_DISABLE_AUTO_UPLOAD": "true",
+                "EXPO_PUBLIC_SUPABASE_URL": "https://ohjpqkmzfpbmmtvynqyd.supabase.co",
+                "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oanBxa216ZnBibW10dnlucXlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxMjg1NDEsImV4cCI6MjA4MTcwNDU0MX0.q8_5w08nQWeevbh-RqyvfpvvC9zO5ZTd2kRG1I5O7H8",
+                "EXPO_PUBLIC_API_URL": "http://13.59.28.73:3001",
+                "EXPO_PUBLIC_SENTRY_DSN": "https://af23afb4ed4e8d93d226ae8075209447@o4510577429250048.ingest.us.sentry.io/4510577462542336"
+            }
         },
         "production": {
             "android": {

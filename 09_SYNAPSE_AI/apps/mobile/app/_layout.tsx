@@ -53,6 +53,32 @@ function RootLayoutNav() {
     useEffect(() => {
         checkOnboardingStatus();
         registerForPushNotificationsAsync();
+
+        // NETWORK DIAGNOSTICS
+        const checkConnections = async () => {
+            console.log('--- START NETWORK DIAGNOSTICS (GLOBAL) ---');
+            try {
+                console.log('Testing HTTPS (Google)...');
+                const r1 = await fetch('https://www.google.com', { method: 'HEAD' });
+                console.log('HTTPS Test: SUCCESS', r1.status);
+            } catch (e: any) {
+                console.error('HTTPS Test: FAILED', e.message);
+            }
+
+            try {
+                console.log('Testing HTTP API (13.59.28.73:3001)...');
+                const r2 = await fetch('http://13.59.28.73:3001/health', {
+                    method: 'GET',
+                    headers: { 'Cache-Control': 'no-cache' }
+                });
+                console.log('HTTP API Test: SUCCESS', r2.status);
+            } catch (e: any) {
+                console.error('HTTP API Test: FAILED', e.message);
+                console.log('Error details:', JSON.stringify(e));
+            }
+            console.log('--- END NETWORK DIAGNOSTICS (GLOBAL) ---');
+        };
+        setTimeout(checkConnections, 3000);
     }, []);
 
     // Re-check onboarding status when navigating TO onboarding screen

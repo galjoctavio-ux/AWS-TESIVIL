@@ -1,12 +1,14 @@
 import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useState, useRef } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { getEquipmentByQrCode } from '../../../services/equipment-service';
 
 export default function ScannerScreen() {
     const router = useRouter();
+    // mode: 'equipment' (default) or 'service'
+    const { mode } = useLocalSearchParams<{ mode?: string }>();
     const [permission, requestPermission] = useCameraPermissions();
     const [scanned, setScanned] = useState(false);
     const [processing, setProcessing] = useState(false);
@@ -59,32 +61,44 @@ export default function ScannerScreen() {
             // Search for equipment in Firestore
             const equipment = await getEquipmentByQrCode(data);
 
-            if (equipment) {
-                // Equipment exists - navigate to detail
-                router.replace(`/(app)/equipment/${equipment.id}`);
+            if (mode === 'service') {
+                // SERVICE MODE: Navigate to new service flow
+                if (equipment) {
+                    // Equipment exists - navigate to new service with preloaded data
+                    router.replace(`/(app)/services/new?equipmentId=${equipment.id}`);
+                } else {
+                    // Equipment not found - navigate to new service with QR code for inline registration
+                    router.replace(`/(app)/services/new?qr_code=${encodeURIComponent(data)}`);
+                }
             } else {
-                // Equipment not found - ask to register
-                Alert.alert(
-                    'Equipo no encontrado',
-                    '¿Deseas registrar este equipo?',
-                    [
-                        {
-                            text: 'No',
-                            style: 'cancel',
-                            onPress: () => {
-                                setScanned(false);
-                                setProcessing(false);
-                                processingRef.current = false;
+                // EQUIPMENT MODE (default): Original behavior
+                if (equipment) {
+                    // Equipment exists - navigate to detail
+                    router.replace(`/(app)/equipment/${equipment.id}`);
+                } else {
+                    // Equipment not found - ask to register
+                    Alert.alert(
+                        'Equipo no encontrado',
+                        '¿Deseas registrar este equipo?',
+                        [
+                            {
+                                text: 'No',
+                                style: 'cancel',
+                                onPress: () => {
+                                    setScanned(false);
+                                    setProcessing(false);
+                                    processingRef.current = false;
+                                },
                             },
-                        },
-                        {
-                            text: 'Sí, Registrar',
-                            onPress: () => {
-                                router.replace(`/(app)/equipment/new?qr_code=${encodeURIComponent(data)}`);
+                            {
+                                text: 'Sí, Registrar',
+                                onPress: () => {
+                                    router.replace(`/(app)/equipment/new?qr_code=${encodeURIComponent(data)}`);
+                                },
                             },
-                        },
-                    ]
-                );
+                        ]
+                    );
+                }
             }
         } catch (error) {
             console.error('Error processing QR code:', error);
@@ -151,6 +165,10 @@ export default function ScannerScreen() {
                     <Text style={styles.instructionText}>
                         Apunta al código QR del equipo
                     </Text>
+                    <Text style={styles.subInstructionText}>
+                        o apunta a un NUEVO QR para darlo de alta
+                    </Text>
+
                     {scanned && !processing && (
                         <TouchableOpacity
                             style={styles.rescanButton}
@@ -163,6 +181,26 @@ export default function ScannerScreen() {
                             <Text style={styles.rescanText}>Escanear de nuevo</Text>
                         </TouchableOpacity>
                     )}
+
+                    <View style={styles.helperLinksContainer}>
+                        <TouchableOpacity
+                            onPress={() => router.push('/(app)/tools/qr-labels')}
+                            style={styles.helperLink}
+                        >
+                            <Text style={styles.helperLinkText}>
+                                ¿No tienes QR? Genera uno aquí
+                            </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            onPress={() => router.replace('/(app)/services/new')}
+                            style={styles.helperLinkSecondary}
+                        >
+                            <Text style={styles.helperLinkTextSecondary}>
+                                Crear servicio sin QR (no recomendado)
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
         </View>
@@ -261,22 +299,54 @@ const styles = StyleSheet.create({
     instructionText: {
         color: 'white',
         fontSize: 16,
-        marginTop: 30,
         textAlign: 'center',
+        paddingHorizontal: 20,
+    },
+    subInstructionText: {
+        color: 'rgba(255, 255, 255, 0.7)',
+        fontSize: 14,
+        textAlign: 'center',
+        paddingHorizontal: 20,
+        marginTop: 4,
+        marginBottom: 20,
     },
     rescanButton: {
         flexDirection: 'row',
-        alignItems: 'center',
         backgroundColor: '#2563EB',
-        paddingHorizontal: 24,
+        paddingHorizontal: 20,
         paddingVertical: 12,
-        borderRadius: 25,
-        marginTop: 20,
+        borderRadius: 8,
+        alignItems: 'center',
+        marginTop: 10,
     },
     rescanText: {
         color: 'white',
         fontWeight: 'bold',
         marginLeft: 8,
+    },
+    helperLinksContainer: {
+        width: '100%',
+        alignItems: 'center',
+        marginTop: 30,
+        paddingHorizontal: 20,
+    },
+    helperLink: {
+        marginBottom: 15,
+        padding: 10,
+    },
+    helperLinkText: {
+        color: '#60A5FA', // Light blue
+        textDecorationLine: 'underline',
+        fontSize: 14,
+        fontWeight: '500',
+    },
+    helperLinkSecondary: {
+        padding: 5,
+    },
+    helperLinkTextSecondary: {
+        color: '#9CA3AF', // Gray 400
+        fontSize: 12,
+        fontStyle: 'italic',
     },
     permissionCard: {
         backgroundColor: 'white',

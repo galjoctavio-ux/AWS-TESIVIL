@@ -21,6 +21,7 @@ export interface UserProfile {
     businessName?: string;            // Nombre de empresa (opcional, privado)
     city: string;                     // Ciudad base (para BTU y precios)
     photoURL?: string;                // URL de foto de perfil (redimensionada)
+    signature?: string;               // Firma digital (Base64)
 
     // Niveles y progreso
     rank: UserRank;                   // Novato < 2 años, Técnico > 2 años, Pro = suscriptor

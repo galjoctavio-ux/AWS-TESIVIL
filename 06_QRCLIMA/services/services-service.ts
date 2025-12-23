@@ -4,7 +4,7 @@ import { db } from '../firebaseConfig';
 export interface ServiceData {
     clientId: string;
     technicianId: string;
-    type: 'Reparación' | 'Mantenimiento' | 'Instalación';
+    type: 'Reparación' | 'Mantenimiento' | 'Instalación' | 'Reinstalación';
     status: 'Pendiente' | 'Terminado';
     date: any; // Timestamp or Date
     diagnosis?: {
@@ -27,6 +27,7 @@ export interface ServiceData {
     reminderEnabled?: boolean;
     cost?: number;
     createdAt?: any;
+    clientSignature?: string; // Firma del cliente en Base64
 }
 
 export const addService = async (serviceData: ServiceData) => {
@@ -98,6 +99,27 @@ export const getUpcomingServices = async (technicianId: string) => {
     }
 };
 
+export const getRecentServices = async (technicianId: string, limitCount: number = 50) => {
+    try {
+        const q = query(
+            collection(db, 'services'),
+            where('technicianId', '==', technicianId),
+            orderBy('createdAt', 'desc'),
+            limit(limitCount)
+        );
+
+        const querySnapshot = await getDocs(q);
+        const services: any[] = [];
+        querySnapshot.forEach((doc) => {
+            services.push({ id: doc.id, ...doc.data() });
+        });
+        return services;
+    } catch (e) {
+        console.error('Error fetching recent services:', e);
+        return [];
+    }
+};
+
 export const getServiceById = async (serviceId: string) => {
     try {
         const { doc, getDoc } = await import('firebase/firestore');
@@ -114,3 +136,19 @@ export const getServiceById = async (serviceId: string) => {
     }
 };
 
+// Check if equipment has a prior installation service
+export const hasInstallationService = async (equipmentId: string): Promise<boolean> => {
+    try {
+        const q = query(
+            collection(db, 'services'),
+            where('equipment.qrId', '==', equipmentId),
+            where('type', 'in', ['Instalación', 'Reinstalación']),
+            limit(1)
+        );
+        const querySnapshot = await getDocs(q);
+        return !querySnapshot.empty;
+    } catch (e) {
+        console.error('Error checking installation service:', e);
+        return false;
+    }
+};

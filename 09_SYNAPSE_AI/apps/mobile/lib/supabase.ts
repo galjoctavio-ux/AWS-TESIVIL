@@ -86,17 +86,22 @@ export async function getSession() {
 /**
  * Sign in with Google using OAuth
  * Uses expo-auth-session for the OAuth flow
+ * Works in both Expo Go (development) and native builds (production)
  */
 export async function signInWithGoogle() {
     try {
         // Create redirect URI for Expo
-        // In Expo Go, this creates an appropriate redirect URI
+        // In Expo Go: uses exp://... or https://auth.expo.io/...
+        // In native builds: uses synapse://auth/callback
         const redirectUri = AuthSession.makeRedirectUri({
-            // For native builds use the scheme
-            native: 'synapse://auth/callback',
+            scheme: 'synapse',
+            path: 'auth/callback',
         });
 
-        console.log('Google Sign-In redirect URI:', redirectUri);
+        console.log('==========================================');
+        console.log('Google Sign-In starting...');
+        console.log('Redirect URI:', redirectUri);
+        console.log('==========================================');
 
         // Start OAuth flow with Supabase
         const { data, error } = await supabase.auth.signInWithOAuth({
@@ -117,16 +122,25 @@ export async function signInWithGoogle() {
         }
 
         if (!data.url) {
+            console.error('No authorization URL received from Supabase');
             return { data: null, error: new Error('No authorization URL received') };
         }
 
         console.log('Opening browser for Google auth...');
+        console.log('Auth URL:', data.url.substring(0, 100) + '...');
 
         // Open browser for OAuth
+        // createTask: false is important for Android to properly handle the deep link redirect
         const result = await WebBrowser.openAuthSessionAsync(
             data.url,
             redirectUri,
+            {
+                showInRecents: false,
+                createTask: false,
+            }
         );
+
+        console.log('Browser closed with result type:', result.type);
 
         console.log('Browser result:', result.type);
 

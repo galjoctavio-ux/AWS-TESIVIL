@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Alert, Image, TextInput } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useAuth } from '../../../context/AuthContext';
 import { useState, useEffect } from 'react';
@@ -18,6 +18,11 @@ export default function ServiceDetail() {
     const [technicianProfile, setTechnicianProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [generatingPdf, setGeneratingPdf] = useState(false);
+
+    // Warranty State
+    const [warrantyType, setWarrantyType] = useState<number>(0); // 0 = No warranty
+    const [customWarranty, setCustomWarranty] = useState('');
+    const [showWarrantyInput, setShowWarrantyInput] = useState(false);
 
     useEffect(() => {
         const loadData = async () => {
@@ -60,12 +65,26 @@ export default function ServiceDetail() {
             return;
         }
 
+        // Prepare warranty text
+        let warrantyText = '';
+        if (warrantyType === 0) {
+            warrantyText = 'Este trabajo no cuenta con garantía.';
+        } else {
+            const duration = warrantyType === -1 ? customWarranty : `${warrantyType} ${warrantyType === 1 ? 'mes' : 'meses'}`;
+            if (!duration && warrantyType === -1) {
+                Alert.alert('Error', 'Por favor especifica la duración de la garantía');
+                return;
+            }
+            warrantyText = `Este servicio cuenta con una garantía de ${duration} a partir de la fecha de entrega, cubriendo exclusivamente la mano de obra realizada. No incluye partes eléctricas, fugas de gas ni daños por uso indebido.`;
+        }
+
         try {
             setGeneratingPdf(true);
             await generateServiceReport({
                 service,
                 client,
-                technicianProfile: technicianProfile || undefined
+                technicianProfile: technicianProfile || undefined,
+                warrantyText
             });
         } catch (error: any) {
             console.error('Error generating PDF:', error);
@@ -148,7 +167,7 @@ export default function ServiceDetail() {
             </View>
 
             {/* Content */}
-            <ScrollView className="flex-1 p-6" showsVerticalScrollIndicator={false}>
+            <ScrollView className="flex-1 p-6" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 150 }}>
                 {/* Client Info */}
                 <View className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
                     <View className="flex-row items-center mb-4">
@@ -208,8 +227,87 @@ export default function ServiceDetail() {
                     </View>
                 )}
 
-                {/* Spacer for FAB */}
-                <View className="h-24" />
+                {/* Warranty Section */}
+                <View className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
+                    <View className="flex-row items-center mb-4">
+                        <View className="bg-purple-100 p-2 rounded-full mr-3">
+                            <Ionicons name="shield-checkmark" size={20} color="#7C3AED" />
+                        </View>
+                        <Text className="text-lg font-bold text-gray-800">Garantía del Servicio</Text>
+                    </View>
+
+                    <Text className="text-gray-600 mb-3 text-sm">Selecciona la garantía para este servicio:</Text>
+
+                    <View className="flex-row flex-wrap mb-3">
+                        {[0, 1, 3, 6].map((months) => (
+                            <TouchableOpacity
+                                key={months}
+                                onPress={() => {
+                                    setWarrantyType(months);
+                                    if (months !== -1) setShowWarrantyInput(false);
+                                }}
+                                className={`px-4 py-2 rounded-full mr-2 mb-2 border ${warrantyType === months && !showWarrantyInput
+                                    ? 'bg-purple-600 border-purple-600'
+                                    : 'bg-white border-gray-300'
+                                    }`}
+                            >
+                                <Text className={
+                                    warrantyType === months && !showWarrantyInput
+                                        ? 'text-white font-bold'
+                                        : 'text-gray-600'
+                                }>
+                                    {months === 0 ? 'Sin Garantía' : `${months} Mes${months > 1 ? 'es' : ''}`}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+                        <TouchableOpacity
+                            onPress={() => {
+                                setWarrantyType(-1);
+                                setShowWarrantyInput(true);
+                            }}
+                            className={`px-4 py-2 rounded-full mr-2 mb-2 border ${warrantyType === -1
+                                ? 'bg-purple-600 border-purple-600'
+                                : 'bg-white border-gray-300'
+                                }`}
+                        >
+                            <Text className={warrantyType === -1 ? 'text-white font-bold' : 'text-gray-600'}>
+                                Otra
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {showWarrantyInput && (
+                        <View className="mt-2">
+                            <Text className="text-gray-600 mb-1 text-xs">Especifica el tiempo o condiciones:</Text>
+                            <TextInput
+                                className="bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-800"
+                                placeholder="Ej: 1 año, 15 días, etc."
+                                value={customWarranty}
+                                onChangeText={setCustomWarranty}
+                            />
+                        </View>
+                    )}
+                </View>
+
+                {/* Signatures */}
+                <View className="flex-row justify-between mb-8">
+                    <View className="w-[48%] bg-white p-3 rounded-xl shadow-sm items-center">
+                        <Text className="text-gray-500 text-xs mb-2">Firma del Técnico</Text>
+                        {technicianProfile?.signature ? (
+                            <Image source={{ uri: technicianProfile.signature }} className="w-full h-16" resizeMode="contain" />
+                        ) : (
+                            <Text className="text-gray-300 italic text-xs">Sin firma</Text>
+                        )}
+                    </View>
+                    <View className="w-[48%] bg-white p-3 rounded-xl shadow-sm items-center">
+                        <Text className="text-gray-500 text-xs mb-2">Firma del Cliente</Text>
+                        {service.clientSignature ? (
+                            <Image source={{ uri: service.clientSignature }} className="w-full h-16" resizeMode="contain" />
+                        ) : (
+                            <Text className="text-gray-300 italic text-xs">Sin firma</Text>
+                        )}
+                    </View>
+                </View>
             </ScrollView>
 
             {/* Floating Action Button - Generate PDF */}

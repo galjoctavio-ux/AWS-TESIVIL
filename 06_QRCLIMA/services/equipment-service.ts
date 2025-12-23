@@ -293,6 +293,24 @@ export const updateLastServiceTechnician = async (
 };
 
 /**
+ * Marks equipment as having an installation service.
+ * This sets installDate so future services show Reinstalación instead of Instalación.
+ */
+export const markEquipmentAsInstalled = async (equipmentId: string): Promise<boolean> => {
+    try {
+        const equipmentRef = doc(db, 'equipments', equipmentId);
+        await updateDoc(equipmentRef, {
+            installDate: serverTimestamp(),
+        });
+        console.log(`Equipment ${equipmentId} marked as installed`);
+        return true;
+    } catch (e) {
+        console.error('Error marking equipment as installed:', e);
+        return false;
+    }
+};
+
+/**
  * Updates equipment geolocation (passive capture)
  */
 export const updateEquipmentGeoLocation = async (
