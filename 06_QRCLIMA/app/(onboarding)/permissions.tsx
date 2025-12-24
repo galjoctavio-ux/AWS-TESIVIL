@@ -13,6 +13,7 @@ export default function PermissionsSetup() {
     const { user, refreshOnboardingStatus } = useAuth();
     // Recibimos los datos acumulados de los pasos anteriores
     const params = useLocalSearchParams<{
+        fullName: string;
         alias: string;
         city: string;
         businessName?: string;
@@ -66,6 +67,7 @@ export default function PermissionsSetup() {
         setLoading(true);
         try {
             const success = await completeOnboarding(user.uid, {
+                fullName: params.fullName || '',
                 alias: params.alias || '',
                 city: params.city || '',
                 businessName: params.businessName,

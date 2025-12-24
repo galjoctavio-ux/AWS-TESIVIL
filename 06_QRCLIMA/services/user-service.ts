@@ -17,6 +17,7 @@ export interface UserStats {
 export interface UserProfile {
     // Identidad
     email: string | null;
+    fullName?: string;                // Nombre real para reportes oficiales
     alias: string;                    // Nombre público único (visible en bitácoras)
     businessName?: string;            // Nombre de empresa (opcional, privado)
     city: string;                     // Ciudad base (para BTU y precios)
@@ -203,6 +204,7 @@ export const completeOnboarding = async (
     userId: string,
     profileData: {
         alias: string;
+        fullName: string;
         city: string;
         businessName?: string;
         experienceYears: number;

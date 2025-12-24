@@ -12,23 +12,24 @@ const CITIES = [
 
 export default function ProfileSetup() {
     const router = useRouter();
+    const [fullName, setFullName] = useState('');
     const [alias, setAlias] = useState('');
     const [city, setCity] = useState('');
     const [businessName, setBusinessName] = useState('');
     const [showCityPicker, setShowCityPicker] = useState(false);
 
-    const isValid = alias.trim().length >= 3 && city.trim().length > 0;
+    const isValid = fullName.trim().length >= 5 && alias.trim().length >= 3 && city.trim().length > 0;
 
     const handleContinue = () => {
         if (!isValid) {
-            Alert.alert('Campos requeridos', 'Por favor ingresa un alias (mínimo 3 caracteres) y tu ciudad');
+            Alert.alert('Campos requeridos', 'Por favor ingresa tu nombre completo, un alias y tu ciudad');
             return;
         }
 
         // Guardar en estado global o pasar como params
         router.push({
             pathname: '/(onboarding)/experience',
-            params: { alias, city, businessName }
+            params: { fullName, alias, city, businessName }
         });
     };
 
@@ -65,6 +66,23 @@ export default function ProfileSetup() {
 
                     {/* Formulario */}
                     <View className="space-y-6">
+                        {/* Nombre Completo */}
+                        <View>
+                            <Text className="text-gray-700 font-semibold mb-2 flex-row items-center">
+                                <Ionicons name="id-card" size={16} color="#374151" /> Nombre Completo (Oficial) *
+                            </Text>
+                            <TextInput
+                                className="bg-white border border-gray-300 rounded-xl p-4 text-lg"
+                                placeholder="Ej: Juan Pérez González"
+                                value={fullName}
+                                onChangeText={setFullName}
+                                autoCapitalize="words"
+                            />
+                            <Text className="text-gray-400 text-sm mt-1">
+                                Este es el nombre que aparecerá en tus firmas y reportes oficiales.
+                            </Text>
+                        </View>
+
                         {/* Alias */}
                         <View>
                             <Text className="text-gray-700 font-semibold mb-2 flex-row items-center">
@@ -79,7 +97,7 @@ export default function ProfileSetup() {
                                 maxLength={20}
                             />
                             <Text className="text-gray-400 text-sm mt-1">
-                                Este nombre aparecerá en tus etiquetas QR y bitácoras
+                                Este nombre se usará en la comunidad y foros.
                             </Text>
                         </View>
 

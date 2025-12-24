@@ -1,0 +1,2 @@
+escenario A, escanee un QR que ya estaba dado de alta en el sistema
+2.- actualmente te manda al paso 2 del wizard de nuevo servicio, modifica para que este sea el nuevo paso 1 pero que en la parte superior aparezca el nombre del cliente 

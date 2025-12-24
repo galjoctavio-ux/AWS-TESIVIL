@@ -360,7 +360,7 @@ export const generateServiceReport = async (data: ReportData): Promise<void> => 
             '<div style="height: 50px;"></div>'}
                 <div class="signature-line">
                     Firma del Técnico<br>
-                    <span style="font-weight: normal; font-size: 9px;">${technicianProfile?.email || ''}</span>
+                    <span style="font-weight: normal; font-size: 9px;">${technicianProfile?.fullName || technicianProfile?.businessName || technicianProfile?.email || ''}</span>
                 </div>
             </div>
             <div class="signature-box">
