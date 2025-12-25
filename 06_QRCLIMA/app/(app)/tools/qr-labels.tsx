@@ -7,6 +7,7 @@ import {
     generateQRLabelsPDF,
     getPreviousDownloads,
     getTimeUntilNextGeneration,
+    regeneratePDF,
     PDFDownloadRecord
 } from '../../../services/qr-labels-service';
 
@@ -19,6 +20,7 @@ export default function QRLabelsScreen() {
     const [canGenerate, setCanGenerate] = useState(true);
     const [timeRemaining, setTimeRemaining] = useState({ hours: 0, minutes: 0 });
     const [previousDownloads, setPreviousDownloads] = useState<PDFDownloadRecord[]>([]);
+    const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
     useEffect(() => {
         loadData();
@@ -72,6 +74,18 @@ export default function QRLabelsScreen() {
             Alert.alert('Error', 'Ocurrió un error al generar las etiquetas');
         } finally {
             setGenerating(false);
+        }
+    };
+
+    const handleRedownload = async (record: PDFDownloadRecord) => {
+        if (downloadingId) return;
+        setDownloadingId(record.id);
+        try {
+            await regeneratePDF(record);
+        } catch (error) {
+            Alert.alert('Error', 'No se pudo descargar el archivo');
+        } finally {
+            setDownloadingId(null);
         }
     };
 
@@ -160,8 +174,8 @@ export default function QRLabelsScreen() {
                         onPress={handleGeneratePDF}
                         disabled={!canGenerate || generating}
                         className={`flex-row items-center justify-center p-4 rounded-2xl ${canGenerate && !generating
-                                ? 'bg-indigo-600'
-                                : 'bg-gray-300'
+                            ? 'bg-indigo-600'
+                            : 'bg-gray-300'
                             }`}
                     >
                         {generating ? (
@@ -216,7 +230,7 @@ export default function QRLabelsScreen() {
                                 className="bg-white rounded-xl p-4 shadow-sm border border-gray-100"
                             >
                                 <View className="flex-row items-center justify-between">
-                                    <View className="flex-row items-center">
+                                    <View className="flex-row items-center flex-1">
                                         <View className="bg-gray-100 p-2 rounded-lg mr-3">
                                             <Ionicons name="document" size={20} color="#6B7280" />
                                         </View>
@@ -229,10 +243,25 @@ export default function QRLabelsScreen() {
                                             </Text>
                                         </View>
                                     </View>
-                                    <View className="bg-indigo-100 px-2 py-1 rounded-full">
-                                        <Text className="text-indigo-700 text-xs font-bold">
-                                            {download.tokens?.length || 0} códigos
-                                        </Text>
+
+                                    <View className="flex-row items-center">
+                                        <View className="bg-indigo-100 px-2 py-1 rounded-full mr-3">
+                                            <Text className="text-indigo-700 text-xs font-bold">
+                                                {download.tokens?.length || 0} códigos
+                                            </Text>
+                                        </View>
+
+                                        <TouchableOpacity
+                                            onPress={() => handleRedownload(download)}
+                                            disabled={!!downloadingId}
+                                            className="bg-gray-50 p-2 rounded-full border border-gray-200"
+                                        >
+                                            {downloadingId === download.id ? (
+                                                <ActivityIndicator size="small" color="#4F46E5" />
+                                            ) : (
+                                                <Ionicons name="download-outline" size={20} color="#4F46E5" />
+                                            )}
+                                        </TouchableOpacity>
                                     </View>
                                 </View>
                             </View>

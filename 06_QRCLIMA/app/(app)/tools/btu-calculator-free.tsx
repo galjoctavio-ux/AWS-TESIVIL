@@ -1,7 +1,8 @@
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type ClimateZone = 'templada' | 'calida' | 'muy_calida';
 
@@ -24,6 +25,7 @@ const getTonnageRecommendation = (btu: number): { tonnage: string; btuCommercial
 
 export default function BTUCalculatorFree() {
     const router = useRouter();
+    const insets = useSafeAreaInsets();
     const [length, setLength] = useState('');
     const [width, setWidth] = useState('');
     const [zone, setZone] = useState<ClimateZone>('calida');
@@ -56,18 +58,36 @@ export default function BTUCalculatorFree() {
     };
 
     return (
-        <ScrollView className="flex-1 bg-slate-50">
-            <View className="p-6">
-                {/* Header Info */}
-                <View className="bg-blue-50 p-4 rounded-xl mb-6 border border-blue-100">
-                    <View className="flex-row items-center mb-2">
-                        <Ionicons name="calculator" size={20} color="#2563EB" />
-                        <Text className="text-blue-700 font-bold ml-2">Estimación Rápida de BTU</Text>
+        <View className="flex-1 bg-slate-50">
+            <Stack.Screen options={{ headerShown: false }} />
+
+            {/* Custom Header */}
+            <View style={{
+                backgroundColor: '#2563EB',
+                paddingTop: insets.top + 10,
+                paddingBottom: 20,
+                paddingHorizontal: 20,
+                borderBottomLeftRadius: 24,
+                borderBottomRightRadius: 24,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.15,
+                shadowRadius: 8,
+                elevation: 8,
+                zIndex: 10
+            }}>
+                <View className="flex-row items-center">
+                    <TouchableOpacity onPress={() => router.back()} className="mr-4 bg-white/20 p-2 rounded-full">
+                        <Ionicons name="arrow-back" size={24} color="white" />
+                    </TouchableOpacity>
+                    <View>
+                        <Text className="text-white text-xl font-bold">Calculadora BTU</Text>
+                        <Text className="text-blue-200 text-xs">Herramienta Gratuita</Text>
                     </View>
-                    <Text className="text-blue-600 text-sm">
-                        Calcula los BTU necesarios según el área y la zona climática. Fórmula: Área × Factor de Zona.
-                    </Text>
                 </View>
+            </View>
+
+            <ScrollView className="flex-1" contentContainerStyle={{ padding: 24 }}>
 
                 {/* Dimensions */}
                 <Text className="text-lg font-bold text-gray-800 mb-3">📐 Dimensiones del Espacio</Text>
@@ -76,7 +96,7 @@ export default function BTUCalculatorFree() {
                     <View className="flex-1">
                         <Text className="text-sm text-gray-600 mb-1">Largo (m)</Text>
                         <TextInput
-                            className="bg-white p-4 rounded-xl border border-gray-200 text-lg"
+                            className="bg-white p-4 rounded-xl border border-gray-200 text-lg shadow-sm"
                             placeholder="Ej: 5"
                             keyboardType="numeric"
                             value={length}
@@ -86,7 +106,7 @@ export default function BTUCalculatorFree() {
                     <View className="flex-1">
                         <Text className="text-sm text-gray-600 mb-1">Ancho (m)</Text>
                         <TextInput
-                            className="bg-white p-4 rounded-xl border border-gray-200 text-lg"
+                            className="bg-white p-4 rounded-xl border border-gray-200 text-lg shadow-sm"
                             placeholder="Ej: 4"
                             keyboardType="numeric"
                             value={width}
@@ -120,7 +140,7 @@ export default function BTUCalculatorFree() {
                 {/* Calculate Button */}
                 <TouchableOpacity
                     onPress={calculateBTU}
-                    className="bg-blue-600 p-4 rounded-xl flex-row items-center justify-center shadow-lg mb-4"
+                    className="bg-blue-600 p-4 rounded-xl flex-row items-center justify-center shadow-lg mb-4 active:bg-blue-700"
                 >
                     <Ionicons name="calculator" size={24} color="white" />
                     <Text className="text-white font-bold text-lg ml-2">Calcular BTU</Text>
@@ -128,15 +148,9 @@ export default function BTUCalculatorFree() {
 
                 {/* Result */}
                 {result && (
-                    <View className="relative">
-                        {/* Watermark */}
-                        <View className="absolute inset-0 items-center justify-center z-10 opacity-20 pointer-events-none">
-                            <Text className="text-gray-500 text-4xl font-bold rotate-[-30deg]">
-                                VERSIÓN FREE
-                            </Text>
-                        </View>
-
-                        <View className="bg-gradient-to-br from-blue-600 to-blue-800 p-6 rounded-2xl shadow-xl">
+                    <View className="relative mt-4">
+                        {/* Result Card - Solid Background for Contrast */}
+                        <View style={{ backgroundColor: '#2563EB', padding: 24, borderRadius: 16 }} className="shadow-xl">
                             <Text className="text-blue-100 text-sm mb-1">Resultado del Cálculo</Text>
 
                             <View className="flex-row items-end mb-4">
@@ -153,9 +167,9 @@ export default function BTUCalculatorFree() {
 
                             <View className="bg-green-500 p-4 rounded-xl">
                                 <Text className="text-green-100 text-sm">Recomendación Comercial</Text>
-                                <View className="flex-row items-baseline">
+                                <View className="flex-row items-baseline flex-wrap">
                                     <Text className="text-white font-bold text-2xl">
-                                        {result.recommendation.tonnage} Tonelada{result.recommendation.tonnage !== '1' ? 's' : ''}
+                                        {result.recommendation.tonnage} Ton
                                     </Text>
                                     <Text className="text-green-100 ml-2">
                                         ({result.recommendation.btuCommercial.toLocaleString()} BTU)
@@ -176,7 +190,8 @@ export default function BTUCalculatorFree() {
                 {/* PRO Upgrade CTA */}
                 <TouchableOpacity
                     onPress={() => router.push('/(app)/tools/btu-calculator-pro' as any)}
-                    className="mt-6 bg-gradient-to-r from-purple-600 to-purple-800 p-4 rounded-xl border border-purple-400"
+                    className="mt-8 bg-gradient-to-r from-purple-600 to-purple-800 p-4 rounded-xl border border-purple-400"
+                    style={{ backgroundColor: '#7C3AED' }} // Fallback for gradient
                 >
                     <View className="flex-row items-center justify-between">
                         <View className="flex-row items-center">
@@ -185,39 +200,24 @@ export default function BTUCalculatorFree() {
                             </View>
                             <View>
                                 <Text className="text-white font-bold text-lg">Calculadora PRO</Text>
-                                <Text className="text-purple-200 text-sm">Cálculo profesional con desglose</Text>
+                                <Text className="text-purple-200 text-sm">Cálculo profesional</Text>
                             </View>
                         </View>
                         <View className="bg-yellow-400 px-3 py-1 rounded-full">
                             <Text className="text-purple-900 font-bold text-xs">PRO</Text>
                         </View>
                     </View>
-                    <View className="mt-3 flex-row flex-wrap gap-2">
-                        <View className="bg-white/10 px-2 py-1 rounded">
-                            <Text className="text-purple-100 text-xs">✓ Muros/Ventanas</Text>
-                        </View>
-                        <View className="bg-white/10 px-2 py-1 rounded">
-                            <Text className="text-purple-100 text-xs">✓ Cargas internas</Text>
-                        </View>
-                        <View className="bg-white/10 px-2 py-1 rounded">
-                            <Text className="text-purple-100 text-xs">✓ Gráfica desglose</Text>
-                        </View>
-                        <View className="bg-white/10 px-2 py-1 rounded">
-                            <Text className="text-purple-100 text-xs">✓ Exportar PDF</Text>
-                        </View>
-                    </View>
                 </TouchableOpacity>
 
                 {/* Tips */}
-                <View className="mt-6 bg-yellow-50 p-4 rounded-xl border border-yellow-200">
+                <View className="mt-6 bg-yellow-50 p-4 rounded-xl border border-yellow-200 mb-8">
                     <Text className="text-yellow-800 font-bold mb-2">💡 Tips Profesionales</Text>
                     <Text className="text-yellow-700 text-sm leading-5">
                         • Siempre redondea al tonelaje comercial superior{'\n'}
-                        • En zonas muy calientes, considera un 10-15% extra{'\n'}
-                        • Equipos Inverter ofrecen mejor eficiencia en cargas variables
+                        • En zonas muy calientes, considera un 10-15% extra
                     </Text>
                 </View>
-            </View>
-        </ScrollView>
+            </ScrollView>
+        </View>
     );
 }

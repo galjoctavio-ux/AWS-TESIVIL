@@ -528,7 +528,7 @@ export const STORE_PRODUCTS: Product[] = [
         name: 'Semana PRO',
         description: 'Desbloquea todas las funciones PRO por 7 días',
         priceMxn: 0,
-        priceTokens: 200,
+        priceTokens: 500,  // Standardized to 500 tokens
         type: 'digital',
         category: 'booster',
         isActive: true,

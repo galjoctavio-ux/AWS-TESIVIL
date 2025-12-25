@@ -6,18 +6,20 @@ import { getClients, ClientData } from '../../services/clients-service';
 import { getUserProfile, UserProfile, UserRank } from '../../services/user-service';
 import { getRecentServices } from '../../services/services-service';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomNav from '../../components/BottomNav';
 
 // Rank display helper
 const getRankLabel = (rank: UserRank | undefined) => {
     switch (rank) {
-        case 'Pro': return { icon: '🥇', label: 'Especialista' };
+        case 'Experto': return { icon: '🥇', label: 'Experto' };
         case 'Técnico': return { icon: '🛡️', label: 'Técnico Pro' };
-        default: return { icon: '✅', label: 'Verificado' };
+        default: return { icon: '🌱', label: 'Novato' };
     }
 };
 
 export default function HomeScreen() {
+    const insets = useSafeAreaInsets();
     const { user, signOut } = useAuth();
     const router = useRouter();
     const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -81,7 +83,7 @@ export default function HomeScreen() {
                 {/* ========================================== */}
                 {/* HEADER - Clean & Minimal */}
                 {/* ========================================== */}
-                <View className="bg-blue-600 pt-14 pb-24 px-5">
+                <View className="bg-blue-600 pb-24 px-5" style={{ paddingTop: insets.top + 8 }}>
                     <View className="flex-row justify-between items-center">
                         {/* Greeting */}
                         <TouchableOpacity onPress={() => router.push('/(app)/profile')}>
@@ -107,8 +109,7 @@ export default function HomeScreen() {
                     <View className="bg-white rounded-3xl p-5 shadow-lg border border-gray-100">
                         {nextService ? (
                             // Has upcoming service
-                            <TouchableOpacity
-                                onPress={() => router.push(`/(app)/services/${nextService.id}`)}
+                            <View
                                 className="mb-4"
                             >
                                 <View className="flex-row items-center mb-2">
@@ -122,7 +123,7 @@ export default function HomeScreen() {
                                     } - {nextService.type}
                                 </Text>
                                 <Text className="text-gray-500">Cliente: {nextService.clientName || 'Ver detalles'}</Text>
-                            </TouchableOpacity>
+                            </View>
                         ) : (
                             // No services
                             <View className="items-center py-2 mb-4">

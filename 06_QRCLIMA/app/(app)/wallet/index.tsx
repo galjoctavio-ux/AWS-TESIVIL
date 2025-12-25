@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, RefreshControl, FlatList } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, RefreshControl, FlatList, Alert, ActivityIndicator } from 'react-native';
 import { useState, useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { useAuth } from '../../../context/AuthContext';
@@ -10,6 +10,7 @@ import {
     TokenTransaction,
     EARN_RULES
 } from '../../../services/wallet-service';
+import { purchaseTokens, TOKEN_PACK } from '../../../services/stripe-service';
 
 // Iconos por tipo de transacción
 const TRANSACTION_ICONS: Record<string, { icon: string; color: string }> = {
@@ -31,6 +32,7 @@ export default function WalletScreen() {
     const [transactions, setTransactions] = useState<TokenTransaction[]>([]);
     const [refreshing, setRefreshing] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [purchasing, setPurchasing] = useState(false);
 
     const loadData = async () => {
         if (!user) return;
@@ -62,6 +64,42 @@ export default function WalletScreen() {
         setRefreshing(true);
         await loadData();
         setRefreshing(false);
+    };
+
+    const handleBuyTokens = async () => {
+        if (!user) {
+            Alert.alert('Error', 'Debes iniciar sesión para comprar tokens');
+            return;
+        }
+
+        Alert.alert(
+            '🪙 Comprar Tokens',
+            `¿Deseas comprar ${TOKEN_PACK.tokens} tokens por $${TOKEN_PACK.priceMxn} MXN?`,
+            [
+                { text: 'Cancelar', style: 'cancel' },
+                {
+                    text: 'Comprar',
+                    onPress: async () => {
+                        try {
+                            setPurchasing(true);
+                            const result = await purchaseTokens({
+                                userId: user.uid,
+                                userEmail: user.email || '',
+                            });
+
+                            if (result.success) {
+                                // Recargar datos después de la compra
+                                await loadData();
+                            }
+                        } catch (error) {
+                            console.error('Error purchasing tokens:', error);
+                        } finally {
+                            setPurchasing(false);
+                        }
+                    }
+                }
+            ]
+        );
     };
 
     const formatDate = (timestamp: any): string => {
@@ -176,6 +214,32 @@ export default function WalletScreen() {
                         </View>
                     </View>
                 </View>
+
+                {/* Buy Tokens Button */}
+                <TouchableOpacity
+                    onPress={handleBuyTokens}
+                    disabled={purchasing}
+                    className="bg-white border-2 border-amber-400 rounded-2xl p-4 mb-6 flex-row items-center justify-between"
+                >
+                    <View className="flex-row items-center">
+                        <View className="bg-amber-100 w-12 h-12 rounded-full items-center justify-center mr-3">
+                            {purchasing ? (
+                                <ActivityIndicator color="#F59E0B" />
+                            ) : (
+                                <Text className="text-2xl">🪙</Text>
+                            )}
+                        </View>
+                        <View>
+                            <Text className="text-gray-800 font-bold text-lg">Comprar Tokens</Text>
+                            <Text className="text-gray-500 text-sm">
+                                {TOKEN_PACK.tokens} tokens por ${TOKEN_PACK.priceMxn} MXN
+                            </Text>
+                        </View>
+                    </View>
+                    <View className="bg-amber-500 px-4 py-2 rounded-xl">
+                        <Text className="text-white font-bold">Comprar</Text>
+                    </View>
+                </TouchableOpacity>
 
                 {/* How to Earn Section */}
                 <Text className="text-lg font-bold text-gray-800 mb-3">💰 Cómo Ganar Tokens</Text>

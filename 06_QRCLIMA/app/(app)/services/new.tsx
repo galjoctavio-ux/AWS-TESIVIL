@@ -6,11 +6,12 @@ import { useSettings } from '../../../context/SettingsContext';
 import { getClients, getClientById } from '../../../services/clients-service';
 import { searchError, getBrands, getModelsByBrand, BrandData, ModelData } from '../../../services/database-service';
 import { addService } from '../../../services/services-service';
-import { getUserProfile } from '../../../services/user-service';
+import { getUserProfile, isUserPro } from '../../../services/user-service';
 import { getEquipmentById, addEquipment, EquipmentData, markEquipmentAsInstalled } from '../../../services/equipment-service';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import SignatureModal from '../../../components/SignatureModal';
+import { checkWarrantyStatus, validateWarrantyInput } from '../../../services/warranty-validator';
 
 export default function NewService() {
     const router = useRouter();
@@ -65,6 +66,10 @@ export default function NewService() {
     const [saving, setSaving] = useState(false);
     const [showSignatureModal, setShowSignatureModal] = useState(false);
     const [clientSignature, setClientSignature] = useState<string | null>(null);
+
+    // WARRANTY STATE (PRO)
+    const [showWarrantyModal, setShowWarrantyModal] = useState(false);
+    const [warrantyMonths, setWarrantyMonths] = useState(3); // Default 3 months
 
     // LOAD PRELOADED DATA FROM QR
     useEffect(() => {
@@ -136,7 +141,7 @@ export default function NewService() {
                 loadClients();
                 // Check if user is PRO
                 getUserProfile(user.uid).then(profile => {
-                    const userIsPro = profile?.rank === 'Pro' || profile?.subscription === 'premium';
+                    const userIsPro = isUserPro(profile);
                     setIsPro(userIsPro);
                     setReminderEnabled(userIsPro); // Enable reminder by default only for PRO users
                 });
@@ -346,7 +351,22 @@ export default function NewService() {
     };
 
     const handleFinishService = () => {
+        // Validate fields
+        if (!selectedClient || !serviceType || !selectedBrand || !selectedModel) {
+            Alert.alert('Error', 'Por favor completa todos los campos requeridos (Cliente, Tipo, Equipo)');
+            return;
+        }
+
+        // Intercept with Warranty Modal if PRO (or generally if we want to capture warranty)
+        // Design doc implies explicit step for PRO.
         setChecklistData(prev => ({ ...prev })); // Force update if needed
+
+        // Show Warranty Input first
+        setShowWarrantyModal(true);
+    };
+
+    const confirmWarranty = () => {
+        setShowWarrantyModal(false);
         setShowSignatureModal(true);
     };
 
@@ -1415,11 +1435,11 @@ export default function NewService() {
                             onValueChange={(value) => {
                                 if (!isPro && value) {
                                     Alert.alert(
-                                        'Función PRO',
-                                        'Los recordatorios automáticos son una función exclusiva para usuarios PRO. ¿Deseas actualizar tu plan?',
+                                        '🚀 Función PRO',
+                                        'Los recordatorios automáticos son una función exclusiva de QRclima Pro',
                                         [
-                                            { text: 'Más tarde', style: 'cancel' },
-                                            { text: 'Ver planes', onPress: () => router.push('/(app)/store') }
+                                            { text: 'Ver Planes', onPress: () => router.push('/(app)/profile/subscription' as any) },
+                                            { text: 'Cancelar', style: 'cancel' }
                                         ]
                                     );
                                     return;
@@ -1471,6 +1491,49 @@ export default function NewService() {
                 description={`Solicita a ${selectedClient?.name || 'el cliente'} su firma de conformidad.`}
                 confirmText="Confirmar y Terminar"
             />
+
+            {/* WARRANTY MODAL (Inline for v1.0.0) */}
+            {showWarrantyModal && (
+                <View className="absolute top-0 left-0 right-0 bottom-0 bg-black/60 justify-center items-center z-50 p-6">
+                    <View className="bg-white rounded-2xl w-full max-w-sm p-6">
+                        <View className="flex-row items-center mb-4">
+                            <Ionicons name="shield-checkmark" size={24} color="#4F46E5" />
+                            <Text className="text-xl font-bold text-gray-800 ml-2">Garantía del Servicio</Text>
+                        </View>
+
+                        <Text className="text-gray-500 mb-6">
+                            Selecciona el periodo de garantía que otorgarás por este servicio. Esto aparecerá en el reporte PDF.
+                        </Text>
+
+                        <View className="flex-row flex-wrap justify-center gap-2 mb-6">
+                            {[0, 1, 3, 6, 12].map(m => (
+                                <TouchableOpacity
+                                    key={m}
+                                    onPress={() => setWarrantyMonths(m)}
+                                    className={`px-4 py-3 rounded-xl border ${warrantyMonths === m ? 'bg-indigo-600 border-indigo-600' : 'bg-white border-gray-200'}`}
+                                >
+                                    <Text className={`font-bold ${warrantyMonths === m ? 'text-white' : 'text-gray-700'}`}>
+                                        {m === 0 ? 'Sin Garantía' : `${m} Mes${m > 1 ? 'es' : ''}`}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+
+                        <TouchableOpacity
+                            onPress={confirmWarranty}
+                            className="bg-indigo-600 p-4 rounded-xl items-center"
+                        >
+                            <Text className="text-white font-bold text-lg">Continuar a Firma</Text>
+                        </TouchableOpacity>
+
+                        {!isPro && (
+                            <Text className="text-center text-xs text-gray-400 mt-4">
+                                * Actualiza a PRO para validación automática de garantías.
+                            </Text>
+                        )}
+                    </View>
+                </View>
+            )}
         </KeyboardAvoidingView>
     );
 }

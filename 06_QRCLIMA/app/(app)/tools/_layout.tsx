@@ -26,8 +26,7 @@ export default function ToolsLayout() {
             <Stack.Screen
                 name="cable-guide"
                 options={{
-                    title: 'Guía de Cables',
-                    headerBackTitle: 'Atrás'
+                    headerShown: false,
                 }}
             />
             <Stack.Screen
@@ -39,6 +38,12 @@ export default function ToolsLayout() {
             />
             <Stack.Screen
                 name="qr-labels"
+                options={{
+                    headerShown: false,
+                }}
+            />
+            <Stack.Screen
+                name="mirage-diagnostic"
                 options={{
                     headerShown: false,
                 }}

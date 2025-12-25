@@ -4,18 +4,21 @@ import { useAuth } from '../../../context/AuthContext';
 import { getUserProfile, UserProfile, UserRank } from '../../../services/user-service';
 import { updateProfilePhotoFlow } from '../../../services/image-service';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useState, useCallback } from 'react';
 import BottomNav from '../../../components/BottomNav';
+import AcademyLeadCapture from '../../../components/AcademyLeadCapture';
 
 const getRankInfo = (rank: UserRank | undefined) => {
     switch (rank) {
-        case 'Pro': return { icon: '🥇', label: 'Especialista Certificado', color: 'bg-yellow-100', textColor: 'text-yellow-700' };
+        case 'Experto': return { icon: '🥇', label: 'Experto Certificado', color: 'bg-purple-100', textColor: 'text-purple-700' };
         case 'Técnico': return { icon: '🛡️', label: 'Técnico Profesional', color: 'bg-blue-100', textColor: 'text-blue-700' };
-        default: return { icon: '✅', label: 'Miembro Verificado', color: 'bg-gray-100', textColor: 'text-gray-600' };
+        default: return { icon: '🌱', label: 'Técnico Novato', color: 'bg-green-100', textColor: 'text-green-600' };
     }
 };
 
 export default function ProfileScreen() {
+    const insets = useSafeAreaInsets();
     const { user, signOut } = useAuth();
     const router = useRouter();
     const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -106,7 +109,7 @@ export default function ProfileScreen() {
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#2563EB" />}
             >
                 {/* Header */}
-                <View className="bg-blue-600 pt-14 pb-20 px-5">
+                <View className="bg-blue-600 pb-20 px-5" style={{ paddingTop: insets.top + 8 }}>
                     <Text className="text-white text-2xl font-bold">Mi Perfil</Text>
                 </View>
 
@@ -182,6 +185,38 @@ export default function ProfileScreen() {
                     </View>
                 </View>
 
+                {/* PRO Subscription CTA - Show only for free users */}
+                {profile?.subscription === 'free' && (
+                    <TouchableOpacity
+                        onPress={() => router.push('/(app)/profile/subscription' as any)}
+                        className="mx-4 mb-6 bg-indigo-600 p-4 rounded-2xl"
+                    >
+                        <View className="flex-row items-center">
+                            <View className="bg-white/20 w-12 h-12 rounded-xl items-center justify-center mr-4">
+                                <Ionicons name="rocket" size={24} color="white" />
+                            </View>
+                            <View className="flex-1">
+                                <Text className="text-white font-bold text-lg">Hazte PRO</Text>
+                                <Text className="text-white/80 text-sm">Desbloquea todo por $99/mes</Text>
+                            </View>
+                            <Ionicons name="chevron-forward" size={24} color="white" />
+                        </View>
+                    </TouchableOpacity>
+                )}
+
+                {/* Show PRO badge for subscribed users */}
+                {profile?.subscription && profile.subscription !== 'free' && (
+                    <View className="mx-4 mb-6 bg-indigo-600 p-4 rounded-2xl">
+                        <View className="flex-row items-center">
+                            <Text className="text-2xl mr-3">⭐</Text>
+                            <View className="flex-1">
+                                <Text className="text-white font-bold">Usuario {profile.subscription}</Text>
+                                <Text className="text-white/80 text-sm">Todas las funciones desbloqueadas</Text>
+                            </View>
+                        </View>
+                    </View>
+                )}
+
                 {/* Menu Items */}
                 <View className="px-4 mb-6">
                     <Text className="text-gray-700 font-bold mb-3">Comunidad & Aprendizaje</Text>
@@ -221,6 +256,26 @@ export default function ProfileScreen() {
                         <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
                     </TouchableOpacity>
 
+                    {/* Branding - only for PRO users */}
+                    {profile?.subscription && profile.subscription !== 'free' && (
+                        <TouchableOpacity
+                            onPress={() => router.push('/(app)/profile/branding')}
+                            className="bg-white p-4 rounded-2xl border border-gray-100 flex-row items-center active:bg-gray-50 mb-3"
+                        >
+                            <View className="bg-indigo-100 w-12 h-12 rounded-xl items-center justify-center mr-4">
+                                <Ionicons name="color-palette" size={24} color="#6366F1" />
+                            </View>
+                            <View className="flex-1">
+                                <Text className="font-bold text-gray-800">Personalizar PDFs</Text>
+                                <Text className="text-gray-500 text-sm">Logo, colores y marca para reportes</Text>
+                            </View>
+                            <View className="bg-indigo-600 px-2 py-0.5 rounded-full mr-2">
+                                <Text className="text-white text-xs font-bold">PRO</Text>
+                            </View>
+                            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+                        </TouchableOpacity>
+                    )}
+
                     <TouchableOpacity
                         onPress={() => router.push('/(app)/profile/settings')}
                         className="bg-white p-4 rounded-2xl border border-gray-100 flex-row items-center active:bg-gray-50"
@@ -234,6 +289,12 @@ export default function ProfileScreen() {
                         </View>
                         <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
                     </TouchableOpacity>
+                </View>
+
+                {/* Academia - Lista de Espera */}
+                <View className="px-4 mb-6">
+                    <Text className="text-gray-700 font-bold mb-3">Aprende con IA</Text>
+                    <AcademyLeadCapture source="qrclima_profile" />
                 </View>
 
                 {/* Logout */}

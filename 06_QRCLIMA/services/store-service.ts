@@ -198,8 +198,15 @@ export const purchaseProduct = async (userId: string, productId: string) => {
 
     // 6. Activate digital benefits immediately
     if (product.category === 'Digital') {
-        // TODO: Update user's unlocked features based on productId
-        console.log('Digital product activated:', product.id);
+        // Activate PRO subscription for boost-pro-week
+        if (product.id === 'boost-pro-week') {
+            const { activateProSubscription } = await import('./user-service');
+            await activateProSubscription(userId, 'Pro', 7); // 7 days PRO
+            console.log('PRO subscription activated for 7 days');
+        } else {
+            // TODO: Update user's unlocked features based on productId
+            console.log('Digital product activated:', product.id);
+        }
     }
 
     return { success: true, message: `Has adquirido: ${product.name}` };

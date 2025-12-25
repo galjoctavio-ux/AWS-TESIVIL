@@ -78,3 +78,10 @@ EXPO_PUBLIC_DEV_MODE=true
 
 # Habilitar logs detallados
 EXPO_PUBLIC_DEBUG_LOGGING=true
+
+# ============================================
+# GOOGLE MAPS / DIRECTIONS API (PRO Feature - Traffic)
+# Obtén tu clave en: https://console.cloud.google.com/apis/credentials
+# Habilita: Directions API
+# ============================================
+EXPO_PUBLIC_GOOGLE_DIRECTIONS_API_KEY=your_google_api_key

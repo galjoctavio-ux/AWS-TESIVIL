@@ -39,7 +39,7 @@ const EXPERIENCE_OPTIONS: ExperienceOption[] = [
         label: 'Más de 5 años',
         description: 'Soy un profesional experimentado',
         years: 6,
-        rank: 'Técnico',
+        rank: 'Experto',
         icon: 'medal',
         color: 'bg-purple-500',
     },
@@ -126,7 +126,7 @@ export default function ExperienceSelection() {
                             </Text>
                             <View className="flex-row items-center mt-1">
                                 <Text className="text-xs text-gray-400">Rango inicial: </Text>
-                                <Text className={`text-xs font-semibold ${option.rank === 'Novato' ? 'text-green-600' : 'text-blue-600'
+                                <Text className={`text-xs font-semibold ${option.rank === 'Novato' ? 'text-green-600' : option.rank === 'Técnico' ? 'text-blue-600' : 'text-purple-600'
                                     }`}>
                                     {option.rank}
                                 </Text>
@@ -143,13 +143,12 @@ export default function ExperienceSelection() {
                 ))}
             </View>
 
-            {/* Info sobre rangos */}
-            <View className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mt-6">
+            {/* Info sobre suscripción PRO */}
+            <View className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 mt-6">
                 <View className="flex-row items-start">
-                    <Ionicons name="information-circle" size={20} color="#d97706" />
-                    <Text className="text-yellow-800 text-sm ml-2 flex-1">
-                        El rango <Text className="font-bold">Pro</Text> se obtiene siendo suscriptor Premium
-                        o alcanzando +50 soluciones en la comunidad.
+                    <Ionicons name="rocket" size={20} color="#4F46E5" />
+                    <Text className="text-indigo-800 text-sm ml-2 flex-1">
+                        ¿Quieres más funciones? Conoce <Text className="font-bold">QRclima Pro</Text> y desbloquea herramientas avanzadas después de registrarte.
                     </Text>
                 </View>
             </View>

@@ -1,0 +1,137 @@
+{
+    "indexes": [
+        {
+            "collectionGroup": "sos_threads",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "authorId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "sos_threads",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "isOffensive",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "sos_threads",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "status",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "isOffensive",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "sos_threads",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "isOffensive",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "likes",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "sos_comments",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "authorId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "sos_comments",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "threadId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "isOffensive",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "isSolution",
+                    "order": "DESCENDING"
+                },
+                {
+                    "fieldPath": "votes",
+                    "order": "DESCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "community_failures",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "isVerified",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "reportCount",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "community_failures",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "isVerified",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "brand",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "reportCount",
+                    "order": "DESCENDING"
+                }
+            ]
+        }
+    ],
+    "fieldOverrides": []
+}

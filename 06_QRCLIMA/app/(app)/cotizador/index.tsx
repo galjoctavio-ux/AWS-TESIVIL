@@ -3,10 +3,12 @@ import { useRouter } from 'expo-router';
 import { useState, useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../../context/AuthContext';
 import { getUserCotizadorQuotes, CotizadorQuote, formatCurrency } from '../../../services/cotizador-service';
 
 export default function CotizadorIndex() {
+    const insets = useSafeAreaInsets();
     const router = useRouter();
     const { user } = useAuth();
     const [quotes, setQuotes] = useState<CotizadorQuote[]>([]);
@@ -74,7 +76,7 @@ export default function CotizadorIndex() {
     return (
         <View className="flex-1 bg-slate-50">
             {/* Header */}
-            <View className="bg-white pt-12 pb-4 px-4 shadow-sm flex-row items-center justify-between">
+            <View className="bg-white pb-4 px-4 shadow-sm flex-row items-center justify-between" style={{ paddingTop: insets.top + 8 }}>
                 <TouchableOpacity onPress={() => router.back()}>
                     <Ionicons name="arrow-back" size={24} color="#374151" />
                 </TouchableOpacity>

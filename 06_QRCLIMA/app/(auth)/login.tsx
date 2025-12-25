@@ -63,6 +63,14 @@ export default function Login() {
                     )}
                 </TouchableOpacity>
 
+                <Link href="/(auth)/forgot-password" asChild>
+                    <TouchableOpacity>
+                        <Text className="text-blue-600 text-center mt-4">
+                            ¿Olvidaste tu contraseña?
+                        </Text>
+                    </TouchableOpacity>
+                </Link>
+
                 <View className="mt-6 flex-row justify-center">
                     <Text className="text-gray-600">¿No tienes cuenta? </Text>
                     <Link href="/(auth)/register" asChild>

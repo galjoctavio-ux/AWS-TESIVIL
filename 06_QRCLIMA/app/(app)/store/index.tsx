@@ -3,11 +3,13 @@ import { useRouter } from 'expo-router';
 import { useState, useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getProducts, purchaseProduct, StoreProduct } from '../../../services/store-service';
 import { useAuth } from '../../../context/AuthContext';
 import { getUserProfile } from '../../../services/user-service';
 
 export default function StoreCatalog() {
+    const insets = useSafeAreaInsets();
     const router = useRouter();
     const { user } = useAuth();
     const [products, setProducts] = useState<StoreProduct[]>([]);
@@ -114,7 +116,7 @@ export default function StoreCatalog() {
     return (
         <View className="flex-1 bg-slate-50">
             {/* Header */}
-            <View className="bg-indigo-900 pt-12 pb-6 px-4 rounded-b-[30px] shadow-lg">
+            <View className="bg-indigo-900 pb-6 px-4 rounded-b-[30px] shadow-lg" style={{ paddingTop: insets.top + 8 }}>
                 <View className="flex-row justify-between items-center mb-6">
                     <TouchableOpacity onPress={() => router.back()}>
                         <Ionicons name="arrow-back" size={24} color="white" />

@@ -154,6 +154,20 @@ const createTables = async () => {
                 source_url TEXT,
                 published_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
+
+            -- =============================================
+            -- AGENDA INTELIGENTE V1.0.0 - BUSQUEDA LOCAL
+            -- =============================================
+            
+            -- Tabla Virtual FTS5 para búsqueda instantánea de clientes
+            CREATE VIRTUAL TABLE IF NOT EXISTS clients_search_index USING fts5(
+                id, 
+                name, 
+                address, 
+                phone, 
+                technicianId, 
+                tokenize = 'porter'
+            );
         `);
         console.log("Tablas verificadas/creadas exitosamente (incluye Training QRclima).");
     } catch (error) {
@@ -196,6 +210,16 @@ const seedMissingBrands = async () => {
             await insertBrandData(db, lgData);
         }
 
+        // MIRAGE
+        const mirageCheck = await db.getAllAsync<{ count: number }>(
+            "SELECT count(*) as count FROM air_conditioner_models WHERE logo_url LIKE '%mirage%' OR reference_id LIKE '%mirage%' OR reference_id LIKE '%absolutv%'"
+        );
+        if (mirageCheck[0].count === 0) {
+            console.log("Seeding Mirage data...");
+            const mirageData = require('../assets/data/data_mirage.json');
+            await insertBrandData(db, mirageData);
+        }
+
     } catch (error) {
         console.error("Error seeding brands:", error);
     }
@@ -210,9 +234,12 @@ const insertBrandData = async (db: SQLite.SQLiteDatabase, data: any[]) => {
         );
         const modelId = result.lastInsertRowId;
 
+        // Determine error list property (Mirage uses 'lista_errores', others use 'errores')
+        const errorList = model.errores || model.lista_errores;
+
         // Insert Errors
-        if (model.errores && Array.isArray(model.errores)) {
-            for (const error of model.errores) {
+        if (errorList && Array.isArray(errorList)) {
+            for (const error of errorList) {
                 await db.runAsync(
                     'INSERT INTO error_codes (model_id, code, description, solution) VALUES (?, ?, ?, ?)',
                     [modelId, error.codigo, error.descripcion, error.solucion]
@@ -800,6 +827,79 @@ export const updateTrainingPostStatus = async (
     } catch (error) {
         console.error('Error updating post status:', error);
         throw error;
+    }
+};
+
+// ============================================
+// AGENDA INTELIGENTE V1.0.0 - FTS & SYNC
+// ============================================
+
+/**
+ * Sincroniza un cliente de Firebase a la tabla de búsqueda local FTS5
+ */
+export const syncClientToSearchIndex = async (client: { id: string; name: string; address?: string; phone?: string; technicianId: string }) => {
+    try {
+        const db = await getDb();
+
+        // Verificar si ya existe
+        const existing = await db.getAllAsync(
+            `SELECT id FROM clients_search_index WHERE id = ?`,
+            [client.id]
+        );
+
+        if (existing.length > 0) {
+            // Update
+            await db.runAsync(
+                `UPDATE clients_search_index SET name = ?, address = ?, phone = ?, technicianId = ? WHERE id = ?`,
+                [client.name, client.address || '', client.phone || '', client.technicianId, client.id]
+            );
+        } else {
+            // Insert
+            await db.runAsync(
+                `INSERT INTO clients_search_index (id, name, address, phone, technicianId) VALUES (?, ?, ?, ?, ?)`,
+                [client.id, client.name, client.address || '', client.phone || '', client.technicianId]
+            );
+        }
+    } catch (error) {
+        console.error('Error syncing client to FTS:', error);
+    }
+};
+
+/**
+ * Búsqueda de clientes super rápida usando FTS5
+ */
+export const searchClientsLocally = async (query: string, technicianId: string): Promise<any[]> => {
+    try {
+        const db = await getDb();
+
+        // Sanitize query for FTS5 (remove special chars usually)
+        const sanitizedQuery = query.replace(/[^\w\s]/gi, '');
+        if (!sanitizedQuery) return [];
+
+        // FTS5 Prefix search
+        const searchQuery = `"${sanitizedQuery}"*`;
+
+        const results = await db.getAllAsync(
+            `SELECT * FROM clients_search_index WHERE clients_search_index MATCH ? AND technicianId = ? LIMIT 20`,
+            [searchQuery, technicianId]
+        );
+
+        return results;
+    } catch (error) {
+        console.error('Error searching clients locally:', error);
+        return [];
+    }
+};
+
+/**
+ * Sincronización masiva inicial (se debe llamar al iniciar la Agenda)
+ */
+export const bulkSyncClients = async (clients: any[]) => {
+    const db = await getDb();
+    // Transactional bulk insert/update logic would go here
+    // For simplicity calling sync individually for now
+    for (const client of clients) {
+        await syncClientToSearchIndex(client);
     }
 };
 

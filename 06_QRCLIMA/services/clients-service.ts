@@ -8,6 +8,9 @@ export interface ClientData {
     notes?: string;
     technicianId: string;
     createdAt?: any;
+    // Geo-coordinates for route optimization (Haversine)
+    lat?: number;
+    lng?: number;
 }
 
 export const addClient = async (clientData: ClientData) => {

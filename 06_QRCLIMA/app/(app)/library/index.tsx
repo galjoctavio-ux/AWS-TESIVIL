@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import { getBrands, BrandData, searchErrorsInModel, ErrorCodeData } from '../../../services/database-service';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Mapeo de logos de las 4 marcas principales
 const brandLogos: { [key: string]: any } = {
@@ -24,6 +25,7 @@ const brandColors: { [key: string]: string } = {
 const defaultBrandIcon = '❄️';
 
 export default function LibraryIndex() {
+    const insets = useSafeAreaInsets();
     const router = useRouter();
     const [brands, setBrands] = useState<BrandData[]>([]);
     const [loading, setLoading] = useState(true);
@@ -193,7 +195,7 @@ export default function LibraryIndex() {
             {/* Header */}
             <View style={{
                 backgroundColor: '#4F46E5',
-                paddingTop: 48,
+                paddingTop: insets.top + 8,
                 paddingBottom: 24,
                 paddingHorizontal: 24,
                 borderBottomLeftRadius: 30,

@@ -1,10 +1,22 @@
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomNav from '../../../components/BottomNav';
 
 // Tool definitions with proper categorization
 const DIAGNOSTIC_TOOLS = [
+    {
+        id: 'mirage-diagnostic',
+        icon: 'pulse',
+        title: 'Modo Diagnóstico',
+        description: 'Guía de Modo TEST para equipos Mirage Inverter',
+        route: '/(app)/tools/mirage-diagnostic',
+        color: 'bg-orange-500',
+        iconBg: 'bg-orange-100',
+        iconColor: '#F97316',
+        premium: true,
+    },
     {
         id: 'errors',
         icon: 'warning',
@@ -106,6 +118,7 @@ const BUSINESS_TOOLS = [
 ];
 
 export default function ToolsIndex() {
+    const insets = useSafeAreaInsets();
     const router = useRouter();
 
     const renderToolCard = (tool: typeof DIAGNOSTIC_TOOLS[0]) => (
@@ -135,7 +148,7 @@ export default function ToolsIndex() {
     return (
         <View className="flex-1 bg-slate-50">
             {/* Header */}
-            <View className="bg-blue-600 pt-14 pb-6 px-5">
+            <View className="bg-blue-600 pb-6 px-5" style={{ paddingTop: insets.top + 8 }}>
                 <Text className="text-white text-2xl font-bold">Herramientas</Text>
                 <Text className="text-blue-200 text-sm mt-1">Todo lo que necesitas para el trabajo</Text>
             </View>

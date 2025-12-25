@@ -9,7 +9,7 @@ import { createCheckoutSession, constructWebhookEvent, retrieveCheckoutSession }
 const WaitlistSchema = z.object({
     contactType: z.enum(['email', 'whatsapp']),
     contactValue: z.string().min(5),
-    source: z.enum(['engine_banner', 'showcase_card', 'direct']).default('direct'),
+    source: z.enum(['engine_banner', 'showcase_card', 'direct', 'qrclima_profile']).default('direct'),
 });
 
 const CheckoutSchema = z.object({

@@ -2,6 +2,7 @@ import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, Link
 import { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import { Link, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -10,6 +11,7 @@ export default function Register() {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
     // Aceptación legal (obligatoria según master_plan.md)
     const [acceptTerms, setAcceptTerms] = useState(false);
@@ -33,9 +35,16 @@ export default function Register() {
 
         setLoading(true);
         try {
+            // Crear cuenta
             await createUserWithEmailAndPassword(auth, email, password);
-            Alert.alert('Éxito', 'Cuenta creada correctamente', [{ text: 'OK' }]);
-            // La redirección la maneja el _layout (irá a onboarding)
+
+            // Enviar email de verificación via Cloud Function (Resend)
+            const functions = getFunctions();
+            const sendVerificationEmail = httpsCallable(functions, 'sendVerificationEmail');
+            await sendVerificationEmail({});
+
+            // Redirigir a pantalla de verificación
+            router.replace('/(auth)/verify-email');
         } catch (error: any) {
             Alert.alert('Error de Registro', error.message);
         } finally {

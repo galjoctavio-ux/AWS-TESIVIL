@@ -701,7 +701,7 @@ import { CotizadorQuote, CotizadorQuoteItem, formatCurrency as formatCotizadorCu
 interface CotizadorPDFData {
     quote: CotizadorQuote & { id: string };
     client: ClientData & { id: string };
-    technicianName?: string;
+    technicianProfile?: UserProfile;
 }
 
 /**
@@ -709,7 +709,7 @@ interface CotizadorPDFData {
  * Includes watermark: "Elaborado con QRclima powered by TESIVIL"
  */
 export const generateCotizadorPDF = async (data: CotizadorPDFData): Promise<void> => {
-    const { quote, client, technicianName } = data;
+    const { quote, client, technicianProfile } = data;
 
     const currentDate = new Date().toLocaleDateString('es-MX', {
         year: 'numeric',
@@ -876,6 +876,31 @@ export const generateCotizadorPDF = async (data: CotizadorPDFData): Promise<void
                 font-style: italic;
                 color: #666;
             }
+            .signatures-container {
+                display: flex;
+                justify-content: center;
+                margin-top: 40px;
+                page-break-inside: avoid;
+            }
+            .signature-box {
+                width: 60%;
+                text-align: center;
+                border-top: 1px solid #9CA3AF;
+                padding-top: 10px;
+            }
+            .signature-image {
+                height: 60px;
+                margin-bottom: 5px;
+                object-fit: contain;
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .technician-name {
+                font-weight: bold;
+                font-size: 12px;
+                color: #374151;
+            }
             .footer {
                 margin-top: 30px;
                 padding-top: 15px;
@@ -968,8 +993,19 @@ export const generateCotizadorPDF = async (data: CotizadorPDFData): Promise<void
         </div>
         ` : ''}
 
+        <div class="signatures-container">
+            <div class="signature-box">
+                ${technicianProfile?.signature ?
+            `<img src="${technicianProfile.signature}" class="signature-image" />` :
+            '<div style="height: 60px;"></div>'}
+                <div class="technician-name">
+                    ${technicianProfile?.fullName || technicianProfile?.businessName || technicianProfile?.email || 'Técnico Certificado'}
+                </div>
+                <div style="font-size: 10px; color: #6B7280; margin-top: 2px;">Técnico Responsable</div>
+            </div>
+        </div>
+
         <div class="footer">
-            Técnico: ${technicianName || 'Técnico Certificado'}<br>
             Documento generado el ${currentDate} por QRclima App
         </div>
     </body>

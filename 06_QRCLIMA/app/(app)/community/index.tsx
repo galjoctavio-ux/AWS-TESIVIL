@@ -1,17 +1,75 @@
-import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, TextInput } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useState, useCallback, useEffect } from 'react';
-import { useFocusEffect } from 'expo-router';
+import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, TextInput, Image } from 'react-native';
+import { useRouter, useFocusEffect } from 'expo-router';
+import { useState, useEffect, useCallback } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getThreads, searchThreads, SOSThread } from '../../../services/community-service';
 import { useAuth } from '../../../context/AuthContext';
+import { formatTimeAgo } from '../../../utils/date-utils';
+import { UserRank } from '../../../services/user-service';
+
+// Componente de Insignia según Rango
+const RankBadge = ({ rank, isPro = false }: { rank: UserRank; isPro?: boolean }) => {
+    const getBadgeConfig = () => {
+        if (isPro) {
+            return {
+                icon: 'star' as const,
+                label: 'PRO',
+                bgColor: 'bg-amber-500',
+                textColor: 'text-white',
+                iconColor: '#FFFFFF',
+            };
+        }
+        switch (rank) {
+            case 'Experto':
+                return {
+                    icon: 'shield-checkmark' as const,
+                    label: 'Experto',
+                    bgColor: 'bg-purple-600',
+                    textColor: 'text-white',
+                    iconColor: '#FFFFFF',
+                };
+            case 'Técnico':
+                return {
+                    icon: 'construct' as const,
+                    label: 'Técnico',
+                    bgColor: 'bg-blue-500',
+                    textColor: 'text-white',
+                    iconColor: '#FFFFFF',
+                };
+            case 'Novato':
+            default:
+                return {
+                    icon: 'leaf' as const,
+                    label: 'Novato',
+                    bgColor: 'bg-green-500',
+                    textColor: 'text-white',
+                    iconColor: '#FFFFFF',
+                };
+        }
+    };
+
+    const config = getBadgeConfig();
+
+    return (
+        <View className={`flex-row items-center px-2 py-0.5 rounded-full ${config.bgColor} ml-1`}>
+            <Ionicons name={config.icon} size={10} color={config.iconColor} />
+            <Text className={`text-[10px] font-bold ml-0.5 ${config.textColor}`}>{config.label}</Text>
+        </View>
+    );
+};
 
 export default function CommunityFeed() {
+    const insets = useSafeAreaInsets();
     const router = useRouter();
     const { user } = useAuth();
     const [threads, setThreads] = useState<SOSThread[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<'recent' | 'solved'>('recent');
+
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
     // Search state
     const [searchQuery, setSearchQuery] = useState('');
@@ -35,34 +93,71 @@ export default function CommunityFeed() {
         return () => clearTimeout(timer);
     }, [searchQuery]);
 
-    const loadThreads = async () => {
-        setLoading(true);
-        const data = await getThreads(filter);
-        setThreads(data);
-        setLoading(false);
+    const loadThreads = async (page: number = 1) => {
+        try {
+            setLoading(true);
+            const result = await getThreads(filter, page);
+            setThreads(result.threads);
+            setCurrentPage(result.currentPage);
+            setTotalPages(result.totalPages);
+        } catch (error) {
+            console.error('Error loading threads:', error);
+            setThreads([]);
+        } finally {
+            setLoading(false);
+        }
     };
 
+    // Load threads when filter changes
+    useEffect(() => {
+        setCurrentPage(1);
+        loadThreads(1);
+    }, [filter]);
+
+    // Also refresh when screen comes into focus (after creating a new case)
     useFocusEffect(
         useCallback(() => {
-            loadThreads();
-        }, [filter])
+            // Only refresh if not already loading
+            if (!loading) {
+                loadThreads(1);
+            }
+        }, [])
     );
 
     const renderThread = ({ item }: { item: SOSThread }) => (
         <TouchableOpacity
             onPress={() => router.push({ pathname: '/(app)/community/[id]', params: { id: item.id } })}
-            className="bg-white p-4 rounded-xl mb-3 border border-gray-100 shadow-sm"
+            className={`bg-white p-4 rounded-xl mb-3 shadow-sm ${item.isPinned
+                ? 'border-2 border-amber-400'
+                : 'border border-gray-100'
+                }`}
         >
+            {/* Pinned Badge */}
+            {item.isPinned && (
+                <View className="flex-row items-center mb-2 bg-amber-100 self-start px-2 py-1 rounded-full">
+                    <Ionicons name="pin" size={12} color="#D97706" />
+                    <Text className="text-amber-700 text-[10px] font-bold ml-1">Fijado</Text>
+                </View>
+            )}
             <View className="flex-row justify-between items-start mb-2">
                 <View className="flex-row items-center">
-                    <View className={`w-8 h-8 rounded-full items-center justify-center mr-2 ${item.authorRank === 'Pro' ? 'bg-yellow-100' : 'bg-blue-100'
-                        }`}>
-                        <Text className="text-xs font-bold">
-                            {item.authorName.charAt(0).toUpperCase()}
-                        </Text>
-                    </View>
+                    {item.authorPhotoURL ? (
+                        <Image
+                            source={{ uri: item.authorPhotoURL }}
+                            className="w-8 h-8 rounded-full mr-2"
+                        />
+                    ) : (
+                        <View className={`w-8 h-8 rounded-full items-center justify-center mr-2 ${item.authorRank === 'Experto' ? 'bg-yellow-100' : 'bg-blue-100'}`}>
+                            <Text className="text-xs font-bold">
+                                {item.authorName.charAt(0).toUpperCase()}
+                            </Text>
+                        </View>
+                    )}
                     <View>
-                        <Text className="text-xs text-gray-500 font-medium">{item.authorName}</Text>
+                        <View className="flex-row items-center">
+                            <Text className="text-xs text-gray-500 font-medium">{item.authorName}</Text>
+                            <RankBadge rank={item.authorRank} isPro={item.authorIsPro} />
+                        </View>
                         <Text className="text-[10px] text-gray-400">{item.brand} • {item.model}</Text>
                     </View>
                 </View>
@@ -79,12 +174,21 @@ export default function CommunityFeed() {
                 {item.content}
             </Text>
 
+            {/* Thread Image Thumbnail */}
+            {item.imageUrl && (
+                <Image
+                    source={{ uri: item.imageUrl }}
+                    className="w-full h-32 rounded-lg mb-3"
+                    resizeMode="cover"
+                />
+            )}
+
             <View className="flex-row items-center justify-between border-t border-gray-50 pt-2">
                 <View className="flex-row items-center">
                     <Ionicons name="chatbubble-outline" size={16} color="#9CA3AF" />
                     <Text className="text-gray-400 text-xs ml-1">{item.commentCount} respuestas</Text>
                 </View>
-                <Text className="text-gray-300 text-xs">Hace un momento</Text>
+                <Text className="text-gray-300 text-xs">{formatTimeAgo(item.createdAt)}</Text>
             </View>
         </TouchableOpacity>
     );
@@ -92,7 +196,7 @@ export default function CommunityFeed() {
     return (
         <View className="flex-1 bg-slate-50">
             {/* Header */}
-            <View className="bg-white pt-12 pb-4 px-4 shadow-sm z-10">
+            <View className="bg-white pb-4 px-4 shadow-sm z-10" style={{ paddingTop: insets.top + 8 }}>
                 <View className="flex-row justify-between items-center mb-4">
                     <TouchableOpacity onPress={() => router.back()}>
                         <Ionicons name="arrow-back" size={24} color="#374151" />
@@ -156,7 +260,7 @@ export default function CommunityFeed() {
                     data={searchQuery.length >= 2 ? searchResults : threads}
                     keyExtractor={item => item.id || Math.random().toString()}
                     renderItem={renderThread}
-                    contentContainerStyle={{ padding: 16 }}
+                    contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
                     ListEmptyComponent={
                         <View className="items-center mt-20">
                             <Ionicons name={searchQuery.length >= 2 ? "search-outline" : "people-outline"} size={64} color="#CBD5E1" />
@@ -166,6 +270,31 @@ export default function CommunityFeed() {
                                     : 'Sé el primero en preguntar. La comunidad está lista para ayudar.'}
                             </Text>
                         </View>
+                    }
+                    ListFooterComponent={
+                        searchQuery.length < 2 && totalPages > 1 ? (
+                            <View className="flex-row items-center justify-center py-4 mb-10">
+                                <TouchableOpacity
+                                    onPress={() => loadThreads(currentPage - 1)}
+                                    disabled={currentPage <= 1}
+                                    className={`px-4 py-2 rounded-lg mr-2 ${currentPage <= 1 ? 'bg-gray-200' : 'bg-blue-500'}`}
+                                >
+                                    <Ionicons name="chevron-back" size={20} color={currentPage <= 1 ? '#9CA3AF' : '#FFFFFF'} />
+                                </TouchableOpacity>
+
+                                <Text className="text-gray-600 font-medium mx-4">
+                                    Página {currentPage} de {totalPages}
+                                </Text>
+
+                                <TouchableOpacity
+                                    onPress={() => loadThreads(currentPage + 1)}
+                                    disabled={currentPage >= totalPages}
+                                    className={`px-4 py-2 rounded-lg ml-2 ${currentPage >= totalPages ? 'bg-gray-200' : 'bg-blue-500'}`}
+                                >
+                                    <Ionicons name="chevron-forward" size={20} color={currentPage >= totalPages ? '#9CA3AF' : '#FFFFFF'} />
+                                </TouchableOpacity>
+                            </View>
+                        ) : null
                     }
                 />
             )}

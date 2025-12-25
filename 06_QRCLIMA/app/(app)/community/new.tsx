@@ -1,10 +1,11 @@
-import { View, Text, TouchableOpacity, TextInput, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Image, ActionSheetIOS } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { createThread, searchThreads, SOSThread } from '../../../services/community-service';
 import { useAuth } from '../../../context/AuthContext';
-import { getUserProfile } from '../../../services/user-service';
+import { getUserProfile, isUserPro } from '../../../services/user-service';
+import { pickSOSPhoto, uploadSOSPhoto } from '../../../services/image-service';
 
 export default function NewThread() {
     const router = useRouter();
@@ -15,6 +16,10 @@ export default function NewThread() {
     const [content, setContent] = useState('');
     const [brand, setBrand] = useState('');
     const [model, setModel] = useState('');
+
+    // Photo state
+    const [photoUri, setPhotoUri] = useState<string | null>(null);
+    const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
     const [loading, setLoading] = useState(false);
 
@@ -45,6 +50,50 @@ export default function NewThread() {
         return () => clearTimeout(timer);
     }, [title, brand]);
 
+    // Handle photo selection
+    const handleAddPhoto = () => {
+        if (Platform.OS === 'ios') {
+            ActionSheetIOS.showActionSheetWithOptions(
+                {
+                    options: ['Cancelar', 'Tomar Foto', 'Elegir de Galería'],
+                    cancelButtonIndex: 0,
+                },
+                async (buttonIndex) => {
+                    if (buttonIndex === 1) {
+                        await pickPhoto('camera');
+                    } else if (buttonIndex === 2) {
+                        await pickPhoto('gallery');
+                    }
+                }
+            );
+        } else {
+            Alert.alert(
+                'Agregar Foto',
+                'Selecciona una opción',
+                [
+                    { text: 'Cancelar', style: 'cancel' },
+                    { text: 'Tomar Foto', onPress: () => pickPhoto('camera') },
+                    { text: 'Galería', onPress: () => pickPhoto('gallery') },
+                ]
+            );
+        }
+    };
+
+    const pickPhoto = async (source: 'camera' | 'gallery') => {
+        try {
+            const uri = await pickSOSPhoto(source);
+            if (uri) {
+                setPhotoUri(uri);
+            }
+        } catch (error: any) {
+            Alert.alert('Error', error.message || 'No se pudo seleccionar la foto');
+        }
+    };
+
+    const removePhoto = () => {
+        setPhotoUri(null);
+    };
+
     const handleSubmit = async () => {
         if (!title.trim() || !content.trim() || !brand.trim()) {
             Alert.alert('Error', 'Completa los campos obligatorios (Título, Marca, Descripción)');
@@ -60,15 +109,31 @@ export default function NewThread() {
             setLoading(true);
             const userProfile = await getUserProfile(user!.uid);
 
+            // Upload photo if selected
+            let imageUrl: string | undefined;
+            if (photoUri) {
+                setUploadingPhoto(true);
+                try {
+                    imageUrl = await uploadSOSPhoto(photoUri);
+                } catch (photoError) {
+                    console.error('Error uploading photo:', photoError);
+                    // Continue without photo if upload fails
+                }
+                setUploadingPhoto(false);
+            }
+
             const threadData = {
                 authorId: user!.uid,
                 authorName: userProfile?.alias || 'Anon',
                 authorRank: userProfile?.rank || 'Novato',
+                ...(userProfile?.photoURL && { authorPhotoURL: userProfile.photoURL }),
+                authorIsPro: isUserPro(userProfile),
                 title: title.trim(),
                 content: content.trim(),
                 brand: brand.trim(),
                 model: model.trim() || 'Desconocido',
                 status: 'Abierto' as const,
+                ...(imageUrl && { imageUrl }),
             };
 
             await createThread(threadData);
@@ -173,7 +238,7 @@ export default function NewThread() {
                     </View>
                 )}
 
-                <View className="bg-white p-4 rounded-xl border border-gray-100 mb-6">
+                <View className="bg-white p-4 rounded-xl border border-gray-100 mb-4">
                     <Text className="text-sm font-bold text-gray-700 mb-2">Descripción Detallada</Text>
                     <TextInput
                         className="bg-gray-50 p-3 rounded-lg border border-gray-100 min-h-[120px]"
@@ -184,6 +249,38 @@ export default function NewThread() {
                         textAlignVertical="top"
                     />
                     <Text className="text-right text-xs text-gray-400 mt-1">{content.length} car.</Text>
+                </View>
+
+                {/* Photo Section */}
+                <View className="bg-white p-4 rounded-xl border border-gray-100 mb-6">
+                    <Text className="text-sm font-bold text-gray-700 mb-2">Foto (Opcional)</Text>
+                    <Text className="text-gray-500 text-xs mb-3">
+                        Una foto ayuda a mostrar el problema y recibir mejor ayuda.
+                    </Text>
+
+                    {photoUri ? (
+                        <View className="relative">
+                            <Image
+                                source={{ uri: photoUri }}
+                                className="w-full h-48 rounded-lg"
+                                resizeMode="cover"
+                            />
+                            <TouchableOpacity
+                                onPress={removePhoto}
+                                className="absolute top-2 right-2 bg-red-500 rounded-full w-8 h-8 items-center justify-center"
+                            >
+                                <Ionicons name="close" size={20} color="white" />
+                            </TouchableOpacity>
+                        </View>
+                    ) : (
+                        <TouchableOpacity
+                            onPress={handleAddPhoto}
+                            className="border-2 border-dashed border-gray-300 rounded-lg p-6 items-center justify-center"
+                        >
+                            <Ionicons name="camera-outline" size={40} color="#9CA3AF" />
+                            <Text className="text-gray-500 mt-2">Tocar para agregar foto</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 {/* Tips */}
@@ -200,7 +297,12 @@ export default function NewThread() {
                     className={`bg-red-600 p-4 rounded-xl shadow-lg items-center ${loading ? 'opacity-70' : ''}`}
                 >
                     {loading ? (
-                        <ActivityIndicator color="white" />
+                        <View className="flex-row items-center">
+                            <ActivityIndicator color="white" />
+                            <Text className="text-white font-medium ml-2">
+                                {uploadingPhoto ? 'Subiendo foto...' : 'Publicando...'}
+                            </Text>
+                        </View>
                     ) : (
                         <View className="flex-row items-center">
                             <Ionicons name="megaphone" size={20} color="white" />

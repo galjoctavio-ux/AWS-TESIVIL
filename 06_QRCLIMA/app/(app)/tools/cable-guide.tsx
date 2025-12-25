@@ -1,7 +1,8 @@
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
-import { useState, useMemo } from 'react';
-import { useRouter } from 'expo-router';
+import { useState, useMemo, useEffect } from 'react';
+import { useRouter, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type Capacity = '1' | '1.5' | '2' | '3';
 type Voltage = '110' | '220';
@@ -10,12 +11,20 @@ type Distance = 'short' | 'long'; // short < 20m, long > 20m
 
 export default function CableGuide() {
     const router = useRouter();
+    const insets = useSafeAreaInsets();
 
     // State
     const [capacity, setCapacity] = useState<Capacity>('1');
     const [voltage, setVoltage] = useState<Voltage>('220');
     const [tech, setTech] = useState<Technology>('std');
     const [distance, setDistance] = useState<Distance>('short');
+
+    // Auto-correct voltage when capacity changes
+    useEffect(() => {
+        if (capacity !== '1' && voltage === '110') {
+            setVoltage('220');
+        }
+    }, [capacity]);
 
     // Logic Matrix (Master Plan 3.5.1)
     const result = useMemo(() => {
@@ -45,42 +54,39 @@ export default function CableGuide() {
             }
         }
         else if (capacity === '1.5' || capacity === '2') {
-            // Asumimos 220V mayormente para estas capacidades, pero validamos select
-            if (voltage === '110') {
-                // Caso raro/teórico en minisplits grandes, forzamos recomendación robusta
-                wire = '10 AWG';
-                breaker = '1 x 20A';
-                note = 'Verificar disponibilidad de equipo 110V en esta capacidad.';
-            } else {
-                breaker = '2 x 15A';
-                if (tech === 'std') {
-                    wire = '12 AWG'; // Corto y Largo
-                } else { // Inverter
-                    if (distance === 'short') wire = '14 AWG';
-                    else wire = '12 AWG';
-                }
+            // 220V Only for 1.5+
+            breaker = '2 x 15A';
+            if (tech === 'std') {
+                wire = '12 AWG'; // Corto y Largo
+            } else { // Inverter
+                if (distance === 'short') wire = '14 AWG';
+                else wire = '12 AWG';
             }
         }
         else if (capacity === '3') {
             breaker = '2 x 20A';
-            if (voltage === '110') {
-                wire = '8 AWG'; // Muy raro
-                breaker = '1 x 30A';
-                note = 'Instalación 110V no recomendada para 3 Ton.';
-            } else {
-                // 220V
-                if (tech === 'std') {
-                    if (distance === 'short') wire = '12 AWG';
-                    else wire = '10 AWG';
-                } else { // Inverter
-                    if (distance === 'short') wire = '12 AWG';
-                    else wire = '10 AWG';
-                }
+            // 220V Only for 3 Ton
+            if (tech === 'std') {
+                if (distance === 'short') wire = '12 AWG';
+                else wire = '10 AWG';
+            } else { // Inverter
+                if (distance === 'short') wire = '12 AWG';
+                else wire = '10 AWG';
             }
         }
 
         return { wire, breaker, note };
     }, [capacity, voltage, tech, distance]);
+
+    const voltageOptions = useMemo(() => {
+        const copts = [
+            { label: '220V', value: '220' },
+        ];
+        if (capacity === '1') {
+            copts.push({ label: '110V', value: '110' });
+        }
+        return copts;
+    }, [capacity]);
 
     const Selector = ({ label, options, current, onChange }: any) => (
         <View className="mb-6">
@@ -91,8 +97,8 @@ export default function CableGuide() {
                         key={opt.value}
                         onPress={() => onChange(opt.value)}
                         className={`px-4 py-3 rounded-xl border ${current === opt.value
-                                ? 'bg-blue-600 border-blue-600'
-                                : 'bg-white border-gray-200'
+                            ? 'bg-blue-600 border-blue-600'
+                            : 'bg-white border-gray-200'
                             }`}
                     >
                         <Text className={`font-medium ${current === opt.value ? 'text-white' : 'text-gray-600'
@@ -107,10 +113,25 @@ export default function CableGuide() {
 
     return (
         <View className="flex-1 bg-gray-50">
+            <Stack.Screen options={{ headerShown: false }} />
+
             {/* Header */}
-            <View className="bg-blue-600 pt-12 pb-6 px-6 rounded-b-[30px] shadow-lg mb-6">
+            <View style={{
+                backgroundColor: '#2563EB',
+                paddingTop: insets.top + 10,
+                paddingBottom: 24,
+                paddingHorizontal: 24,
+                borderBottomLeftRadius: 30,
+                borderBottomRightRadius: 30,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.15,
+                shadowRadius: 8,
+                elevation: 8,
+                marginBottom: 24
+            }}>
                 <View className="flex-row items-center">
-                    <TouchableOpacity onPress={() => router.back()} className="mr-4">
+                    <TouchableOpacity onPress={() => router.back()} className="mr-4 bg-white/20 p-2 rounded-full">
                         <Ionicons name="arrow-back" size={24} color="white" />
                     </TouchableOpacity>
                     <View>
@@ -140,10 +161,7 @@ export default function CableGuide() {
                         label="Voltaje"
                         current={voltage}
                         onChange={setVoltage}
-                        options={[
-                            { label: '220V', value: '220' },
-                            { label: '110V', value: '110' },
-                        ]}
+                        options={voltageOptions}
                     />
 
                     <Selector

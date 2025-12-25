@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { useState, useCallback, useEffect } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
     initializeTrainingData,
     getModulesByBlock,
@@ -48,6 +49,7 @@ interface BlockData {
 }
 
 export default function TrainingFeed() {
+    const insets = useSafeAreaInsets();
     const router = useRouter();
     const { user } = useAuth();
 
@@ -205,7 +207,7 @@ export default function TrainingFeed() {
     return (
         <View className="flex-1 bg-slate-50">
             {/* Header */}
-            <View className="bg-indigo-900 pt-12 pb-6 px-4 shadow-lg rounded-b-[30px] z-10">
+            <View className="bg-indigo-900 pb-6 px-4 shadow-lg rounded-b-[30px] z-10" style={{ paddingTop: insets.top + 8 }}>
                 <View className="flex-row justify-between items-center mb-4">
                     <TouchableOpacity onPress={() => router.back()}>
                         <Ionicons name="arrow-back" size={24} color="white" />

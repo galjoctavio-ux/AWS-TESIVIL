@@ -9,12 +9,12 @@ import { Ionicons } from '@expo/vector-icons';
 // Helper to get rank display info
 const getRankInfo = (rank: UserRank | undefined) => {
     switch (rank) {
-        case 'Pro':
-            return { icon: '🥇', label: 'Especialista Certificado', color: 'bg-gradient-to-r from-yellow-400 to-amber-500', textColor: 'text-yellow-700' };
+        case 'Experto':
+            return { icon: '🥇', label: 'Experto Certificado', color: 'bg-gradient-to-r from-purple-400 to-purple-500', textColor: 'text-purple-700' };
         case 'Técnico':
             return { icon: '🛡️', label: 'Técnico Profesional', color: 'bg-blue-500', textColor: 'text-blue-700' };
         default:
-            return { icon: '✅', label: 'Miembro Verificado', color: 'bg-gray-500', textColor: 'text-gray-600' };
+            return { icon: '🌱', label: 'Técnico Novato', color: 'bg-green-500', textColor: 'text-green-600' };
     }
 };
 

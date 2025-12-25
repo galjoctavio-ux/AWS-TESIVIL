@@ -300,3 +300,105 @@ export const uploadServicePhotos = async (uris: string[]): Promise<string[]> => 
     }
 };
 
+// ============================================
+// FUNCIONES DE FOTOS SOS (COMUNIDAD)
+// ============================================
+
+/**
+ * Preset para fotos de publicaciones SOS
+ * Optimizado para mostrar en el feed
+ */
+export const compressSOSPhoto = async (uri: string): Promise<CompressionResult> => {
+    return compressImage(uri, {
+        maxWidth: 800,
+        maxHeight: 800,
+        quality: 0.6,
+        format: 'jpeg',
+    });
+};
+
+/**
+ * Abre el selector de imágenes para elegir una foto SOS.
+ * Permite seleccionar desde galería o cámara.
+ * @returns URI de la imagen seleccionada (ya comprimida) o null si se canceló
+ */
+export const pickSOSPhoto = async (source: 'camera' | 'gallery' = 'gallery'): Promise<string | null> => {
+    try {
+        if (source === 'camera') {
+            // Solicitar permisos de cámara
+            const { status } = await ImagePicker.requestCameraPermissionsAsync();
+            if (status !== 'granted') {
+                throw new Error('Se requiere permiso para usar la cámara');
+            }
+
+            const result = await ImagePicker.launchCameraAsync({
+                mediaTypes: 'images',
+                allowsEditing: true,
+                aspect: [4, 3],         // Más formato paisaje para SOS
+                quality: 0.6,           // 60% calidad para ahorrar datos
+                exif: false,
+            });
+
+            if (result.canceled || !result.assets || result.assets.length === 0) {
+                return null;
+            }
+
+            return result.assets[0].uri;
+        } else {
+            // Solicitar permisos de galería
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== 'granted') {
+                throw new Error('Se requiere permiso para acceder a la galería');
+            }
+
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: 'images',
+                allowsEditing: true,
+                aspect: [4, 3],
+                quality: 0.6,
+                exif: false,
+            });
+
+            if (result.canceled || !result.assets || result.assets.length === 0) {
+                return null;
+            }
+
+            return result.assets[0].uri;
+        }
+    } catch (error) {
+        console.error('Error picking SOS photo:', error);
+        throw error;
+    }
+};
+
+/**
+ * Sube una foto SOS a Firebase Storage con compresión adicional.
+ * @param imageUri URI local de la imagen
+ * @returns URL de descarga de la imagen subida
+ */
+export const uploadSOSPhoto = async (imageUri: string): Promise<string> => {
+    try {
+        // 1. Comprimir la imagen
+        const compressed = await compressSOSPhoto(imageUri);
+
+        // 2. Convertir URI a blob
+        const response = await fetch(compressed.uri);
+        const blob = await response.blob();
+
+        // 3. Crear referencia única en Firebase Storage
+        const filename = `sos_photos/${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
+        const photoRef = ref(storage, filename);
+
+        // 4. Subir imagen
+        await uploadBytes(photoRef, blob);
+
+        // 5. Obtener URL de descarga
+        const downloadURL = await getDownloadURL(photoRef);
+
+        console.log('SOS photo uploaded:', downloadURL);
+        return downloadURL;
+    } catch (error) {
+        console.error('Error uploading SOS photo:', error);
+        throw error;
+    }
+};

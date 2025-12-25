@@ -2,11 +2,13 @@ import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, Scro
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { addClient } from '../../../services/clients-service';
 import { useAuth } from '../../../context/AuthContext';
 import AddressAutocomplete from '../../../components/AddressAutocomplete';
 
 export default function AddClient() {
+    const insets = useSafeAreaInsets();
     const router = useRouter();
     const { user } = useAuth();
     const [name, setName] = useState('');
@@ -37,6 +39,8 @@ export default function AddClient() {
                 phone,
                 address,
                 technicianId: user.uid,
+                lat: coordinates?.lat,
+                lng: coordinates?.lng,
             });
             Alert.alert('Éxito', 'Cliente guardado correctamente', [
                 { text: 'OK', onPress: () => router.back() }
@@ -55,7 +59,7 @@ export default function AddClient() {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
             {/* Header */}
-            <View className="flex-row items-center p-4 bg-white shadow-sm pt-12">
+            <View className="flex-row items-center p-4 bg-white shadow-sm" style={{ paddingTop: insets.top + 8 }}>
                 <TouchableOpacity onPress={() => router.back()} className="mr-4">
                     <Ionicons name="arrow-back" size={24} color="#374151" />
                 </TouchableOpacity>

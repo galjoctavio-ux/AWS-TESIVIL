@@ -30,6 +30,7 @@ export type TransactionType =
     | 'training_quiz_passed'    // +Variable (10-100 según nivel)
     | 'training_comment_approved' // +2 tokens
     | 'training_reaction_maestro' // +5 tokens (cuando alguien te da Maestro)
+    | 'token_purchase'          // Compra de tokens (micropago)
     | 'store_purchase'          // Gasto (negativo)
     | 'admin_grant'             // Otorgado por admin
     | 'fraud_revoked';          // Revocado por fraude
@@ -55,6 +56,7 @@ export const EARN_RULES: Record<TransactionType, { amount: number; dailyLimit: n
     training_quiz_passed: { amount: 0, dailyLimit: null, description: 'Quiz Aprobado (variable)' }, // Variable según módulo
     training_comment_approved: { amount: 2, dailyLimit: 10, description: 'Comentario Aprobado' },
     training_reaction_maestro: { amount: 5, dailyLimit: 5, description: 'Reacción Maestro Recibida' },
+    token_purchase: { amount: 50, dailyLimit: null, description: 'Compra de Tokens' }, // Micropago $19 MXN = 50 tokens
     store_purchase: { amount: 0, dailyLimit: null, description: 'Compra en Tienda' },
     admin_grant: { amount: 0, dailyLimit: null, description: 'Otorgado por Admin' },
     fraud_revoked: { amount: 0, dailyLimit: null, description: 'Revocado por Fraude' },

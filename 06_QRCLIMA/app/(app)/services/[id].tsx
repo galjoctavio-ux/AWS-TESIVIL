@@ -7,8 +7,10 @@ import { getClientById, ClientData } from '../../../services/clients-service';
 import { getUserProfile, UserProfile } from '../../../services/user-service';
 import { generateServiceReport } from '../../../services/pdf-generator';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ServiceDetail() {
+    const insets = useSafeAreaInsets();
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
     const { user } = useAuth();
@@ -131,7 +133,7 @@ export default function ServiceDetail() {
     return (
         <View className="flex-1 bg-slate-50">
             {/* Header */}
-            <View className="bg-blue-600 pt-12 pb-6 px-6 rounded-b-[30px] shadow-lg">
+            <View className="bg-blue-600 pb-6 px-6 rounded-b-[30px] shadow-lg" style={{ paddingTop: insets.top + 8 }}>
                 <View className="flex-row items-center mb-4">
                     <TouchableOpacity onPress={() => router.back()} className="mr-4">
                         <Ionicons name="arrow-back" size={24} color="white" />

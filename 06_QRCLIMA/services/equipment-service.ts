@@ -30,6 +30,11 @@ export interface EquipmentData {
     lastServiceDate?: any;       // Fecha del último servicio
     geoLocation?: GeoLocation;   // Passive geolocation capture
     createdAt?: any;
+
+    // AGENDA v1.0.0 - Warranty Management
+    warrantyMonths?: number;           // Duration of warranty given (e.g., 3, 6, 12)
+    warrantyExpirationDate?: any;      // Calculated expiration date
+    isWarrantyClaim?: boolean;         // Flag if current service is a warranty claim
 }
 
 // ============================================

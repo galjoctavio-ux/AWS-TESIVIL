@@ -497,17 +497,32 @@ export const LABELS = {
 // ============================================================================
 // PDF EXPORT FUNCTION
 // ============================================================================
-
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+import { BrandingConfig } from './user-service';
+
+/**
+ * Default branding config (QRclima blue)
+ */
+const DEFAULT_BRANDING: BrandingConfig = {
+    primaryColor: '#2563EB',
+    secondaryColor: '#1D4ED8',
+    footerText: '',
+    showQRclimaWatermark: true,
+};
 
 /**
  * Generate and share a PDF report of the BTU calculation
  */
 export const generateBTUReport = async (
     state: BTUCalculatorState,
-    result: BTUCalculationResult
+    result: BTUCalculationResult,
+    branding?: BrandingConfig
 ): Promise<void> => {
+    const brand = { ...DEFAULT_BRANDING, ...branding };
+    const primaryColor = brand.primaryColor || '#2563EB';
+    const secondaryColor = brand.secondaryColor || '#1D4ED8';
+
     const currentDate = new Date().toLocaleDateString('es-MX', {
         year: 'numeric',
         month: 'long',
@@ -547,6 +562,18 @@ export const generateBTUReport = async (
         ).join('')
         : '<tr><td colspan="4">Sin ventanas configuradas</td></tr>';
 
+    // Header: use custom logo or default QRclima text
+    const headerContent = brand.logoURL
+        ? `<img src="${brand.logoURL}" style="max-height: 50px; max-width: 200px;" alt="Logo" />`
+        : `<h1 style="color: ${primaryColor}; font-size: 24px; margin-bottom: 3px;">❄️ QRclima</h1>`;
+
+    // Footer: custom text + optional QRclima watermark
+    const footerContent = `
+        ${brand.footerText ? `<strong>${brand.footerText}</strong><br>` : ''}
+        Documento generado el ${currentDate}${brand.showQRclimaWatermark !== false ? ' - Powered by QRclima App' : ''}<br>
+        <small>Este cálculo es una estimación. Consulte con un profesional para proyectos críticos.</small>
+    `;
+
     const html = `
     <!DOCTYPE html>
     <html>
@@ -556,19 +583,18 @@ export const generateBTUReport = async (
         <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #333; line-height: 1.5; padding: 30px; font-size: 12px; }
-            .header { text-align: center; border-bottom: 3px solid #2563EB; padding-bottom: 15px; margin-bottom: 20px; }
-            .header h1 { color: #2563EB; font-size: 24px; margin-bottom: 3px; }
+            .header { text-align: center; border-bottom: 3px solid ${primaryColor}; padding-bottom: 15px; margin-bottom: 20px; }
             .header .subtitle { color: #666; font-size: 14px; }
-            .result-box { background: linear-gradient(135deg, #2563EB, #1D4ED8); color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
+            .result-box { background: linear-gradient(135deg, ${primaryColor}, ${secondaryColor}); color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
             .result-box .btu { font-size: 36px; font-weight: bold; }
             .result-box .recommendation { background: rgba(255,255,255,0.2); padding: 10px; border-radius: 8px; margin-top: 10px; }
             .section { margin-bottom: 20px; }
-            .section-title { color: #2563EB; font-size: 14px; font-weight: bold; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #E5E7EB; }
+            .section-title { color: ${primaryColor}; font-size: 14px; font-weight: bold; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #E5E7EB; }
             table { width: 100%; border-collapse: collapse; }
             th, td { padding: 8px 10px; border: 1px solid #E5E7EB; text-align: left; }
             th { background: #F3F4F6; font-weight: bold; }
             .text-right { text-align: right; }
-            .breakdown-row td:last-child { font-weight: bold; color: #2563EB; }
+            .breakdown-row td:last-child { font-weight: bold; color: ${primaryColor}; }
             .footer { margin-top: 30px; text-align: center; color: #9CA3AF; font-size: 10px; border-top: 1px solid #E5E7EB; padding-top: 15px; }
             .info-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
             .info-item { flex: 1; min-width: 100px; background: #F8FAFC; padding: 10px; border-radius: 8px; }
@@ -578,7 +604,7 @@ export const generateBTUReport = async (
     </head>
     <body>
         <div class="header">
-            <h1>❄️ QRclima</h1>
+            ${headerContent}
             <div class="subtitle">Cálculo de Carga Térmica PRO</div>
         </div>
 
@@ -668,8 +694,7 @@ export const generateBTUReport = async (
         </div>
 
         <div class="footer">
-            Documento generado el ${currentDate} por QRclima App - Calculadora BTU PRO<br>
-            <small>Este cálculo es una estimación. Consulte con un profesional para proyectos críticos.</small>
+            ${footerContent}
         </div>
     </body>
     </html>

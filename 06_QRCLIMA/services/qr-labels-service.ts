@@ -442,3 +442,50 @@ export const getTimeUntilNextGeneration = async (technicianId: string): Promise<
         return { canGenerate: true, hoursRemaining: 0, minutesRemaining: 0 };
     }
 };
+
+/**
+ * Regenerates an existing PDF from a download record
+ */
+export const regeneratePDF = async (record: PDFDownloadRecord): Promise<boolean> => {
+    try {
+        console.log(`Regenerating PDF for record: ${record.id}`);
+
+        // Reconstruct tokens
+        const tokenBatch: QRLabelToken[] = record.tokens.map(token => ({
+            token,
+            url: getQrWebUrl(token),
+        }));
+
+        // Generate PDF HTML
+        const html = generateLabelsHTML(tokenBatch);
+
+        // Create PDF
+        const { uri } = await Print.printToFileAsync({
+            html,
+            base64: false,
+        });
+
+        // Share the PDF
+        if (await Sharing.isAvailableAsync()) {
+            await Sharing.shareAsync(uri, {
+                mimeType: 'application/pdf',
+                dialogTitle: `Descargar Etiquetas (${formatDate(record.generatedAt)})`,
+                UTI: 'com.adobe.pdf',
+            });
+            return true;
+        } else {
+            throw new Error('Compartir no está disponible');
+        }
+
+    } catch (error) {
+        console.error('Error regenerating PDF:', error);
+        return false;
+    }
+};
+
+// Helper for formatting date in dialog title
+const formatDate = (timestamp: any) => {
+    if (!timestamp) return '';
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    return date.toLocaleDateString('es-MX');
+};

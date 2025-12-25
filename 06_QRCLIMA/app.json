@@ -31,6 +31,13 @@
     "plugins": [
       "expo-router",
       "expo-sqlite",
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.com.bitavo.qrclima",
+          "enableGooglePay": true
+        }
+      ],
       "expo-asset",
       [
         "expo-camera",

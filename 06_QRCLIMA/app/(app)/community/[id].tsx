@@ -1,10 +1,62 @@
-import { View, Text, ScrollView, TouchableOpacity, TextInput, FlatList, ActivityIndicator, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, FlatList, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { getThreads, getComments, addComment, markSolution, SOSThread, SOSComment } from '../../../services/community-service';
+import { getThreads, getComments, addComment, markSolution, pinThread, getPinCost, SOSThread, SOSComment } from '../../../services/community-service';
 import { useAuth } from '../../../context/AuthContext';
-import { getUserProfile } from '../../../services/user-service';
+import { getUserProfile, UserRank, isUserPro } from '../../../services/user-service';
+import { formatTimeAgo } from '../../../utils/date-utils';
+
+// Componente de Insignia según Rango
+const RankBadge = ({ rank, isPro = false }: { rank: UserRank; isPro?: boolean }) => {
+    const getBadgeConfig = () => {
+        if (isPro) {
+            return {
+                icon: 'star' as const,
+                label: 'PRO',
+                bgColor: 'bg-amber-500',
+                textColor: 'text-white',
+                iconColor: '#FFFFFF',
+            };
+        }
+        switch (rank) {
+            case 'Experto':
+                return {
+                    icon: 'shield-checkmark' as const,
+                    label: 'Experto',
+                    bgColor: 'bg-purple-600',
+                    textColor: 'text-white',
+                    iconColor: '#FFFFFF',
+                };
+            case 'Técnico':
+                return {
+                    icon: 'construct' as const,
+                    label: 'Técnico',
+                    bgColor: 'bg-blue-500',
+                    textColor: 'text-white',
+                    iconColor: '#FFFFFF',
+                };
+            case 'Novato':
+            default:
+                return {
+                    icon: 'leaf' as const,
+                    label: 'Novato',
+                    bgColor: 'bg-green-500',
+                    textColor: 'text-white',
+                    iconColor: '#FFFFFF',
+                };
+        }
+    };
+
+    const config = getBadgeConfig();
+
+    return (
+        <View className={`flex-row items-center px-2 py-0.5 rounded-full ${config.bgColor} ml-1`}>
+            <Ionicons name={config.icon} size={10} color={config.iconColor} />
+            <Text className={`text-[10px] font-bold ml-0.5 ${config.textColor}`}>{config.label}</Text>
+        </View>
+    );
+};
 
 export default function ThreadDetail() {
     const { id } = useLocalSearchParams();
@@ -24,8 +76,8 @@ export default function ThreadDetail() {
 
     const loadData = async () => {
         // In a real app we would getThreadById, but reuse getThreads for mock
-        const allThreads = await getThreads('recent'); // Fallback
-        const found = allThreads.find(t => t.id === id);
+        const result = await getThreads('recent', 1, 100); // Fallback
+        const found = result.threads.find((t: SOSThread) => t.id === id);
         if (found) setThread(found);
 
         const loadedComments = await getComments(id as string);
@@ -45,6 +97,8 @@ export default function ThreadDetail() {
                 authorId: user!.uid,
                 authorName: userProfile?.alias || 'Anon',
                 authorRank: userProfile?.rank || 'Novato',
+                ...(userProfile?.photoURL && { authorPhotoURL: userProfile.photoURL }),
+                authorIsPro: isUserPro(userProfile),
                 content: newComment.trim(),
             });
 
@@ -73,6 +127,29 @@ export default function ThreadDetail() {
                             Alert.alert('¡Gracias!', 'Has cerrado este caso y premiado a tu compañero.');
                         } catch (e) {
                             Alert.alert('Error', 'No se pudo marcar como solución');
+                        }
+                    }
+                }
+            ]
+        );
+    };
+
+    const handlePinThread = async () => {
+        const cost = getPinCost();
+        Alert.alert(
+            '📌 Fijar Caso',
+            `Fijar tu caso lo mostrará al inicio de la lista por 24 horas.\n\nCosto: ${cost} tokens`,
+            [
+                { text: 'Cancelar', style: 'cancel' },
+                {
+                    text: `Pagar ${cost} tokens`,
+                    onPress: async () => {
+                        const result = await pinThread(id as string, user!.uid);
+                        if (result.success) {
+                            Alert.alert('¡Éxito!', result.message);
+                            loadData();
+                        } else {
+                            Alert.alert('Error', result.message);
                         }
                     }
                 }
@@ -113,12 +190,21 @@ export default function ThreadDetail() {
                 <View className="bg-white p-6 mb-2">
                     <View className="flex-row justify-between items-start mb-4">
                         <View className="flex-row items-center">
-                            <View className={`w-10 h-10 rounded-full items-center justify-center mr-3 ${thread.authorRank === 'Pro' ? 'bg-yellow-100' : 'bg-blue-100'
-                                }`}>
-                                <Text className="font-bold text-gray-700">{thread.authorName.charAt(0)}</Text>
-                            </View>
+                            {thread.authorPhotoURL ? (
+                                <Image
+                                    source={{ uri: thread.authorPhotoURL }}
+                                    className="w-10 h-10 rounded-full mr-3"
+                                />
+                            ) : (
+                                <View className={`w-10 h-10 rounded-full items-center justify-center mr-3 ${thread.authorRank === 'Experto' ? 'bg-purple-100' : 'bg-blue-100'}`}>
+                                    <Text className="font-bold text-gray-700">{thread.authorName.charAt(0)}</Text>
+                                </View>
+                            )}
                             <View>
-                                <Text className="font-bold text-gray-800">{thread.authorName}</Text>
+                                <View className="flex-row items-center">
+                                    <Text className="font-bold text-gray-800">{thread.authorName}</Text>
+                                    <RankBadge rank={thread.authorRank} isPro={thread.authorIsPro} />
+                                </View>
                                 <Text className="text-xs text-gray-500">{thread.brand} • {thread.model}</Text>
                             </View>
                         </View>
@@ -130,6 +216,36 @@ export default function ThreadDetail() {
                     </View>
                     <Text className="text-xl font-bold text-gray-800 mb-4">{thread.title}</Text>
                     <Text className="text-gray-700 leading-6 text-base">{thread.content}</Text>
+
+                    {/* Thread Image */}
+                    {thread.imageUrl && (
+                        <Image
+                            source={{ uri: thread.imageUrl }}
+                            className="w-full h-64 rounded-xl mt-4"
+                            resizeMode="cover"
+                        />
+                    )}
+
+                    {/* Pin Button - Only for author, if not already pinned and not resolved */}
+                    {isAuthor && !thread.isPinned && thread.status !== 'Resuelto' && (
+                        <TouchableOpacity
+                            onPress={handlePinThread}
+                            className="flex-row items-center justify-center bg-amber-100 py-3 mt-4 rounded-xl border border-amber-300"
+                        >
+                            <Ionicons name="pin" size={18} color="#D97706" />
+                            <Text className="text-amber-700 font-bold ml-2">
+                                Fijar caso ({getPinCost()} tokens)
+                            </Text>
+                        </TouchableOpacity>
+                    )}
+
+                    {/* Pinned Indicator */}
+                    {thread.isPinned && (
+                        <View className="flex-row items-center justify-center bg-amber-100 py-2 mt-4 rounded-xl">
+                            <Ionicons name="pin" size={16} color="#D97706" />
+                            <Text className="text-amber-700 font-medium ml-2">📌 Este caso está fijado</Text>
+                        </View>
+                    )}
                 </View>
 
                 {/* Comments Header */}
@@ -138,39 +254,70 @@ export default function ThreadDetail() {
                 </View>
 
                 {/* Comments List */}
-                {comments.map((comment) => (
-                    <View key={comment.id} className={`bg-white p-4 mb-2 border-l-4 ${comment.isSolution ? 'border-green-500 bg-green-50' : 'border-transparent'}`}>
-                        {comment.isSolution && (
-                            <View className="flex-row items-center mb-2">
-                                <Ionicons name="checkmark-circle" size={16} color="#16A34A" />
-                                <Text className="text-green-700 font-bold text-xs ml-1">Solución Aceptada</Text>
-                            </View>
-                        )}
-                        <View className="flex-row justify-between mb-2">
-                            <Text className="font-bold text-gray-700 text-sm">{comment.authorName} <Text className="text-gray-400 font-normal">• {comment.authorRank}</Text></Text>
-                            <Text className="text-gray-400 text-xs">Hace un momento</Text>
-                        </View>
-                        <Text className="text-gray-800 mb-3">{comment.content}</Text>
+                {comments.map((comment) => {
+                    const isSolution = comment.isSolution;
+                    const isPro = comment.authorIsPro && !isSolution;
 
-                        {/* Actions */}
-                        <View className="flex-row justify-between items-center">
-                            <TouchableOpacity className="flex-row items-center">
-                                <Ionicons name="thumbs-up-outline" size={16} color="#9CA3AF" />
-                                <Text className="text-gray-400 text-xs ml-1">Util</Text>
-                            </TouchableOpacity>
-
-                            {/* Mark Solution Button (Only for Author available if not solved yet) */}
-                            {isAuthor && thread.status !== 'Resuelto' && !comment.isSolution && (
-                                <TouchableOpacity
-                                    onPress={() => handleMarkSolution(comment.id!, comment.authorId)}
-                                    className="bg-green-100 px-3 py-1 rounded-full"
-                                >
-                                    <Text className="text-green-700 text-xs font-bold">Marcar Solución</Text>
-                                </TouchableOpacity>
+                    return (
+                        <View
+                            key={comment.id}
+                            className={
+                                isSolution
+                                    ? "p-4 mb-2 border-l-4 border-green-500 bg-green-50"
+                                    : isPro
+                                        ? "p-4 mb-2 border-l-4 border-amber-400 bg-amber-100"
+                                        : "p-4 mb-2 border-l-4 border-transparent bg-white"
+                            }
+                        >
+                            {comment.isSolution && (
+                                <View className="flex-row items-center mb-2">
+                                    <Ionicons name="checkmark-circle" size={16} color="#16A34A" />
+                                    <Text className="text-green-700 font-bold text-xs ml-1">Solución Aceptada</Text>
+                                </View>
                             )}
+                            <View className="flex-row items-center mb-2">
+                                {comment.authorPhotoURL ? (
+                                    <Image
+                                        source={{ uri: comment.authorPhotoURL }}
+                                        className="w-6 h-6 rounded-full mr-2"
+                                    />
+                                ) : (
+                                    <View className="w-6 h-6 rounded-full bg-gray-200 items-center justify-center mr-2">
+                                        <Text className="text-[10px] font-bold text-gray-600">{comment.authorName.charAt(0)}</Text>
+                                    </View>
+                                )}
+                                <View className="flex-1">
+                                    <View className="flex-row items-center justify-between">
+                                        <View className="flex-row items-center flex-1 flex-wrap">
+                                            <Text className="font-bold text-gray-700 text-sm">{comment.authorName}</Text>
+                                            <RankBadge rank={comment.authorRank} isPro={comment.authorIsPro} />
+                                        </View>
+                                        <Text className="text-gray-400 text-xs ml-2">{formatTimeAgo(comment.createdAt)}</Text>
+                                    </View>
+                                </View>
+                            </View>
+                            <Text className="text-gray-800 mb-3">{comment.content}</Text>
+
+                            {/* Actions */}
+                            <View className="flex-row justify-between items-center">
+                                <TouchableOpacity className="flex-row items-center">
+                                    <Ionicons name="thumbs-up-outline" size={16} color="#9CA3AF" />
+                                    <Text className="text-gray-400 text-xs ml-1">Util</Text>
+                                </TouchableOpacity>
+
+                                {/* Mark Solution Button (Only for Author available if not solved yet) */}
+                                {isAuthor && thread.status !== 'Resuelto' && !comment.isSolution && (
+                                    <TouchableOpacity
+                                        onPress={() => handleMarkSolution(comment.id!, comment.authorId)}
+                                        className="bg-green-100 px-3 py-1 rounded-full"
+                                    >
+                                        <Text className="text-green-700 text-xs font-bold">Marcar Solución</Text>
+                                    </TouchableOpacity>
+                                )}
+                            </View>
                         </View>
-                    </View>
-                ))}
+                    );
+                })}
                 <View className="h-4" />
             </ScrollView>
 

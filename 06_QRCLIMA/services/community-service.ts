@@ -4,6 +4,7 @@ import {
     writeBatch, deleteDoc
 } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
+import { UserRank } from './user-service';
 
 // ============================================
 // COMUNIDAD SOS - QRclima
@@ -18,12 +19,15 @@ export interface SOSThread {
     id?: string;
     authorId: string;
     authorName: string;
-    authorRank: 'Novato' | 'Técnico' | 'Pro';
+    authorRank: UserRank;
+    authorPhotoURL?: string;      // URL de foto de perfil del autor
+    authorIsPro?: boolean;        // True si el autor es usuario PRO
     title: string;
     content: string;
     brand: string;
     model?: string;
     errorCode?: string;          // Código de error relacionado
+    imageUrl?: string;           // URL de la foto adjunta (comprimida)
     status: 'Abierto' | 'Resuelto';
     createdAt: any;
     updatedAt?: any;
@@ -33,6 +37,10 @@ export interface SOSThread {
     isOffensive?: boolean;       // Flag de contenido ofensivo (IA)
     toxicityScore?: number;      // Score de toxicidad (0-1)
     tags?: string[];             // Tags para búsqueda
+    // Sistema de Casos Fijados
+    isPinned?: boolean;          // True si el caso está fijado
+    pinnedAt?: any;              // Timestamp de cuando fue fijado
+    pinnedUntil?: any;           // Timestamp hasta cuando está fijado
 }
 
 export interface SOSComment {
@@ -40,7 +48,9 @@ export interface SOSComment {
     threadId: string;
     authorId: string;
     authorName: string;
-    authorRank: 'Novato' | 'Técnico' | 'Pro';
+    authorRank: UserRank;
+    authorPhotoURL?: string;      // URL de foto de perfil del autor
+    authorIsPro?: boolean;        // True si el autor es usuario PRO
     content: string;
     isSolution: boolean;
     createdAt: any;
@@ -82,6 +92,10 @@ const COMMUNITY_CONFIG = {
     threadReward: 20,
     solutionReward: 50,
     verifiedFailureReward: 100,  // Por contribuir a falla verificada
+
+    // Sistema de Casos Fijados (Pinned)
+    pinCost: 50,             // Costo en tokens para fijar un caso
+    pinDurationHours: 24,    // Duración del pin en horas
 };
 
 // ============================================
@@ -286,43 +300,78 @@ export const createThread = async (
 
 export const getThreads = async (
     filter: 'recent' | 'solved' | 'popular' = 'recent',
-    limitCount: number = 20
-): Promise<SOSThread[]> => {
+    page: number = 1,
+    pageSize: number = 10
+): Promise<{ threads: SOSThread[]; totalPages: number; currentPage: number }> => {
     try {
         let q;
+        const now = new Date();
 
-        switch (filter) {
-            case 'solved':
-                q = query(
-                    collection(db, 'sos_threads'),
-                    where('status', '==', 'Resuelto'),
-                    where('isOffensive', '==', false),
-                    orderBy('createdAt', 'desc'),
-                    limit(limitCount)
-                );
-                break;
-            case 'popular':
-                q = query(
-                    collection(db, 'sos_threads'),
-                    where('isOffensive', '==', false),
-                    orderBy('likes', 'desc'),
-                    limit(limitCount)
-                );
-                break;
-            default:
-                q = query(
-                    collection(db, 'sos_threads'),
-                    where('isOffensive', '==', false),
-                    orderBy('createdAt', 'desc'),
-                    limit(limitCount)
-                );
-        }
+        let allThreads: SOSThread[] = [];
+
+        // Estrategia: Obtener siempre por fecha (recent) y filtrar en memoria
+        // Esto evita errores de "Missing Index" en Firestore para consultas complejas
+        // y permite manejar la paginación y el pin de forma consistente.
+
+        // 1. Base Query: Get threads ordered by date
+        q = query(
+            collection(db, 'sos_threads'),
+            orderBy('createdAt', 'desc'),
+            limit(100) // Traemos suficientes para filtrar en cliente
+        );
 
         const snapshot = await getDocs(q);
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as SOSThread));
+
+        // 2. Map & Filter
+        allThreads = snapshot.docs
+            .map(doc => ({ id: doc.id, ...doc.data() } as SOSThread))
+            .filter(thread => !thread.isOffensive);
+
+        // 3. Apply Filter (Solved vs Recent)
+        if (filter === 'solved') {
+            allThreads = allThreads.filter(t => t.status === 'Resuelto');
+        } else if (filter === 'popular') {
+            // Client-side sort for popular to avoid index issues too
+            allThreads.sort((a, b) => b.likes - a.likes);
+        }
+
+        // 4. Expire Pins & Sort Pinned First (Always applied)
+
+        // Expire old pins and sort pinned first
+        allThreads = allThreads.map(thread => {
+            if (thread.isPinned && thread.pinnedUntil) {
+                const pinnedUntil = thread.pinnedUntil.toDate
+                    ? thread.pinnedUntil.toDate()
+                    : new Date(thread.pinnedUntil);
+                if (pinnedUntil < now) {
+                    // Pin expired - mark as not pinned (will be updated on next write)
+                    return { ...thread, isPinned: false };
+                }
+            }
+            return thread;
+        });
+
+        // Sort: pinned first, then by date
+        allThreads.sort((a, b) => {
+            if (a.isPinned && !b.isPinned) return -1;
+            if (!a.isPinned && b.isPinned) return 1;
+            return 0; // Maintain existing order (by date from query)
+        });
+
+        // Calculate pagination
+        const totalItems = allThreads.length;
+        const totalPages = Math.ceil(totalItems / pageSize);
+        const startIndex = (page - 1) * pageSize;
+        const paginatedThreads = allThreads.slice(startIndex, startIndex + pageSize);
+
+        return {
+            threads: paginatedThreads,
+            totalPages: Math.max(1, totalPages),
+            currentPage: page
+        };
     } catch (e) {
         console.error('Error fetching threads:', e);
-        return [];
+        return { threads: [], totalPages: 1, currentPage: 1 };
     }
 };
 
@@ -353,6 +402,88 @@ export const likeThread = async (threadId: string, userId: string): Promise<void
         likes: increment(1)
     });
 };
+
+/**
+ * Fija un caso en la parte superior pagando con tokens
+ * @param threadId - ID del hilo a fijar
+ * @param userId - ID del usuario que paga
+ * @returns Objeto con éxito y mensaje
+ */
+export const pinThread = async (
+    threadId: string,
+    userId: string
+): Promise<{ success: boolean; message: string }> => {
+    try {
+        // 1. Verify thread exists and user is author
+        const threadRef = doc(db, 'sos_threads', threadId);
+        const threadSnap = await getDoc(threadRef);
+
+        if (!threadSnap.exists()) {
+            return { success: false, message: 'Caso no encontrado' };
+        }
+
+        const threadData = threadSnap.data() as SOSThread;
+        if (threadData.authorId !== userId) {
+            return { success: false, message: 'Solo el autor puede fijar el caso' };
+        }
+
+        if (threadData.isPinned) {
+            return { success: false, message: 'Este caso ya está fijado' };
+        }
+
+        // 2. Check user has enough tokens
+        const userRef = doc(db, 'users', userId);
+        const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists()) {
+            return { success: false, message: 'Usuario no encontrado' };
+        }
+
+        const userData = userSnap.data();
+        const tokenBalance = userData.tokenBalance || userData.token_balance || 0;
+
+        if (tokenBalance < COMMUNITY_CONFIG.pinCost) {
+            return {
+                success: false,
+                message: `Necesitas ${COMMUNITY_CONFIG.pinCost} tokens. Tu balance: ${tokenBalance}`
+            };
+        }
+
+        // 3. Deduct tokens and pin thread
+        const pinnedUntil = new Date();
+        pinnedUntil.setHours(pinnedUntil.getHours() + COMMUNITY_CONFIG.pinDurationHours);
+
+        const batch = writeBatch(db);
+
+        // Deduct tokens
+        batch.update(userRef, {
+            token_balance: increment(-COMMUNITY_CONFIG.pinCost)
+        });
+
+        // Pin thread
+        batch.update(threadRef, {
+            isPinned: true,
+            pinnedAt: serverTimestamp(),
+            pinnedUntil: Timestamp.fromDate(pinnedUntil),
+            updatedAt: serverTimestamp()
+        });
+
+        await batch.commit();
+
+        return {
+            success: true,
+            message: `¡Caso fijado por ${COMMUNITY_CONFIG.pinDurationHours} horas!`
+        };
+    } catch (e) {
+        console.error('Error pinning thread:', e);
+        return { success: false, message: 'Error al fijar el caso' };
+    }
+};
+
+/**
+ * Obtiene el costo de fijar un caso
+ */
+export const getPinCost = (): number => COMMUNITY_CONFIG.pinCost;
 
 // ============================================
 // COMMENTS
@@ -623,11 +754,11 @@ export const searchThreads = async (
     // For now, do client-side filtering
 
     try {
-        const allThreads = await getThreads('recent', 100);
+        const result = await getThreads('recent', 1, 100);
         const lowerQuery = searchQuery.toLowerCase();
 
-        return allThreads
-            .filter(thread =>
+        return result.threads
+            .filter((thread: SOSThread) =>
                 thread.title.toLowerCase().includes(lowerQuery) ||
                 thread.content.toLowerCase().includes(lowerQuery) ||
                 thread.brand?.toLowerCase().includes(lowerQuery) ||

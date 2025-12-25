@@ -6,13 +6,14 @@ import { loadDatabase } from '../services/database-service';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import { ThemeProvider } from '../context/ThemeContext';
 import { SettingsProvider } from '../context/SettingsContext';
+import { StripePaymentProvider } from '../components/StripePaymentProvider';
 import "../global.css";
 
 // Mantener el Splash Screen visible hasta que terminemos de cargar
 SplashScreen.preventAutoHideAsync();
 
 function InitialLayout() {
-    const { user, loading: authLoading, isOnboarded, checkingOnboarding } = useAuth();
+    const { user, loading: authLoading, emailVerified, isOnboarded, checkingOnboarding } = useAuth();
     const segments = useSegments();
     const router = useRouter();
     const [dbLoaded, setDbLoaded] = useState(false);
@@ -25,30 +26,37 @@ function InitialLayout() {
             .catch((err) => setDbError(err.message));
     }, []);
 
-    // 2. Control de Navegación (Auth Flow + Onboarding)
+    // 2. Control de Navegación (Auth Flow + Email Verification + Onboarding)
     useEffect(() => {
         if (!dbLoaded || authLoading || checkingOnboarding) {
             console.log('Still loading - dbLoaded:', dbLoaded, 'authLoading:', authLoading, 'checkingOnboarding:', checkingOnboarding);
             return;
         }
 
-        // Esperar a que isOnboarded tenga un valor si hay usuario
-        if (user && isOnboarded === null) {
+        // Esperar a que emailVerified y isOnboarded tengan un valor si hay usuario
+        if (user && (emailVerified === null || isOnboarded === null)) {
             return;
         }
 
-        // Ocultar Splash una vez que Auth, DB y Onboarding check están listos
+        // Ocultar Splash una vez que Auth, DB y profile check están listos
         SplashScreen.hideAsync();
 
         const inAuthGroup = segments[0] === '(auth)';
         const inAppGroup = segments[0] === '(app)';
         const inOnboardingGroup = segments[0] === '(onboarding)';
+        const inVerifyEmail = segments[0] === '(auth)' && segments.length > 1 && (segments as string[])[1] === 'verify-email';
 
-        console.log('Navigation check - user:', !!user, 'isOnboarded:', isOnboarded, 'segments:', segments);
+        console.log('Navigation check - user:', !!user, 'emailVerified:', emailVerified, 'isOnboarded:', isOnboarded, 'segments:', segments);
 
         if (user) {
             // Usuario logueado
-            if (isOnboarded === false) {
+            if (!emailVerified) {
+                // Email no verificado - ir a pantalla de verificación
+                if (!inVerifyEmail) {
+                    console.log('Email not verified, redirecting to verify-email');
+                    router.replace('/(auth)/verify-email');
+                }
+            } else if (isOnboarded === false) {
                 // Usuario nuevo - necesita completar onboarding
                 if (!inOnboardingGroup) {
                     console.log('User needs onboarding, redirecting to welcome');
@@ -68,7 +76,7 @@ function InitialLayout() {
                 router.replace('/(auth)/login');
             }
         }
-    }, [user, authLoading, dbLoaded, segments, isOnboarded, checkingOnboarding]);
+    }, [user, authLoading, dbLoaded, segments, emailVerified, isOnboarded, checkingOnboarding]);
 
     if (dbError) {
         return (
@@ -93,13 +101,15 @@ function InitialLayout() {
 export default function Layout() {
     return (
         <SafeAreaProvider>
-            <ThemeProvider>
-                <SettingsProvider>
-                    <AuthProvider>
-                        <InitialLayout />
-                    </AuthProvider>
-                </SettingsProvider>
-            </ThemeProvider>
+            <StripePaymentProvider>
+                <ThemeProvider>
+                    <SettingsProvider>
+                        <AuthProvider>
+                            <InitialLayout />
+                        </AuthProvider>
+                    </SettingsProvider>
+                </ThemeProvider>
+            </StripePaymentProvider>
         </SafeAreaProvider>
     );
 }

@@ -2,8 +2,11 @@ import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firest
 import { User } from 'firebase/auth';
 import { db } from '../firebaseConfig';
 
-// Tipos de rango según master_plan.md
-export type UserRank = 'Novato' | 'Técnico' | 'Pro';
+// Tipos de rango según experiencia del técnico
+export type UserRank = 'Novato' | 'Técnico' | 'Experto';
+
+// Tipos de suscripción
+export type SubscriptionType = 'free' | 'Pro' | 'Pro+';
 
 // Estadísticas del usuario
 export interface UserStats {
@@ -14,6 +17,16 @@ export interface UserStats {
 }
 
 // Interface completa según master_plan.md (Capítulo 4: Esquema de Datos)
+
+// PDF Branding Configuration (PRO only)
+export interface BrandingConfig {
+    logoURL?: string;               // Custom logo URL (stored in Firebase Storage)
+    primaryColor?: string;          // Hex color e.g. "#FF5500"
+    secondaryColor?: string;        // Hex color for accents
+    footerText?: string;            // Custom footer ("Mi Empresa - Tel: 555-1234")
+    showQRclimaWatermark?: boolean; // Default true, PRO+ can hide
+}
+
 export interface UserProfile {
     // Identidad
     email: string | null;
@@ -31,8 +44,10 @@ export interface UserProfile {
 
     // Estado
     role: 'technician' | 'admin';
-    subscription: 'free' | 'premium';
+    subscription: SubscriptionType;
     subscriptionEndDate?: any;
+    emailVerified?: boolean;          // Email verificado via Resend
+    emailVerifiedAt?: any;            // Timestamp de verificación
     isOnboarded: boolean;             // Ha completado el wizard inicial
     eligibleForDirectory: boolean;    // Flag manual de admin
 
@@ -42,6 +57,9 @@ export interface UserProfile {
     // Economía de Tokens
     tokenBalance?: number;            // Balance de tokens (calculado desde wallet ledger)
 
+    // PDF Branding (PRO only)
+    branding?: BrandingConfig;
+
     // Legal (Aceptación obligatoria)
     termsAcceptedAt?: any;
     privacyAcceptedAt?: any;
@@ -50,6 +68,21 @@ export interface UserProfile {
     // Timestamps
     createdAt: any;
     updatedAt?: any;
+
+    // AGENDA v1.0.0 - Base Location for Route Optimization
+    baseLat?: number;            // Technician's home base latitude
+    baseLng?: number;            // Technician's home base longitude
+
+    // NOTIFICACIONES
+    fcmToken?: string;
+    fcmTokenUpdatedAt?: any;
+    notificationPreferences?: {
+        maintenanceReminders: boolean;
+        appointmentReminders: boolean;
+        sosReplies: boolean;
+        walletUpdates: boolean;
+        storeOrders: boolean;
+    };
 }
 
 // Perfil por defecto para usuarios nuevos
@@ -87,12 +120,106 @@ export const calculateProfileCompleteness = (profile: Partial<UserProfile>): num
 
 /**
  * Determina el rango basado en años de experiencia
- * Según master_plan.md: Novato < 2 años, Técnico >= 2 años
+ * Novato < 2 años, Técnico 2-5 años, Experto > 5 años
  */
-export const calculateRank = (experienceYears: number, isPremium: boolean = false): UserRank => {
-    if (isPremium) return 'Pro';
+export const calculateRank = (experienceYears: number): UserRank => {
+    if (experienceYears >= 5) return 'Experto';
     if (experienceYears >= 2) return 'Técnico';
     return 'Novato';
+};
+
+/**
+ * Verifica si el usuario tiene suscripción PRO activa Y no expirada
+ * DOBLE VALIDACIÓN: verifica tipo de suscripción + fecha de expiración
+ */
+export const isUserPro = (profile: UserProfile | null): boolean => {
+    if (!profile) return false;
+
+    // Verificar si tiene suscripción activa
+    if (profile.subscription !== 'Pro' && profile.subscription !== 'Pro+') {
+        return false;
+    }
+
+    // Verificar si la suscripción NO ha expirado
+    if (profile.subscriptionEndDate) {
+        const endDate = profile.subscriptionEndDate.toDate
+            ? profile.subscriptionEndDate.toDate()
+            : new Date(profile.subscriptionEndDate);
+
+        if (endDate < new Date()) {
+            // La suscripción expiró
+            console.log('Suscripción expirada para usuario, acceso denegado');
+            return false;
+        }
+    }
+
+    return true;
+};
+
+/**
+ * Expira la suscripción de un usuario (regresa a free)
+ */
+export const expireSubscription = async (userId: string): Promise<boolean> => {
+    try {
+        await updateUserProfile(userId, {
+            subscription: 'free',
+            subscriptionEndDate: null
+        });
+        console.log('Suscripción expirada para usuario:', userId);
+        return true;
+    } catch (error) {
+        console.error('Error expirando suscripción:', error);
+        return false;
+    }
+};
+
+/**
+ * Verifica y expira la suscripción si es necesario
+ * Llamar cuando el usuario abre la app o accede a función PRO
+ */
+export const checkAndExpireSubscription = async (userId: string): Promise<boolean> => {
+    try {
+        const profile = await getUserProfile(userId);
+        if (!profile) return false;
+
+        // Si no tiene suscripción PRO, no hacer nada
+        if (profile.subscription === 'free') return false;
+
+        // Verificar fecha de expiración
+        if (profile.subscriptionEndDate) {
+            const endDate = profile.subscriptionEndDate.toDate
+                ? profile.subscriptionEndDate.toDate()
+                : new Date(profile.subscriptionEndDate);
+
+            if (endDate < new Date()) {
+                // La suscripción expiró - actualizar a free
+                await expireSubscription(userId);
+                return true; // Indica que SI se expiró
+            }
+        }
+
+        return false; // No se expiró
+    } catch (error) {
+        console.error('Error verificando expiración:', error);
+        return false;
+    }
+};
+
+/**
+ * Activa la suscripción PRO para un usuario
+ */
+export const activateProSubscription = async (
+    userId: string,
+    tier: 'Pro' | 'Pro+',
+    durationDays: number
+): Promise<boolean> => {
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + durationDays);
+
+    return updateUserProfile(userId, {
+        subscription: tier,
+        subscriptionEndDate: endDate
+    });
 };
 
 /**

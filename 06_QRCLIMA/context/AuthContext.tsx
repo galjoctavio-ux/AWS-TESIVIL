@@ -1,24 +1,28 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { onAuthStateChanged, User, signOut as firebaseSignOut } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
-import { initializeUserProfile, getUserProfile } from '../services/user-service';
+import { initializeUserProfile, getUserProfile, checkAndExpireSubscription } from '../services/user-service';
 
 interface AuthContextType {
     user: User | null;
     loading: boolean;
+    emailVerified: boolean | null;
     isOnboarded: boolean | null;
     checkingOnboarding: boolean;
     signOut: () => Promise<void>;
     refreshOnboardingStatus: () => Promise<void>;
+    refreshUserProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
     user: null,
     loading: true,
+    emailVerified: null,
     isOnboarded: null,
     checkingOnboarding: false,
     signOut: async () => { },
     refreshOnboardingStatus: async () => { },
+    refreshUserProfile: async () => { },
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -26,20 +30,26 @@ export const useAuth = () => useContext(AuthContext);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    const [emailVerified, setEmailVerified] = useState<boolean | null>(null);
     const [isOnboarded, setIsOnboarded] = useState<boolean | null>(null);
     const [checkingOnboarding, setCheckingOnboarding] = useState(false);
 
-    // Función para verificar el estado de onboarding
-    const checkOnboardingStatus = useCallback(async (userId: string) => {
+    // Función para verificar el estado del perfil (email verified + onboarding)
+    const checkUserProfileStatus = useCallback(async (userId: string) => {
         setCheckingOnboarding(true);
         try {
             const profile = await getUserProfile(userId);
+            const verified = profile?.emailVerified ?? false;
             const onboarded = profile?.isOnboarded ?? false;
-            console.log('Onboarding status checked:', onboarded);
+
+            console.log('Profile status checked - emailVerified:', verified, 'isOnboarded:', onboarded);
+
+            setEmailVerified(verified);
             setIsOnboarded(onboarded);
         } catch (error) {
-            console.error('Error checking onboarding status:', error);
-            // En caso de error (ej: offline), asumimos que sí está onboarded
+            console.error('Error checking profile status:', error);
+            // En caso de error (ej: offline), asumimos valores por defecto
+            setEmailVerified(false);
             setIsOnboarded(true);
         } finally {
             setCheckingOnboarding(false);
@@ -49,9 +59,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Función pública para refrescar el estado de onboarding
     const refreshOnboardingStatus = useCallback(async () => {
         if (user) {
-            await checkOnboardingStatus(user.uid);
+            await checkUserProfileStatus(user.uid);
         }
-    }, [user, checkOnboardingStatus]);
+    }, [user, checkUserProfileStatus]);
+
+    // Alias para compatibilidad - refrescar perfil completo
+    const refreshUserProfile = refreshOnboardingStatus;
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
@@ -66,16 +79,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 initializeUserProfile(authUser).catch(err =>
                     console.error("Error initializing user profile:", err)
                 );
-                // Check onboarding status
-                await checkOnboardingStatus(authUser.uid);
+
+                // Check and expire subscription if needed (triple layer protection)
+                checkAndExpireSubscription(authUser.uid).then(expired => {
+                    if (expired) console.log('Suscripción expirada automáticamente al iniciar app');
+                }).catch(err => console.error('Error checking subscription:', err));
+
+                // Check profile status (email verification + onboarding)
+                await checkUserProfileStatus(authUser.uid);
             } else {
-                // Reset onboarding state when user logs out
+                // Reset state when user logs out
+                setEmailVerified(null);
                 setIsOnboarded(null);
             }
         });
 
         return unsubscribe;
-    }, [checkOnboardingStatus]);
+    }, [checkUserProfileStatus]);
 
     const signOut = async () => {
         try {
@@ -89,10 +109,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         <AuthContext.Provider value={{
             user,
             loading,
+            emailVerified,
             isOnboarded,
             checkingOnboarding,
             signOut,
-            refreshOnboardingStatus
+            refreshOnboardingStatus,
+            refreshUserProfile
         }}>
             {children}
         </AuthContext.Provider>

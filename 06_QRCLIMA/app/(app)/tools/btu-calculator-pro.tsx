@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Svg, { Path, Circle, G, Text as SvgText } from 'react-native-svg';
 import { auth } from '../../../firebaseConfig';
-import { getUserProfile } from '../../../services/user-service';
+import { getUserProfile, isUserPro, BrandingConfig } from '../../../services/user-service';
 import {
     BTUCalculatorState,
     BTUCalculationResult,
@@ -245,58 +245,12 @@ export default function BTUCalculatorPRO() {
     const [primaryOrientation, setPrimaryOrientation] = useState<Orientation | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [hasAccess, setHasAccess] = useState(false);
+    const [userBranding, setUserBranding] = useState<BrandingConfig | undefined>(undefined);
 
-    // Check subscription on mount
-    useEffect(() => {
-        const checkSubscription = async () => {
-            try {
-                const user = auth.currentUser;
-                if (!user) {
-                    router.replace('/(app)/tools/btu-calculator-free' as any);
-                    return;
-                }
-
-                const profile = await getUserProfile(user.uid);
-                if (profile?.subscription === 'premium' || profile?.rank === 'Pro') {
-                    setHasAccess(true);
-                } else {
-                    // Redirect FREE users to the free calculator
-                    Alert.alert(
-                        'Función PRO',
-                        'La calculadora avanzada está disponible solo para usuarios PRO. Se te redirigirá a la versión gratuita.',
-                        [{ text: 'OK', onPress: () => router.replace('/(app)/tools/btu-calculator-free' as any) }]
-                    );
-                }
-            } catch (error) {
-                console.error('Error checking subscription:', error);
-                router.replace('/(app)/tools/btu-calculator-free' as any);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        checkSubscription();
-    }, []);
-
-    // Show loading while checking subscription
-    if (isLoading) {
-        return (
-            <View className="flex-1 bg-slate-50 items-center justify-center">
-                <ActivityIndicator size="large" color="#2563EB" />
-                <Text className="text-gray-500 mt-4">Verificando acceso PRO...</Text>
-            </View>
-        );
-    }
-
-    // If no access, don't render (redirect will happen)
-    if (!hasAccess) {
-        return (
-            <View className="flex-1 bg-slate-50 items-center justify-center">
-                <Ionicons name="lock-closed" size={48} color="#9CA3AF" />
-                <Text className="text-gray-500 mt-4">Redirigiendo...</Text>
-            </View>
-        );
-    }
+    // ========================================================================
+    // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
+    // (React Rules of Hooks)
+    // ========================================================================
 
     // Real-time calculation
     const result = useMemo<BTUCalculationResult | null>(() => {
@@ -316,10 +270,6 @@ export default function BTUCalculatorPRO() {
         if (!result) return [];
         return getSmartRecommendations(result);
     }, [result]);
-
-    // ========================================================================
-    // HANDLERS
-    // ========================================================================
 
     const updateState = useCallback((updates: Partial<BTUCalculatorState>) => {
         setState(prev => ({ ...prev, ...updates }));
@@ -375,6 +325,70 @@ export default function BTUCalculatorPRO() {
         }));
     }, []);
 
+    // Check subscription on mount
+    useEffect(() => {
+        const checkSubscription = async () => {
+            try {
+                const user = auth.currentUser;
+                if (!user) {
+                    router.replace('/(app)/tools/btu-calculator-free' as any);
+                    return;
+                }
+
+                const profile = await getUserProfile(user.uid);
+                if (isUserPro(profile)) {
+                    setHasAccess(true);
+                    setUserBranding(profile?.branding);
+                } else {
+                    // Offer subscription option
+                    Alert.alert(
+                        '🚀 Función PRO',
+                        '¡Desbloquea la calculadora avanzada con QRclima Pro!',
+                        [
+                            { text: 'Ver Planes', onPress: () => router.push('/(app)/profile/subscription' as any) },
+                            { text: 'Usar Básica', onPress: () => router.replace('/(app)/tools/btu-calculator-free' as any) }
+                        ]
+                    );
+                }
+            } catch (error) {
+                console.error('Error checking subscription:', error);
+                router.replace('/(app)/tools/btu-calculator-free' as any);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        checkSubscription();
+    }, []);
+
+    // ========================================================================
+    // CONDITIONAL RETURNS (after all hooks)
+    // ========================================================================
+
+    // Show loading while checking subscription
+    if (isLoading) {
+        return (
+            <View className="flex-1 bg-slate-50 items-center justify-center">
+                <ActivityIndicator size="large" color="#2563EB" />
+                <Text className="text-gray-500 mt-4">Verificando acceso PRO...</Text>
+            </View>
+        );
+    }
+
+    // If no access, don't render (redirect will happen)
+    if (!hasAccess) {
+        return (
+            <View className="flex-1 bg-slate-50 items-center justify-center">
+                <Ionicons name="lock-closed" size={48} color="#9CA3AF" />
+                <Text className="text-gray-500 mt-4">Redirigiendo...</Text>
+            </View>
+        );
+    }
+
+    // ========================================================================
+    // HANDLERS (non-hook functions)
+    // ========================================================================
+
     const goToStep = (nextStep: number) => {
         if (nextStep === 2 && (state.length <= 0 || state.width <= 0)) {
             Alert.alert('Datos requeridos', 'Ingresa las dimensiones del espacio');
@@ -415,20 +429,28 @@ export default function BTUCalculatorPRO() {
                         <Text className="text-sm text-gray-600 mb-1">Largo (m)</Text>
                         <TextInput
                             className="bg-white p-4 rounded-xl border border-gray-200 text-lg"
-                            placeholder="Ej: 5"
-                            keyboardType="numeric"
+                            placeholder="Ej: 5.5"
+                            keyboardType="decimal-pad"
                             value={state.length > 0 ? state.length.toString() : ''}
-                            onChangeText={(text) => updateState({ length: parseFloat(text) || 0 })}
+                            onChangeText={(text) => {
+                                const cleaned = text.replace(',', '.');
+                                const num = parseFloat(cleaned);
+                                updateState({ length: isNaN(num) ? 0 : num });
+                            }}
                         />
                     </View>
                     <View className="flex-1">
                         <Text className="text-sm text-gray-600 mb-1">Ancho (m)</Text>
                         <TextInput
                             className="bg-white p-4 rounded-xl border border-gray-200 text-lg"
-                            placeholder="Ej: 4"
-                            keyboardType="numeric"
+                            placeholder="Ej: 4.5"
+                            keyboardType="decimal-pad"
                             value={state.width > 0 ? state.width.toString() : ''}
-                            onChangeText={(text) => updateState({ width: parseFloat(text) || 0 })}
+                            onChangeText={(text) => {
+                                const cleaned = text.replace(',', '.');
+                                const num = parseFloat(cleaned);
+                                updateState({ width: isNaN(num) ? 0 : num });
+                            }}
                         />
                     </View>
                     <View className="flex-1">
@@ -436,9 +458,13 @@ export default function BTUCalculatorPRO() {
                         <TextInput
                             className="bg-white p-4 rounded-xl border border-gray-200 text-lg"
                             placeholder="2.5"
-                            keyboardType="numeric"
+                            keyboardType="decimal-pad"
                             value={state.height > 0 ? state.height.toString() : ''}
-                            onChangeText={(text) => updateState({ height: parseFloat(text) || 2.5 })}
+                            onChangeText={(text) => {
+                                const cleaned = text.replace(',', '.');
+                                const num = parseFloat(cleaned);
+                                updateState({ height: isNaN(num) ? 2.5 : num });
+                            }}
                         />
                     </View>
                 </View>
@@ -859,8 +885,8 @@ export default function BTUCalculatorPRO() {
             <ScrollView className="flex-1 bg-slate-50" showsVerticalScrollIndicator={false}>
                 <View className="p-4">
                     {/* Main Result Card */}
-                    <View className="bg-gradient-to-br from-blue-600 to-blue-800 p-6 rounded-2xl shadow-xl mb-6">
-                        <Text className="text-blue-100 text-sm mb-1">Carga Térmica Total</Text>
+                    <View className="bg-blue-600 p-6 rounded-2xl mb-6">
+                        <Text className="text-blue-200 text-sm mb-1">Carga Térmica Total</Text>
                         <View className="flex-row items-end mb-4">
                             <Text className="text-white text-5xl font-bold">
                                 {result.totalBTU.toLocaleString()}
@@ -868,8 +894,8 @@ export default function BTUCalculatorPRO() {
                             <Text className="text-blue-200 text-xl ml-2 mb-1">BTU/h</Text>
                         </View>
 
-                        <View className="bg-white/20 p-4 rounded-xl mb-4">
-                            <Text className="text-blue-100 text-sm">Área calculada</Text>
+                        <View className="bg-blue-500 p-4 rounded-xl mb-4">
+                            <Text className="text-blue-200 text-sm">Área calculada</Text>
                             <Text className="text-white font-bold text-lg">{result.area.toFixed(1)} m²</Text>
                         </View>
 
@@ -935,7 +961,7 @@ export default function BTUCalculatorPRO() {
                         <TouchableOpacity
                             onPress={async () => {
                                 try {
-                                    await generateBTUReport(state, result);
+                                    await generateBTUReport(state, result, userBranding);
                                 } catch (error) {
                                     Alert.alert('Error', 'No se pudo generar el PDF');
                                 }

@@ -2,11 +2,13 @@ import { View, Text, TouchableOpacity, TextInput, ScrollView, ActivityIndicator 
 import { useRouter } from 'expo-router';
 import { useState, useMemo, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../../context/AuthContext';
 import { getRecentServices } from '../../../services/services-service';
 import { getClients, ClientData } from '../../../services/clients-service';
 
 export default function ServiceLogScreen() {
+    const insets = useSafeAreaInsets();
     const router = useRouter();
     const { user } = useAuth();
 
@@ -101,7 +103,7 @@ export default function ServiceLogScreen() {
     return (
         <View className="flex-1 bg-slate-50">
             {/* Header */}
-            <View className="bg-white pt-12 pb-4 px-4 border-b border-gray-100 flex-row items-center justify-between">
+            <View className="bg-white pb-4 px-4 border-b border-gray-100 flex-row items-center justify-between" style={{ paddingTop: insets.top + 8 }}>
                 <View className="flex-row items-center">
                     <TouchableOpacity onPress={() => router.back()} className="mr-3">
                         <Ionicons name="arrow-back" size={24} color="#1F2937" />

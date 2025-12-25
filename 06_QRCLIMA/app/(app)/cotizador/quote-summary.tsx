@@ -10,6 +10,7 @@ import {
 } from '../../../services/cotizador-service';
 import { generateCotizadorPDF } from '../../../services/pdf-generator';
 import { getClientById } from '../../../services/clients-service';
+import { getUserProfile } from '../../../services/user-service';
 
 export default function QuoteSummaryScreen() {
     const router = useRouter();
@@ -43,6 +44,9 @@ export default function QuoteSummaryScreen() {
         setGeneratingPDF(true);
 
         try {
+            // Fetch user profile for PDF signature
+            const profile = await getUserProfile(user.uid);
+
             // Save the quote first
             const quoteId = await saveCotizadorQuote({
                 technicianId: user.uid,
@@ -77,7 +81,7 @@ export default function QuoteSummaryScreen() {
                         status: 'Sent'
                     },
                     client: client,
-                    technicianName: user.email || undefined
+                    technicianProfile: profile || undefined
                 });
             }
 
