@@ -1,4 +1,5 @@
 import os
+import json
 import logging
 import time
 import random
@@ -12,25 +13,16 @@ from dotenv import load_dotenv
 # --- CONFIGURACIÓN ---
 PROVIDER_NAME = "Tienda Mirage"
 LOG_FILE = 'scraper_tienda_mirage.log'
+# Aseguramos que la URL termine en diagonal para evitar redirecciones
 BASE_URL = "https://www.tiendamirage.mx/11-aire-acondicionado"
 
-logging.basicConfig(
-    filename=LOG_FILE, 
-    level=logging.INFO, 
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# 1. CARGA DE CREDENCIALES
 env_path = Path(__file__).parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-
-if not SUPABASE_URL or not SUPABASE_KEY:
-    print("❌ FATAL: No se encontraron las credenciales en .env")
-    exit(1)
-
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def get_normalized_id(sku):
@@ -46,74 +38,98 @@ def run_scraper():
     page = 1
     
     session = requests.Session()
+    # Headers más completos para imitar un navegador real
     session.headers.update({
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'es-MX,es;q=0.9',
+        'Connection': 'keep-alive',
     })
 
     while True:
-        url_con_pagina = f"{BASE_URL}?page={page}"
-        print(f"Escaneando: {url_con_pagina}")
+        # PrestaShop acepta ?page=X o ?p=X. Probaremos con page.
+        current_url = f"{BASE_URL}?page={page}"
+        print(f"Escaneando: {current_url}")
         
         try:
-            response = session.get(url_con_pagina, timeout=20)
-            if response.status_code != 200: break
+            response = session.get(current_url, timeout=30)
+            if response.status_code != 200:
+                print(f"❌ Error de servidor: {response.status_code}")
+                break
             
             soup = BeautifulSoup(response.text, 'html.parser')
-            # En PrestaShop los productos suelen estar en artículos con clase 'product-miniature'
-            products = soup.select('article.product-miniature')
+            
+            # --- NUEVOS SELECTORES ---
+            # PrestaShop 1.7+ usa estas clases
+            products = soup.find_all('article', class_='product-miniature') or \
+                       soup.select('.product-miniature') or \
+                       soup.select('.js-product-miniature')
 
             if not products:
-                print("🏁 Fin de productos o página vacía.")
+                print("⚠️ No se encontraron productos con los selectores actuales.")
+                # Debug: Guardar un pedazo del HTML para revisar si estamos bloqueados
+                with open("debug_mirage.html", "w") as f:
+                    f.write(response.text[:2000])
+                print("   Se guardó 'debug_mirage.html' para inspección.")
                 break
+
+            print(f"   🎯 Detectados {len(products)} productos.")
 
             for p in products:
-                # 1. Título
-                title_tag = p.select_one('.product-title a')
-                title = title_tag.get_text(strip=True) if title_tag else "N/A"
-                link = title_tag['href'] if title_tag else ""
+                try:
+                    # Título y Link
+                    title_tag = p.select_one('.product-title a') or p.select_one('h2.h3.product-title a')
+                    title = title_tag.get_text(strip=True)
+                    link = title_tag['href']
 
-                # 2. Precio (Buscamos la clase 'price')
-                price_tag = p.select_one('.price')
-                price_raw = price_tag.get_text(strip=True) if price_tag else "0"
-                # Limpiar precio: "$10,500.00" -> 10500.00
-                price = float(price_raw.replace('$', '').replace(',', '').strip())
+                    # Precio
+                    price_tag = p.select_one('.price') or p.select_one('[itemprop="price"]')
+                    if price_tag:
+                        price_raw = price_tag.get_text(strip=True)
+                        # Limpieza profunda: quitar $, comas, espacios y letras
+                        price_str = "".join(c for c in price_raw if c.isdigit() or c == '.')
+                        price = float(price_str)
+                    else:
+                        price = 0.0
 
-                # 3. SKU (En Tienda Mirage suele estar en data-id-product o una referencia interna)
-                # Intentamos sacar la referencia que es más parecida al SKU master
-                sku = p.get('data-id-product', 'N/A')
-                
-                if price > 0:
-                    all_extracted_data.append({
-                        "provider_name": PROVIDER_NAME,
-                        "product_title": title,
-                        "sku": str(sku), # Nota: Podrías necesitar mapear esto si tus SKUs son distintos
-                        "price": price,
-                        "currency": "MXN",
-                        "normalized_product_id": get_normalized_id(sku),
-                        "metadata": {
-                            "url": link,
-                            "source_page": page
-                        }
-                    })
+                    # SKU / Referencia
+                    # En Tienda Mirage, el SKU suele venir en un atributo de datos
+                    sku = p.get('data-id-product') or "N/A"
+                    
+                    if price > 0:
+                        all_extracted_data.append({
+                            "provider_name": PROVIDER_NAME,
+                            "product_title": title,
+                            "sku": str(sku),
+                            "price": price,
+                            "currency": "MXN",
+                            "normalized_product_id": get_normalized_id(sku),
+                            "metadata": {"url": link, "page": page}
+                        })
+                except Exception as e:
+                    continue
 
-            # Verificar si existe el botón "Siguiente"
-            next_button = soup.select_one('a.next')
-            if not next_button or 'disabled' in next_button.get('class', []):
-                break
+            # Paginación: Buscar el link de "Siguiente"
+            next_page_link = soup.select_one('a.next.js-search-link') or \
+                             soup.select_one('a[rel="next"]')
             
-            page += 1
-            time.sleep(random.uniform(2, 4)) # PrestaShop es más sensible a ráfagas
+            if next_page_link and next_page_link.get('href') and 'page=' in next_page_link['href']:
+                page += 1
+                time.sleep(random.uniform(2, 5))
+            else:
+                print("🏁 No se detectó botón de siguiente página. Fin.")
+                break
 
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f"❌ Error crítico: {e}")
             break
 
-    # 2. INSERCIÓN
+    # Guardar resultados
     if all_extracted_data:
-        print(f"📤 Insertando {len(all_extracted_data)} registros en Supabase...")
+        print(f"📤 Enviando {len(all_extracted_data)} registros a Supabase...")
         try:
             supabase.table("market_prices_log").insert(all_extracted_data).execute()
-            print("✅ Hecho.")
+            print("✅ Datos guardados.")
         except Exception as e:
             print(f"❌ Error Supabase: {e}")
 
