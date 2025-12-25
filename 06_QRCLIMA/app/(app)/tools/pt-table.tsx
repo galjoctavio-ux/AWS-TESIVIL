@@ -2,6 +2,7 @@ import { View, Text, ScrollView, TouchableOpacity, Platform } from 'react-native
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Datos de presión según master_plan.md - Sección 3.5.2
 type GasType = 'R410A' | 'R32' | 'R22';
@@ -150,6 +151,7 @@ const PressureGauge = ({ min, max, unit, color }: { min: number; max: number; un
 };
 
 export default function PTTable() {
+    const insets = useSafeAreaInsets();
     const [selectedGas, setSelectedGas] = useState<GasType>('R410A');
     const [temperature, setTemperature] = useState(30);
     const [showBar, setShowBar] = useState(false);
@@ -158,138 +160,167 @@ export default function PTTable() {
     const gasConfig = GAS_DATA[selectedGas];
 
     return (
-        <ScrollView className="flex-1 bg-slate-50">
-            <View className="p-6">
-                {/* Header Info */}
-                <View className="bg-cyan-50 p-4 rounded-xl mb-6 border border-cyan-100">
-                    <View className="flex-row items-center mb-2">
-                        <Ionicons name="thermometer" size={20} color="#0891B2" />
-                        <Text className="text-cyan-700 font-bold ml-2">Tabla P-T Dinámica</Text>
+        <View className="flex-1 bg-slate-50">
+            <ScrollView showsVerticalScrollIndicator={false}>
+                {/* ========================================== */}
+                {/* HEADER - Uniform with rest of app */}
+                {/* ========================================== */}
+                <View className="bg-blue-600 pb-6 px-5" style={{ paddingTop: insets.top + 8 }}>
+                    <View className="flex-row justify-between items-center">
+                        <View>
+                            <Text className="text-blue-200 text-sm">Herramienta</Text>
+                            <Text className="text-white text-2xl font-bold">Tabla P-T</Text>
+                        </View>
+                        <View className="bg-white/20 w-12 h-12 rounded-full items-center justify-center">
+                            <Ionicons name="thermometer" size={24} color="white" />
+                        </View>
                     </View>
-                    <Text className="text-cyan-600 text-sm">
-                        Referencia rápida de presiones de succión según temperatura ambiente y tipo de refrigerante.
-                    </Text>
                 </View>
 
-                {/* Gas Selector */}
-                <Text className="text-lg font-bold text-gray-800 mb-3">🧪 Tipo de Refrigerante</Text>
-                <View className="flex-row gap-2 mb-6">
-                    {(Object.keys(GAS_DATA) as GasType[]).map((gas) => (
-                        <TouchableOpacity
-                            key={gas}
-                            onPress={() => setSelectedGas(gas)}
-                            className={`flex-1 p-4 rounded-xl border-2`}
-                            style={{
-                                backgroundColor: selectedGas === gas ? GAS_DATA[gas].bgColor : 'white',
-                                borderColor: selectedGas === gas ? GAS_DATA[gas].color : '#E5E7EB',
-                            }}
-                        >
-                            <Text
-                                className={`text-center font-bold text-lg`}
-                                style={{ color: selectedGas === gas ? GAS_DATA[gas].color : '#6B7280' }}
+                <View className="p-4">
+                    {/* Info Card */}
+                    <View className="bg-cyan-50 p-4 rounded-xl mb-6 border border-cyan-100">
+                        <View className="flex-row items-center mb-2">
+                            <Ionicons name="information-circle" size={20} color="#0891B2" />
+                            <Text className="text-cyan-700 font-bold ml-2">Referencia Dinámica</Text>
+                        </View>
+                        <Text className="text-cyan-600 text-sm">
+                            Presiones de succión según temperatura ambiente y tipo de refrigerante.
+                        </Text>
+                    </View>
+
+                    {/* Gas Selector */}
+                    <View className="flex-row items-center mb-3">
+                        <Ionicons name="flask" size={20} color="#374151" />
+                        <Text className="text-lg font-bold text-gray-800 ml-2">Tipo de Refrigerante</Text>
+                    </View>
+                    <View className="flex-row gap-2 mb-6">
+                        {(Object.keys(GAS_DATA) as GasType[]).map((gas) => (
+                            <TouchableOpacity
+                                key={gas}
+                                onPress={() => setSelectedGas(gas)}
+                                className={`flex-1 p-4 rounded-xl border-2`}
+                                style={{
+                                    backgroundColor: selectedGas === gas ? GAS_DATA[gas].bgColor : 'white',
+                                    borderColor: selectedGas === gas ? GAS_DATA[gas].color : '#E5E7EB',
+                                }}
                             >
-                                {GAS_DATA[gas].name}
-                            </Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
+                                <Text
+                                    className={`text-center font-bold text-lg`}
+                                    style={{ color: selectedGas === gas ? GAS_DATA[gas].color : '#6B7280' }}
+                                >
+                                    {GAS_DATA[gas].name}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
 
-                {/* Temperature Slider */}
-                <Text className="text-lg font-bold text-gray-800 mb-3">🌡️ Temperatura Ambiente</Text>
-                <View className="bg-white p-4 rounded-xl border border-gray-200 mb-6">
-                    <View className="flex-row justify-between items-center mb-2">
-                        <Text className="text-gray-500">20°C</Text>
-                        <View className="bg-gray-800 px-4 py-2 rounded-full">
-                            <Text className="text-white font-bold text-xl">{temperature}°C</Text>
+                    {/* Temperature Slider */}
+                    <View className="flex-row items-center mb-3">
+                        <Ionicons name="thermometer-outline" size={20} color="#374151" />
+                        <Text className="text-lg font-bold text-gray-800 ml-2">Temperatura Ambiente</Text>
+                    </View>
+                    <View className="bg-white p-4 rounded-xl border border-gray-200 mb-6">
+                        <View className="flex-row justify-between items-center mb-2">
+                            <Text className="text-gray-500">20°C</Text>
+                            <View className="bg-gray-800 px-4 py-2 rounded-full">
+                                <Text className="text-white font-bold text-xl">{temperature}°C</Text>
+                            </View>
+                            <Text className="text-gray-500">45°C</Text>
                         </View>
-                        <Text className="text-gray-500">45°C</Text>
+
+                        <Slider
+                            style={{ width: '100%', height: 40 }}
+                            minimumValue={20}
+                            maximumValue={45}
+                            step={1}
+                            value={temperature}
+                            onValueChange={setTemperature}
+                            minimumTrackTintColor={gasConfig.color}
+                            maximumTrackTintColor="#E5E7EB"
+                            thumbTintColor={gasConfig.color}
+                        />
                     </View>
 
-                    <Slider
-                        style={{ width: '100%', height: 40 }}
-                        minimumValue={20}
-                        maximumValue={45}
-                        step={1}
-                        value={temperature}
-                        onValueChange={setTemperature}
-                        minimumTrackTintColor={gasConfig.color}
-                        maximumTrackTintColor="#E5E7EB"
-                        thumbTintColor={gasConfig.color}
-                    />
-                </View>
-
-                {/* Unit Toggle */}
-                <View className="flex-row justify-center mb-4">
-                    <TouchableOpacity
-                        onPress={() => setShowBar(false)}
-                        className={`px-6 py-2 rounded-l-xl ${!showBar ? 'bg-gray-800' : 'bg-gray-200'}`}
-                    >
-                        <Text className={`font-bold ${!showBar ? 'text-white' : 'text-gray-600'}`}>PSI</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => setShowBar(true)}
-                        className={`px-6 py-2 rounded-r-xl ${showBar ? 'bg-gray-800' : 'bg-gray-200'}`}
-                    >
-                        <Text className={`font-bold ${showBar ? 'text-white' : 'text-gray-600'}`}>Bar</Text>
-                    </TouchableOpacity>
-                </View>
-
-                {/* Pressure Gauge */}
-                <PressureGauge
-                    min={showBar ? pressureData.minBar : pressureData.minPSI}
-                    max={showBar ? pressureData.maxBar : pressureData.maxPSI}
-                    unit={showBar ? 'bar' : 'psig'}
-                    color={gasConfig.color}
-                />
-
-                {/* Quick Reference Table */}
-                <Text className="text-lg font-bold text-gray-800 mt-6 mb-3">📊 Tabla de Referencia - {gasConfig.name}</Text>
-                <View className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                    {/* Header */}
-                    <View className="flex-row bg-gray-100 p-3">
-                        <Text className="flex-1 font-bold text-gray-700 text-center">Temp °C</Text>
-                        <Text className="flex-1 font-bold text-gray-700 text-center">PSI</Text>
-                        <Text className="flex-1 font-bold text-gray-700 text-center">Bar</Text>
-                    </View>
-
-                    {/* Rows */}
-                    {gasConfig.pressures.map((row, index) => (
-                        <View
-                            key={row.temp}
-                            className={`flex-row p-3 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
-                            style={{
-                                backgroundColor: row.temp === Math.round(temperature / 5) * 5
-                                    ? gasConfig.bgColor
-                                    : index % 2 === 0 ? 'white' : '#F9FAFB'
-                            }}
+                    {/* Unit Toggle */}
+                    <View className="flex-row justify-center mb-4">
+                        <TouchableOpacity
+                            onPress={() => setShowBar(false)}
+                            className={`px-6 py-2 rounded-l-xl ${!showBar ? 'bg-gray-800' : 'bg-gray-200'}`}
                         >
-                            <Text className="flex-1 text-center text-gray-700">{row.temp}°</Text>
-                            <Text className="flex-1 text-center text-gray-700">{row.minPSI}-{row.maxPSI}</Text>
-                            <Text className="flex-1 text-center text-gray-700">{row.minBar}-{row.maxBar}</Text>
-                        </View>
-                    ))}
-                </View>
-
-                {/* Disclaimer */}
-                <View className="mt-6 bg-amber-50 p-4 rounded-xl border border-amber-200">
-                    <View className="flex-row items-center mb-2">
-                        <Ionicons name="warning" size={20} color="#D97706" />
-                        <Text className="text-amber-700 font-bold ml-2">Importante</Text>
+                            <Text className={`font-bold ${!showBar ? 'text-white' : 'text-gray-600'}`}>PSI</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => setShowBar(true)}
+                            className={`px-6 py-2 rounded-r-xl ${showBar ? 'bg-gray-800' : 'bg-gray-200'}`}
+                        >
+                            <Text className={`font-bold ${showBar ? 'text-white' : 'text-gray-600'}`}>Bar</Text>
+                        </TouchableOpacity>
                     </View>
-                    <Text className="text-amber-600 text-sm leading-5">
-                        Estos valores son orientativos para presiones de succión (baja). La presión real puede variar según:{'\n'}
-                        • Condiciones del equipo{'\n'}
-                        • Carga de refrigerante{'\n'}
-                        • Restricciones en el sistema{'\n'}
-                        Siempre consulta el manual del fabricante.
+
+                    {/* Pressure Gauge */}
+                    <PressureGauge
+                        min={showBar ? pressureData.minBar : pressureData.minPSI}
+                        max={showBar ? pressureData.maxBar : pressureData.maxPSI}
+                        unit={showBar ? 'bar' : 'psig'}
+                        color={gasConfig.color}
+                    />
+
+                    {/* Quick Reference Table */}
+                    <View className="flex-row items-center mt-6 mb-3">
+                        <Ionicons name="grid" size={20} color="#374151" />
+                        <Text className="text-lg font-bold text-gray-800 ml-2">Tabla de Referencia - {gasConfig.name}</Text>
+                    </View>
+                    <View className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                        {/* Header */}
+                        <View className="flex-row bg-gray-100 p-3">
+                            <Text className="flex-1 font-bold text-gray-700 text-center">Temp °C</Text>
+                            <Text className="flex-1 font-bold text-gray-700 text-center">PSI</Text>
+                            <Text className="flex-1 font-bold text-gray-700 text-center">Bar</Text>
+                        </View>
+
+                        {/* Rows */}
+                        {gasConfig.pressures.map((row, index) => (
+                            <View
+                                key={row.temp}
+                                className={`flex-row p-3 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
+                                style={{
+                                    backgroundColor: row.temp === Math.round(temperature / 5) * 5
+                                        ? gasConfig.bgColor
+                                        : index % 2 === 0 ? 'white' : '#F9FAFB'
+                                }}
+                            >
+                                <Text className="flex-1 text-center text-gray-700">{row.temp}°</Text>
+                                <Text className="flex-1 text-center text-gray-700">{row.minPSI}-{row.maxPSI}</Text>
+                                <Text className="flex-1 text-center text-gray-700">{row.minBar}-{row.maxBar}</Text>
+                            </View>
+                        ))}
+                    </View>
+
+                    {/* Disclaimer */}
+                    <View className="mt-6 bg-amber-50 p-4 rounded-xl border border-amber-200">
+                        <View className="flex-row items-center mb-2">
+                            <Ionicons name="warning" size={20} color="#D97706" />
+                            <Text className="text-amber-700 font-bold ml-2">Importante</Text>
+                        </View>
+                        <Text className="text-amber-600 text-sm leading-5">
+                            Estos valores son orientativos para presiones de succión (baja). La presión real puede variar según:{'\n'}
+                            • Condiciones del equipo{'\n'}
+                            • Carga de refrigerante{'\n'}
+                            • Restricciones en el sistema{'\n'}
+                            Siempre consulta el manual del fabricante.
+                        </Text>
+                    </View>
+
+                    {/* Sources */}
+                    <Text className="text-gray-400 text-xs text-center mt-4 mb-32">
+                        Fuentes: FSW, Refrigerants Center Inc, Royal Refrigerants, Ace Services
                     </Text>
                 </View>
 
-                {/* Sources */}
-                <Text className="text-gray-400 text-xs text-center mt-4 mb-8">
-                    Fuentes: FSW, Refrigerants Center Inc, Royal Refrigerants, Ace Services
-                </Text>
-            </View>
-        </ScrollView>
+                {/* Bottom spacing for navigation */}
+                <View className="h-20" />
+            </ScrollView>
+        </View>
     );
 }

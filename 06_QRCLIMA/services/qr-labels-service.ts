@@ -4,6 +4,7 @@ import * as FileSystem from 'expo-file-system';
 import { collection, addDoc, getDocs, query, where, orderBy, limit, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { generateUniqueToken, getQrWebUrl } from './equipment-service';
+import { updateUserProfile } from './user-service';
 
 // ============================================
 // TESIVIL QR LABELS SERVICE
@@ -380,6 +381,11 @@ export const generateQRLabelsPDF = async (technicianId: string): Promise<Generat
                 UTI: 'com.adobe.pdf',
             });
         }
+
+        // Trigger: Marcar logro de primer PDF de etiquetas
+        updateUserProfile(technicianId, {
+            achievements: { firstLabelsPdf: true }
+        }).catch(err => console.warn('Could not update firstLabelsPdf achievement:', err));
 
         return {
             success: true,

@@ -192,6 +192,73 @@ export default function SettingsScreen() {
                     </View>
                 </View>
 
+                {/* Navigation App Preference Section */}
+                <View className="mb-6">
+                    <Text className="text-gray-500 font-medium text-sm mb-3 uppercase">
+                        App de Navegación
+                    </Text>
+
+                    <View className="bg-white rounded-2xl border border-gray-100 p-4">
+                        <View className="flex-row items-center mb-4">
+                            <View className="bg-green-100 w-10 h-10 rounded-xl items-center justify-center mr-3">
+                                <Ionicons name="map" size={20} color="#16A34A" />
+                            </View>
+                            <View className="flex-1">
+                                <Text className="text-gray-800 font-bold">App Preferida</Text>
+                                <Text className="text-gray-500 text-xs">
+                                    Selecciona tu app de navegación favorita
+                                </Text>
+                            </View>
+                        </View>
+
+                        <View className="flex-row flex-wrap">
+                            {[
+                                { value: null, label: 'Preguntar', icon: 'help-circle-outline' as const },
+                                { value: 'waze', label: 'Waze', icon: 'navigate' as const },
+                                { value: 'google', label: 'Google Maps', icon: 'map-outline' as const },
+                                { value: 'apple', label: 'Apple Maps', icon: 'compass-outline' as const },
+                            ].map(option => (
+                                <TouchableOpacity
+                                    key={option.value || 'ask'}
+                                    onPress={() => {
+                                        updateSettings({ preferredNavApp: option.value as any });
+                                        if (user?.uid) {
+                                            updateUserProfile(user.uid, { preferredNavigationApp: option.value as any });
+                                        }
+                                    }}
+                                    className={`px-3 py-2 rounded-full mr-2 mb-2 flex-row items-center border ${settings.preferredNavApp === option.value
+                                        ? 'bg-green-600 border-green-600'
+                                        : 'bg-white border-gray-300'
+                                        }`}
+                                >
+                                    <Ionicons
+                                        name={option.icon}
+                                        size={14}
+                                        color={settings.preferredNavApp === option.value ? 'white' : '#6B7280'}
+                                    />
+                                    <Text className={`font-medium ml-1 ${settings.preferredNavApp === option.value
+                                        ? 'text-white'
+                                        : 'text-gray-600'
+                                        }`}>
+                                        {option.label}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+
+                        {settings.preferredNavApp && (
+                            <View className="bg-green-50 p-3 rounded-xl mt-3 flex-row items-start">
+                                <Ionicons name="checkmark-circle" size={16} color="#16A34A" />
+                                <Text className="text-green-700 text-xs flex-1 ml-2">
+                                    Navegación se abrirá automáticamente con <Text className="font-bold">
+                                        {settings.preferredNavApp === 'waze' ? 'Waze' :
+                                            settings.preferredNavApp === 'google' ? 'Google Maps' : 'Apple Maps'}
+                                    </Text>
+                                </Text>
+                            </View>
+                        )}
+                    </View>
+                </View>
                 {/* Notification Settings Section */}
                 <View className="mb-6">
                     <Text className="text-gray-500 font-medium text-sm mb-3 uppercase">

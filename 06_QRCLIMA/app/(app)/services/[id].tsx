@@ -229,68 +229,6 @@ export default function ServiceDetail() {
                     </View>
                 )}
 
-                {/* Warranty Section */}
-                <View className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
-                    <View className="flex-row items-center mb-4">
-                        <View className="bg-purple-100 p-2 rounded-full mr-3">
-                            <Ionicons name="shield-checkmark" size={20} color="#7C3AED" />
-                        </View>
-                        <Text className="text-lg font-bold text-gray-800">Garantía del Servicio</Text>
-                    </View>
-
-                    <Text className="text-gray-600 mb-3 text-sm">Selecciona la garantía para este servicio:</Text>
-
-                    <View className="flex-row flex-wrap mb-3">
-                        {[0, 1, 3, 6].map((months) => (
-                            <TouchableOpacity
-                                key={months}
-                                onPress={() => {
-                                    setWarrantyType(months);
-                                    if (months !== -1) setShowWarrantyInput(false);
-                                }}
-                                className={`px-4 py-2 rounded-full mr-2 mb-2 border ${warrantyType === months && !showWarrantyInput
-                                    ? 'bg-purple-600 border-purple-600'
-                                    : 'bg-white border-gray-300'
-                                    }`}
-                            >
-                                <Text className={
-                                    warrantyType === months && !showWarrantyInput
-                                        ? 'text-white font-bold'
-                                        : 'text-gray-600'
-                                }>
-                                    {months === 0 ? 'Sin Garantía' : `${months} Mes${months > 1 ? 'es' : ''}`}
-                                </Text>
-                            </TouchableOpacity>
-                        ))}
-                        <TouchableOpacity
-                            onPress={() => {
-                                setWarrantyType(-1);
-                                setShowWarrantyInput(true);
-                            }}
-                            className={`px-4 py-2 rounded-full mr-2 mb-2 border ${warrantyType === -1
-                                ? 'bg-purple-600 border-purple-600'
-                                : 'bg-white border-gray-300'
-                                }`}
-                        >
-                            <Text className={warrantyType === -1 ? 'text-white font-bold' : 'text-gray-600'}>
-                                Otra
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    {showWarrantyInput && (
-                        <View className="mt-2">
-                            <Text className="text-gray-600 mb-1 text-xs">Especifica el tiempo o condiciones:</Text>
-                            <TextInput
-                                className="bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-800"
-                                placeholder="Ej: 1 año, 15 días, etc."
-                                value={customWarranty}
-                                onChangeText={setCustomWarranty}
-                            />
-                        </View>
-                    )}
-                </View>
-
                 {/* Signatures */}
                 <View className="flex-row justify-between mb-8">
                     <View className="w-[48%] bg-white p-3 rounded-xl shadow-sm items-center">

@@ -422,23 +422,44 @@ export const getErrorsByModel = async (modelId: number): Promise<ErrorCodeData[]
 };
 
 /**
- * Búsqueda predictiva de errores con filtro opcional por modelo
+ * Resultado de búsqueda con información del modelo incluida
  */
-export const searchErrorsInModel = async (codePart: string, modelId?: number): Promise<ErrorCodeData[]> => {
+export interface SearchResultData extends ErrorCodeData {
+    model_name?: string;
+}
+
+/**
+ * Búsqueda predictiva de errores con filtro opcional por modelo
+ * Busca tanto en códigos de error como en nombres de modelos
+ */
+export const searchErrorsInModel = async (codePart: string, modelId?: number): Promise<SearchResultData[]> => {
     try {
         const db = await getDb();
         const searchTerm = `%${codePart}%`;
 
         if (modelId) {
-            const result = await db.getAllAsync<ErrorCodeData>(
-                'SELECT * FROM error_codes WHERE model_id = ? AND code LIKE ? ORDER BY code LIMIT 20',
+            // Búsqueda dentro de un modelo específico (solo por código)
+            const result = await db.getAllAsync<SearchResultData>(
+                `SELECT e.*, m.name as model_name 
+                 FROM error_codes e 
+                 JOIN air_conditioner_models m ON e.model_id = m.id 
+                 WHERE e.model_id = ? AND e.code LIKE ? 
+                 ORDER BY e.code LIMIT 20`,
                 [modelId, searchTerm]
             );
             return result;
         } else {
-            const result = await db.getAllAsync<ErrorCodeData>(
-                'SELECT * FROM error_codes WHERE code LIKE ? ORDER BY code LIMIT 20',
-                [searchTerm]
+            // Búsqueda global: en códigos de error Y en nombres de modelos
+            const result = await db.getAllAsync<SearchResultData>(
+                `SELECT e.*, m.name as model_name 
+                 FROM error_codes e 
+                 JOIN air_conditioner_models m ON e.model_id = m.id 
+                 WHERE e.code LIKE ? OR m.name LIKE ? OR m.reference_id LIKE ?
+                 ORDER BY 
+                    CASE WHEN e.code LIKE ? THEN 0 ELSE 1 END,
+                    m.name, e.code 
+                 LIMIT 30`,
+                [searchTerm, searchTerm, searchTerm, searchTerm]
             );
             return result;
         }

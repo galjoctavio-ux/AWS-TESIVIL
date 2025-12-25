@@ -71,7 +71,7 @@ Estos Términos se rigen por las leyes de los Estados Unidos Mexicanos. Cualquie
 
     PRIVACY: `Responsable del Tratamiento
 QRclima
-Correo de contacto: [correo@qrclima.mx]
+Correo de contacto: [qrclima@tesivil.com]
 
 Datos Personales Recabados
 • Número telefónico (autenticación).
@@ -90,7 +90,7 @@ QRclima no vende ni transfiere datos personales a terceros, salvo obligación le
 
 Derechos ARCO
 El usuario podrá ejercer sus derechos ARCO mediante solicitud al correo:
-arco@qrclima.mx
+qrclima@tesivil.com
 
 Seguridad
 QRclima implementa medidas administrativas y técnicas razonables para proteger la información.`,

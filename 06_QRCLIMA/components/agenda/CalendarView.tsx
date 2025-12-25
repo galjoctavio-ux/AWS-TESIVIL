@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
 import { Calendar } from 'react-native-big-calendar';
 import { getLinearDistance } from '../../services/haversine-calculator';
+import { TrafficDistanceResult, formatDuration } from '../../services/traffic-distance-service';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 
@@ -23,6 +24,9 @@ interface Props {
     baseLat?: number | null;
     baseLng?: number | null;
     isLoading?: boolean;
+    // PRO Traffic Data
+    trafficDataMap?: { [eventId: string]: TrafficDistanceResult };
+    isPro?: boolean;
 }
 
 export default function CalendarView({
@@ -35,7 +39,9 @@ export default function CalendarView({
     onLongPressCell,
     baseLat,
     baseLng,
-    isLoading
+    isLoading,
+    trafficDataMap,
+    isPro
 }: Props) {
 
     // Dynamic height based on screen - adjusted to prevent cut-off
@@ -101,6 +107,7 @@ export default function CalendarView({
         const { key, ...restProps } = touchableOpacityProps;
         const bgColor = getEventColor(event.type);
         const distanceInfo = eventDistances[event.id];
+        const trafficInfo = trafficDataMap?.[event.id];
 
         return (
             <TouchableOpacity
@@ -116,7 +123,10 @@ export default function CalendarView({
                         <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 9 }} numberOfLines={1}>{event.address}</Text>
                         {distanceInfo && (
                             <Text style={{ color: 'rgba(255,255,255,0.75)', fontSize: 8, marginTop: 1 }}>
-                                {distanceInfo.fromBase ? '🏠' : '📍'} {distanceInfo.distance} km {distanceInfo.fromBase ? '(base)' : ''}
+                                {distanceInfo.fromBase ? '🏠' : '📍'} {distanceInfo.distance} km
+                                {isPro && trafficInfo?.isTrafficData && trafficInfo.durationInTrafficMinutes
+                                    ? ` • 🚗 ${formatDuration(trafficInfo.durationInTrafficMinutes)}`
+                                    : ''}
                             </Text>
                         )}
                     </>

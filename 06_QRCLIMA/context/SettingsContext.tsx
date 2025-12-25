@@ -3,12 +3,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SETTINGS_STORAGE_KEY = '@qrclima_settings';
 
+export type NavAppPreference = 'waze' | 'google' | 'apple' | null;
+
 export interface AppSettings {
     reminderMonths: number; // Default: 6 months for maintenance reminder
+    preferredNavApp: NavAppPreference; // Preferred navigation app
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
     reminderMonths: 6,
+    preferredNavApp: null, // null = always ask
 };
 
 interface SettingsContextType {

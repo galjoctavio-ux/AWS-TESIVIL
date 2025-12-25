@@ -6,7 +6,6 @@
  */
 
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
 
 interface StripePaymentProviderProps {
     children: React.ReactNode;
@@ -15,13 +14,7 @@ interface StripePaymentProviderProps {
 export const StripePaymentProvider: React.FC<StripePaymentProviderProps> = ({ children }) => {
     // STRIPE DISABLED - just pass through children
     console.log('ℹ️ Stripe temporarily disabled (requires native build)');
-    return <View style={styles.container}>{children}</View>;
+    return <>{children}</>;
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-});
 
 export default StripePaymentProvider;

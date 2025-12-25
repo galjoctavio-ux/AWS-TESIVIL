@@ -1,5 +1,6 @@
-import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc, query, where, orderBy, limit, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc, query, where, orderBy, limit, serverTimestamp, increment } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
+import { updateUserProfile } from './user-service';
 
 export interface ServiceData {
     clientId: string;
@@ -48,6 +49,25 @@ export const addService = async (serviceData: ServiceData) => {
             createdAt: serverTimestamp(),
         });
         console.log('Service created with ID: ', docRef.id);
+
+        // Incrementar el contador de servicios del técnico
+        try {
+            const userRef = doc(db, 'users', serviceData.technicianId);
+            await updateDoc(userRef, {
+                'stats.servicesCount': increment(1)
+            });
+            console.log('Service count incremented for technician:', serviceData.technicianId);
+        } catch (statsError) {
+            console.warn('Could not update service count (user profile may not exist):', statsError);
+        }
+
+        // Trigger: Marcar logro de primera agenda si tiene fecha programada
+        if (serviceData.scheduledStart || serviceData.date) {
+            updateUserProfile(serviceData.technicianId, {
+                achievements: { firstAgenda: true }
+            }).catch(err => console.warn('Could not update firstAgenda achievement:', err));
+        }
+
         return docRef.id;
     } catch (e) {
         console.error('Error adding service: ', e);
@@ -128,6 +148,45 @@ export const getRecentServices = async (technicianId: string, limitCount: number
     } catch (e) {
         console.error('Error fetching recent services:', e);
         return [];
+    }
+};
+
+/**
+ * Cuenta el total de servicios de un técnico
+ */
+export const getTotalServicesCount = async (technicianId: string): Promise<number> => {
+    try {
+        const q = query(
+            collection(db, 'services'),
+            where('technicianId', '==', technicianId)
+        );
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.size;
+    } catch (e) {
+        console.error('Error counting services:', e);
+        return 0;
+    }
+};
+
+/**
+ * Sincroniza el contador de servicios del perfil con el conteo real
+ * Útil para usuarios existentes que ya tenían servicios antes de esta actualización
+ */
+export const syncServicesCount = async (technicianId: string): Promise<number> => {
+    try {
+        const totalCount = await getTotalServicesCount(technicianId);
+
+        // Actualizar el perfil con el conteo real
+        const userRef = doc(db, 'users', technicianId);
+        await updateDoc(userRef, {
+            'stats.servicesCount': totalCount
+        });
+
+        console.log('Synced services count for technician:', technicianId, 'count:', totalCount);
+        return totalCount;
+    } catch (e) {
+        console.error('Error syncing services count:', e);
+        return 0;
     }
 };
 

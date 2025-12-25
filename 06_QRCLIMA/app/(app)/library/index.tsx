@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, TextInput, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
-import { getBrands, BrandData, searchErrorsInModel, ErrorCodeData } from '../../../services/database-service';
+import { getBrands, BrandData, searchErrorsInModel, SearchResultData } from '../../../services/database-service';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -31,7 +31,7 @@ export default function LibraryIndex() {
     const [loading, setLoading] = useState(true);
     const [searchMode, setSearchMode] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState<ErrorCodeData[]>([]);
+    const [searchResults, setSearchResults] = useState<SearchResultData[]>([]);
     const [searching, setSearching] = useState(false);
 
     useEffect(() => {
@@ -155,7 +155,7 @@ export default function LibraryIndex() {
         );
     };
 
-    const renderSearchResult = ({ item }: { item: ErrorCodeData }) => (
+    const renderSearchResult = ({ item }: { item: SearchResultData }) => (
         <TouchableOpacity
             onPress={() => router.push({
                 pathname: '/(app)/library/errors',
@@ -185,6 +185,16 @@ export default function LibraryIndex() {
                 }}>
                     <Text style={{ color: '#DC2626', fontWeight: 'bold', fontSize: 18 }}>{item.code}</Text>
                 </View>
+                {item.model_name && (
+                    <View style={{
+                        backgroundColor: '#E0E7FF',
+                        paddingHorizontal: 10,
+                        paddingVertical: 4,
+                        borderRadius: 12,
+                    }}>
+                        <Text style={{ color: '#4338CA', fontWeight: '600', fontSize: 12 }}>{item.model_name}</Text>
+                    </View>
+                )}
             </View>
             <Text style={{ color: '#374151' }} numberOfLines={2}>{item.description}</Text>
         </TouchableOpacity>
@@ -240,7 +250,7 @@ export default function LibraryIndex() {
                         <TextInput
                             value={searchQuery}
                             onChangeText={setSearchQuery}
-                            placeholder="Buscar código de error (ej: E1, F2)..."
+                            placeholder="Buscar código o modelo (ej: E1, Flex, X32)..."
                             placeholderTextColor="#9CA3AF"
                             style={{ flex: 1, marginLeft: 12, color: '#1F2937' }}
                             autoFocus
@@ -288,7 +298,7 @@ export default function LibraryIndex() {
                         ) : searchQuery.length > 1 ? (
                             <FlatList
                                 data={searchResults}
-                                keyExtractor={(item) => `${item.model_id}-${item.code}`}
+                                keyExtractor={(item) => item.id.toString()}
                                 renderItem={renderSearchResult}
                                 ListEmptyComponent={
                                     <View style={{ alignItems: 'center', marginTop: 40 }}>
@@ -301,8 +311,8 @@ export default function LibraryIndex() {
                         ) : (
                             <View style={{ alignItems: 'center', marginTop: 40 }}>
                                 <Ionicons name="keypad-outline" size={48} color="#9CA3AF" />
-                                <Text style={{ color: '#9CA3AF', marginTop: 16 }}>Escribe un código de error</Text>
-                                <Text style={{ color: '#D1D5DB', fontSize: 12 }}>Ej: E1, E2, F3, H6...</Text>
+                                <Text style={{ color: '#9CA3AF', marginTop: 16 }}>Escribe un código o modelo</Text>
+                                <Text style={{ color: '#D1D5DB', fontSize: 12 }}>Ej: E1, Flex, X32, Inverter...</Text>
                             </View>
                         )}
                     </View>

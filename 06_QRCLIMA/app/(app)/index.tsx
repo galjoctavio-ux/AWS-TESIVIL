@@ -4,7 +4,7 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { useState, useCallback, useMemo } from 'react';
 import { getClients, ClientData } from '../../services/clients-service';
 import { getUserProfile, UserProfile, UserRank } from '../../services/user-service';
-import { getRecentServices } from '../../services/services-service';
+import { getRecentServices, getTotalServicesCount } from '../../services/services-service';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomNav from '../../components/BottomNav';
@@ -26,6 +26,7 @@ export default function HomeScreen() {
     const [upcomingServices, setUpcomingServices] = useState<any[]>([]);
     const [recentServices, setRecentServices] = useState<any[]>([]);
     const [clients, setClients] = useState<any[]>([]);
+    const [servicesCount, setServicesCount] = useState(0);
 
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -33,16 +34,18 @@ export default function HomeScreen() {
     const loadData = async () => {
         if (!user) return;
         try {
-            const [profileData, upcomingData, recentData, clientsData] = await Promise.all([
+            const [profileData, upcomingData, recentData, clientsData, totalServices] = await Promise.all([
                 getUserProfile(user.uid),
                 import('../../services/services-service').then(mod => mod.getUpcomingServices(user.uid)),
                 getRecentServices(user.uid, 5),
-                getClients(user.uid)
+                getClients(user.uid),
+                getTotalServicesCount(user.uid)
             ]);
             setProfile(profileData);
             setUpcomingServices(upcomingData);
             setRecentServices(recentData);
             setClients(clientsData);
+            setServicesCount(totalServices);
         } catch (err) {
             console.error("Error loading data:", err);
         }
@@ -201,14 +204,14 @@ export default function HomeScreen() {
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                            onPress={() => router.push('/(app)/tools/btu-calculator')}
+                            onPress={() => router.push('/(app)/tools/btu-calculator-free')}
                             className="flex-1 bg-white rounded-2xl p-4 border border-gray-100 flex-row items-center"
                         >
                             <View className="bg-purple-100 w-10 h-10 rounded-xl items-center justify-center mr-3">
                                 <Ionicons name="calculator" size={20} color="#7C3AED" />
                             </View>
                             <View>
-                                <Text className="text-gray-800 font-semibold">Calc BTU</Text>
+                                <Text className="text-gray-800 font-semibold">Calculadora BTU</Text>
                                 <Text className="text-gray-400 text-xs">Carga térmica</Text>
                             </View>
                         </TouchableOpacity>
@@ -270,7 +273,7 @@ export default function HomeScreen() {
                             <Text className="text-2xl mr-2">{rankInfo.icon}</Text>
                             <View>
                                 <Text className="text-white font-semibold">{rankInfo.label}</Text>
-                                <Text className="text-gray-400 text-xs">{profile?.stats?.servicesCount || 0} servicios realizados</Text>
+                                <Text className="text-gray-400 text-xs">{servicesCount} servicios realizados</Text>
                             </View>
                         </View>
                         <TouchableOpacity

@@ -10,7 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 const getRankInfo = (rank: UserRank | undefined) => {
     switch (rank) {
         case 'Experto':
-            return { icon: '🥇', label: 'Experto Certificado', color: 'bg-gradient-to-r from-purple-400 to-purple-500', textColor: 'text-purple-700' };
+            return { icon: '🥇', label: 'Experto', color: 'bg-gradient-to-r from-purple-400 to-purple-500', textColor: 'text-purple-700' };
         case 'Técnico':
             return { icon: '🛡️', label: 'Técnico Profesional', color: 'bg-blue-500', textColor: 'text-blue-700' };
         default:
@@ -25,7 +25,7 @@ const MODULES = [
     { id: 'quotes', icon: 'document-text', label: 'Cotizador Pro', route: '/(app)/quotes', color: 'bg-green-600', iconBg: 'bg-green-500' },
     { id: 'cotizador-free', icon: 'create', label: 'Cotizador Free', route: '/(app)/cotizador', color: 'bg-emerald-500', iconBg: 'bg-emerald-400' },
     // Row 2: Tools
-    { id: 'btu', icon: 'calculator', label: 'Calc BTU', route: '/(app)/tools/btu-calculator', color: 'bg-purple-600', iconBg: 'bg-purple-500' },
+    { id: 'btu', icon: 'calculator', label: 'Calculadora BTU', route: '/(app)/tools/btu-calculator-free', color: 'bg-purple-600', iconBg: 'bg-purple-500' },
     { id: 'cables', icon: 'flash', label: 'Guía Cables', route: '/(app)/tools/cable-guide', color: 'bg-yellow-500', iconBg: 'bg-yellow-400' },
     { id: 'pt-table', icon: 'thermometer', label: 'Tabla P-T', route: '/(app)/tools/pt-table', color: 'bg-cyan-600', iconBg: 'bg-cyan-500' },
     { id: 'errors', icon: 'warning', label: 'Códigos Error', route: '/(app)/library', color: 'bg-red-500', iconBg: 'bg-red-400' },

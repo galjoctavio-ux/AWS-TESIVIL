@@ -2,16 +2,18 @@ import { View, Text, TouchableOpacity, ScrollView, Alert, RefreshControl, Image,
 import { useRouter, useFocusEffect } from 'expo-router';
 import { useAuth } from '../../../context/AuthContext';
 import { getUserProfile, UserProfile, UserRank } from '../../../services/user-service';
+import { getEquipmentsByTechnician } from '../../../services/equipment-service';
 import { updateProfilePhotoFlow } from '../../../services/image-service';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useState, useCallback } from 'react';
 import BottomNav from '../../../components/BottomNav';
 import AcademyLeadCapture from '../../../components/AcademyLeadCapture';
+import ProfileCompletionGuide from '../../../components/ProfileCompletionGuide';
 
 const getRankInfo = (rank: UserRank | undefined) => {
     switch (rank) {
-        case 'Experto': return { icon: '🥇', label: 'Experto Certificado', color: 'bg-purple-100', textColor: 'text-purple-700' };
+        case 'Experto': return { icon: '🥇', label: 'Experto', color: 'bg-purple-100', textColor: 'text-purple-700' };
         case 'Técnico': return { icon: '🛡️', label: 'Técnico Profesional', color: 'bg-blue-100', textColor: 'text-blue-700' };
         default: return { icon: '🌱', label: 'Técnico Novato', color: 'bg-green-100', textColor: 'text-green-600' };
     }
@@ -24,12 +26,18 @@ export default function ProfileScreen() {
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [refreshing, setRefreshing] = useState(false);
     const [uploadingPhoto, setUploadingPhoto] = useState(false);
+    const [qrCount, setQrCount] = useState(0);
+    const [showGuide, setShowGuide] = useState(false);
 
     const loadProfile = async () => {
         if (!user) return;
         try {
-            const data = await getUserProfile(user.uid);
+            const [data, equipments] = await Promise.all([
+                getUserProfile(user.uid),
+                getEquipmentsByTechnician(user.uid)
+            ]);
             setProfile(data);
+            setQrCount(equipments.length);
         } catch (err) {
             console.error('Error loading profile:', err);
         }
@@ -154,16 +162,23 @@ export default function ProfileScreen() {
                             </View>
                         </View>
 
-                        {/* Profile Completeness */}
-                        <View className="bg-gray-50 rounded-2xl p-4">
+                        {/* Profile Completeness - Clickable to open guide */}
+                        <TouchableOpacity
+                            onPress={() => setShowGuide(true)}
+                            className="bg-gray-50 rounded-2xl p-4 active:bg-gray-100"
+                        >
                             <View className="flex-row justify-between items-center mb-2">
-                                <Text className="text-gray-600 font-medium">Perfil completado</Text>
+                                <View className="flex-row items-center">
+                                    <Text className="text-gray-600 font-medium">Perfil completado</Text>
+                                    <Ionicons name="chevron-forward" size={16} color="#9CA3AF" className="ml-1" />
+                                </View>
                                 <Text className="text-blue-600 font-bold">{completenessScore}%</Text>
                             </View>
                             <View className="h-2 bg-gray-200 rounded-full overflow-hidden">
                                 <View className="h-full bg-blue-600 rounded-full" style={{ width: `${completenessScore}%` }} />
                             </View>
-                        </View>
+                            <Text className="text-gray-400 text-xs mt-2">Toca para ver qué te falta</Text>
+                        </TouchableOpacity>
 
                         {/* Stats Row */}
                         <View className="flex-row mt-4 pt-4 border-t border-gray-100">
@@ -173,7 +188,7 @@ export default function ProfileScreen() {
                             </View>
                             <View className="w-px bg-gray-100" />
                             <View className="flex-1 items-center">
-                                <Text className="text-2xl font-bold text-gray-800">{profile?.stats?.qrsActive || 0}</Text>
+                                <Text className="text-2xl font-bold text-gray-800">{qrCount}</Text>
                                 <Text className="text-gray-500 text-xs">QRs</Text>
                             </View>
                             <View className="w-px bg-gray-100" />
@@ -321,6 +336,13 @@ export default function ProfileScreen() {
 
             {/* Bottom Navigation */}
             <BottomNav />
+
+            {/* Profile Completion Guide Modal */}
+            <ProfileCompletionGuide
+                profile={profile}
+                isVisible={showGuide}
+                onClose={() => setShowGuide(false)}
+            />
         </View>
     );
 }

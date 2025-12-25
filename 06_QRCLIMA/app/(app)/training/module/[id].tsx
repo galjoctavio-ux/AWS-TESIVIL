@@ -33,6 +33,7 @@ export default function ModuleViewer() {
     const [quizReason, setQuizReason] = useState('');
     const [remainingTime, setRemainingTime] = useState(0);
     const [scrolledToEnd, setScrolledToEnd] = useState(false);
+    const [isReadingStarted, setIsReadingStarted] = useState(false);
 
     // Quiz state
     const [showQuiz, setShowQuiz] = useState(false);
@@ -65,6 +66,7 @@ export default function ModuleViewer() {
             // Start reading tracking
             if (user?.uid && mod) {
                 await startReading(user.uid, mod.id);
+                setIsReadingStarted(true);
             }
         } catch (error) {
             console.error('Error loading module:', error);
@@ -90,7 +92,7 @@ export default function ModuleViewer() {
     // Check quiz availability periodically
     useEffect(() => {
         const checkQuiz = async () => {
-            if (!user?.uid || !module) return;
+            if (!user?.uid || !module || !isReadingStarted) return;
             const result = await canTakeQuiz(user.uid, module.id, scrolledToEnd);
             setCanQuiz(result.allowed);
             setQuizReason(result.reason || '');
@@ -100,7 +102,7 @@ export default function ModuleViewer() {
         checkQuiz();
         const interval = setInterval(checkQuiz, 5000); // Check every 5 seconds
         return () => clearInterval(interval);
-    }, [user?.uid, module, scrolledToEnd]);
+    }, [user?.uid, module, scrolledToEnd, isReadingStarted]);
 
     // Countdown timer
     useEffect(() => {

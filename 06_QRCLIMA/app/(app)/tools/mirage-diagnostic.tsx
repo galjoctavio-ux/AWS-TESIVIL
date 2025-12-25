@@ -166,17 +166,23 @@ export default function MirageDiagnosticScreen() {
                     <View className="flex-row mx-4 mt-4 bg-gray-100 rounded-xl p-1">
                         <TouchableOpacity
                             onPress={() => setSelectedControlType('A')}
-                            className={`flex-1 py-2 rounded-lg ${selectedControlType === 'A' ? 'bg-white shadow-sm' : ''}`}
+                            style={[
+                                { flex: 1, paddingVertical: 8, borderRadius: 8 },
+                                selectedControlType === 'A' && { backgroundColor: 'white', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 2, elevation: 2 }
+                            ]}
                         >
-                            <Text className={`text-center font-semibold ${selectedControlType === 'A' ? 'text-orange-600' : 'text-gray-500'}`}>
+                            <Text style={{ textAlign: 'center', fontWeight: '600', color: selectedControlType === 'A' ? '#EA580C' : '#6B7280' }}>
                                 Control Tipo A
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             onPress={() => setSelectedControlType('B')}
-                            className={`flex-1 py-2 rounded-lg ${selectedControlType === 'B' ? 'bg-white shadow-sm' : ''}`}
+                            style={[
+                                { flex: 1, paddingVertical: 8, borderRadius: 8 },
+                                selectedControlType === 'B' && { backgroundColor: 'white', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 2, elevation: 2 }
+                            ]}
                         >
-                            <Text className={`text-center font-semibold ${selectedControlType === 'B' ? 'text-orange-600' : 'text-gray-500'}`}>
+                            <Text style={{ textAlign: 'center', fontWeight: '600', color: selectedControlType === 'B' ? '#EA580C' : '#6B7280' }}>
                                 Control Tipo B
                             </Text>
                         </TouchableOpacity>

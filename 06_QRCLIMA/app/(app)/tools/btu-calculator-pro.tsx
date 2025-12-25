@@ -3,6 +3,7 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Svg, { Path, Circle, G, Text as SvgText } from 'react-native-svg';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { auth } from '../../../firebaseConfig';
 import { getUserProfile, isUserPro, BrandingConfig } from '../../../services/user-service';
 import {
@@ -240,6 +241,7 @@ const ChipSelector = <T extends string>({
 
 export default function BTUCalculatorPRO() {
     const router = useRouter();
+    const insets = useSafeAreaInsets();
     const [step, setStep] = useState(1);
     const [state, setState] = useState<BTUCalculatorState>(createDefaultState());
     const [primaryOrientation, setPrimaryOrientation] = useState<Orientation | null>(null);
@@ -422,7 +424,10 @@ export default function BTUCalculatorPRO() {
                 </View>
 
                 {/* Dimensions */}
-                <Text className="text-lg font-bold text-gray-800 mb-3">📐 Dimensiones del Espacio</Text>
+                <View className="flex-row items-center mb-3">
+                    <Ionicons name="resize-outline" size={20} color="#374151" />
+                    <Text className="text-lg font-bold text-gray-800 ml-2">Dimensiones del Espacio</Text>
+                </View>
 
                 <View className="flex-row gap-3 mb-4">
                     <View className="flex-1">
@@ -434,8 +439,13 @@ export default function BTUCalculatorPRO() {
                             value={state.length > 0 ? state.length.toString() : ''}
                             onChangeText={(text) => {
                                 const cleaned = text.replace(',', '.');
-                                const num = parseFloat(cleaned);
-                                updateState({ length: isNaN(num) ? 0 : num });
+                                // Allow empty string, or valid decimal patterns including trailing dot
+                                if (cleaned === '' || cleaned === '.') {
+                                    updateState({ length: 0 });
+                                } else if (/^\d*\.?\d*$/.test(cleaned)) {
+                                    const num = parseFloat(cleaned);
+                                    updateState({ length: isNaN(num) ? 0 : num });
+                                }
                             }}
                         />
                     </View>
@@ -448,8 +458,12 @@ export default function BTUCalculatorPRO() {
                             value={state.width > 0 ? state.width.toString() : ''}
                             onChangeText={(text) => {
                                 const cleaned = text.replace(',', '.');
-                                const num = parseFloat(cleaned);
-                                updateState({ width: isNaN(num) ? 0 : num });
+                                if (cleaned === '' || cleaned === '.') {
+                                    updateState({ width: 0 });
+                                } else if (/^\d*\.?\d*$/.test(cleaned)) {
+                                    const num = parseFloat(cleaned);
+                                    updateState({ width: isNaN(num) ? 0 : num });
+                                }
                             }}
                         />
                     </View>
@@ -462,15 +476,22 @@ export default function BTUCalculatorPRO() {
                             value={state.height > 0 ? state.height.toString() : ''}
                             onChangeText={(text) => {
                                 const cleaned = text.replace(',', '.');
-                                const num = parseFloat(cleaned);
-                                updateState({ height: isNaN(num) ? 2.5 : num });
+                                if (cleaned === '' || cleaned === '.') {
+                                    updateState({ height: 2.5 });
+                                } else if (/^\d*\.?\d*$/.test(cleaned)) {
+                                    const num = parseFloat(cleaned);
+                                    updateState({ height: isNaN(num) ? 2.5 : num });
+                                }
                             }}
                         />
                     </View>
                 </View>
 
                 {/* Climate Zone */}
-                <Text className="text-lg font-bold text-gray-800 mb-3 mt-2">🌡️ Zona Climática</Text>
+                <View className="flex-row items-center mb-3 mt-2">
+                    <Ionicons name="thermometer-outline" size={20} color="#374151" />
+                    <Text className="text-lg font-bold text-gray-800 ml-2">Zona Climática</Text>
+                </View>
                 <View className="flex-row gap-2 mb-6">
                     {(['templada', 'calida', 'muy_calida'] as ClimateZone[]).map((zone) => (
                         <TouchableOpacity
@@ -492,7 +513,10 @@ export default function BTUCalculatorPRO() {
                 </View>
 
                 {/* Orientation Compass */}
-                <Text className="text-lg font-bold text-gray-800 mb-2">🧭 Orientación Principal</Text>
+                <View className="flex-row items-center mb-2">
+                    <Ionicons name="compass-outline" size={20} color="#374151" />
+                    <Text className="text-lg font-bold text-gray-800 ml-2">Orientación Principal</Text>
+                </View>
                 <Text className="text-gray-500 text-sm mb-2">
                     ¿Hacia dónde dan las paredes con más exposición al sol?
                 </Text>
@@ -526,7 +550,10 @@ export default function BTUCalculatorPRO() {
                     {/* Walls Section */}
                     <View className="mb-6">
                         <View className="flex-row justify-between items-center mb-3">
-                            <Text className="text-lg font-bold text-gray-800">🧱 Muros Expuestos</Text>
+                            <View className="flex-row items-center">
+                                <Ionicons name="layers-outline" size={20} color="#374151" />
+                                <Text className="text-lg font-bold text-gray-800 ml-2">Muros Expuestos</Text>
+                            </View>
                             <TouchableOpacity
                                 onPress={addWall}
                                 className="bg-blue-100 px-3 py-1 rounded-lg flex-row items-center"
@@ -623,7 +650,10 @@ export default function BTUCalculatorPRO() {
                     {/* Windows Section */}
                     <View className="mb-6">
                         <View className="flex-row justify-between items-center mb-3">
-                            <Text className="text-lg font-bold text-gray-800">🪟 Ventanas</Text>
+                            <View className="flex-row items-center">
+                                <Ionicons name="grid-outline" size={20} color="#374151" />
+                                <Text className="text-lg font-bold text-gray-800 ml-2">Ventanas</Text>
+                            </View>
                             <TouchableOpacity
                                 onPress={addWindow}
                                 className="bg-blue-100 px-3 py-1 rounded-lg flex-row items-center"
@@ -700,7 +730,10 @@ export default function BTUCalculatorPRO() {
 
                     {/* Ceiling Section */}
                     <View className="mb-6">
-                        <Text className="text-lg font-bold text-gray-800 mb-3">🏠 Techo</Text>
+                        <View className="flex-row items-center mb-3">
+                            <Ionicons name="home-outline" size={20} color="#374151" />
+                            <Text className="text-lg font-bold text-gray-800 ml-2">Techo</Text>
+                        </View>
                         <View className="bg-white p-4 rounded-xl border border-gray-200">
                             <Text className="text-xs text-gray-500 mb-1">Tipo de Techo</Text>
                             <ChipSelector
@@ -734,7 +767,10 @@ export default function BTUCalculatorPRO() {
 
                     {/* Internal Loads Section */}
                     <View className="mb-6">
-                        <Text className="text-lg font-bold text-gray-800 mb-3">🔌 Cargas Internas</Text>
+                        <View className="flex-row items-center mb-3">
+                            <Ionicons name="flash-outline" size={20} color="#374151" />
+                            <Text className="text-lg font-bold text-gray-800 ml-2">Cargas Internas</Text>
+                        </View>
                         <View className="bg-white p-4 rounded-xl border border-gray-200">
                             {/* Persons */}
                             <View className="flex-row items-center justify-between mb-4">
@@ -917,15 +953,19 @@ export default function BTUCalculatorPRO() {
 
                     {/* Pie Chart */}
                     <View className="bg-white p-4 rounded-xl border border-gray-200 mb-6">
-                        <Text className="text-lg font-bold text-gray-800 mb-4 text-center">
-                            📊 Distribución de Carga Térmica
-                        </Text>
+                        <View className="flex-row items-center justify-center mb-4">
+                            <Ionicons name="pie-chart" size={20} color="#374151" />
+                            <Text className="text-lg font-bold text-gray-800 ml-2">Distribución de Carga Térmica</Text>
+                        </View>
                         <PieChart data={pieData} />
                     </View>
 
                     {/* Recommendations */}
                     <View className="bg-yellow-50 p-4 rounded-xl border border-yellow-200 mb-6">
-                        <Text className="text-yellow-800 font-bold mb-3">💡 Recomendaciones</Text>
+                        <View className="flex-row items-center mb-3">
+                            <Ionicons name="bulb" size={20} color="#A16207" />
+                            <Text className="text-yellow-800 font-bold ml-2">Recomendaciones</Text>
+                        </View>
                         {recommendations.map((rec, idx) => (
                             <Text key={idx} className="text-yellow-700 text-sm mb-2 leading-5">
                                 {rec}
@@ -935,18 +975,24 @@ export default function BTUCalculatorPRO() {
 
                     {/* Breakdown Table */}
                     <View className="bg-white p-4 rounded-xl border border-gray-200 mb-6">
-                        <Text className="text-lg font-bold text-gray-800 mb-3">📋 Desglose Detallado</Text>
+                        <View className="flex-row items-center mb-3">
+                            <Ionicons name="list" size={20} color="#374151" />
+                            <Text className="text-lg font-bold text-gray-800 ml-2">Desglose Detallado</Text>
+                        </View>
                         {[
-                            { label: '🧱 Conducción (Muros/Techo)', value: result.breakdown.conduccion },
-                            { label: '☀️ Radiación Solar (Ventanas)', value: result.breakdown.radiacion },
-                            { label: '👥 Personas', value: result.breakdown.personas },
-                            { label: '📺 Equipos Eléctricos', value: result.breakdown.equipos },
-                            { label: '🍳 Estufa/Cocina', value: result.breakdown.estufa },
-                            { label: '💡 Iluminación', value: result.breakdown.iluminacion },
-                            { label: '💨 Infiltración', value: result.breakdown.infiltracion },
+                            { label: 'Conducción (Muros/Techo)', value: result.breakdown.conduccion, icon: 'layers-outline' },
+                            { label: 'Radiación Solar (Ventanas)', value: result.breakdown.radiacion, icon: 'sunny-outline' },
+                            { label: 'Personas', value: result.breakdown.personas, icon: 'people-outline' },
+                            { label: 'Equipos Eléctricos', value: result.breakdown.equipos, icon: 'tv-outline' },
+                            { label: 'Estufa/Cocina', value: result.breakdown.estufa, icon: 'flame-outline' },
+                            { label: 'Iluminación', value: result.breakdown.iluminacion, icon: 'bulb-outline' },
+                            { label: 'Infiltración', value: result.breakdown.infiltracion, icon: 'cloud-outline' },
                         ].filter(item => item.value > 0).map((item, idx) => (
-                            <View key={idx} className="flex-row justify-between py-2 border-b border-gray-100">
-                                <Text className="text-gray-600">{item.label}</Text>
+                            <View key={idx} className="flex-row justify-between items-center py-2 border-b border-gray-100">
+                                <View className="flex-row items-center">
+                                    <Ionicons name={item.icon as any} size={16} color="#6B7280" />
+                                    <Text className="text-gray-600 ml-2">{item.label}</Text>
+                                </View>
                                 <Text className="font-medium text-gray-800">{item.value.toLocaleString()} BTU</Text>
                             </View>
                         ))}
@@ -988,6 +1034,9 @@ export default function BTUCalculatorPRO() {
                             <Text className="text-blue-600 font-medium ml-2">Modificar Configuración</Text>
                         </TouchableOpacity>
                     </View>
+
+                    {/* Bottom spacing for navigation */}
+                    <View className="h-32" />
                 </View>
             </ScrollView>
         );
@@ -999,6 +1048,19 @@ export default function BTUCalculatorPRO() {
 
     return (
         <View className="flex-1 bg-slate-50">
+            {/* Header */}
+            <View className="bg-blue-600 pb-4 px-5" style={{ paddingTop: insets.top + 8 }}>
+                <View className="flex-row justify-between items-center">
+                    <View>
+                        <Text className="text-blue-200 text-sm">Herramienta PRO</Text>
+                        <Text className="text-white text-2xl font-bold">Calculadora BTU</Text>
+                    </View>
+                    <View className="bg-white/20 w-12 h-12 rounded-full items-center justify-center">
+                        <Ionicons name="calculator" size={24} color="white" />
+                    </View>
+                </View>
+            </View>
+
             <StepIndicator currentStep={step} />
             {step === 1 && renderStep1()}
             {step === 2 && renderStep2()}

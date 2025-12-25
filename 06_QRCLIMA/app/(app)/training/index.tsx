@@ -231,7 +231,7 @@ export default function TrainingFeed() {
                         />
                     </View>
                     <Text className="text-indigo-200 text-[10px] mt-2">
-                        🏆 Completa todos los módulos para obtener la Insignia "Técnico Certificado QRclima"
+                        🏆 Completa todos los módulos para obtener 3 días de PRO gratis
                     </Text>
                 </View>
             </View>

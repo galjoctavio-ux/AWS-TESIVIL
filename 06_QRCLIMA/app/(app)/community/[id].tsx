@@ -1,4 +1,5 @@
 import { View, Text, ScrollView, TouchableOpacity, TextInput, FlatList, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
@@ -59,6 +60,7 @@ const RankBadge = ({ rank, isPro = false }: { rank: UserRank; isPro?: boolean })
 };
 
 export default function ThreadDetail() {
+    const insets = useSafeAreaInsets();
     const { id } = useLocalSearchParams();
     const router = useRouter();
     const { user } = useAuth();
@@ -323,21 +325,23 @@ export default function ThreadDetail() {
 
             {/* Input Area */}
             {thread.status !== 'Resuelto' && (
-                <View className="bg-white p-4 border-t border-gray-200 flex-row items-end">
-                    <TextInput
-                        className="flex-1 bg-gray-100 rounded-2xl px-4 py-3 mr-2 max-h-24 text-gray-800"
-                        placeholder="Escribe una respuesta..."
-                        value={newComment}
-                        onChangeText={setNewComment}
-                        multiline
-                    />
-                    <TouchableOpacity
-                        onPress={handleSendComment}
-                        disabled={submitting || !newComment.trim()}
-                        className={`w-12 h-12 rounded-full items-center justify-center ${submitting || !newComment.trim() ? 'bg-gray-300' : 'bg-blue-600'}`}
-                    >
-                        {submitting ? <ActivityIndicator color="white" size="small" /> : <Ionicons name="send" size={20} color="white" />}
-                    </TouchableOpacity>
+                <View style={{ backgroundColor: 'white', paddingBottom: insets.bottom }}>
+                    <View className="p-4 border-t border-gray-200 flex-row items-end">
+                        <TextInput
+                            className="flex-1 bg-gray-100 rounded-2xl px-4 py-3 mr-2 max-h-24 text-gray-800"
+                            placeholder="Escribe una respuesta..."
+                            value={newComment}
+                            onChangeText={setNewComment}
+                            multiline
+                        />
+                        <TouchableOpacity
+                            onPress={handleSendComment}
+                            disabled={submitting || !newComment.trim()}
+                            className={`w-12 h-12 rounded-full items-center justify-center ${submitting || !newComment.trim() ? 'bg-gray-300' : 'bg-blue-600'}`}
+                        >
+                            {submitting ? <ActivityIndicator color="white" size="small" /> : <Ionicons name="send" size={20} color="white" />}
+                        </TouchableOpacity>
+                    </View>
                 </View>
             )}
         </KeyboardAvoidingView>

@@ -32,15 +32,21 @@ export interface TrafficDistanceResult {
 interface CachedTrafficData {
     result: Omit<TrafficDistanceResult, 'isFromCache' | 'lastUpdated'> & { lastUpdated: string };
     cacheKey: string;
-    expiresAt: number; // timestamp
+    expiresAt: number; // timestamp (end of day)
+}
+
+interface DailyApiUsage {
+    date: string; // YYYY-MM-DD
+    count: number;
 }
 
 // ==========================================
 // CONSTANTS
 // ==========================================
 
-const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour in milliseconds
+const MAX_DAILY_API_CALLS = 5; // Maximum API calls per day for PRO users
 const CACHE_PREFIX = 'traffic_cache_';
+const DAILY_USAGE_KEY = '@traffic_daily_usage';
 const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_DIRECTIONS_API_KEY;
 
 // In-memory cache for faster access
@@ -91,7 +97,66 @@ const getCachedData = async (cacheKey: string): Promise<CachedTrafficData | null
 };
 
 /**
- * Save data to cache
+ * Get today's date as YYYY-MM-DD
+ */
+const getTodayString = (): string => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+};
+
+/**
+ * Get end of day timestamp for cache expiration
+ */
+const getEndOfDayTimestamp = (): number => {
+    const now = new Date();
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    return endOfDay.getTime();
+};
+
+/**
+ * Get current daily API usage
+ */
+const getDailyUsage = async (): Promise<DailyApiUsage> => {
+    try {
+        const stored = await AsyncStorage.getItem(DAILY_USAGE_KEY);
+        if (stored) {
+            const usage: DailyApiUsage = JSON.parse(stored);
+            // Reset if it's a new day
+            if (usage.date !== getTodayString()) {
+                return { date: getTodayString(), count: 0 };
+            }
+            return usage;
+        }
+    } catch (error) {
+        console.warn('[TrafficService] Usage read error:', error);
+    }
+    return { date: getTodayString(), count: 0 };
+};
+
+/**
+ * Increment daily API usage
+ */
+const incrementDailyUsage = async (): Promise<void> => {
+    try {
+        const usage = await getDailyUsage();
+        usage.count += 1;
+        await AsyncStorage.setItem(DAILY_USAGE_KEY, JSON.stringify(usage));
+        console.log(`[TrafficService] Daily usage: ${usage.count}/${MAX_DAILY_API_CALLS}`);
+    } catch (error) {
+        console.warn('[TrafficService] Usage write error:', error);
+    }
+};
+
+/**
+ * Check if we can make more API calls today
+ */
+const canMakeApiCall = async (): Promise<boolean> => {
+    const usage = await getDailyUsage();
+    return usage.count < MAX_DAILY_API_CALLS;
+};
+
+/**
+ * Save data to cache (expires at end of day)
  */
 const setCachedData = async (cacheKey: string, result: TrafficDistanceResult): Promise<void> => {
     const cacheData: CachedTrafficData = {
@@ -103,7 +168,7 @@ const setCachedData = async (cacheKey: string, result: TrafficDistanceResult): P
             lastUpdated: result.lastUpdated.toISOString(),
         },
         cacheKey,
-        expiresAt: Date.now() + CACHE_TTL_MS,
+        expiresAt: getEndOfDayTimestamp(), // Cache until end of day
     };
 
     // Save to memory
@@ -187,9 +252,9 @@ const getHaversineFallback = (origin: Coordinates, destination: Coordinates): Tr
 
 /**
  * Get traffic distance between two points
- * - Returns cached data if available and less than 1 hour old
- * - Fetches from Google Directions API for PRO users
- * - Falls back to Haversine if API unavailable
+ * - Returns cached data if available (valid until end of day)
+ * - Fetches from Google Directions API if under daily limit (5 calls/day)
+ * - Falls back to Haversine if API unavailable or limit reached
  */
 export const getTrafficDistance = async (
     origin: Coordinates,
@@ -211,11 +276,22 @@ export const getTrafficDistance = async (
         };
     }
 
+    // Check daily limit before making API call
+    const canCall = await canMakeApiCall();
+    if (!canCall) {
+        console.log('[TrafficService] Daily limit reached, using Haversine');
+        const fallback = getHaversineFallback(origin, destination);
+        await setCachedData(cacheKey, fallback);
+        return fallback;
+    }
+
     // Fetch from API
     console.log('[TrafficService] Fetching from Google Directions API...');
     const apiResult = await fetchGoogleDirections(origin, destination);
 
     if (apiResult) {
+        // Increment usage counter
+        await incrementDailyUsage();
         // Cache the result
         await setCachedData(cacheKey, apiResult);
         return apiResult;
@@ -257,4 +333,12 @@ export const formatDuration = (minutes: number): string => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return mins > 0 ? `${hours}h ${mins}min` : `${hours}h`;
+};
+
+/**
+ * Get remaining API calls for today
+ */
+export const getRemainingApiCalls = async (): Promise<number> => {
+    const usage = await getDailyUsage();
+    return Math.max(0, MAX_DAILY_API_CALLS - usage.count);
 };

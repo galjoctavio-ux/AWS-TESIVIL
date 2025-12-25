@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, TextInput, FlatList, ScrollView, Alert, KeyboardAvoidingView, Platform, Image, ActivityIndicator, Switch } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, FlatList, ScrollView, Alert, KeyboardAvoidingView, Platform, Image, ActivityIndicator, Switch, Modal } from 'react-native';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '../../../context/AuthContext';
@@ -19,7 +19,11 @@ export default function NewService() {
     const { settings } = useSettings();
 
     // URL Parameters for QR integration
-    const { equipmentId, qr_code } = useLocalSearchParams<{ equipmentId?: string; qr_code?: string }>();
+    const { equipmentId, qr_code, otherTechnician } = useLocalSearchParams<{
+        equipmentId?: string;
+        qr_code?: string;
+        otherTechnician?: string;  // Flag when equipment belongs to another technician
+    }>();
 
     // Steps: 0=QR Registration (if virgin QR), 1=Client, 2=Type, 3=Equipment, 4=Details/Review
     const [step, setStep] = useState(1);
@@ -31,6 +35,10 @@ export default function NewService() {
     const [preloadedClient, setPreloadedClient] = useState<any>(null);
     const [isQrVirgin, setIsQrVirgin] = useState(false);
     const [qrCodeValue, setQrCodeValue] = useState<string | null>(null);
+
+    // OTHER TECHNICIAN QR STATE
+    const [showOtherTechModal, setShowOtherTechModal] = useState(false);
+    const [isOtherTechEquipment, setIsOtherTechEquipment] = useState(false);
 
     // DATA STATE
     const [clients, setClients] = useState<any[]>([]);
@@ -83,16 +91,30 @@ export default function NewService() {
                     if (equipment) {
                         setPreloadedEquipment(equipment);
 
-                        // Preload client
-                        if (equipment.clientId) {
-                            const client = await getClientById(equipment.clientId);
-                            if (client) {
-                                setPreloadedClient(client);
-                                setSelectedClient(client);
+                        // Check if equipment belongs to another technician
+                        const belongsToOtherTech = equipment.technicianId !== user?.uid;
+                        setIsOtherTechEquipment(belongsToOtherTech);
+
+                        if (belongsToOtherTech) {
+                            // DO NOT load client from other technician (Firebase permission denied)
+                            // Show modal and let technician B select/create their own client
+                            setShowOtherTechModal(true);
+                            // Skip to step 1 (client selection) - technician needs to select THEIR client
+                            setStep(1);
+                        } else {
+                            // Same technician - OK to load client
+                            if (equipment.clientId) {
+                                const client = await getClientById(equipment.clientId);
+                                if (client) {
+                                    setPreloadedClient(client);
+                                    setSelectedClient(client);
+                                }
                             }
+                            // Start from Step 2 (Type selection) since client and equipment are preloaded
+                            setStep(2);
                         }
 
-                        // Preload equipment data
+                        // Preload equipment data (always, regardless of owner)
                         setSelectedBrand({
                             name: equipment.brand,
                             displayName: equipment.brand,
@@ -114,9 +136,6 @@ export default function NewService() {
                         // Check if equipment already has an installation (use installDate or lastServiceDate as indicator)
                         const hasInstall = !!(equipment.installDate || equipment.lastServiceDate);
                         setEquipmentHasInstallation(hasInstall);
-
-                        // Start from Step 2 (Type selection) since client and equipment are preloaded
-                        setStep(2);
                     }
                 } catch (error) {
                     console.error('Error loading preloaded equipment:', error);
@@ -132,7 +151,7 @@ export default function NewService() {
         };
 
         loadPreloadedData();
-    }, [equipmentId, qr_code]);
+    }, [equipmentId, qr_code, user?.uid]);
 
     // LOAD INITIAL DATA - Use useFocusEffect to reload clients when returning from add client
     useFocusEffect(
@@ -382,19 +401,25 @@ export default function NewService() {
 
             {/* Preloaded Equipment Banner */}
             {preloadedEquipment && (
-                <View className="bg-purple-100 border border-purple-200 rounded-xl p-3 mt-3 flex-row items-center">
-                    <View className="bg-purple-500 p-2 rounded-full mr-3">
+                <View className={`${isOtherTechEquipment ? 'bg-amber-100 border-amber-200' : 'bg-purple-100 border-purple-200'} border rounded-xl p-3 mt-3 flex-row items-center`}>
+                    <View className={`${isOtherTechEquipment ? 'bg-amber-500' : 'bg-purple-500'} p-2 rounded-full mr-3`}>
                         <Ionicons name="qr-code" size={16} color="white" />
                     </View>
                     <View className="flex-1">
-                        <Text className="text-purple-800 font-bold text-sm">
+                        <Text className={`${isOtherTechEquipment ? 'text-amber-800' : 'text-purple-800'} font-bold text-sm`}>
                             {preloadedEquipment.brand} {preloadedEquipment.model}
                         </Text>
-                        <Text className="text-purple-600 text-xs">
-                            Cliente: {preloadedClient?.name || 'Cargando...'}
+                        <Text className={`${isOtherTechEquipment ? 'text-amber-600' : 'text-purple-600'} text-xs`}>
+                            {isOtherTechEquipment
+                                ? (selectedClient?.name ? `Cliente: ${selectedClient.name}` : 'Selecciona un cliente de tu cartera')
+                                : `Cliente: ${preloadedClient?.name || 'Cargando...'}`}
                         </Text>
                     </View>
-                    <Ionicons name="checkmark-circle" size={20} color="#7C3AED" />
+                    <Ionicons
+                        name={isOtherTechEquipment && !selectedClient ? "alert-circle" : "checkmark-circle"}
+                        size={20}
+                        color={isOtherTechEquipment ? "#D97706" : "#7C3AED"}
+                    />
                 </View>
             )}
 
@@ -1534,6 +1559,65 @@ export default function NewService() {
                     </View>
                 </View>
             )}
+
+            {/* OTHER TECHNICIAN QR MODAL */}
+            <Modal
+                visible={showOtherTechModal}
+                transparent
+                animationType="fade"
+                onRequestClose={() => router.back()}
+            >
+                <View className="flex-1 bg-black/50 justify-center items-center p-6">
+                    <View className="bg-white rounded-2xl p-6 w-full max-w-sm">
+                        {/* Header con icono */}
+                        <View className="items-center mb-4">
+                            <View className="bg-amber-100 p-4 rounded-full">
+                                <Ionicons name="information-circle" size={40} color="#D97706" />
+                            </View>
+                        </View>
+
+                        {/* Equipo info */}
+                        {preloadedEquipment && (
+                            <View className="bg-purple-100 rounded-xl p-3 mb-4">
+                                <Text className="text-purple-800 font-bold text-center">
+                                    {preloadedEquipment.brand} {preloadedEquipment.model}
+                                </Text>
+                            </View>
+                        )}
+
+                        {/* Título */}
+                        <Text className="text-xl font-bold text-gray-800 text-center mb-3">
+                            Este QR pertenece a otro técnico
+                        </Text>
+
+                        {/* Contenido */}
+                        <Text className="text-gray-600 text-center mb-6 leading-5">
+                            Si registras un servicio nuevo, tu número de contacto aparecerá
+                            en la hoja de vida del equipo y serás el técnico de referencia
+                            para el cliente.
+                        </Text>
+
+                        {/* Botones */}
+                        <TouchableOpacity
+                            onPress={() => setShowOtherTechModal(false)}
+                            className="bg-blue-600 rounded-xl py-4 mb-3"
+                        >
+                            <Text className="text-white font-bold text-center text-lg">
+                                Entendido, continuar
+                            </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            onPress={() => router.back()}
+                            className="py-3"
+                        >
+                            <Text className="text-gray-500 text-center">
+                                Cancelar
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </KeyboardAvoidingView>
     );
 }

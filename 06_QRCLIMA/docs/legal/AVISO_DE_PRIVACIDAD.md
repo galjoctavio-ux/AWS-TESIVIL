@@ -5,7 +5,7 @@
 ## Responsable del Tratamiento
 
 **QRclima**
-Correo de contacto: [correo@qrclima.mx]
+Correo de contacto: [qrclima@tesivil.com]
 
 ## Datos Personales Recabados
 
@@ -28,7 +28,7 @@ QRclima no vende ni transfiere datos personales a terceros, salvo obligación le
 ## Derechos ARCO
 
 El usuario podrá ejercer sus derechos ARCO mediante solicitud al correo:
-arco@qrclima.mx
+qrclima@tesivil.com
 
 ## Seguridad
 

@@ -2,8 +2,9 @@ import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Alert, Tex
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useAuth } from '../../../context/AuthContext';
 import { useState, useEffect } from 'react';
-import { getClientById, updateClient, getClientServices, ClientData } from '../../../services/clients-service';
+import { getClientById, updateClient, getClientServices, getClientEquipments, ClientData } from '../../../services/clients-service';
 import { ServiceData } from '../../../services/services-service';
+import { EquipmentData } from '../../../services/equipment-service';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function ClientProfile() {
@@ -13,6 +14,7 @@ export default function ClientProfile() {
 
     const [client, setClient] = useState<(ClientData & { id: string }) | null>(null);
     const [services, setServices] = useState<(ServiceData & { id: string })[]>([]);
+    const [equipments, setEquipments] = useState<(EquipmentData & { id: string })[]>([]);
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -24,7 +26,7 @@ export default function ClientProfile() {
     const [editNotes, setEditNotes] = useState('');
 
     // Active tab
-    const [activeTab, setActiveTab] = useState<'info' | 'history'>('info');
+    const [activeTab, setActiveTab] = useState<'info' | 'history' | 'equipments'>('info');
 
     useEffect(() => {
         loadData();
@@ -34,9 +36,10 @@ export default function ClientProfile() {
         if (!id || !user) return;
         setLoading(true);
         try {
-            const [clientData, servicesData] = await Promise.all([
+            const [clientData, servicesData, equipmentsData] = await Promise.all([
                 getClientById(id),
-                getClientServices(id, user.uid)
+                getClientServices(id, user.uid),
+                getClientEquipments(id)
             ]);
 
             if (clientData) {
@@ -47,6 +50,7 @@ export default function ClientProfile() {
                 setEditNotes(clientData.notes || '');
             }
             setServices(servicesData as (ServiceData & { id: string })[]);
+            setEquipments(equipmentsData as (EquipmentData & { id: string })[]);
         } catch (error) {
             console.error('Error loading client:', error);
             Alert.alert('Error', 'No se pudo cargar el cliente');
@@ -194,18 +198,26 @@ export default function ClientProfile() {
             <View className="flex-row px-6 pt-4">
                 <TouchableOpacity
                     onPress={() => setActiveTab('info')}
-                    className={`flex-1 py-3 rounded-t-xl ${activeTab === 'info' ? 'bg-white' : 'bg-gray-200'}`}
+                    className={`flex-1 py-2 rounded-t-xl ${activeTab === 'info' ? 'bg-white' : 'bg-gray-200'}`}
                 >
-                    <Text className={`text-center font-bold ${activeTab === 'info' ? 'text-blue-600' : 'text-gray-500'}`}>
-                        Datos Generales
+                    <Text className={`text-center font-bold text-xs ${activeTab === 'info' ? 'text-blue-600' : 'text-gray-500'}`}>
+                        Datos
                     </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={() => setActiveTab('history')}
-                    className={`flex-1 py-3 rounded-t-xl ${activeTab === 'history' ? 'bg-white' : 'bg-gray-200'}`}
+                    className={`flex-1 py-2 rounded-t-xl ${activeTab === 'history' ? 'bg-white' : 'bg-gray-200'}`}
                 >
-                    <Text className={`text-center font-bold ${activeTab === 'history' ? 'text-blue-600' : 'text-gray-500'}`}>
-                        Historial ({services.length})
+                    <Text className={`text-center font-bold text-xs ${activeTab === 'history' ? 'text-blue-600' : 'text-gray-500'}`}>
+                        Servicios ({services.length})
+                    </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => setActiveTab('equipments')}
+                    className={`flex-1 py-2 rounded-t-xl ${activeTab === 'equipments' ? 'bg-white' : 'bg-gray-200'}`}
+                >
+                    <Text className={`text-center font-bold text-xs ${activeTab === 'equipments' ? 'text-purple-600' : 'text-gray-500'}`}>
+                        Equipos ({equipments.length})
                     </Text>
                 </TouchableOpacity>
             </View>
@@ -312,7 +324,7 @@ export default function ClientProfile() {
                             </View>
                         )}
                     </View>
-                ) : (
+                ) : activeTab === 'history' ? (
                     // History Tab
                     <View className="py-4">
                         {services.length === 0 ? (
@@ -352,6 +364,69 @@ export default function ClientProfile() {
                                         <Text className="text-gray-500 text-sm mt-2 italic" numberOfLines={2}>
                                             "{service.notes}"
                                         </Text>
+                                    )}
+                                </TouchableOpacity>
+                            ))
+                        )}
+                    </View>
+                ) : (
+                    // Equipments Tab
+                    <View className="py-4">
+                        {equipments.length === 0 ? (
+                            <View className="items-center py-10">
+                                <Ionicons name="snow-outline" size={48} color="#9CA3AF" />
+                                <Text className="text-gray-500 mt-3">Sin equipos registrados</Text>
+                                <Text className="text-gray-400 text-sm text-center px-4">
+                                    Los equipos con QR activo para este cliente aparecerán aquí
+                                </Text>
+                            </View>
+                        ) : (
+                            equipments.map((equipment) => (
+                                <TouchableOpacity
+                                    key={equipment.id}
+                                    onPress={() => router.push(`/(app)/equipment/${equipment.id}`)}
+                                    className="bg-gray-50 p-4 rounded-xl mb-3 border-l-4 border-purple-500"
+                                >
+                                    <View className="flex-row justify-between items-start mb-2">
+                                        <View className="flex-1">
+                                            <Text className="text-lg font-bold text-gray-800">{equipment.brand}</Text>
+                                            <Text className="text-gray-600 text-sm">{equipment.model}</Text>
+                                        </View>
+                                        <View className="bg-purple-100 px-2 py-1 rounded-full">
+                                            <Text className="text-purple-700 text-xs font-bold">
+                                                🔗 {equipment.token}
+                                            </Text>
+                                        </View>
+                                    </View>
+
+                                    <View className="flex-row items-center gap-4 mt-2">
+                                        {equipment.btu && (
+                                            <View className="flex-row items-center">
+                                                <Ionicons name="thermometer" size={14} color="#6B7280" />
+                                                <Text className="text-gray-500 text-xs ml-1">{equipment.btu} BTU</Text>
+                                            </View>
+                                        )}
+                                        {equipment.location && (
+                                            <View className="flex-row items-center flex-1">
+                                                <Ionicons name="location" size={14} color="#6B7280" />
+                                                <Text className="text-gray-500 text-xs ml-1" numberOfLines={1}>{equipment.location}</Text>
+                                            </View>
+                                        )}
+                                    </View>
+
+                                    {equipment.lastServiceDate && (
+                                        <Text className="text-gray-400 text-xs mt-2">
+                                            Último servicio: {formatDate(equipment.lastServiceDate)}
+                                        </Text>
+                                    )}
+
+                                    {equipment.warrantyExpirationDate && (
+                                        <View className="mt-2 bg-green-50 p-2 rounded-lg flex-row items-center">
+                                            <Ionicons name="shield-checkmark" size={14} color="#16A34A" />
+                                            <Text className="text-green-600 text-xs ml-1">
+                                                Garantía hasta: {formatDate(equipment.warrantyExpirationDate)}
+                                            </Text>
+                                        </View>
                                     )}
                                 </TouchableOpacity>
                             ))

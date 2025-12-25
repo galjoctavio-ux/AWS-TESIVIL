@@ -108,20 +108,13 @@ export default function CommunityFeed() {
         }
     };
 
-    // Load threads when filter changes
-    useEffect(() => {
-        setCurrentPage(1);
-        loadThreads(1);
-    }, [filter]);
 
-    // Also refresh when screen comes into focus (after creating a new case)
+
+    // Refresh when screen comes into focus and when filter changes
     useFocusEffect(
         useCallback(() => {
-            // Only refresh if not already loading
-            if (!loading) {
-                loadThreads(1);
-            }
-        }, [])
+            loadThreads(1);
+        }, [filter])
     );
 
     const renderThread = ({ item }: { item: SOSThread }) => (
@@ -302,7 +295,8 @@ export default function CommunityFeed() {
             {/* FAB */}
             <TouchableOpacity
                 onPress={() => router.push('/(app)/community/new')}
-                className="absolute bottom-6 right-6 bg-red-500 w-14 h-14 rounded-full items-center justify-center shadow-lg"
+                className="absolute right-6 bg-red-500 w-14 h-14 rounded-full items-center justify-center shadow-lg"
+                style={{ bottom: insets.bottom + 24 }}
             >
                 <Ionicons name="add" size={32} color="white" />
             </TouchableOpacity>

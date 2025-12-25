@@ -4,9 +4,11 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useState, useRef } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { getEquipmentByQrCode } from '../../../services/equipment-service';
+import { useAuth } from '../../../context/AuthContext';
 
 export default function ScannerScreen() {
     const router = useRouter();
+    const { user } = useAuth();
     // mode: 'equipment' (default) or 'service'
     const { mode } = useLocalSearchParams<{ mode?: string }>();
     const [permission, requestPermission] = useCameraPermissions();
@@ -64,8 +66,11 @@ export default function ScannerScreen() {
             if (mode === 'service') {
                 // SERVICE MODE: Navigate to new service flow
                 if (equipment) {
+                    // Check if equipment belongs to another technician
+                    const isOtherTechnician = equipment.technicianId !== user?.uid;
+                    const otherTechParam = isOtherTechnician ? '&otherTechnician=true' : '';
                     // Equipment exists - navigate to new service with preloaded data
-                    router.replace(`/(app)/services/new?equipmentId=${equipment.id}`);
+                    router.replace(`/(app)/services/new?equipmentId=${equipment.id}${otherTechParam}`);
                 } else {
                     // Equipment not found - navigate to new service with QR code for inline registration
                     router.replace(`/(app)/services/new?qr_code=${encodeURIComponent(data)}`);

@@ -14,6 +14,7 @@ interface TabItem {
 const TABS: TabItem[] = [
     { name: 'Inicio', route: '/(app)/', icon: 'home-outline', iconActive: 'home' },
     { name: 'Agenda', route: '/(app)/agenda', icon: 'calendar-outline', iconActive: 'calendar' },
+    { name: 'Clientes', route: '/(app)/clients', icon: 'people-outline', iconActive: 'people' },
     { name: 'Herramientas', route: '/(app)/tools', icon: 'construct-outline', iconActive: 'construct' },
     { name: 'Perfil', route: '/(app)/profile', icon: 'person-outline', iconActive: 'person' },
 ];
@@ -42,7 +43,7 @@ export default function BottomNav() {
                 borderTopColor: '#E2E8F0',
                 paddingTop: 12,
                 paddingBottom: Math.max(insets.bottom, 12) + 12,
-                paddingHorizontal: 20,
+                paddingHorizontal: 8,
                 flexDirection: 'row',
                 justifyContent: 'space-around',
                 alignItems: 'center',

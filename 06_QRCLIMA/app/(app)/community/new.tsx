@@ -1,4 +1,5 @@
 import { View, Text, TouchableOpacity, TextInput, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Image, ActionSheetIOS } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,6 +9,7 @@ import { getUserProfile, isUserPro } from '../../../services/user-service';
 import { pickSOSPhoto, uploadSOSPhoto } from '../../../services/image-service';
 
 export default function NewThread() {
+    const insets = useSafeAreaInsets();
     const router = useRouter();
     const { user } = useAuth();
 
@@ -311,7 +313,7 @@ export default function NewThread() {
                     )}
                 </TouchableOpacity>
 
-                <View className="h-10" />
+                <View style={{ height: insets.bottom + 40 }} />
             </ScrollView>
         </KeyboardAvoidingView>
     );

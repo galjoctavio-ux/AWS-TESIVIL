@@ -1,4 +1,4 @@
-import { collection, addDoc, getDocs, query, where, serverTimestamp, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where, serverTimestamp, doc, getDoc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
 // ============================================
@@ -212,6 +212,17 @@ export const addEquipment = async (equipmentData: AddEquipmentInput): Promise<{ 
         });
 
         console.log(`Equipment created - ID: ${docRef.id}, Token: ${token}`);
+
+        // Update technician stats
+        try {
+            const userRef = doc(db, 'users', equipmentData.technicianId);
+            await updateDoc(userRef, {
+                'stats.qrsActive': increment(1)
+            });
+        } catch (e) {
+            console.error('Error updating technician stats for QR:', e);
+        }
+
         return { id: docRef.id, token };
     } catch (e) {
         console.error('Error adding equipment:', e);

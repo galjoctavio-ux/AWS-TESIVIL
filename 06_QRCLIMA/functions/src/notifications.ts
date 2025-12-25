@@ -221,7 +221,6 @@ export const sendMaintenanceReminders = functions.pubsub
             console.log(`Found ${snapshot.size} services due for maintenance in 7 days.`);
 
             // Process each service
-            const processedUsers = new Set<string>();
 
             for (const doc of snapshot.docs) {
                 const service = doc.data();
@@ -266,11 +265,8 @@ export const sendMaintenanceReminders = functions.pubsub
                     }
                 }
 
-                // Get Equipment Info
-                let equipmentInfo = 'Aire Acondicionado';
-                if (service.equipment_id) {
-                    // Could fetch equipment details if needed, but service should have basic info
-                }
+                // Get Equipment Info if needed
+                // service.equipment_id has the equipment details
 
                 // Send Notification
                 await sendPushNotification(

@@ -1,14 +1,17 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Dimensions, StyleSheet, Linking, Alert, Platform, Animated, PanResponder } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { deleteService, updateServiceDate } from '../../services/services-service';
+import { getClientById } from '../../services/clients-service';
 import { TrafficDistanceResult } from '../../services/traffic-distance-service';
 import DistanceIndicator from './DistanceIndicator';
 import MiniCRMCard from './MiniCRMCard';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 const { width, height } = Dimensions.get('window');
+
+type NavAppType = 'waze' | 'google' | 'apple';
 
 interface Props {
     selectedEvent: any | null;
@@ -24,6 +27,12 @@ interface Props {
     // PRO Traffic Data
     trafficData?: TrafficDistanceResult;
     isPro?: boolean;
+    // Base Location
+    hasBaseLocation?: boolean;
+    onGoToSettings?: () => void;
+    // Navigation App Preference
+    preferredNavApp?: NavAppType | null;
+    onRememberNavApp?: (app: NavAppType) => void;
 }
 
 export default function ActionSheet({
@@ -38,12 +47,45 @@ export default function ActionSheet({
     isFromBase,
     technicianId,
     trafficData,
-    isPro
+    isPro,
+    hasBaseLocation,
+    onGoToSettings,
+    preferredNavApp,
+    onRememberNavApp
 }: Props) {
     // Reschedule State
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);
     const [newDate, setNewDate] = useState<Date | null>(null);
+
+    // Client Phone State - Fetch from clients collection
+    const [clientPhone, setClientPhone] = useState<string | null>(null);
+
+    // Fetch client phone when sheet opens
+    useEffect(() => {
+        const fetchClientPhone = async () => {
+            const clientId = selectedEvent?.raw?.clientId;
+            if (clientId) {
+                try {
+                    const client = await getClientById(clientId);
+                    if (client?.phone) {
+                        setClientPhone(client.phone);
+                    } else {
+                        setClientPhone(null);
+                    }
+                } catch (error) {
+                    console.error('[ActionSheet] Error fetching client phone:', error);
+                    setClientPhone(null);
+                }
+            } else {
+                setClientPhone(null);
+            }
+        };
+
+        if (selectedEvent) {
+            fetchClientPhone();
+        }
+    }, [selectedEvent]);
 
     // Safe area for bottom navigation
     const insets = useSafeAreaInsets();
@@ -88,21 +130,106 @@ export default function ActionSheet({
     if (!selectedEvent) return null;
 
     const handleCall = () => {
-        const phone = selectedEvent.raw?.phone || selectedEvent.phone;
+        // Priority: fetched clientPhone > raw.phone > phone
+        const phone = clientPhone || selectedEvent.raw?.phone || selectedEvent.phone;
         if (phone) {
             Linking.openURL(`tel:${phone}`);
+        } else {
+            Alert.alert(
+                '📞 Sin número',
+                'Este cliente no tiene número de teléfono registrado.',
+                [{ text: 'Entendido' }]
+            );
         }
         onCall();
     };
 
-    const handleNavigate = () => {
+    // Navigation URL helpers
+    const getNavigationUrls = () => {
         const address = selectedEvent.address;
-        if (address) {
-            const encoded = encodeURIComponent(address);
-            Linking.openURL(`https://waze.com/ul?q=${encoded}&navigate=yes`).catch(() => {
-                Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encoded}`);
-            });
+        const lat = selectedEvent.lat || selectedEvent.raw?.lat;
+        const lng = selectedEvent.lng || selectedEvent.raw?.lng;
+        const encoded = encodeURIComponent(address || '');
+        const coords = lat && lng ? `${lat},${lng}` : '';
+
+        return {
+            waze: coords
+                ? `https://waze.com/ul?ll=${coords}&navigate=yes`
+                : `https://waze.com/ul?q=${encoded}&navigate=yes`,
+            google: coords
+                ? `https://www.google.com/maps/dir/?api=1&destination=${coords}`
+                : `https://www.google.com/maps/search/?api=1&query=${encoded}`,
+            apple: coords
+                ? `http://maps.apple.com/?daddr=${coords}`
+                : `http://maps.apple.com/?q=${encoded}`,
+            hasLocation: !!(address || lat)
+        };
+    };
+
+    const openNavApp = (app: 'waze' | 'google' | 'apple', remember: boolean = false) => {
+        const urls = getNavigationUrls();
+        const url = urls[app];
+
+        if (remember && onRememberNavApp) {
+            onRememberNavApp(app);
         }
+
+        Linking.openURL(url).catch(() => {
+            const appNames = { waze: 'Waze', google: 'Google Maps', apple: 'Apple Maps' };
+            Alert.alert('Error', `No se pudo abrir ${appNames[app]}`);
+        });
+    };
+
+    const handleNavigate = () => {
+        const urls = getNavigationUrls();
+
+        if (!urls.hasLocation) {
+            Alert.alert('📍 Sin ubicación', 'Esta cita no tiene dirección registrada.');
+            return;
+        }
+
+        // If user has a saved preference, use it directly
+        if (preferredNavApp) {
+            openNavApp(preferredNavApp);
+            onNavigate();
+            return;
+        }
+
+        // Otherwise, show picker with "remember" option
+        Alert.alert(
+            '🗺️ Navegación',
+            '¿Con qué app deseas abrir la ruta?',
+            [
+                {
+                    text: 'Waze',
+                    onPress: () => {
+                        Alert.alert('Recordar elección', '¿Siempre usar Waze?', [
+                            { text: 'Solo esta vez', onPress: () => openNavApp('waze', false) },
+                            { text: 'Siempre', onPress: () => openNavApp('waze', true) }
+                        ]);
+                    }
+                },
+                {
+                    text: 'Google Maps',
+                    onPress: () => {
+                        Alert.alert('Recordar elección', '¿Siempre usar Google Maps?', [
+                            { text: 'Solo esta vez', onPress: () => openNavApp('google', false) },
+                            { text: 'Siempre', onPress: () => openNavApp('google', true) }
+                        ]);
+                    }
+                },
+                {
+                    text: 'Apple Maps',
+                    onPress: () => {
+                        Alert.alert('Recordar elección', '¿Siempre usar Apple Maps?', [
+                            { text: 'Solo esta vez', onPress: () => openNavApp('apple', false) },
+                            { text: 'Siempre', onPress: () => openNavApp('apple', true) }
+                        ]);
+                    }
+                },
+                { text: 'Cancelar', style: 'cancel' }
+            ]
+        );
         onNavigate();
     };
 
@@ -210,6 +337,30 @@ export default function ActionSheet({
                             isPro={isPro}
                         />
                     </View>
+                )}
+
+                {/* Informative Banner - No Base Location Configured */}
+                {!hasBaseLocation && distanceKm === undefined && (
+                    <TouchableOpacity
+                        onPress={onGoToSettings}
+                        className="mb-3 bg-blue-50 border border-blue-200 rounded-xl p-3 flex-row items-start"
+                        activeOpacity={0.7}
+                    >
+                        <Ionicons name="location-outline" size={20} color="#2563EB" style={{ marginTop: 2 }} />
+                        <View className="flex-1 ml-2">
+                            <Text className="text-blue-800 font-bold text-sm">📍 Activa las distancias</Text>
+                            <Text className="text-blue-600 text-xs mt-1 leading-4">
+                                Configura tu ubicación base para ver la distancia lineal a cada cita.
+                                {isPro
+                                    ? ' Como usuario PRO, también verás el tiempo real con tráfico.'
+                                    : ' Los usuarios PRO también ven el tiempo con tráfico.'}
+                            </Text>
+                            <View className="flex-row items-center mt-2">
+                                <Text className="text-blue-700 font-bold text-xs">Ir a Configuración</Text>
+                                <Ionicons name="chevron-forward" size={14} color="#1D4ED8" />
+                            </View>
+                        </View>
+                    </TouchableOpacity>
                 )}
 
                 {/* Mini CRM Card */}

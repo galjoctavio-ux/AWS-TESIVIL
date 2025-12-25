@@ -27,6 +27,25 @@ export interface BrandingConfig {
     showQRclimaWatermark?: boolean; // Default true, PRO+ can hide
 }
 
+// Profile Achievements - Logros de primera vez
+export interface ProfileAchievements {
+    firstClient?: boolean;      // Primer cliente creado
+    firstAgenda?: boolean;      // Primera agenda creada  
+    firstLabelsPdf?: boolean;   // Primer PDF de etiquetas generado
+}
+
+// Criterio individual para guía de perfil
+export interface ProfileCriterion {
+    id: string;
+    label: string;
+    description: string;
+    weight: number;
+    completed: boolean;
+    icon: string;
+    route?: string;             // Ruta para completar este ítem
+    category: 'profile' | 'config' | 'achievement';
+}
+
 export interface UserProfile {
     // Identidad
     email: string | null;
@@ -83,6 +102,10 @@ export interface UserProfile {
         walletUpdates: boolean;
         storeOrders: boolean;
     };
+
+    // Perfil Completado v2.0 - Nuevos campos
+    preferredNavigationApp?: 'google' | 'waze' | 'apple';  // App preferida para navegación
+    achievements?: ProfileAchievements;                     // Logros de primera vez
 }
 
 // Perfil por defecto para usuarios nuevos
@@ -95,27 +118,216 @@ const DEFAULT_STATS: UserStats = {
 
 /**
  * Calcula el porcentaje de completitud del perfil (0-100)
- * Basado en los campos requeridos según master_plan.md
+ * Incluye datos de perfil, configuración y logros de uso
  */
 export const calculateProfileCompleteness = (profile: Partial<UserProfile>): number => {
-    const fields = [
-        { key: 'alias', weight: 25 },
-        { key: 'city', weight: 20 },
-        { key: 'experienceYears', weight: 15 },
-        { key: 'businessName', weight: 10 },
-        { key: 'termsAcceptedAt', weight: 15 },
-        { key: 'privacyAcceptedAt', weight: 15 },
+    const criteria = [
+        // Datos de Perfil (30%)
+        { check: !!profile.alias, weight: 5 },
+        { check: !!profile.city, weight: 5 },
+        { check: (profile.experienceYears || 0) > 0, weight: 5 },
+        { check: !!profile.businessName, weight: 5 },
+        { check: !!profile.termsAcceptedAt, weight: 5 },
+        { check: !!profile.privacyAcceptedAt, weight: 5 },
+
+        // Configuración (20%)
+        { check: !!(profile.baseLat && profile.baseLng), weight: 5 },
+        { check: !!profile.signature, weight: 5 },
+        { check: !!profile.preferredNavigationApp, weight: 5 },
+        { check: !!profile.photoURL, weight: 5 },
+
+        // Logros de Uso (50%)
+        { check: (profile.stats?.servicesCount || 0) >= 1, weight: 8 },
+        { check: (profile.stats?.qrsActive || 0) >= 1, weight: 8 },
+        { check: !!profile.achievements?.firstClient, weight: 8 },
+        { check: !!profile.achievements?.firstAgenda, weight: 8 },
+        { check: !!profile.achievements?.firstLabelsPdf, weight: 6 },
+        { check: (profile.stats?.sosSolved || 0) >= 1, weight: 6 },
+        { check: (profile.stats?.trainingCompleted || 0) >= 1, weight: 6 },
     ];
 
-    let score = 0;
-    for (const field of fields) {
-        const value = profile[field.key as keyof UserProfile];
-        if (value !== undefined && value !== null && value !== '') {
-            score += field.weight;
-        }
-    }
+    return criteria.reduce((sum, c) => sum + (c.check ? c.weight : 0), 0);
+};
 
-    return Math.min(score, 100);
+/**
+ * Obtiene los criterios de completitud con su estado actual
+ * Usado para mostrar la guía visual en el perfil
+ */
+export const getProfileCompletionCriteria = (profile: Partial<UserProfile>): ProfileCriterion[] => {
+    return [
+        // Datos de Perfil (30%)
+        {
+            id: 'alias',
+            label: 'Nombre de usuario',
+            description: 'Configura tu alias público',
+            weight: 5,
+            completed: !!profile.alias,
+            icon: 'person',
+            route: '/(app)/profile/settings',
+            category: 'profile',
+        },
+        {
+            id: 'city',
+            label: 'Ciudad',
+            description: 'Indica tu ciudad de trabajo',
+            weight: 5,
+            completed: !!profile.city,
+            icon: 'location',
+            route: '/(app)/profile/settings',
+            category: 'profile',
+        },
+        {
+            id: 'experience',
+            label: 'Años de experiencia',
+            description: 'Registra tu experiencia',
+            weight: 5,
+            completed: (profile.experienceYears || 0) > 0,
+            icon: 'trophy',
+            route: '/(app)/profile/settings',
+            category: 'profile',
+        },
+        {
+            id: 'business',
+            label: 'Nombre de empresa',
+            description: 'Agrega tu empresa (opcional)',
+            weight: 5,
+            completed: !!profile.businessName,
+            icon: 'business',
+            route: '/(app)/profile/settings',
+            category: 'profile',
+        },
+        {
+            id: 'terms',
+            label: 'Términos aceptados',
+            description: 'Acepta los términos de uso',
+            weight: 5,
+            completed: !!profile.termsAcceptedAt,
+            icon: 'document-text',
+            category: 'profile',
+        },
+        {
+            id: 'privacy',
+            label: 'Privacidad aceptada',
+            description: 'Acepta el aviso de privacidad',
+            weight: 5,
+            completed: !!profile.privacyAcceptedAt,
+            icon: 'shield-checkmark',
+            category: 'profile',
+        },
+
+        // Configuración (20%)
+        {
+            id: 'baseLocation',
+            label: 'Ubicación base',
+            description: 'Configura tu punto de partida',
+            weight: 5,
+            completed: !!(profile.baseLat && profile.baseLng),
+            icon: 'home',
+            route: '/(app)/profile/settings',
+            category: 'config',
+        },
+        {
+            id: 'signature',
+            label: 'Firma digital',
+            description: 'Crea tu firma para reportes',
+            weight: 5,
+            completed: !!profile.signature,
+            icon: 'create',
+            route: '/(app)/profile/signature',
+            category: 'config',
+        },
+        {
+            id: 'navApp',
+            label: 'App de navegación',
+            description: 'Elige Google Maps o Waze',
+            weight: 5,
+            completed: !!profile.preferredNavigationApp,
+            icon: 'navigate',
+            route: '/(app)/profile/settings',
+            category: 'config',
+        },
+        {
+            id: 'photo',
+            label: 'Foto de perfil',
+            description: 'Sube una foto profesional',
+            weight: 5,
+            completed: !!profile.photoURL,
+            icon: 'camera',
+            category: 'config',
+        },
+
+        // Logros de Uso (50%)
+        {
+            id: 'firstService',
+            label: 'Primer servicio',
+            description: 'Registra tu primer servicio',
+            weight: 8,
+            completed: (profile.stats?.servicesCount || 0) >= 1,
+            icon: 'construct',
+            route: '/(app)/services',
+            category: 'achievement',
+        },
+        {
+            id: 'firstQR',
+            label: 'Primer QR activo',
+            description: 'Da de alta tu primer QR',
+            weight: 8,
+            completed: (profile.stats?.qrsActive || 0) >= 1,
+            icon: 'qr-code',
+            route: '/(app)/scanner',
+            category: 'achievement',
+        },
+        {
+            id: 'firstClient',
+            label: 'Primer cliente',
+            description: 'Crea tu primer cliente',
+            weight: 8,
+            completed: !!profile.achievements?.firstClient,
+            icon: 'people',
+            route: '/(app)/clients',
+            category: 'achievement',
+        },
+        {
+            id: 'firstAgenda',
+            label: 'Primera agenda',
+            description: 'Agenda tu primera cita',
+            weight: 8,
+            completed: !!profile.achievements?.firstAgenda,
+            icon: 'calendar',
+            route: '/(app)/agenda',
+            category: 'achievement',
+        },
+        {
+            id: 'firstLabelsPdf',
+            label: 'Primer PDF de etiquetas',
+            description: 'Genera etiquetas para equipos',
+            weight: 6,
+            completed: !!profile.achievements?.firstLabelsPdf,
+            icon: 'document',
+            route: '/(app)/tools/qr-labels',
+            category: 'achievement',
+        },
+        {
+            id: 'firstSOS',
+            label: 'Caso SOS',
+            description: 'Crea o responde un caso SOS',
+            weight: 6,
+            completed: (profile.stats?.sosSolved || 0) >= 1,
+            icon: 'alert-circle',
+            route: '/(app)/community',
+            category: 'achievement',
+        },
+        {
+            id: 'firstCourse',
+            label: 'Curso completado',
+            description: 'Completa un curso de capacitación',
+            weight: 6,
+            completed: (profile.stats?.trainingCompleted || 0) >= 1,
+            icon: 'school',
+            route: '/(app)/training',
+            category: 'achievement',
+        },
+    ];
 };
 
 /**
@@ -307,14 +519,70 @@ export const updateUserProfile = async (
 
         // Calcular completitud si hay cambios relevantes
         const currentProfile = await getUserProfile(userId);
-        const mergedProfile = { ...currentProfile, ...updates };
+
+        if (!currentProfile) {
+            console.error('User profile not found for ID:', userId);
+            return false;
+        }
+
+        // Deep merge achievements to prevent overwriting
+        let finalAchievements = currentProfile.achievements || {};
+        if (updates.achievements) {
+            finalAchievements = { ...finalAchievements, ...updates.achievements };
+        }
+
+        // Deep merge stats if present (though usually updated via increment)
+        let finalStats = currentProfile.stats || { servicesCount: 0, qrsActive: 0, sosSolved: 0, trainingCompleted: 0 };
+        if (updates.stats) {
+            finalStats = { ...finalStats, ...updates.stats };
+        }
+
+        const mergedProfile = {
+            ...currentProfile,
+            ...updates,
+            achievements: finalAchievements,
+            stats: finalStats
+        };
         const completenessScore = calculateProfileCompleteness(mergedProfile);
 
-        await updateDoc(userRef, {
+        // Prepare the actual update object for Firestore
+        // We do NOT want to send the entire merged profile back as it might overwrite concurrent stats updates (like increments)
+        // logic: only send what's in 'updates' + the calculated score + branding/achievements deep merged fields if they were modified
+
+        const finalUpdates: any = {
             ...updates,
             profileCompletenessScore: completenessScore,
             updatedAt: serverTimestamp(),
-        });
+        };
+
+        // Explicitly set the deep merged objects if they were part of the update
+        if (updates.achievements) {
+            finalUpdates.achievements = finalAchievements;
+        }
+
+        // Caution: stats are usually updated atomically via increment in other services.
+        // We should typically NOT overwrite 'stats' here unless we are sure. 
+        // If updates.stats exists, we use it, otherwise we leave it out of finalUpdates to preserve Firestore increments.
+        if (updates.stats) {
+            finalUpdates.stats = finalStats;
+        }
+
+        // Recompensa: 3 días PRO al llegar al 100%
+        if (completenessScore === 100 && (currentProfile?.profileCompletenessScore || 0) < 100) {
+            console.log('🎉 Usuario completó su perfil al 100%');
+
+            // Solo si es free o no tiene subscripción activa de pago
+            if (!currentProfile?.subscription || currentProfile.subscription === 'free') {
+                const rewardEndDate = new Date();
+                rewardEndDate.setDate(rewardEndDate.getDate() + 3);
+
+                finalUpdates.subscription = 'Pro';
+                finalUpdates.subscriptionEndDate = rewardEndDate;
+                console.log('🎁 Recompensa otorgada: 3 días PRO');
+            }
+        }
+
+        await updateDoc(userRef, finalUpdates);
 
         console.log('User profile updated for:', userId);
         return true;

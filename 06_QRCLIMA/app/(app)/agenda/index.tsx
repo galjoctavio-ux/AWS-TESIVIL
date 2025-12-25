@@ -4,9 +4,10 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../../context/AuthContext';
+import { useSettings } from '../../../context/SettingsContext';
 import { getUpcomingServices, ServiceData } from '../../../services/services-service';
 import { getLinearDistance } from '../../../services/haversine-calculator';
-import { getUserProfile, isUserPro } from '../../../services/user-service';
+import { getUserProfile, isUserPro, updateUserProfile } from '../../../services/user-service';
 import { getTrafficDistance, TrafficDistanceResult } from '../../../services/traffic-distance-service';
 import CalendarView, { CalendarMode } from '../../../components/agenda/CalendarView';
 import ActionSheet from '../../../components/agenda/ActionSheet';
@@ -16,6 +17,7 @@ export default function AgendaScreen() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
     const { user } = useAuth();
+    const { settings, updateSettings } = useSettings();
 
     // Calendar State
     const [date, setDate] = useState(new Date());
@@ -36,6 +38,7 @@ export default function AgendaScreen() {
     // PRO Traffic Feature
     const [isPro, setIsPro] = useState(false);
     const [trafficData, setTrafficData] = useState<TrafficDistanceResult | null>(null);
+    const [trafficDataMap, setTrafficDataMap] = useState<{ [eventId: string]: TrafficDistanceResult }>({});
     const [loadingTraffic, setLoadingTraffic] = useState(false);
 
     // Data Load
@@ -54,6 +57,10 @@ export default function AgendaScreen() {
             if (profile?.baseLat && profile?.baseLng) {
                 setBaseLat(profile.baseLat);
                 setBaseLng(profile.baseLng);
+            }
+            // Sync settings if profile has preference but settings doesn't
+            if (profile?.preferredNavigationApp && !settings.preferredNavApp) {
+                updateSettings({ preferredNavApp: profile.preferredNavigationApp });
             }
             // Check PRO status
             setIsPro(isUserPro(profile));
@@ -144,6 +151,8 @@ export default function AgendaScreen() {
                     { latitude: targetLat, longitude: targetLng }
                 );
                 setTrafficData(data);
+                // Also update trafficDataMap for calendar cards
+                setTrafficDataMap(prev => ({ ...prev, [selectedEvent.id]: data }));
             } catch (error) {
                 console.error('[Agenda] Error loading traffic data:', error);
                 setTrafficData(null);
@@ -266,6 +275,8 @@ export default function AgendaScreen() {
                     baseLat={baseLat}
                     baseLng={baseLng}
                     isLoading={loading || refreshing}
+                    trafficDataMap={trafficDataMap}
+                    isPro={isPro}
                 />
             </View>
 
@@ -310,8 +321,8 @@ export default function AgendaScreen() {
                     onNavigate={() => console.log('Navigate')}
                     onCall={() => console.log('Call')}
                     onStartJob={() => {
-                        router.push(`/(app)/services/${selectedEvent.id}`);
                         setSelectedEvent(null);
+                        router.push('/(app)/scanner?mode=service');
                     }}
                     onDelete={() => loadEvents()}
                     onReschedule={() => loadEvents()}
@@ -362,6 +373,18 @@ export default function AgendaScreen() {
                     technicianId={user?.uid}
                     trafficData={trafficData || undefined}
                     isPro={isPro}
+                    hasBaseLocation={!!(baseLat && baseLng)}
+                    onGoToSettings={() => {
+                        setSelectedEvent(null);
+                        router.push('/(app)/profile/settings');
+                    }}
+                    preferredNavApp={settings.preferredNavApp}
+                    onRememberNavApp={(app) => {
+                        updateSettings({ preferredNavApp: app });
+                        if (user?.uid) {
+                            updateUserProfile(user.uid, { preferredNavigationApp: app });
+                        }
+                    }}
                 />
             )}
         </View>
