@@ -9,116 +9,78 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from supabase import create_client, Client
 from dotenv import load_dotenv
-from filtros import es_minisplit_coresa
 
-# --- CONFIGURACIÓN ESPECÍFICA ---
+# --- CONFIGURACIÓN OPTIMIZADA ---
 PROVIDER_NAME = "Grupo Coresa"
-LOG_FILE = 'scraper_coresa.log'
+LOG_FILE = 'scraper_coresa_full.log'
 
-# URLs Principales extraídas de su menú de navegación
+# Agregamos las categorías que alimentan tus 11 grupos. 
+# Agregamos '?product_list_limit=64' para cargar más productos por página y ahorrar tiempo.
 URLS_CATEGORIAS = [
-    "https://www.grupocoresa.com/equipos-de-aire-acondicionado"
+    "https://www.grupocoresa.com/equipos-de-aire-acondicionado?product_list_limit=64",
+    "https://www.grupocoresa.com/tuberias-y-aislamientos/tuberias-de-cobre?product_list_limit=64",
+    "https://www.grupocoresa.com/refrigerantes-y-quimicos?product_list_limit=64",
+    "https://www.grupocoresa.com/herramientas?product_list_limit=64"
 ]
 
-# SELECTORES MAGENTO 2 (Confirmados con tu HTML)
 SELECTOR_PRODUCTO = 'li.product-item'
 SELECTOR_TITULO = 'a.product-item-link'
 SELECTOR_PRECIO = '.price-box .price' 
 SELECTOR_PAGINACION_NEXT = 'a.action.next'
 
-# --------------------------------
-
-logging.basicConfig(
-    filename=LOG_FILE, 
-    level=logging.INFO, 
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
-
+logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 load_dotenv()
 
-# Validación de entorno
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-
-if not SUPABASE_URL or not SUPABASE_KEY:
-    print("Error: Faltan credenciales en .env")
-    exit()
-
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def create_robust_session():
     session = requests.Session()
-    retry = Retry(
-        total=4, 
-        backoff_factor=2, 
-        status_forcelist=[500, 502, 503, 504],
-        allowed_methods=["GET"]
-    )
+    retry = Retry(total=5, backoff_factor=3, status_forcelist=[429, 500, 502, 503, 504])
     session.mount("https://", HTTPAdapter(max_retries=retry))
-    # User-Agent real de Chrome para evitar bloqueos simples
     session.headers.update({
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-        'Accept-Language': 'es-MX,es;q=0.9,en-US;q=0.8,en;q=0.7'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     })
     return session
 
 def clean_price(price_str):
-    """Convierte '$11,073.82' a 11073.82"""
     if not price_str: return 0.0
-    # Eliminar $, MXN, comas y espacios
     clean = price_str.replace('$', '').replace(',', '').replace('MXN', '').strip()
     try:
         return float(clean)
-    except ValueError:
+    except:
         return 0.0
 
 def process_category(session, category_url):
     page = 1
     items_count = 0
     current_url = category_url
-    
-    print(f"--> Iniciando categoría: {category_url}")
+
+    print(f"--> Iniciando: {category_url.split('com/')[1].split('?')[0]}")
 
     while True:
         try:
-            print(f"    Escaneando Pag {page}...")
+            print(f"    Página {page}...")
             response = session.get(current_url, timeout=30)
-            
-            if response.status_code == 404:
-                print("    Error 404 - Fin de categoría.")
-                break
-                
             soup = BeautifulSoup(response.text, 'html.parser')
             products = soup.select(SELECTOR_PRODUCTO)
-            
+
             if not products:
-                print("    No se encontraron productos. Fin o Bloqueo.")
-                # Si es página 1 y no hay productos, es sospechoso (posible cambio de diseño)
-                if page == 1:
-                    logging.warning(f"Pagina 1 vacía en {category_url}")
                 break
 
             batch_data = []
             for p in products:
                 try:
-                    # 1. Título y Link
                     tag_titulo = p.select_one(SELECTOR_TITULO)
-                    if not tag_titulo: continue # Si no tiene título, saltamos
-                    
+                    if not tag_titulo: continue
+
                     title = tag_titulo.get_text(strip=True)
-                    if not es_minisplit_coresa(title):
-                        continue
-                    link = tag_titulo.get('href', category_url)
-
-                    # 2. Precio
-                    # Magento a veces muestra "Precio especial" y "Precio antiguo".
-                    # El selector .price-box .price suele agarrar el primero visible.
+                    link = tag_titulo.get('href', '')
+                    
                     tag_precio = p.select_one(SELECTOR_PRECIO)
-                    price_raw = tag_precio.get_text(strip=True) if tag_precio else "0"
-                    price = clean_price(price_raw)
+                    price = clean_price(tag_precio.get_text(strip=True)) if tag_precio else 0.0
 
-                    # 3. SKU (A veces Magento lo pone en un atributo data-product-sku en el form)
                     sku = "N/A"
                     form_tocart = p.select_one('form[data-product-sku]')
                     if form_tocart:
@@ -133,51 +95,39 @@ def process_category(session, category_url):
                             "created_at": datetime.now().astimezone().isoformat(),
                             "metadata": {
                                 "url": link,
-                                "category_source": category_url
+                                "category_slug": category_url.split('com/')[1].split('?')[0]
                             }
                         })
-                except Exception as e:
-                    continue
+                except: continue
 
-            # Insertar lote en Supabase
             if batch_data:
                 supabase.table("market_prices_log").insert(batch_data).execute()
                 items_count += len(batch_data)
-                print(f"    Insertados {len(batch_data)} productos.")
-            
-            # --- PAGINACIÓN ---
-            # Buscamos el botón "Siguiente" en el HTML actual
+
+            # Paginación
             next_btn = soup.select_one(SELECTOR_PAGINACION_NEXT)
             if next_btn and next_btn.get('href'):
-                current_url = next_btn['href'] # Magento da la URL completa, usamos esa
+                current_url = next_btn['href']
+                if "product_list_limit=64" not in current_url:
+                    current_url += "&product_list_limit=64"
                 page += 1
-                # Pausa aleatoria para parecer humano (Coresa es más estricto que Shopify)
-                time.sleep(random.uniform(2, 5)) 
+                time.sleep(random.uniform(2, 4))
             else:
-                print("    No hay botón 'Siguiente'. Fin de categoría.")
                 break
 
         except Exception as e:
-            logging.error(f"Error crítico en {current_url}: {e}")
             print(f"Error: {e}")
             break
-            
+
     return items_count
 
 def run_scraper():
     session = create_robust_session()
-    total_products = 0
-    
-    msg = f"--- Iniciando Scraper Coresa: {datetime.now()} ---"
-    print(msg)
-    logging.info(msg)
-
+    total = 0
+    print(f"--- ⚡ Iniciando Barrido Optimizado Coresa ---")
     for cat in URLS_CATEGORIAS:
-        total_products += process_category(session, cat)
-
-    msg_end = f"--- Finalizado Coresa. Total recolectado: {total_products} ---"
-    print(msg_end)
-    logging.info(msg_end)
+        total += process_category(session, cat)
+    print(f"--- ✅ Finalizado. Total Coresa: {total} ---")
 
 if __name__ == "__main__":
     run_scraper()
