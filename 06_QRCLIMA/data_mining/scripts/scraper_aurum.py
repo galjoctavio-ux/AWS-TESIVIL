@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 PROVIDER_NAME = "Aires Aurum"
 LOG_FILE = 'scraper_aires_aurum.log'
 BASE_URL = "https://airesaurum.com.mx"
-START_URL = f"{BASE_URL}/productos/"
+START_URL = "https://airesaurum.com.mx/aires-acondicionados/"
 
 # Selectores específicos de TiendaNube (Aires Aurum)
 SELECTOR_ITEM_LINK = 'a.js-item-link' 
