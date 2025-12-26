@@ -30,21 +30,29 @@ SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
 if not SUPABASE_URL or not SUPABASE_KEY:
-    exit("❌ Error: Credenciales no encontradas en .env")
+    print("❌ Error: Credenciales no encontradas en .env")
+    exit(1)
 
+# Cliente de Supabase
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def create_robust_session():
+    """Crea una sesión HTTP resistente a fallos y bloqueos."""
     session = requests.Session()
     retry = Retry(
         total=5,
         backoff_factor=2,
         status_forcelist=[429, 500, 502, 503, 504],
-        allowed_methods=["GET"]
+        allowed_methods=["HEAD", "GET", "OPTIONS"]
     )
-    session.mount("https://", HTTPAdapter(max_retries=retry))
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
+    
+    # Headers para parecer un navegador real
     session.headers.update({
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "application/json"
     })
     return session
 
@@ -52,70 +60,101 @@ def fetch_and_store():
     session = create_robust_session()
     page = 1
     total_inserted = 0
-
-    print(f"--- 🚀 Iniciando Barrido TOTAL en {PROVIDER_NAME} ---")
+    
+    print(f"🚀 Iniciando Scraper Inteligente para {PROVIDER_NAME}...")
+    logging.info(f"Iniciando scrapeo de {PROVIDER_NAME}")
 
     while True:
         try:
-            print(f"Consultando página JSON {page}...")
-            response = session.get(f"{BASE_URL}?page={page}&limit=250", timeout=30)
-            response.raise_for_status() 
+            print(f"📄 Procesando página {page}...")
+            response = session.get(f"{BASE_URL}?page={page}&limit=250", timeout=20)
+            
+            if response.status_code != 200:
+                logging.error(f"Error {response.status_code} en pág {page}")
+                break
 
             data = response.json()
             products = data.get('products', [])
 
             if not products:
-                print("🏁 Fin de la paginación.")
+                print("✅ No hay más productos. Finalizando.")
                 break
 
             batch_data = []
 
             for product in products:
-                # Capturamos metadatos de clasificación
-                p_type = product.get('product_type', 'N/A')
+                # Extraer datos base
+                p_id = product.get('id')
+                p_title = product.get('title', '').strip()
+                p_vendor = product.get('vendor', '')
+                p_type = product.get('product_type', '')
                 p_tags = product.get('tags', [])
-                p_vendor = product.get('vendor', 'N/A')
+                p_handle = product.get('handle', '')
 
-                for variant in product['variants']:
-                    variant_title = variant['title'] if variant['title'] != "Default Title" else ""
-                    title_full = f"{product['title']} {variant_title}".strip()
+                # Iterar sobre variantes (cada variante es un producto con precio distinto)
+                for variant in product.get('variants', []):
+                    try:
+                        price = float(variant.get('price', 0))
+                        
+                        # FILTRO: Ignorar precios cero o errores obvios
+                        if price <= 1.0: 
+                            continue
 
-                    # --- FILTRO REMOVIDO ---
-                    # Ahora aceptamos todo el catálogo para análisis de tendencias.
-                    
-                    price = float(variant['price'])
+                        # Construcción de título compuesto si la variante tiene nombre relevante
+                        variant_title = variant.get('title', '')
+                        title_full = p_title
+                        if variant_title and variant_title.lower() != 'default title':
+                            title_full = f"{p_title} - {variant_title}"
 
-                    if price > 0:
+                        # SKU: Prioridad al SKU del proveedor, si no, usar ID
+                        sku_val = variant.get('sku')
+                        if not sku_val:
+                            sku_val = f"R-{variant.get('id')}"
+
+                        # --- OBJETO PARA EL NUEVO SCHEMA DB ---
                         item = {
                             "provider_name": PROVIDER_NAME,
-                            "product_title": title_full,
-                            "sku": variant.get('sku') or f"R{variant['id']}",
+                            "sku_provider": str(sku_val).strip(),  # Columna nueva
+                            "raw_title": title_full[:500],         # Columna nueva (truncado por seguridad)
                             "price": price,
-                            "created_at": datetime.now().astimezone().isoformat(),
-                            "metadata": {
-                                "url": f"https://reacsa.mx/products/{product['handle']}",
+                            "currency": "MXN",
+                            "status": "pending",                   # La clave para activar la IA
+                            "metadata": {                          # JSON limpio
+                                "url": f"https://reacsa.mx/products/{p_handle}",
                                 "vendor": p_vendor,
-                                "product_type": p_type,
                                 "tags": p_tags,
-                                "variant_id": variant['id']
+                                "original_id": p_id
                             }
+                            # Nota: 'created_at' lo pone la DB automáticamente
                         }
                         batch_data.append(item)
+                    except Exception as e_var:
+                        logging.warning(f"Error procesando variante {variant.get('id')}: {e_var}")
 
+            # Insertar en Supabase por lotes
             if batch_data:
-                supabase.table("market_prices_log").insert(batch_data).execute()
-                total_inserted += len(batch_data)
-                print(f"✅ Página {page}: {len(batch_data)} ítems procesados.")
+                try:
+                    # Usamos upsert implícito o insert simple
+                    # Como es un log de precios históricos, 'insert' está bien.
+                    data_result = supabase.table("market_prices_log").insert(batch_data).execute()
+                    
+                    count = len(batch_data)
+                    total_inserted += count
+                    print(f"   💾 Guardados {count} registros de pág {page}")
+                except Exception as e_db:
+                    logging.error(f"Error insertando lote página {page}: {e_db}")
+                    print(f"   ❌ Error al guardar en BD: {e_db}")
 
             page += 1
-            # Pausa aleatoria para evitar detección de comportamiento bot
-            time.sleep(random.uniform(0.7, 1.5)) 
+            # Pausa amigable para no saturar al servidor de Reacsa
+            time.sleep(random.uniform(1.0, 2.0)) 
 
         except Exception as e:
-            print(f"❌ Error crítico en página {page}: {e}")
+            logging.error(f"Error crítico en loop principal pág {page}: {e}")
+            print(f"❌ Error crítico: {e}")
             break
 
-    print(f"--- 🏁 Finalizado. Total {PROVIDER_NAME}: {total_inserted} registros ---")
+    print(f"\n--- 🏁 Finalizado {PROVIDER_NAME}. Total insertados: {total_inserted} ---")
 
 if __name__ == "__main__":
     fetch_and_store()
