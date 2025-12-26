@@ -17,7 +17,7 @@ LOG_FILE = 'scraper_tienda_mirage.log'
 # TUS CATEGORÍAS ORIGINALES (PrestaShop)
 CATEGORIES = [
     {"name": "Aire Acondicionado", "url": "https://www.tiendamirage.mx/11-aire-acondicionado"},
-    {"name": "Refacciones", "url": "https://www.tiendamirage.mx/10-refacciones"}
+   # {"name": "Refacciones", "url": "https://www.tiendamirage.mx/10-refacciones"}
 ]
 
 # 1. Logging
