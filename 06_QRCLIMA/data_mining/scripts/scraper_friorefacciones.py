@@ -1,130 +1,114 @@
 import os
 import time
 import logging
+import random
 from datetime import datetime
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from supabase import create_client, Client
 from dotenv import load_dotenv
-from filtros import es_accesorio_valido
 
-# 1. Configuración de Logs (Para saber qué pasó si falla en la madrugada)
+# 1. Configuración de Logs
 logging.basicConfig(
-    filename='scraper_log.log', 
+    filename='scraper_friorefacciones.log', 
     level=logging.INFO, 
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-# 2. Cargar variables de entorno (busca .env en la carpeta actual)
 load_dotenv()
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
-# Validación simple
 if not SUPABASE_URL or not SUPABASE_KEY:
-    error_msg = "FATAL: No se encontraron las credenciales en .env"
-    print(error_msg)
-    logging.error(error_msg)
-    exit()
+    exit("Error: Credenciales no encontradas.")
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 BASE_URL = "https://friorefacciones.com/products.json"
 PROVIDER_NAME = "Frio Refacciones"
 
-# 3. Función para crear una sesión robusta (Reintentos automáticos)
 def create_robust_session():
     session = requests.Session()
     retry = Retry(
-        total=5,  # Número de reintentos totales
-        backoff_factor=2,  # Espera: 2s, 4s, 8s, 16s...
-        status_forcelist=[500, 502, 503, 504], # Reintentar solo en errores de servidor
+        total=5, 
+        backoff_factor=2, 
+        status_forcelist=[429, 500, 502, 503, 504],
         allowed_methods=["GET"]
     )
-    adapter = HTTPAdapter(max_retries=retry)
-    session.mount("https://", adapter)
-    session.mount("http://", adapter)
+    session.mount("https://", HTTPAdapter(max_retries=retry))
+    session.headers.update({
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    })
     return session
 
 def fetch_and_store():
     session = create_robust_session()
     page = 1
     total_inserted = 0
-    
-    msg_start = f"--- Iniciando Scraper {PROVIDER_NAME}: {datetime.now()} ---"
-    print(msg_start)
-    logging.info(msg_start)
+
+    print(f"--- 🚀 Iniciando Scraper TOTAL {PROVIDER_NAME} ---")
 
     while True:
         try:
-            print(f"Consultando página JSON {page}...")
-            
-            # Usamos session.get en lugar de requests.get para tener reintentos
+            # Shopify permite hasta 250 productos por página
             response = session.get(f"{BASE_URL}?page={page}&limit=250", timeout=30)
-            
-            # Si después de los reintentos sigue fallando (ej. 404), lanzará error aquí
             response.raise_for_status() 
 
             data = response.json()
             products = data.get('products', [])
 
             if not products:
-                print("Fin de la paginación o sin productos.")
+                print("🏁 Fin de la paginación.")
                 break
 
             batch_data = []
 
             for product in products:
+                # Extraemos el tipo y etiquetas para facilitar el mapeo posterior
+                p_type = product.get('product_type', 'Sin Tipo')
+                p_tags = product.get('tags', [])
+                p_vendor = product.get('vendor', 'N/A')
+
                 for variant in product['variants']:
-                    # Limpieza y preparación de datos
                     title_full = f"{product['title']} - {variant['title']}".replace(" - Default Title", "")
-                    if not es_accesorio_valido(title_full): # Ojo con la variable del titulo
-                            continue
-                    item = {
-                        "provider_name": PROVIDER_NAME,
-                        "product_title": title_full,
-                        "sku": variant.get('sku') or str(variant['id']),
-                        "price": float(variant['price']),
-                        "created_at": datetime.utcnow().isoformat(), # Asegurar fecha UTC
-                        "metadata": {
-                            "url": f"https://friorefacciones.com/products/{product['handle']}",
-                            "vendor": product.get('vendor'),
-                            "shopify_id": product['id'],
-                            "variant_id": variant['id']
+                    
+                    # --- ELIMINAMOS EL FILTRO LIMITANTE ---
+                    # Ahora capturamos TODO. La limpieza se hará en la etapa de análisis.
+                    
+                    price = float(variant['price'])
+                    
+                    if price > 0:
+                        item = {
+                            "provider_name": PROVIDER_NAME,
+                            "product_title": title_full,
+                            "sku": variant.get('sku') or f"V{variant['id']}",
+                            "price": price,
+                            "created_at": datetime.now().astimezone().isoformat(),
+                            "metadata": {
+                                "url": f"https://friorefacciones.com/products/{product['handle']}",
+                                "vendor": p_vendor,
+                                "product_type": p_type, # <--- ÚTIL PARA CATEGORIZAR
+                                "tags": p_tags,         # <--- ÚTIL PARA CATEGORIZAR
+                                "variant_id": variant['id']
+                            }
                         }
-                    }
-                    batch_data.append(item)
+                        batch_data.append(item)
 
             if batch_data:
-                # Insertar en Supabase
-                data = supabase.table("market_prices_log").insert(batch_data).execute()
-                # Nota: supabase-py v2 retorna un objeto, asumimos éxito si no hay excepción
-                inserted_count = len(batch_data)
-                total_inserted += inserted_count
-                logging.info(f"Página {page}: Insertados {inserted_count} productos.")
-            
+                supabase.table("market_prices_log").insert(batch_data).execute()
+                total_inserted += len(batch_data)
+                print(f"✅ Página {page}: Procesados {len(batch_data)} ítems.")
+
             page += 1
-            time.sleep(1) # Pequeña pausa de cortesía adicional
+            time.sleep(random.uniform(0.5, 1.5)) 
 
-        except requests.exceptions.RequestException as e:
-            err_msg = f"Error de Conexión/Red en página {page} tras reintentos: {e}"
-            print(err_msg)
-            logging.error(err_msg)
-            # Aquí decidimos si rompemos el ciclo o intentamos saltar la página
-            # Para integridad de datos, mejor romper el ciclo y revisar logs luego.
-            break
-            
         except Exception as e:
-            err_msg = f"Error lógico/procesamiento en página {page}: {e}"
-            print(err_msg)
-            logging.error(err_msg)
+            print(f"❌ Error en página {page}: {e}")
             break
 
-    msg_end = f"--- Finalizado. Total insertados: {total_inserted} ---"
-    print(msg_end)
-    logging.info(msg_end)
+    print(f"--- Finalizado. Total en base de datos: {total_inserted} ---")
 
 if __name__ == "__main__":
     fetch_and_store()
