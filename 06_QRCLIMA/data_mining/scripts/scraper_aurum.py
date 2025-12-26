@@ -1,4 +1,5 @@
 import os
+import json
 import logging
 import random
 import time
@@ -14,8 +15,11 @@ from dotenv import load_dotenv
 PROVIDER_NAME = "Aires Aurum"
 LOG_FILE = 'scraper_aires_aurum.log'
 BASE_URL = "https://airesaurum.com.mx"
-# URL semilla para empezar (ej: listado general o categorías)
 START_URL = f"{BASE_URL}/productos/"
+
+# Selectores específicos de TiendaNube (Aires Aurum)
+SELECTOR_ITEM_LINK = 'a.js-item-link' 
+SELECTOR_PAGINACION_NEXT = 'a.js-pagination-next'
 
 # 1. Configuración de Logs
 logging.basicConfig(
@@ -53,7 +57,7 @@ def create_robust_session():
     return session
 
 def scrape_product_detail(session, url):
-    """Extrae datos de una página de detalle de producto."""
+    """Extrae datos usando JSON-LD (Lógica de la versión antigua, adaptada al esquema nuevo)."""
     try:
         response = session.get(url, timeout=15)
         if response.status_code != 200:
@@ -61,43 +65,59 @@ def scrape_product_detail(session, url):
         
         soup = BeautifulSoup(response.text, 'html.parser')
 
-        # 1. Título (Ajusta el selector según el sitio real)
-        title_tag = soup.select_one('h1') or soup.select_one('.product_title')
-        if not title_tag: 
-            return None
-        raw_title = title_tag.get_text(strip=True)
-
-        # 2. Precio
-        price_tag = soup.select_one('.price') or soup.select_one('.current-price') or soup.select_one('span.money')
-        if not price_tag:
-            return None
+        # Buscamos el Schema JSON-LD de tipo Product
+        scripts = soup.find_all('script', type='application/ld+json')
+        target_data = None
         
-        price_text = price_tag.get_text(strip=True).replace('$', '').replace(',', '').replace('MXN', '')
-        try:
-            price = float(price_text)
-        except ValueError:
-            return None # Si no hay precio numérico, no nos sirve
+        for script in scripts:
+            try:
+                data = json.loads(script.string)
+                # A veces es una lista, a veces un dict
+                if isinstance(data, list):
+                    # Buscar el dict que sea Product dentro de la lista
+                    data = next((item for item in data if item.get('@type') == 'Product'), None)
+                
+                if data and data.get('@type') == 'Product':
+                    target_data = data
+                    break
+            except:
+                continue
+        
+        if not target_data:
+            logging.warning(f"No JSON-LD found for {url}")
+            return None
 
-        # 3. SKU (Búsqueda inteligente)
-        # Intenta buscar selectores comunes de SKU, si falla, usa el slug de la URL
-        sku_provider = None
-        sku_tag = soup.select_one('.sku') or soup.select_one('span[itemprop="sku"]')
-        if sku_tag:
-            sku_provider = sku_tag.get_text(strip=True)
-        else:
-            # Fallback: Usar el slug de la URL como ID único
-            sku_provider = url.split('/')[-1].split('?')[0]
+        # Extracción de datos limpia
+        raw_title = target_data.get('name')
+        # Tiendanube a veces pone el SKU en 'sku' o 'mpn'
+        sku_provider = target_data.get('sku') or target_data.get('mpn') or "N/A"
+        
+        price = 0.0
+        currency = "MXN"
+        
+        if 'offers' in target_data:
+            offers = target_data['offers']
+            # offers puede ser lista o dict
+            if isinstance(offers, list):
+                offers = offers[0] # Tomar la primera oferta
+            
+            price = float(offers.get('price', 0))
+            currency = offers.get('priceCurrency', 'MXN')
 
-        # 4. Construir objeto para Supabase
+        if price == 0:
+            return None
+
+        # Construir objeto para Supabase (Esquema del script nuevo)
         return {
             "provider_name": PROVIDER_NAME,
-            "sku_provider": sku_provider[:100], # Limitar largo
+            "sku_provider": str(sku_provider)[:100],
             "raw_title": raw_title[:500],
             "price": price,
-            "currency": "MXN",
-            "status": "pending", # <--- ESTO ACTIVA LA IA
+            "currency": currency,
+            "status": "pending", 
             "metadata": {
                 "url": url,
+                "brand": target_data.get('brand', {}).get('name', 'N/A'),
                 "scraped_at": time.time()
             }
         }
@@ -108,76 +128,53 @@ def scrape_product_detail(session, url):
 
 def fetch_and_store():
     session = create_robust_session()
-    print(f"🚀 Iniciando Scraper {PROVIDER_NAME}...")
+    print(f"🚀 Iniciando Scraper {PROVIDER_NAME} (Modo TiendaNube)...")
     
-    page = 1
+    current_url = START_URL
     total_inserted = 0
-    
-    # NUEVO: Variable para guardar los links de la página anterior
-    previous_page_links = []
+    page_num = 1
 
-    while True:
-        list_url = f"{START_URL}?page={page}"
-        print(f"📄 Escaneando listado: {list_url}")
+    while current_url:
+        print(f"📄 Escaneando página {page_num}: {current_url}")
         
         try:
-            response = session.get(list_url, timeout=20)
-            # Algunos sitios redirigen a la home cuando la paginación acaba
-            if response.status_code != 200 or response.url == BASE_URL:
-                print("   ⛔ Fin de paginación (Status code o Redirección).")
+            response = session.get(current_url, timeout=20)
+            if response.status_code != 200:
+                print("   ⛔ Error de conexión o fin.")
                 break
             
             soup = BeautifulSoup(response.text, 'html.parser')
             
-            # --- DETECCIÓN DE PÁGINA VACÍA POR TEXTO (OPCIONAL PERO ÚTIL) ---
-            body_text = soup.get_text().lower()
-            if "no se encontraron productos" in body_text or "no products found" in body_text:
-                print("   ⛔ Texto de 'No resultados' encontrado.")
-                break
-
+            # 1. Obtener links usando el selector específico de TiendaNube
             product_links = []
-            for a in soup.find_all('a', href=True):
-                href = a['href']
-                if '/productos/' in href and href.count('/') > 2: 
+            link_elements = soup.select(SELECTOR_ITEM_LINK)
+            
+            for a in link_elements:
+                if a.has_attr('href'):
+                    href = a['href']
                     full_link = href if href.startswith('http') else f"{BASE_URL}{href}"
-                    # Limpieza básica para evitar duplicados por query params (ej: ?v=123)
+                    # Limpiar query params
                     clean_link = full_link.split('?')[0]
                     if clean_link not in product_links:
                         product_links.append(clean_link)
-
-            # Ordenamos para asegurar que la comparación de listas sea exacta
-            product_links.sort()
 
             if not product_links:
                 print("⚠️ No se encontraron productos en esta página. Terminando.")
                 break
 
-            # --- CORRECCIÓN PRINCIPAL: DETECCIÓN DE BUCLE ---
-            # Si los enlaces de esta página son IGUALES a los de la anterior, estamos en bucle
-            if product_links == previous_page_links:
-                print("   🔄 Bucle detectado: La página actual tiene los mismos productos que la anterior.")
-                print("   ⛔ Deteniendo scraper para evitar duplicados infinitos.")
-                break
-            
-            # Actualizamos el registro de la página anterior
-            previous_page_links = product_links
+            print(f"   Encontrados {len(product_links)} enlaces. Procesando...")
 
-            print(f"   Encontrados {len(product_links)} enlaces únicos. Procesando...")
-
+            # 2. Procesar detalles
             batch_data = []
             for link in product_links:
-                # Pequeña optimización: no volver a scrapear si ya lo procesaste en el loop anterior
-                # (Aunque el check de arriba ya previene esto, es doble seguridad)
                 data = scrape_product_detail(session, link)
                 if data:
                     batch_data.append(data)
-                time.sleep(random.uniform(0.5, 1.0)) 
+                time.sleep(random.uniform(0.5, 1.5)) # Respetar servidor
 
+            # 3. Guardar en BD
             if batch_data:
                 try:
-                    # Usamos upsert o insert. Si el SKU ya existe, esto podría duplicar filas
-                    # dependiendo de tu esquema en Supabase.
-                    # Idealmente en el futuro usar upsert basado en SKU + Provider
                     supabase.table("market_prices_log").insert(batch_data).execute()
                     count = len(batch_data)
                     total_inserted += count
@@ -185,17 +182,22 @@ def fetch_and_store():
                 except Exception as e:
                     print(f"   ❌ Error al guardar en DB: {e}")
 
-            page += 1
-            # Reduje el límite de seguridad a 40 ya que vimos que muere antes
-            if page > 40: 
-                print("   🛡️ Límite de seguridad de páginas alcanzado.")
-                break
+            # 4. Obtener siguiente página (Lógica 'Next Button')
+            next_btn = soup.select_one(SELECTOR_PAGINACION_NEXT)
+            if next_btn and next_btn.has_attr('href'):
+                current_url = next_btn['href']
+                if not current_url.startswith('http'):
+                    current_url = f"{BASE_URL}{current_url}"
+                page_num += 1
+            else:
+                print("   ✅ No hay más páginas (botón 'Siguiente' no encontrado).")
+                current_url = None
 
         except Exception as e:
-            print(f"❌ Error general en página {page}: {e}")
+            print(f"❌ Error general: {e}")
             break
 
-    print(f"\n🏁 {PROVIDER_NAME} Finalizado. Total: {total_inserted}")
+    print(f"\n🏁 {PROVIDER_NAME} Finalizado. Total insertados: {total_inserted}")
 
 if __name__ == "__main__":
     fetch_and_store()
