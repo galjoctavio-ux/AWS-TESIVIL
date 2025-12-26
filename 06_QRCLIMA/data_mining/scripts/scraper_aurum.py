@@ -24,7 +24,7 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-# 1. CARGA ROBUSTA DE CREDENCIALES
+# 1. CARGA DE CREDENCIALES
 env_path = Path(__file__).parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
@@ -32,8 +32,7 @@ SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
 if not SUPABASE_URL or not SUPABASE_KEY:
-    print("❌ FATAL: No se encontraron las credenciales en .env")
-    exit(1)
+    exit("❌ FATAL: No se encontraron las credenciales en .env")
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
@@ -58,33 +57,35 @@ def get_normalized_id(sku):
     try:
         res = supabase.table("product_catalog").select("id").eq("sku_master", sku).maybe_single().execute()
         return res.data['id'] if res.data else None
-    except Exception as e:
-        logging.error(f"Error consultando catálogo para SKU {sku}: {e}")
+    except Exception:
         return None
 
 def scrape_product_detail(session, url):
-    """Extrae datos desde el bloque JSON-LD del producto"""
+    """Extrae datos profundos desde el JSON-LD del producto"""
     try:
         response = session.get(url, timeout=20)
         if response.status_code != 200: return None
-        
+
         soup = BeautifulSoup(response.text, 'html.parser')
         scripts = soup.find_all('script', type='application/ld+json')
-        
+
         for script in scripts:
             try:
                 data = json.loads(script.string)
-                # El JSON-LD puede ser un objeto directo o una lista
                 if isinstance(data, list): data = data[0]
-                
+
                 if data.get('@type') == 'Product' or 'Product' in str(data.get('@type')):
                     sku = data.get('sku') or data.get('mpn') or "N/A"
                     price = 0.0
-                    
+
                     if 'offers' in data:
                         offers = data['offers']
                         if isinstance(offers, list): offers = offers[0]
                         price = float(offers.get('price', 0))
+
+                    # Capturamos la marca y una descripción corta para el mapeador
+                    brand_info = data.get('brand')
+                    brand_name = brand_info.get('name', 'N/A') if isinstance(brand_info, dict) else str(brand_info)
                     
                     return {
                         "provider_name": PROVIDER_NAME,
@@ -93,9 +94,12 @@ def scrape_product_detail(session, url):
                         "price": price,
                         "currency": "MXN",
                         "normalized_product_id": get_normalized_id(sku),
+                        "created_at": datetime.now().astimezone().isoformat(), # Normalización de fecha
                         "metadata": {
                             "url": url,
-                            "brand": data.get('brand', {}).get('name', 'N/A') if isinstance(data.get('brand'), dict) else "N/A"
+                            "brand": brand_name,
+                            "category": "Equipos de Aire Acondicionado", # Categoría base fija para Aurum
+                            "description_snippet": data.get('description', '')[:150] # Pistas para el mapeador
                         }
                     }
             except Exception: continue
@@ -106,20 +110,18 @@ def scrape_product_detail(session, url):
 def run_scraper():
     session = create_robust_session()
     current_url = URL_PRODUCTOS
-    all_extracted_data = []
-    
-    print(f"--- Iniciando Scraper {PROVIDER_NAME} ---")
+    total_scraped = 0
+
+    print(f"--- 🌀 Iniciando Scraper Normalizado: {PROVIDER_NAME} ---")
 
     while current_url:
-        print(f"Escaneando lista: {current_url}")
+        print(f"Buscando productos en: {current_url}")
         try:
             res = session.get(current_url, timeout=20)
             soup = BeautifulSoup(res.text, 'html.parser')
-            
-            # Selectores flexibles para Tiendanube
-            items = soup.select('a.js-item-link') or \
-                    soup.select('.item-link') or \
-                    soup.select('a[href*="/productos/"]')
+
+            # Selectores de Tiendanube
+            items = soup.select('a.js-item-link') or soup.select('.item-link')
 
             links = []
             for a in items:
@@ -129,46 +131,33 @@ def run_scraper():
                     if "/productos/" in full_url and full_url.rstrip('/') != URL_PRODUCTOS.rstrip('/'):
                         links.append(full_url)
 
-            links = list(dict.fromkeys(links))
-            print(f"  🔍 Detectados {len(links)} productos en esta página.")
+            links = list(dict.fromkeys(links)) # Eliminar duplicados
 
-            if not links:
-                print("  ⚠️ No se encontraron productos. Fin del proceso.")
-                break
-
+            batch_data = []
             for link in links:
-                print(f"    > Procesando: {link.split('/')[-2]}")
-                product_data = scrape_product_detail(session, link)
-                if product_data and product_data['price'] > 0:
-                    all_extracted_data.append(product_data)
-                time.sleep(random.uniform(1, 2))
+                data = scrape_product_detail(session, link)
+                if data and data['price'] > 0:
+                    batch_data.append(data)
+                time.sleep(random.uniform(1, 2)) # Cortesía
 
-            # Manejo de paginación
-            next_page = soup.select_one('a.js-pagination-next') or \
-                        soup.select_one('a[rel="next"]')
-            
+            if batch_data:
+                supabase.table("market_prices_log").insert(batch_data).execute()
+                total_scraped += len(batch_data)
+                print(f"   ✅ Se guardaron {len(batch_data)} productos.")
+
+            # Paginación
+            next_page = soup.select_one('a.js-pagination-next') or soup.select_one('a[rel="next"]')
             if next_page and next_page.get('href'):
                 next_href = next_page['href']
                 current_url = next_href if next_href.startswith('http') else BASE_URL + next_href
             else:
-                print("  🏁 Fin de la paginación.")
                 current_url = None
 
         except Exception as e:
-            print(f"❌ Error en lista: {e}")
+            print(f"❌ Error: {e}")
             break
 
-    # 3. INSERCIÓN EN SUPABASE
-    if all_extracted_data:
-        print(f"📤 Enviando {len(all_extracted_data)} registros a Supabase...")
-        try:
-            supabase.table("market_prices_log").insert(all_extracted_data).execute()
-            print("✅ ¡Éxito! Datos guardados correctamente.")
-        except Exception as e:
-            print(f"❌ Error al guardar en Supabase: {e}")
-            logging.error(f"Error Supabase: {e}")
-    else:
-        print("Empty: No se recolectaron datos válidos.")
+    print(f"--- 🏁 Finalizado. Total {PROVIDER_NAME}: {total_scraped} ---")
 
 if __name__ == "__main__":
     run_scraper()

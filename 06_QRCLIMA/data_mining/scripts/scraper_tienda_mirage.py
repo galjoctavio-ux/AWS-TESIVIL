@@ -13,17 +13,25 @@ from dotenv import load_dotenv
 # --- CONFIGURACIÓN ---
 PROVIDER_NAME = "Tienda Mirage"
 LOG_FILE = 'scraper_tienda_mirage.log'
-# Aseguramos que la URL termine en diagonal para evitar redirecciones
-BASE_URL = "https://www.tiendamirage.mx/11-aire-acondicionado"
 
-logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Lista de categorías para el análisis de grupos
+CATEGORIES = [
+    {"name": "Aire Acondicionado", "url": "https://www.tiendamirage.mx/11-aire-acondicionado"},
+    {"name": "Refacciones", "url": "https://www.tiendamirage.mx/10-refacciones"}
+]
 
+# 1. Configuración de Logs
+logging.basicConfig(
+    filename=LOG_FILE, 
+    level=logging.INFO, 
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
+# 2. Carga de credenciales
 env_path = Path(__file__).parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+supabase: Client = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_SERVICE_ROLE_KEY"))
 
 def get_normalized_id(sku):
     if not sku or sku == "N/A": return None
@@ -32,48 +40,26 @@ def get_normalized_id(sku):
         return res.data['id'] if res.data else None
     except: return None
 
-def run_scraper():
-    print(f"--- Iniciando Scraper {PROVIDER_NAME} ---")
-    all_extracted_data = []
+def process_category(session, category_info):
+    """Procesa una categoría completa de PrestaShop con paginación"""
+    category_data = []
     page = 1
-    
-    session = requests.Session()
-    # Headers más completos para imitar un navegador real
-    session.headers.update({
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Accept-Language': 'es-MX,es;q=0.9',
-        'Connection': 'keep-alive',
-    })
+    base_cat_url = category_info["url"]
+    cat_name = category_info["name"]
+
+    print(f"--> Analizando Categoría: {cat_name}")
 
     while True:
-        # PrestaShop acepta ?page=X o ?p=X. Probaremos con page.
-        current_url = f"{BASE_URL}?page={page}"
-        print(f"Escaneando: {current_url}")
-        
+        current_url = f"{base_cat_url}?page={page}"
         try:
             response = session.get(current_url, timeout=30)
-            if response.status_code != 200:
-                print(f"❌ Error de servidor: {response.status_code}")
-                break
-            
+            if response.status_code != 200: break
+
             soup = BeautifulSoup(response.text, 'html.parser')
-            
-            # --- NUEVOS SELECTORES ---
-            # PrestaShop 1.7+ usa estas clases
-            products = soup.find_all('article', class_='product-miniature') or \
-                       soup.select('.product-miniature') or \
-                       soup.select('.js-product-miniature')
+            products = soup.select('.product-miniature') or soup.select('.js-product-miniature')
 
             if not products:
-                print("⚠️ No se encontraron productos con los selectores actuales.")
-                # Debug: Guardar un pedazo del HTML para revisar si estamos bloqueados
-                with open("debug_mirage.html", "w") as f:
-                    f.write(response.text[:2000])
-                print("   Se guardó 'debug_mirage.html' para inspección.")
                 break
-
-            print(f"   🎯 Detectados {len(products)} productos.")
 
             for p in products:
                 try:
@@ -82,56 +68,69 @@ def run_scraper():
                     title = title_tag.get_text(strip=True)
                     link = title_tag['href']
 
-                    # Precio
+                    # Precio con limpieza estándar
                     price_tag = p.select_one('.price') or p.select_one('[itemprop="price"]')
-                    if price_tag:
-                        price_raw = price_tag.get_text(strip=True)
-                        # Limpieza profunda: quitar $, comas, espacios y letras
-                        price_str = "".join(c for c in price_raw if c.isdigit() or c == '.')
-                        price = float(price_str)
-                    else:
-                        price = 0.0
+                    price_raw = price_tag.get_text(strip=True) if price_tag else "0"
+                    price = float("".join(c for c in price_raw if c.isdigit() or c == '.')) if price_raw != "0" else 0.0
 
-                    # SKU / Referencia
-                    # En Tienda Mirage, el SKU suele venir en un atributo de datos
+                    # SKU (ID interno de PrestaShop como referencia inicial)
                     sku = p.get('data-id-product') or "N/A"
-                    
+
                     if price > 0:
-                        all_extracted_data.append({
+                        category_data.append({
                             "provider_name": PROVIDER_NAME,
                             "product_title": title,
                             "sku": str(sku),
                             "price": price,
                             "currency": "MXN",
                             "normalized_product_id": get_normalized_id(sku),
-                            "metadata": {"url": link, "page": page}
+                            "created_at": datetime.now().astimezone().isoformat(), # FECHA NORMALIZADA
+                            "metadata": {
+                                "url": link,
+                                "category_hint": cat_name, # Pista para el mapeador (Equipos vs Refacciones)
+                                "internal_id": sku,
+                                "page_found": page
+                            }
                         })
-                except Exception as e:
-                    continue
+                except Exception: continue
 
-            # Paginación: Buscar el link de "Siguiente"
-            next_page_link = soup.select_one('a.next.js-search-link') or \
-                             soup.select_one('a[rel="next"]')
-            
-            if next_page_link and next_page_link.get('href') and 'page=' in next_page_link['href']:
-                page += 1
-                time.sleep(random.uniform(2, 5))
-            else:
-                print("🏁 No se detectó botón de siguiente página. Fin.")
+            print(f"    ✅ Pág {page}: {len(products)} productos detectados.")
+
+            # Verificación de paginación
+            next_button = soup.select_one('a.next')
+            if not next_button or 'disabled' in next_button.get('class', []):
                 break
+            
+            page += 1
+            time.sleep(random.uniform(2, 4)) # PrestaShop requiere pausas para evitar bloqueos
 
         except Exception as e:
-            print(f"❌ Error crítico: {e}")
+            print(f"    ❌ Error en página {page}: {e}")
             break
+    
+    return category_data
 
-    # Guardar resultados
-    if all_extracted_data:
-        print(f"📤 Enviando {len(all_extracted_data)} registros a Supabase...")
-        try:
-            supabase.table("market_prices_log").insert(all_extracted_data).execute()
-            print("✅ Datos guardados.")
-        except Exception as e:
-            print(f"❌ Error Supabase: {e}")
+def run_scraper():
+    print(f"--- 🌀 Iniciando Scraper Normalizado: {PROVIDER_NAME} ---")
+    total_inserted = 0
+    
+    session = requests.Session()
+    session.headers.update({
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept-Language': 'es-MX,es;q=0.9'
+    })
+
+    for cat_info in CATEGORIES:
+        data = process_category(session, cat_info)
+        if data:
+            try:
+                supabase.table("market_prices_log").insert(data).execute()
+                total_inserted += len(data)
+                print(f"📤 {len(data)} registros de '{cat_info['name']}' enviados a Supabase.")
+            except Exception as e:
+                print(f"❌ Error al insertar lote: {e}")
+
+    print(f"--- 🏁 Finalizado. Total Tienda Mirage: {total_inserted} registros ---")
 
 if __name__ == "__main__":
     run_scraper()
