@@ -16,12 +16,19 @@ LOG_FILE = 'scraper_coresa_full.log'
 
 # Agregamos las categorías que alimentan tus 11 grupos. 
 # Agregamos '?product_list_limit=64' para cargar más productos por página y ahorrar tiempo.
+# URLs específicas de subcategoría para asegurar que encuentre productos
 URLS_CATEGORIAS = [
     "https://www.grupocoresa.com/equipos-de-aire-acondicionado?product_list_limit=64",
-    "https://www.grupocoresa.com/tuberias-y-aislamientos/tuberias-de-cobre?product_list_limit=64",
-    "https://www.grupocoresa.com/refrigerantes-y-quimicos?product_list_limit=64",
-    "https://www.grupocoresa.com/herramientas?product_list_limit=64"
+    # Subcategorías de Cobre
+    "https://www.grupocoresa.com/tuberias-y-aislamientos/tuberias-de-cobre/tuberia-de-cobre-flexible?product_list_limit=64",
+    "https://www.grupocoresa.com/tuberias-y-aislamientos/tuberias-de-cobre/tuberia-de-cobre-rigida?product_list_limit=64",
+    # Subcategorías de Gases y Químicos
+    "https://www.grupocoresa.com/refrigerantes-y-quimicos/gases-refrigerantes?product_list_limit=64",
+    "https://www.grupocoresa.com/refrigerantes-y-quimicos/limpiadores-y-quimicos?product_list_limit=64",
+    # Herramientas (Apuntamos a la principal de HVAC)
+    "https://www.grupocoresa.com/herramientas/herramientas-para-aire-acondicionado?product_list_limit=64"
 ]
+
 
 SELECTOR_PRODUCTO = 'li.product-item'
 SELECTOR_TITULO = 'a.product-item-link'
