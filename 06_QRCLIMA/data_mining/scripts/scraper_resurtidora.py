@@ -2,9 +2,10 @@ import os
 import logging
 import time
 import random
-from datetime import datetime
 from pathlib import Path
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from supabase import create_client, Client
 from dotenv import load_dotenv
 
@@ -12,46 +13,65 @@ from dotenv import load_dotenv
 PROVIDER_NAME = "Resurtidora"
 LOG_FILE = 'scraper_resurtidora.log'
 
-# Lista de colecciones a scrapear (formato .json)
+# TUS URLs EXACTAS (No las cambiamos)
 COLLECTIONS = [
     "https://tienda.resurtidora.mx/collections/equipos-aire-acondicionado-minisplits/products.json",
     "https://tienda.resurtidora.mx/collections/aire-acondicionado-portatil-y-purificadores-de-aire/products.json"
 ]
 
+# 1. Configuración de Logs
 logging.basicConfig(
     filename=LOG_FILE, 
     level=logging.INFO, 
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-# 1. CARGA DE CREDENCIALES
+# 2. Credenciales
 env_path = Path(__file__).parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
-supabase: Client = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_SERVICE_ROLE_KEY"))
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
-def get_normalized_id(sku):
-    """Busca el ID en el catálogo maestro usando el SKU"""
-    if not sku or sku == "N/A": return None
-    try:
-        res = supabase.table("product_catalog").select("id").eq("sku_master", sku).maybe_single().execute()
-        return res.data['id'] if res.data else None
-    except:
-        return None
+if not SUPABASE_URL or not SUPABASE_KEY:
+    print("❌ Error: Credenciales no encontradas en .env")
+    exit(1)
+
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+def create_robust_session():
+    session = requests.Session()
+    retry = Retry(
+        total=5,
+        backoff_factor=2,
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=["GET"]
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
+    session.headers.update({
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    })
+    return session
 
 def process_collection(session, collection_url):
     """Procesa una colección completa manejando su propia paginación"""
     all_data = []
     page = 1
-    collection_name = collection_url.split('/')[-2] # Extrae el nombre de la categoría de la URL
+    # Extrae el nombre de la categoría de la URL para metadata
+    collection_name = collection_url.split('/')[-2] 
     
     print(f"--> Analizando colección: {collection_name}")
 
     while True:
         try:
             # Shopify permite hasta 250 por página en el endpoint .json
-            response = session.get(f"{collection_url}?page={page}&limit=250", timeout=20)
+            url = f"{collection_url}?page={page}&limit=250"
+            response = session.get(url, timeout=20)
+            
             if response.status_code != 200:
+                print(f"   ⚠️ Fin o Error {response.status_code}")
                 break
 
             data = response.json()
@@ -61,39 +81,51 @@ def process_collection(session, collection_url):
                 break
 
             for p in products:
-                # Captura de pistas para el agrupador
-                p_type = p.get('product_type', 'N/A')
+                p_handle = p.get('handle', '')
+                p_vendor = p.get('vendor', '')
                 p_tags = p.get('tags', [])
+                p_type = p.get('product_type', 'N/A')
                 
+                # Imagen principal (si existe) para guardar en metadata
+                image_url = p['images'][0]['src'] if p.get('images') else None
+
                 for variant in p.get('variants', []):
-                    sku = variant.get('sku') or f"RES-{variant['id']}"
                     price = float(variant.get('price', 0))
-                    title = p.get('title')
+                    
+                    if price <= 1.0: continue
 
-                    if len(p['variants']) > 1:
-                        title = f"{title} - {variant.get('title')}"
+                    # Construir título compuesto
+                    title_full = p.get('title')
+                    if len(p.get('variants', [])) > 1 and variant.get('title') != 'Default Title':
+                        title_full = f"{title_full} - {variant.get('title')}"
 
-                    if price > 0:
-                        all_data.append({
-                            "provider_name": PROVIDER_NAME,
-                            "product_title": title,
-                            "sku": str(sku),
-                            "price": price,
-                            "currency": "MXN",
-                            "normalized_product_id": get_normalized_id(sku),
-                            "created_at": datetime.now().astimezone().isoformat(), # FECHA NORMALIZADA
-                            "metadata": {
-                                "url": f"https://tienda.resurtidora.mx/products/{p.get('handle')}",
-                                "product_type": p_type,
-                                "tags": p_tags,
-                                "image": p['images'][0]['src'] if p.get('images') else None,
-                                "collection_source": collection_name
-                            }
-                        })
+                    # SKU
+                    sku = variant.get('sku')
+                    if not sku: 
+                        sku = f"RES-{variant['id']}"
+
+                    # --- ESTRUCTURA NUEVA ---
+                    item = {
+                        "provider_name": PROVIDER_NAME,
+                        "sku_provider": str(sku).strip(),    # Nombre nuevo
+                        "raw_title": title_full[:500],       # Nombre nuevo
+                        "price": price,
+                        "currency": "MXN",
+                        "status": "pending",                 # SEÑAL PARA IA
+                        "metadata": {
+                            "url": f"https://tienda.resurtidora.mx/products/{p_handle}",
+                            "product_type": p_type,
+                            "tags": p_tags,
+                            "image": image_url,
+                            "collection_source": collection_name,
+                            "variant_id": variant['id']
+                        }
+                    }
+                    all_data.append(item)
             
-            print(f"    ✅ Pág {page} de {collection_name} lista.")
+            print(f"    ✅ Pág {page} procesada ({len(all_data)} acumulados).")
             page += 1
-            time.sleep(random.uniform(0.5, 1.0))
+            time.sleep(random.uniform(1.0, 2.0))
 
         except Exception as e:
             print(f"❌ Error en {collection_name}: {e}")
@@ -102,25 +134,22 @@ def process_collection(session, collection_url):
     return all_data
 
 def run_scraper():
-    print(f"--- 🚀 Iniciando Scraper Multi-Colección: {PROVIDER_NAME} ---")
+    print(f"--- 🚀 Iniciando Scraper Resurtidora (Shopify Mode) ---")
     total_extracted = 0
-    
-    with requests.Session() as session:
-        session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-        })
+    session = create_robust_session()
 
-        for url in COLLECTIONS:
-            collection_data = process_collection(session, url)
-            
-            if collection_data:
-                # Inserción por cada colección para no saturar memoria
-                try:
-                    supabase.table("market_prices_log").insert(collection_data).execute()
-                    total_extracted += len(collection_data)
-                    print(f"📤 {len(collection_data)} productos de esta colección enviados a Supabase.")
-                except Exception as e:
-                    print(f"❌ Error al insertar lote: {e}")
+    for url in COLLECTIONS:
+        collection_data = process_collection(session, url)
+        
+        if collection_data:
+            try:
+                # Inserción por lotes
+                supabase.table("market_prices_log").insert(collection_data).execute()
+                count = len(collection_data)
+                total_extracted += count
+                print(f"   💾 Guardados {count} productos de {url.split('/')[-2]}")
+            except Exception as e:
+                print(f"   ❌ Error al insertar en Supabase: {e}")
 
     print(f"--- 🏁 Finalizado. Total Resurtidora: {total_extracted} registros ---")
 

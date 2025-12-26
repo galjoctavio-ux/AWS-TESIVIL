@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 PROVIDER_NAME = "Grupo Coresa"
 LOG_FILE = 'scraper_coresa.log'
 
-# URLs definitivas que me pasaste (Directo al grano)
+# URLs de categorías a escanear
 URLS_CATEGORIAS = [
     "https://www.grupocoresa.com/equipos-de-aire-acondicionado",
     "https://www.grupocoresa.com/accesorios-y-refacciones/agentes-de-limpieza",
@@ -26,90 +26,130 @@ URLS_CATEGORIAS = [
     "https://www.grupocoresa.com/accesorios-y-refacciones/herramientas-y-accesorios-para-instalaciones"
 ]
 
-SELECTOR_PRODUCTO = 'li.product-item'
-SELECTOR_TITULO = 'a.product-item-link'
-SELECTOR_PRECIO = '.price-box .price' 
-SELECTOR_PAGINACION_NEXT = 'a.action.next'
+# Selectores (Ajustados a la estructura actual de Coresa)
+SELECTOR_PRODUCTO = 'div.product-item'
+SELECTOR_TITULO = 'h5.product-item-title a'
+SELECTOR_PRECIO = 'span.product-item-price' # A veces cambia, validamos abajo
+SELECTOR_PAGINACION_NEXT = 'li.page-item.next a'
 
-logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-load_dotenv()
+# 1. Logging
+logging.basicConfig(
+    filename=LOG_FILE, 
+    level=logging.INFO, 
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
-supabase: Client = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_SERVICE_ROLE_KEY"))
+# 2. Credenciales y Supabase
+env_path = Path(__file__).parent / ".env"
+load_dotenv(dotenv_path=env_path)
+
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    print("❌ Error: Credenciales no encontradas en .env")
+    exit(1)
+
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def create_robust_session():
     session = requests.Session()
-    retry = Retry(total=5, backoff_factor=3, status_forcelist=[429, 500, 502, 503, 504])
-    session.mount("https://", HTTPAdapter(max_retries=retry))
+    retry = Retry(total=5, backoff_factor=2, status_forcelist=[429, 500, 502, 503, 504])
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
     session.headers.update({
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     })
     return session
 
 def process_category(session, category_url):
+    print(f"📂 Procesando categoría: {category_url.split('/')[-1]}...")
     page = 1
-    items_count = 0
     current_url = category_url
-
-    print(f"--> Analizando: {category_url.split('/')[-1]}")
+    items_count = 0
 
     while True:
         try:
-            # Quitamos el parámetro de límite ya que el sitio lo ignora
-            response = session.get(current_url, timeout=30)
+            response = session.get(current_url, timeout=20)
+            if response.status_code != 200:
+                logging.error(f"Error {response.status_code} en {current_url}")
+                break
+            
             soup = BeautifulSoup(response.text, 'html.parser')
             products = soup.select(SELECTOR_PRODUCTO)
 
             if not products:
-                print(f"    ⚠️ No se hallaron productos en página {page}.")
+                print("   ⚠️ No se encontraron productos (o fin de lista).")
                 break
 
             batch_data = []
+            
             for p in products:
-                tag_titulo = p.select_one(SELECTOR_TITULO)
-                if not tag_titulo: continue
-
-                title = tag_titulo.get_text(strip=True)
-                link = tag_titulo.get('href', '')
+                # Extraer Título y Link
+                title_elem = p.select_one(SELECTOR_TITULO)
+                if not title_elem: continue
                 
-                tag_precio = p.select_one(SELECTOR_PRECIO)
-                price_raw = tag_precio.get_text(strip=True) if tag_precio else "0"
-                # Limpieza de precio
-                price = float(price_raw.replace('$', '').replace(',', '').strip()) if price_raw != "0" else 0.0
+                title = title_elem.get_text(strip=True)
+                link_href = title_elem.get('href')
+                link = link_href if link_href.startswith('http') else f"https://www.grupocoresa.com{link_href}"
 
-                sku = "N/A"
-                form_tocart = p.select_one('form[data-product-sku]')
-                if form_tocart:
-                    sku = form_tocart.get('data-product-sku')
+                # Extraer Precio (Limpieza robusta)
+                price_elem = p.select_one(SELECTOR_PRECIO)
+                if not price_elem: continue
+                
+                price_str = price_elem.get_text(strip=True).replace('$', '').replace(',', '').replace('MXN', '')
+                try:
+                    price = float(price_str)
+                except ValueError:
+                    continue # Saltamos si no es un número válido
 
-                if price > 0:
-                    batch_data.append({
-                        "provider_name": PROVIDER_NAME,
-                        "product_title": title,
-                        "sku": sku,
-                        "price": price,
-                        "created_at": datetime.now().astimezone().isoformat(),
-                        "metadata": {
-                            "url": link,
-                            "category_label": category_url.split('/')[-1]
-                        }
-                    })
+                # Extraer SKU (Lógica mejorada)
+                # Coresa a veces no muestra SKU en el grid. Usamos el slug de la URL como fallback.
+                sku = None
+                sku_elem = p.select_one('.product-item-sku') # Selector hipotético común
+                if sku_elem:
+                    sku = sku_elem.get_text(strip=True)
+                
+                if not sku:
+                    # Fallback: Usar la última parte de la URL como ID único
+                    # Ejemplo: .../minisplit-mirage-x3 -> minisplit-mirage-x3
+                    sku = link.split('/')[-1]
 
+                # Construir objeto para Supabase
+                batch_data.append({
+                    "provider_name": PROVIDER_NAME,
+                    "sku_provider": sku[:100],  # Columna NUEVA
+                    "raw_title": title[:500],   # Columna NUEVA
+                    "price": price,
+                    "currency": "MXN",
+                    "status": "pending",        # <--- LA SEÑAL PARA LA IA
+                    "metadata": {
+                        "url": link,
+                        "category_origin": category_url.split('/')[-1]
+                    }
+                })
+
+            # Insertar lote
             if batch_data:
-                supabase.table("market_prices_log").insert(batch_data).execute()
-                items_count += len(batch_data)
-                print(f"    ✅ Pág {page}: +{len(batch_data)} productos.")
+                try:
+                    supabase.table("market_prices_log").insert(batch_data).execute()
+                    items_count += len(batch_data)
+                    print(f"   💾 Pág {page}: Guardados {len(batch_data)} productos.")
+                except Exception as e:
+                    logging.error(f"Error DB en pág {page}: {e}")
 
-            # Navegación a la siguiente página (crucial por el límite de 24)
+            # Paginación
             next_btn = soup.select_one(SELECTOR_PAGINACION_NEXT)
             if next_btn and next_btn.get('href'):
                 current_url = next_btn['href']
                 page += 1
-                time.sleep(random.uniform(2, 4))
+                time.sleep(random.uniform(1.5, 3.0)) # Pausa ética
             else:
                 break
 
         except Exception as e:
-            print(f"    ❌ Error: {e}")
+            logging.error(f"Error crítico en loop: {e}")
             break
 
     return items_count
@@ -117,10 +157,12 @@ def process_category(session, category_url):
 def run_scraper():
     session = create_robust_session()
     total = 0
-    print(f"--- 🌀 Iniciando Scraper Coresa (Modo Paginación) ---")
+    print(f"🚀 Iniciando Scraper {PROVIDER_NAME}...")
+    
     for cat in URLS_CATEGORIAS:
         total += process_category(session, cat)
-    print(f"--- 🏁 Finalizado. Total General Coresa: {total} ---")
+        
+    print(f"\n🏁 Finalizado {PROVIDER_NAME}. Total insertados: {total}")
 
 if __name__ == "__main__":
     run_scraper()
