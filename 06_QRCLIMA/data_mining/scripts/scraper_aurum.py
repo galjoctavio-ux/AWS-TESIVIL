@@ -15,9 +15,10 @@ from dotenv import load_dotenv
 PROVIDER_NAME = "Aires Aurum"
 LOG_FILE = 'scraper_aires_aurum.log'
 BASE_URL = "https://airesaurum.com.mx"
+# ✅ CORRECCIÓN: URL específica de la categoría
 START_URL = "https://airesaurum.com.mx/aires-acondicionados/"
 
-# Selectores específicos de TiendaNube (Aires Aurum)
+# Selectores (TiendaNube)
 SELECTOR_ITEM_LINK = 'a.js-item-link' 
 SELECTOR_PAGINACION_NEXT = 'a.js-pagination-next'
 
@@ -57,7 +58,7 @@ def create_robust_session():
     return session
 
 def scrape_product_detail(session, url):
-    """Extrae datos usando JSON-LD (Lógica de la versión antigua, adaptada al esquema nuevo)."""
+    """Extrae datos usando JSON-LD."""
     try:
         response = session.get(url, timeout=15)
         if response.status_code != 200:
@@ -65,16 +66,14 @@ def scrape_product_detail(session, url):
         
         soup = BeautifulSoup(response.text, 'html.parser')
 
-        # Buscamos el Schema JSON-LD de tipo Product
+        # Buscar JSON-LD
         scripts = soup.find_all('script', type='application/ld+json')
         target_data = None
         
         for script in scripts:
             try:
                 data = json.loads(script.string)
-                # A veces es una lista, a veces un dict
                 if isinstance(data, list):
-                    # Buscar el dict que sea Product dentro de la lista
                     data = next((item for item in data if item.get('@type') == 'Product'), None)
                 
                 if data and data.get('@type') == 'Product':
@@ -84,12 +83,11 @@ def scrape_product_detail(session, url):
                 continue
         
         if not target_data:
-            logging.warning(f"No JSON-LD found for {url}")
+            # logging.warning(f"No JSON-LD found for {url}") # Opcional: descomentar para debug
             return None
 
-        # Extracción de datos limpia
+        # Extracción
         raw_title = target_data.get('name')
-        # Tiendanube a veces pone el SKU en 'sku' o 'mpn'
         sku_provider = target_data.get('sku') or target_data.get('mpn') or "N/A"
         
         price = 0.0
@@ -97,17 +95,14 @@ def scrape_product_detail(session, url):
         
         if 'offers' in target_data:
             offers = target_data['offers']
-            # offers puede ser lista o dict
             if isinstance(offers, list):
-                offers = offers[0] # Tomar la primera oferta
-            
+                offers = offers[0]
             price = float(offers.get('price', 0))
             currency = offers.get('priceCurrency', 'MXN')
 
         if price == 0:
             return None
 
-        # Construir objeto para Supabase (Esquema del script nuevo)
         return {
             "provider_name": PROVIDER_NAME,
             "sku_provider": str(sku_provider)[:100],
@@ -128,7 +123,7 @@ def scrape_product_detail(session, url):
 
 def fetch_and_store():
     session = create_robust_session()
-    print(f"🚀 Iniciando Scraper {PROVIDER_NAME} (Modo TiendaNube)...")
+    print(f"🚀 Iniciando Scraper {PROVIDER_NAME} (Categoría: Aires Acondicionados)...")
     
     current_url = START_URL
     total_inserted = 0
@@ -145,17 +140,26 @@ def fetch_and_store():
             
             soup = BeautifulSoup(response.text, 'html.parser')
             
-            # 1. Obtener links usando el selector específico de TiendaNube
             product_links = []
+            
+            # 1. Intento A: Selector específico de TiendaNube (.js-item-link)
             link_elements = soup.select(SELECTOR_ITEM_LINK)
             
+            # 2. Intento B: Si falla A, buscar cualquier enlace que contenga '/productos/'
+            if not link_elements:
+                print("   ⚠️ Selector .js-item-link vacío. Usando búsqueda genérica...")
+                for a in soup.find_all('a', href=True):
+                    if '/productos/' in a['href']:
+                        link_elements.append(a)
+
             for a in link_elements:
                 if a.has_attr('href'):
                     href = a['href']
                     full_link = href if href.startswith('http') else f"{BASE_URL}{href}"
-                    # Limpiar query params
                     clean_link = full_link.split('?')[0]
-                    if clean_link not in product_links:
+                    
+                    # Evitar procesar el mismo listado como producto
+                    if clean_link != START_URL and clean_link != current_url and clean_link not in product_links:
                         product_links.append(clean_link)
 
             if not product_links:
@@ -164,15 +168,14 @@ def fetch_and_store():
 
             print(f"   Encontrados {len(product_links)} enlaces. Procesando...")
 
-            # 2. Procesar detalles
             batch_data = []
             for link in product_links:
                 data = scrape_product_detail(session, link)
                 if data:
                     batch_data.append(data)
-                time.sleep(random.uniform(0.5, 1.5)) # Respetar servidor
+                # print(".", end="", flush=True) # Feedback visual opcional
+                time.sleep(random.uniform(0.5, 1.2))
 
-            # 3. Guardar en BD
             if batch_data:
                 try:
                     supabase.table("market_prices_log").insert(batch_data).execute()
@@ -181,8 +184,10 @@ def fetch_and_store():
                     print(f"   💾 Guardados {count} productos nuevos.")
                 except Exception as e:
                     print(f"   ❌ Error al guardar en DB: {e}")
+            else:
+                print("   ⚠️ Se encontraron enlaces pero no se pudo extraer info (¿quizás no eran productos válidos?).")
 
-            # 4. Obtener siguiente página (Lógica 'Next Button')
+            # Paginación
             next_btn = soup.select_one(SELECTOR_PAGINACION_NEXT)
             if next_btn and next_btn.has_attr('href'):
                 current_url = next_btn['href']
@@ -190,7 +195,7 @@ def fetch_and_store():
                     current_url = f"{BASE_URL}{current_url}"
                 page_num += 1
             else:
-                print("   ✅ No hay más páginas (botón 'Siguiente' no encontrado).")
+                print("   ✅ No hay más páginas (fin de paginación).")
                 current_url = None
 
         except Exception as e:
