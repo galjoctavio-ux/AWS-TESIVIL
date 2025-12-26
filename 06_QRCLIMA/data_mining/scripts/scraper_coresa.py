@@ -26,10 +26,11 @@ URLS_CATEGORIAS = [
     "https://www.grupocoresa.com/accesorios-y-refacciones/herramientas-y-accesorios-para-instalaciones"
 ]
 
-# ✅ SELECTORES DE LA VERSIÓN QUE FUNCIONA (MAGENTO)
-SELECTOR_PRODUCTO = 'li.product-item'
+# ✅ SELECTORES AJUSTADOS (Más robustos para Magento)
+# Quitamos el "li" estricto y buscamos clases contenedoras comunes
+SELECTOR_PRODUCTO = '.product-item, .product-item-info, .item.product' 
 SELECTOR_TITULO = 'a.product-item-link'
-SELECTOR_PRECIO = '[data-price-type="finalPrice"] .price' 
+SELECTOR_PRECIO = '.price-box .price, [data-price-type="finalPrice"] .price' 
 SELECTOR_PAGINACION_NEXT = 'a.action.next'
 
 # 1. Logging
@@ -62,15 +63,20 @@ def create_robust_session():
     adapter = HTTPAdapter(max_retries=retry)
     session.mount("https://", adapter)
     session.mount("http://", adapter)
+    # Headers actualizados para parecer un navegador real moderno
     session.headers.update({
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-        "Accept-Language": "es-MX,es;q=0.9,en-US;q=0.8,en;q=0.7"
+        "Accept-Language": "es-MX,es;q=0.9,en-US;q=0.8,en;q=0.7",
+        "Referer": "https://www.google.com/",
+        "Connection": "keep-alive",
+        "Upgrade-Insecure-Requests": "1"
     })
     return session
 
 def process_category(session, category_url):
-    print(f"📂 Procesando: {category_url.split('/')[-1]}...")
+    category_name = category_url.split('/')[-1]
+    print(f"📂 Procesando: {category_name}...")
     page = 1
     current_url = category_url
     items_count = 0
@@ -87,8 +93,19 @@ def process_category(session, category_url):
             soup = BeautifulSoup(response.text, 'html.parser')
             products = soup.select(SELECTOR_PRODUCTO)
 
+            # --- DEBUGGING CRÍTICO ---
+            if not products and page == 1:
+                print("      ⚠️ No se encontraron productos. Guardando HTML de depuración...")
+                debug_filename = f"debug_fail_{category_name}.html"
+                with open(debug_filename, "w", encoding="utf-8") as f:
+                    f.write(response.text)
+                print(f"      🛑 Revisa el archivo {debug_filename} para ver qué respondió el servidor.")
+                # Si falla la primera página, probablemente falle todo. Rompemos el ciclo.
+                break
+            # -------------------------
+
             if not products:
-                print("      ⚠️ No se encontraron productos en esta página.")
+                print("      ⚠️ Fin de lista o estructura no reconocida.")
                 break
 
             batch_data = []
@@ -97,6 +114,10 @@ def process_category(session, category_url):
                 try:
                     # 1. Título y Link
                     title_elem = p.select_one(SELECTOR_TITULO)
+                    # Fallback si no encuentra el título con el selector estándar
+                    if not title_elem: 
+                        title_elem = p.select_one('a') 
+                    
                     if not title_elem: continue
                     
                     raw_title = title_elem.get_text(strip=True)
@@ -104,14 +125,10 @@ def process_category(session, category_url):
 
                     # 2. Precio (Limpieza robusta)
                     price_elem = p.select_one(SELECTOR_PRECIO)
-                    if not price_elem: 
-                        # Intento secundario para precio
-                        price_elem = p.select_one('.price-box .price')
                     
                     if not price_elem: continue
                     
                     price_text = price_elem.get_text(strip=True)
-                    # Extraer solo números y puntos
                     price_clean = "".join(c for c in price_text if c.isdigit() or c == '.')
                     try:
                         price = float(price_clean)
@@ -120,25 +137,26 @@ def process_category(session, category_url):
 
                     if price <= 1.0: continue
 
-                    # 3. SKU (Usando la lógica inteligente del script viejo)
+                    # 3. SKU
                     sku_val = None
-                    # Magento suele poner el SKU en un form data-product-sku
                     form_tocart = p.select_one('form[data-product-sku]')
                     if form_tocart:
                         sku_val = form_tocart.get('data-product-sku')
                     
                     if not sku_val:
-                        # Fallback: buscar input hidden
                         input_sku = p.select_one('input[name="product"]')
                         if input_sku: sku_val = input_sku.get('value')
 
-                    if not sku_val:
-                        # Último recurso: slug de la URL
+                    if not sku_val and link:
                         sku_val = link.split('/')[-1].replace('.html', '')
 
-                    sku_provider = f"COR-{sku_val}" # Prefijo Coresa
+                    # Si aún así es nulo, generamos uno temporal basado en título (emergencia)
+                    if not sku_val:
+                         sku_val = f"UNK-{abs(hash(raw_title))}"
 
-                    # 4. Construir objeto (Esquema Nuevo)
+                    sku_provider = f"COR-{sku_val}" 
+
+                    # 4. Construir objeto
                     batch_data.append({
                         "provider_name": PROVIDER_NAME,
                         "sku_provider": sku_provider[:100],
@@ -148,7 +166,7 @@ def process_category(session, category_url):
                         "status": "pending", 
                         "metadata": {
                             "url": link,
-                            "category_origin": category_url.split('/')[-1],
+                            "category_origin": category_name,
                             "scraped_at": time.time()
                         }
                     })
@@ -158,22 +176,22 @@ def process_category(session, category_url):
             # Insertar lote
             if batch_data:
                 try:
+                    # Usamos upsert o insert según prefieras, insert es estándar
                     supabase.table("market_prices_log").insert(batch_data).execute()
                     items_count += len(batch_data)
                     print(f"      💾 Guardados {len(batch_data)} productos.")
                 except Exception as e:
                     logging.error(f"Error DB en pág {page}: {e}")
             else:
-                 print("      ⚠️ Elementos encontrados pero sin datos válidos (precio/título).")
+                 print("      ⚠️ Elementos HTML encontrados pero sin datos válidos.")
 
             # Paginación
             next_btn = soup.select_one(SELECTOR_PAGINACION_NEXT)
             if next_btn and next_btn.get('href'):
                 current_url = next_btn['href']
                 page += 1
-                time.sleep(random.uniform(2.0, 4.0)) # Pausa para evitar bloqueo
+                time.sleep(random.uniform(2.0, 4.0)) 
             else:
-                print("      ✅ Fin de paginación.")
                 break
 
         except Exception as e:
