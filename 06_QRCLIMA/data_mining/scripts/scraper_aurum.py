@@ -110,10 +110,11 @@ def fetch_and_store():
     session = create_robust_session()
     print(f"🚀 Iniciando Scraper {PROVIDER_NAME}...")
     
-    # Cola de URLs por visitar (Empezamos con la página 1)
-    # Nota: Aurum usa paginación tipo ?page=1
     page = 1
     total_inserted = 0
+    
+    # NUEVO: Variable para guardar los links de la página anterior
+    previous_page_links = []
 
     while True:
         list_url = f"{START_URL}?page={page}"
@@ -121,39 +122,62 @@ def fetch_and_store():
         
         try:
             response = session.get(list_url, timeout=20)
-            if response.status_code != 200:
-                print("   Fin de paginación o error.")
+            # Algunos sitios redirigen a la home cuando la paginación acaba
+            if response.status_code != 200 or response.url == BASE_URL:
+                print("   ⛔ Fin de paginación (Status code o Redirección).")
                 break
             
             soup = BeautifulSoup(response.text, 'html.parser')
             
-            # Buscar enlaces a productos (Ajusta el selector 'a.product-link' según inspección)
-            # Buscamos cualquier link que parezca de producto
+            # --- DETECCIÓN DE PÁGINA VACÍA POR TEXTO (OPCIONAL PERO ÚTIL) ---
+            body_text = soup.get_text().lower()
+            if "no se encontraron productos" in body_text or "no products found" in body_text:
+                print("   ⛔ Texto de 'No resultados' encontrado.")
+                break
+
             product_links = []
             for a in soup.find_all('a', href=True):
                 href = a['href']
-                # Filtro heurístico: usualmente los productos están en /productos/nombre-producto
                 if '/productos/' in href and href.count('/') > 2: 
                     full_link = href if href.startswith('http') else f"{BASE_URL}{href}"
-                    if full_link not in product_links:
-                        product_links.append(full_link)
+                    # Limpieza básica para evitar duplicados por query params (ej: ?v=123)
+                    clean_link = full_link.split('?')[0]
+                    if clean_link not in product_links:
+                        product_links.append(clean_link)
+
+            # Ordenamos para asegurar que la comparación de listas sea exacta
+            product_links.sort()
 
             if not product_links:
                 print("⚠️ No se encontraron productos en esta página. Terminando.")
                 break
 
-            print(f"   Encontrados {len(product_links)} enlaces. Procesando...")
+            # --- CORRECCIÓN PRINCIPAL: DETECCIÓN DE BUCLE ---
+            # Si los enlaces de esta página son IGUALES a los de la anterior, estamos en bucle
+            if product_links == previous_page_links:
+                print("   🔄 Bucle detectado: La página actual tiene los mismos productos que la anterior.")
+                print("   ⛔ Deteniendo scraper para evitar duplicados infinitos.")
+                break
+            
+            # Actualizamos el registro de la página anterior
+            previous_page_links = product_links
+
+            print(f"   Encontrados {len(product_links)} enlaces únicos. Procesando...")
 
             batch_data = []
             for link in product_links:
+                # Pequeña optimización: no volver a scrapear si ya lo procesaste en el loop anterior
+                # (Aunque el check de arriba ya previene esto, es doble seguridad)
                 data = scrape_product_detail(session, link)
                 if data:
                     batch_data.append(data)
-                time.sleep(random.uniform(0.5, 1.0)) # Respetar servidor
+                time.sleep(random.uniform(0.5, 1.0)) 
 
-            # Insertar lote
             if batch_data:
                 try:
+                    # Usamos upsert o insert. Si el SKU ya existe, esto podría duplicar filas
+                    # dependiendo de tu esquema en Supabase.
+                    # Idealmente en el futuro usar upsert basado en SKU + Provider
                     supabase.table("market_prices_log").insert(batch_data).execute()
                     count = len(batch_data)
                     total_inserted += count
@@ -162,11 +186,13 @@ def fetch_and_store():
                     print(f"   ❌ Error al guardar en DB: {e}")
 
             page += 1
-            if page > 50: # Límite de seguridad para no loopear infinito
+            # Reduje el límite de seguridad a 40 ya que vimos que muere antes
+            if page > 40: 
+                print("   🛡️ Límite de seguridad de páginas alcanzado.")
                 break
 
         except Exception as e:
-            print(f"❌ Error general: {e}")
+            print(f"❌ Error general en página {page}: {e}")
             break
 
     print(f"\n🏁 {PROVIDER_NAME} Finalizado. Total: {total_inserted}")
