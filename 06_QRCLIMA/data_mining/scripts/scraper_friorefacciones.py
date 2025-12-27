@@ -124,7 +124,7 @@ def fetch_and_store():
 
             if batch_data:
                 try:
-                    supabase.table("market_prices_log").insert(batch_data).execute()
+                    supabase.table("log_scraper_prices").insert(batch_data).execute()
                     total_inserted += len(batch_data)
                     print(f"   💾 Guardados {len(batch_data)} registros.")
                 except Exception as e_db:

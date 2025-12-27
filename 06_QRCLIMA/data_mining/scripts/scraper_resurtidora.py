@@ -144,7 +144,7 @@ def run_scraper():
         if collection_data:
             try:
                 # Inserción por lotes
-                supabase.table("market_prices_log").insert(collection_data).execute()
+                supabase.table("log_scraper_prices").insert(collection_data).execute()
                 count = len(collection_data)
                 total_extracted += count
                 print(f"   💾 Guardados {count} productos de {url.split('/')[-2]}")

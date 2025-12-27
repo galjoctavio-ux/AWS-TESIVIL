@@ -177,7 +177,7 @@ def process_category(session, category_url):
             if batch_data:
                 try:
                     # Usamos upsert o insert según prefieras, insert es estándar
-                    supabase.table("market_prices_log").insert(batch_data).execute()
+                    supabase.table("log_scraper_prices").insert(batch_data).execute()
                     items_count += len(batch_data)
                     print(f"      💾 Guardados {len(batch_data)} productos.")
                 except Exception as e:

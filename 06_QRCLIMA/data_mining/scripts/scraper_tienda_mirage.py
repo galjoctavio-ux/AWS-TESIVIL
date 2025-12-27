@@ -136,7 +136,7 @@ def process_category(session, category_info):
                     
                     sku_provider = f"MIR-{sku_val}"
 
-                    # 4. Objeto Nuevo (Esquema market_prices_log)
+                    # 4. Objeto Nuevo (Esquema log_scraper_prices)
                     item = {
                         "provider_name": PROVIDER_NAME,
                         "sku_provider": sku_provider[:100],
@@ -159,7 +159,7 @@ def process_category(session, category_info):
             # Insertar lote
             if batch_data:
                 try:
-                    supabase.table("market_prices_log").insert(batch_data).execute()
+                    supabase.table("log_scraper_prices").insert(batch_data).execute()
                     count = len(batch_data)
                     total_items += count
                     print(f"      💾 Guardados {count} productos.")

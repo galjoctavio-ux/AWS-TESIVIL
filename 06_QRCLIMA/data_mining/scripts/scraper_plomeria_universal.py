@@ -109,7 +109,7 @@ def run_scraper():
     if all_extracted_data:
         print(f"📤 Enviando {len(all_extracted_data)} variantes a la Nube...")
         try:
-            supabase.table("market_prices_log").insert(all_extracted_data).execute()
+            supabase.table("log_scraper_prices").insert(all_extracted_data).execute()
             print("✅ Variantes actualizadas correctamente.")
         except Exception as e:
             print(f"❌ Error Supabase: {e}")

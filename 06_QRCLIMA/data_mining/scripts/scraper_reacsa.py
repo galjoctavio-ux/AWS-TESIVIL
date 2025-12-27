@@ -136,7 +136,7 @@ def fetch_and_store():
                 try:
                     # Usamos upsert implícito o insert simple
                     # Como es un log de precios históricos, 'insert' está bien.
-                    data_result = supabase.table("market_prices_log").insert(batch_data).execute()
+                    data_result = supabase.table("log_scraper_prices").insert(batch_data).execute()
                     
                     count = len(batch_data)
                     total_inserted += count
