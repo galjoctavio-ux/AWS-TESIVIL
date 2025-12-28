@@ -1,0 +1,666 @@
+{
+    "new_products": [
+        {
+            "sku": "EQ-MSI-15T220-009",
+            "nombre_estandarizado": "Minisplit Inverter Mirage V32 1.5 Ton Frío-Calor 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "Mirage",
+            "modelo": "V32",
+            "descripcion_tecnica": "1.5 Ton 220V R32 Frío-Calor 17.6 SEER",
+            "capacidad": "1.5 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-2T220-007",
+            "nombre_estandarizado": "Minisplit Inverter Mirage V32 2 Ton Frío-Calor 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "Mirage",
+            "modelo": "V32",
+            "descripcion_tecnica": "2 Ton 220V R32 Frío-Calor 17.7 SEER",
+            "capacidad": "2 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSO-1T110-006",
+            "nombre_estandarizado": "Minisplit On/Off Mirage NEX 2024 1 Ton Frío-Calor 110V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits On/Off",
+            "marca": "Mirage",
+            "modelo": "NEX 2024",
+            "descripcion_tecnica": "1 Ton 110V Frío-Calor 12 SEER",
+            "capacidad": "1 Ton",
+            "voltaje": "110V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-2T220-008",
+            "nombre_estandarizado": "Minisplit Inverter York Triple 2 Ton Frío-Calor 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "York",
+            "modelo": "Triple Inverter",
+            "descripcion_tecnica": "2 Ton 220V R32 Frío-Calor 22 SEER",
+            "capacidad": "2 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-15T220-010",
+            "nombre_estandarizado": "Minisplit Inverter York Triple 1.5 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "York",
+            "modelo": "Triple Inverter",
+            "descripcion_tecnica": "1.5 Ton 220V R410A Solo Frío 19.17 SEER",
+            "capacidad": "1.5 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSO-15T220-006",
+            "nombre_estandarizado": "Minisplit On/Off Mirage Xlife 1.5 Ton Frío-Calor 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits On/Off",
+            "marca": "Mirage",
+            "modelo": "Xlife",
+            "descripcion_tecnica": "1.5 Ton 220V Frío-Calor 11.7 SEER",
+            "capacidad": "1.5 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-PAN-TRA-001",
+            "nombre_estandarizado": "Panel para Cassette Trane U-Match",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Paneles/Accesorios",
+            "marca": "Trane",
+            "modelo": "U-Match",
+            "descripcion_tecnica": "Panel Cassette 18MBH",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-PAQ-TRA-001",
+            "nombre_estandarizado": "Paquete Residencial Trane MTZ 4 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Paquetes",
+            "marca": "Trane",
+            "modelo": "MTZ",
+            "descripcion_tecnica": "4 Ton 220V Solo Frío 13 SEER Horizontal",
+            "capacidad": "4 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-PAQ-TRA-002",
+            "nombre_estandarizado": "Paquete Residencial Trane Impack Dual 5 Ton Frío-Calor 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Paquetes",
+            "marca": "Trane",
+            "modelo": "Impack",
+            "descripcion_tecnica": "5 Ton 220V Frío-Calor 14 SEER",
+            "capacidad": "5 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-PAQ-TRA-003",
+            "nombre_estandarizado": "Paquete Comercial Trane Precedent 10 Ton Solo Frío 460V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Paquetes",
+            "marca": "Trane",
+            "modelo": "Precedent",
+            "descripcion_tecnica": "10 Ton 460V 3F Solo Frío",
+            "capacidad": "10 Ton",
+            "voltaje": "460V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-1T110-004",
+            "nombre_estandarizado": "Minisplit Inverter Mirage V32 1 Ton Frío-Calor 110V 17 SEER",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "Mirage",
+            "modelo": "V32",
+            "descripcion_tecnica": "1 Ton 110V R32 Frío-Calor 17.4 SEER",
+            "capacidad": "1 Ton",
+            "voltaje": "110V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSO-1T220-008",
+            "nombre_estandarizado": "Minisplit On/Off Mirage Xlife 1 Ton Frío-Calor 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits On/Off",
+            "marca": "Mirage",
+            "modelo": "Xlife",
+            "descripcion_tecnica": "1 Ton 220V R410A Frío-Calor 12 SEER",
+            "capacidad": "1 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-1T220-009",
+            "nombre_estandarizado": "Minisplit Inverter York Triple 1 Ton Frío-Calor 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "York",
+            "modelo": "Triple Inverter",
+            "descripcion_tecnica": "1 Ton 220V R32 Frío-Calor 22 SEER",
+            "capacidad": "1 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-15T220-011",
+            "nombre_estandarizado": "Minisplit Inverter York Triple 1.5 Ton Frío-Calor 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "York",
+            "modelo": "Triple Inverter",
+            "descripcion_tecnica": "1.5 Ton 220V R32 Frío-Calor 21 SEER",
+            "capacidad": "1.5 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-3T220-002",
+            "nombre_estandarizado": "Minisplit Inverter Mirage Magnum 18 3 Ton Frío-Calor 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "Mirage",
+            "modelo": "Magnum 18",
+            "descripcion_tecnica": "3 Ton 220V R410A Frío-Calor 18 SEER",
+            "capacidad": "3 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-3T220-003",
+            "nombre_estandarizado": "Minisplit Inverter York 3 Ton Frío-Calor 220V 17 SEER",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "York",
+            "modelo": "Inverter",
+            "descripcion_tecnica": "3 Ton 220V R32 Frío-Calor 17.18 SEER",
+            "capacidad": "3 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-2T220-009",
+            "nombre_estandarizado": "Minisplit Inverter Mirage X32 2 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "Mirage",
+            "modelo": "Inverter X32",
+            "descripcion_tecnica": "2 Ton 220V R32 Solo Frío 17 SEER",
+            "capacidad": "2 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-PAQ-YOR-011",
+            "nombre_estandarizado": "Paquete Comercial York 10 Ton Solo Frío 440V 11.2 EER",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Paquetes",
+            "marca": "York",
+            "modelo": "Comercial",
+            "descripcion_tecnica": "10 Ton 440V 3F Solo Frío 11.2 EER",
+            "capacidad": "10 Ton",
+            "voltaje": "440V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-1T110-005",
+            "nombre_estandarizado": "Minisplit Inverter York 1 Ton Solo Frío 110V 17 SEER",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "York",
+            "modelo": "Inverter",
+            "descripcion_tecnica": "1 Ton 110V R32 Solo Frío 17.18 SEER",
+            "capacidad": "1 Ton",
+            "voltaje": "110V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-1T220-010",
+            "nombre_estandarizado": "Minisplit Inverter York 1 Ton Frío-Calor 220V 17 SEER",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "York",
+            "modelo": "Inverter",
+            "descripcion_tecnica": "1 Ton 220V R32 Frío-Calor 17.2 SEER",
+            "capacidad": "1 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-15T220-012",
+            "nombre_estandarizado": "Minisplit Inverter Mirage Magnum 22 1.5 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "Mirage",
+            "modelo": "Magnum 22",
+            "descripcion_tecnica": "1.5 Ton 220V R410A Solo Frío 21.8 SEER",
+            "capacidad": "1.5 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "EQ-MSO-2T220-004",
+            "precio": 9060.49,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-240807-00079951",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-mirage-nex-2024-setchf261t-2tr-24-000btus-solo-frio-220-1-60-r410a-12seer",
+            "scraped_at": "2025-12-26 19:25:43.68975+00",
+            "raw_id": 1354
+        },
+        {
+            "sku": "EQ-MSO-15T220-007",
+            "precio": 7691.95,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-240812-00010061",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-nex-2024-mirage-setchc181tt-1-5tr-18-000btus-frio-calor-220-1-60-r410a-12seer",
+            "scraped_at": "2025-12-26 19:25:43.68975+00",
+            "raw_id": 1356
+        },
+        {
+            "sku": "EQ-MSI-15T220-009",
+            "precio": 8453.52,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-240919-00017061",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-v32-mirage-setcvc181e-1-5tr-18-000btus-frio-calor-220-1-60-r32-17-6seer",
+            "scraped_at": "2025-12-26 19:25:43.68975+00",
+            "raw_id": 1358
+        },
+        {
+            "sku": "EQ-MSI-2T220-007",
+            "precio": 11013.98,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-240919-00027061",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-v32-mirage-setcvc261e-2tr-24-000btus-frio-calor-220-1-60-r32-17-7seer",
+            "scraped_at": "2025-12-26 19:25:43.68975+00",
+            "raw_id": 1360
+        },
+        {
+            "sku": "EQ-MSO-1T110-006",
+            "precio": 4729.85,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-240927-00090161",
+            "url": "https://www.grupocoresa.com/minisplit-mirage-high-wall-nex-2024-setchc120t-1tr-12-000btus-frio-calor-110-1-60-r410a-12seer",
+            "scraped_at": "2025-12-26 19:25:43.68975+00",
+            "raw_id": 1362
+        },
+        {
+            "sku": "EQ-MSI-2T220-006",
+            "precio": 10959.33,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-241007-00052161",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-x-mirage-setcmf261j-2tr-24-000btus-solo-frio-220-1-60-r32-18-5seer",
+            "scraped_at": "2025-12-26 19:25:43.68975+00",
+            "raw_id": 1364
+        },
+        {
+            "sku": "EQ-MSO-1T220-007",
+            "precio": 4236.48,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-241014-00095161",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-nex-2024-mirage-setchf121t-1tr-12-000btus-solo-frio-220-1-60-r410a-12seer",
+            "scraped_at": "2025-12-26 19:25:43.68975+00",
+            "raw_id": 1366
+        },
+        {
+            "sku": "EQ-FAN-YOR-003",
+            "precio": 30841.29,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-241119-00000361",
+            "url": "https://www.grupocoresa.com/juego-fan-coil-inverter-york-yejf36bztmcmowx-3tr-solo-frio-220-1-60-r32-15-3seer",
+            "scraped_at": "2025-12-26 19:25:43.68975+00",
+            "raw_id": 1369
+        },
+        {
+            "sku": "EQ-FAN-YOR-005",
+            "precio": 45465.53,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-241119-00010361",
+            "url": "https://www.grupocoresa.com/juego-fan-coil-york-yejf55bztmcmowx-5tr-solo-frio-r32-inverter-220-1-60-14-5seer",
+            "scraped_at": "2025-12-26 19:25:43.68975+00",
+            "raw_id": 1370
+        },
+        {
+            "sku": "EQ-PIT-YOR-003",
+            "precio": 46024.81,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-241119-00050361",
+            "url": "https://www.grupocoresa.com/minisplit-piso-techo-york-yfkf55bztmcmorx-5tr-60-000btus-frio-calor-r32-inverter-220-1-60-15seer",
+            "scraped_at": "2025-12-26 19:25:47.670896+00",
+            "raw_id": 1373
+        },
+        {
+            "sku": "EQ-CAS-YOR-004",
+            "precio": 47736.3,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-241120-00051361",
+            "url": "https://www.grupocoresa.com/juego-cassette-york-ykkf55bztmcmorx-5tr-frio-calor-r32-inverter-220-1-60-15-5seer",
+            "scraped_at": "2025-12-26 19:25:47.670896+00",
+            "raw_id": 1374
+        },
+        {
+            "sku": "EQ-MSO-1T110-007",
+            "precio": 5005.99,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250221-00000561",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-york-yhff12zxmdhuorx-1tr-12-000btus-solo-frio-110-1-60-r32-11seer",
+            "scraped_at": "2025-12-26 19:25:47.670896+00",
+            "raw_id": 1376
+        },
+        {
+            "sku": "EQ-MSO-1T220-009",
+            "precio": 4860.61,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250221-00010561",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-york-yhff12zhmdhuorx-1tr-12-000btus-solo-frio-220-1-60-r32-11-3seer",
+            "scraped_at": "2025-12-26 19:25:47.670896+00",
+            "raw_id": 1378
+        },
+        {
+            "sku": "EQ-MSO-15T220-008",
+            "precio": 7347.49,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250221-00020561",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-york-yhff18zhmdhuorx-1-5tr-18-000btus-solo-frio-220-1-60-r32-11seer",
+            "scraped_at": "2025-12-26 19:25:47.670896+00",
+            "raw_id": 1380
+        },
+        {
+            "sku": "EQ-MSO-2T220-006",
+            "precio": 9947.34,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250221-00030561",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-york-yhff24zhmdhuorx-2tr-24-000btus-solo-frio-220-1-60-r32-11seer",
+            "scraped_at": "2025-12-26 19:25:47.670896+00",
+            "raw_id": 1383
+        },
+        {
+            "sku": "EQ-MSO-1T220-010",
+            "precio": 5409.69,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250221-00079461",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-york-yhgf12zhmdhuorx-1tr-12-000btus-frio-calor-220-1-60-r32-11-3seer",
+            "scraped_at": "2025-12-26 19:25:47.670896+00",
+            "raw_id": 1384
+        },
+        {
+            "sku": "EQ-MSO-15T220-009",
+            "precio": 8397.15,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250221-00089461",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-york-yhgf18zhmdhuorx-1-5tr-18-000btus-frio-calor-220-1-60-r32-11seer",
+            "scraped_at": "2025-12-26 19:25:47.670896+00",
+            "raw_id": 1387
+        },
+        {
+            "sku": "EQ-MSO-2T220-007",
+            "precio": 10867.91,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250221-00099461",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-york-yhgf24zhmdhuorx-2tr-24-000btus-frio-calor-220-1-60-r32-11seer",
+            "scraped_at": "2025-12-26 19:25:47.670896+00",
+            "raw_id": 1389
+        },
+        {
+            "sku": "EQ-MSO-15T220-010",
+            "precio": 6769.63,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250324-00096561",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-nex-2024-mirage-setchf181t-1-5tr-18-000btus-solo-frio-220-1-60-r410a-12seer",
+            "scraped_at": "2025-12-26 19:25:47.670896+00",
+            "raw_id": 1390
+        },
+        {
+            "sku": "EQ-MSO-15T220-010",
+            "precio": 6769.63,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250324-00096561",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-nex-2024-mirage-setchf181t-1-5tr-18-000btus-solo-frio-220-1-60-r410a-12seer",
+            "scraped_at": "2025-12-26 19:25:47.670896+00",
+            "raw_id": 1391
+        },
+        {
+            "sku": "EQ-MSO-1T220-011",
+            "precio": 5057.09,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250402-00078561",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-york-yhge12ztmdhorx-1tr-12-000-btu-s-frio-calor-220-1-60-r410a-11-3-seer",
+            "scraped_at": "2025-12-26 19:25:47.670896+00",
+            "raw_id": 1394
+        },
+        {
+            "sku": "EQ-MSO-1T220-011",
+            "precio": 5057.09,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250402-00078561",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-york-yhge12ztmdhorx-1tr-12-000-btu-s-frio-calor-220-1-60-r410a-11-3-seer",
+            "scraped_at": "2025-12-26 19:25:47.670896+00",
+            "raw_id": 1395
+        },
+        {
+            "sku": "EQ-MSI-2T220-008",
+            "precio": 26132.42,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200820-00009121",
+            "url": "https://www.grupocoresa.com/minisplit-2tr-s-f-triple-inverter-220v-r410a-19-28seer-12190",
+            "scraped_at": "2025-12-26 19:25:50.71509+00",
+            "raw_id": 1416
+        },
+        {
+            "sku": "EQ-MSI-15T220-010",
+            "precio": 17968.66,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200820-00098121",
+            "url": "https://www.grupocoresa.com/minisplit-1-5tr-s-f-triple-inverter-220v-r410a-19-17seer-12189",
+            "scraped_at": "2025-12-26 19:25:50.71509+00",
+            "raw_id": 1418
+        },
+        {
+            "sku": "EQ-MSO-15T220-006",
+            "precio": 8499.67,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-210701-00019741",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-xlife-mirage-setclc181h-1-5tr-18-000btus-frio-calor-220-1-60-r410a-11-7seer",
+            "scraped_at": "2025-12-26 19:25:54.36524+00",
+            "raw_id": 1420
+        },
+        {
+            "sku": "EQ-PAN-TRA-001",
+            "precio": 1093.76,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-220120-00004331",
+            "url": "https://www.grupocoresa.com/panel-para-cassette-u-match-18mbh-hasta-21seer-13340",
+            "scraped_at": "2025-12-26 19:25:54.36524+00",
+            "raw_id": 1424
+        },
+        {
+            "sku": "EQ-PAQ-TRA-001",
+            "precio": 48863.77,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-220124-00016331",
+            "url": "https://www.grupocoresa.com/paquete-mtz-4tr-s-f-descarga-horizontal-220-1-60-r410-13seer-13361",
+            "scraped_at": "2025-12-26 19:25:54.36524+00",
+            "raw_id": 1426
+        },
+        {
+            "sku": "EQ-PAQ-TRA-001",
+            "precio": 48863.77,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-220124-00016331",
+            "url": "https://www.grupocoresa.com/paquete-mtz-4tr-s-f-descarga-horizontal-220-1-60-r410-13seer-13361",
+            "scraped_at": "2025-12-26 19:25:54.36524+00",
+            "raw_id": 1427
+        },
+        {
+            "sku": "EQ-PAQ-TRA-002",
+            "precio": 125912.61,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-220124-00095331",
+            "url": "https://www.grupocoresa.com/paquete-impack-dual-5tr-h-p-200-230-3-60-alta-eficiencia-14seer-13359",
+            "scraped_at": "2025-12-26 19:25:54.36524+00",
+            "raw_id": 1428
+        },
+        {
+            "sku": "EQ-PAQ-TRA-002",
+            "precio": 125912.61,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-220124-00095331",
+            "url": "https://www.grupocoresa.com/paquete-impack-dual-5tr-h-p-200-230-3-60-alta-eficiencia-14seer-13359",
+            "scraped_at": "2025-12-26 19:25:54.36524+00",
+            "raw_id": 1429
+        },
+        {
+            "sku": "EQ-PAQ-TRA-003",
+            "precio": 166012.16,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-220127-00077331",
+            "url": "https://www.grupocoresa.com/paquete-precedent-electromecanico-10tr-s-f-460-3-60-r410-eficiencia-estandar-13377",
+            "scraped_at": "2025-12-26 19:25:54.36524+00",
+            "raw_id": 1430
+        },
+        {
+            "sku": "EQ-MSI-1T110-004",
+            "precio": 5743.31,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-240919-00096061",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-v32-mirage-setcvc120e-1tr-12-000btus-frio-calor-110-1-60-r32-17-4seer",
+            "scraped_at": "2025-12-26 19:25:54.36524+00",
+            "raw_id": 1432
+        },
+        {
+            "sku": "EQ-MSO-1T220-008",
+            "precio": 5267.85,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250313-00062241",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-xlife-mirage-setclc121h-1tr-12-000btus-frio-calor-220-1-60-r410a-12seer",
+            "scraped_at": "2025-12-26 19:25:54.36524+00",
+            "raw_id": 1434
+        },
+        {
+            "sku": "EQ-MSI-1T220-009",
+            "precio": 13241.64,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250423-00027151",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-triple-inverter-york-yhkf12zmexcorx-1tr-12-000btus-frio-calor-220-1-60-r32-22seer-panel-negro",
+            "scraped_at": "2025-12-26 19:25:54.36524+00",
+            "raw_id": 1436
+        },
+        {
+            "sku": "EQ-MSI-15T220-011",
+            "precio": 19765.61,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250423-00036151",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-triple-inverter-york-yhkf18zjmexcorx-1-5tr-18-000btus-frio-calor-220-1-60-r32-21seer-panel-negro",
+            "scraped_at": "2025-12-26 19:25:54.36524+00",
+            "raw_id": 1438
+        },
+        {
+            "sku": "EQ-MSI-3T220-002",
+            "precio": 25009.1,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250603-00022941",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-magnum-18-mirage-setcmc361v-3tr-36-000btus-frio-calor-220-1-60-r410a-18seer",
+            "scraped_at": "2025-12-26 19:25:54.36524+00",
+            "raw_id": 1440
+        },
+        {
+            "sku": "EQ-MSI-3T220-003",
+            "precio": 20831.36,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250603-00033051",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-york-yhkf36zjmgxhorx-3tr-36-000btus-frio-calor-220-1-60-r32-17-18seer",
+            "scraped_at": "2025-12-26 19:25:54.36524+00",
+            "raw_id": 1442
+        },
+        {
+            "sku": "EQ-MSI-2T220-009",
+            "precio": 10639.68,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250603-00067741",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-x32-mirage-setcwf261e-2tr-24-000btus-solo-frio-220-1-60-r32-17seer",
+            "scraped_at": "2025-12-26 19:25:57.121174+00",
+            "raw_id": 1444
+        },
+        {
+            "sku": "EQ-MSI-1T110-003",
+            "precio": 6069.64,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00007051",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-x32-mirage-setcwc120e-1tr-12-000btus-frio-calor-110-1-60-r32-17seer",
+            "scraped_at": "2025-12-26 19:25:57.121174+00",
+            "raw_id": 1446
+        },
+        {
+            "sku": "EQ-PAQ-YOR-011",
+            "precio": 151254.78,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00007141",
+            "url": "https://www.grupocoresa.com/paquete-comercial-york-ymmrzc120bajkbgx-10tr-solo-frio-r410a-120mbtu-440-3-60-11-2eer",
+            "scraped_at": "2025-12-26 19:25:57.121174+00",
+            "raw_id": 1448
+        },
+        {
+            "sku": "EQ-MSI-1T110-005",
+            "precio": 6297.85,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00019941",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-york-yhjf12zx6axtorx-1tr-12-000btus-solo-frio-110-1-60-r32-17-18seer",
+            "scraped_at": "2025-12-26 19:25:57.121174+00",
+            "raw_id": 1450
+        },
+        {
+            "sku": "EQ-MSI-1T220-010",
+            "precio": 6346.37,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00020441",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-york-yhkf12zj6axkorx-1tr-12-000btus-frio-calor-220-1-60-r32-17-2seer",
+            "scraped_at": "2025-12-26 19:25:57.121174+00",
+            "raw_id": 1452
+        },
+        {
+            "sku": "EQ-MSI-15T220-012",
+            "precio": 10888.03,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00022641",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-magnum-22-mirage-setcmf181v-1-5tr-18-000btus-solo-frio-220-1-60-r410a-21-8seer",
+            "scraped_at": "2025-12-26 19:25:57.121174+00",
+            "raw_id": 1454
+        }
+    ]
+}

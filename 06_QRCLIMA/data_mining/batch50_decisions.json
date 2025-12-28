@@ -1,0 +1,649 @@
+{
+    "new_products": [
+        {
+            "sku": "RE-IGN-MIR-003",
+            "name": "Sistema Ignición Pulso Mirage BP06ZR09",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "BP06ZR09"
+        },
+        {
+            "sku": "RE-ELC-MIR-001",
+            "name": "Electrodo Encendido Mirage BPCHB06ZR06",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "BPCHB06ZR06"
+        },
+        {
+            "sku": "RE-ELC-MIR-002",
+            "name": "Electrodo Encendido Mirage Flux 10/16L",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "Flux 10/16L"
+        },
+        {
+            "sku": "AC-INS-MIR-001",
+            "name": "Kit Instalación Mirage 1/4 x 1/2 Cobre",
+            "category": "Accesorios",
+            "brand": "Mirage",
+            "specs": "1/4 x 1/2 Cobre"
+        },
+        {
+            "sku": "RE-ASP-MIR-002",
+            "name": "Aspa Condensador Mirage 12100105000084",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "12100105000084"
+        },
+        {
+            "sku": "EL-TRA-MIR-001",
+            "name": "Transformador Mirage X2",
+            "category": "Eléctricos",
+            "brand": "Mirage",
+            "specs": "X2"
+        },
+        {
+            "sku": "RF-BOY-R22-002",
+            "name": "Gas Refrigerante R22 Boya 13.6kg Mirage",
+            "category": "Refrigerantes",
+            "brand": "Mirage",
+            "specs": "Boya 13.6kg"
+        },
+        {
+            "sku": "RE-ASP-MIR-003",
+            "name": "Aspa Condensador Mirage 12100105000051",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "12100105000051"
+        },
+        {
+            "sku": "RE-ASP-MIR-004",
+            "name": "Aspa Condensador Mirage 46cm x 14cm 1.2",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "46cm x 14cm 1.2"
+        },
+        {
+            "sku": "RE-ASP-MIR-005",
+            "name": "Aspa Condensador Mirage 12100105000181",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "12100105000181"
+        },
+        {
+            "sku": "RE-TUR-MIR-001",
+            "name": "Turbina Evaporador Mirage 52.3cm x 10.8cm Izquierda",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "52.3cm x 10.8cm Izq"
+        },
+        {
+            "sku": "RE-TUR-MIR-002",
+            "name": "Turbina Mirage 12100102000084",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "12100102000084"
+        },
+        {
+            "sku": "RE-TUR-MIR-003",
+            "name": "Turbina Mirage 12100102000131",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "12100102000131"
+        },
+        {
+            "sku": "EQ-PIT-YOR-008",
+            "name": "Evaporadora Piso Techo York 4 Ton Solo Frío R22",
+            "category": "Equipos",
+            "brand": "York",
+            "specs": "4 Ton Solo Frío R22"
+        },
+        {
+            "sku": "RE-TUR-MIR-004",
+            "name": "Turbina Mirage 12100102000044",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "12100102000044"
+        },
+        {
+            "sku": "RE-TUR-MIR-005",
+            "name": "Turbina Mirage 12100102000018",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "12100102000018"
+        },
+        {
+            "sku": "EL-CAP-MIR-018",
+            "name": "Capacitor Compresor Mirage 17400103000052",
+            "category": "Eléctricos",
+            "brand": "Mirage",
+            "specs": "17400103000052"
+        },
+        {
+            "sku": "EL-CAP-MIR-019",
+            "name": "Capacitor Motor Mirage 17400101000011",
+            "category": "Eléctricos",
+            "brand": "Mirage",
+            "specs": "17400101000011"
+        },
+        {
+            "sku": "EL-CAP-MIR-020",
+            "name": "Capacitor Compresor Mirage 17400103000033",
+            "category": "Eléctricos",
+            "brand": "Mirage",
+            "specs": "17400103000033"
+        },
+        {
+            "sku": "EL-CAP-MIR-021",
+            "name": "Capacitor Compresor Mirage 17400103000055",
+            "category": "Eléctricos",
+            "brand": "Mirage",
+            "specs": "17400103000055"
+        },
+        {
+            "sku": "EL-CAP-MIR-022",
+            "name": "Capacitor Compresor Mirage 17400103000090",
+            "category": "Eléctricos",
+            "brand": "Mirage",
+            "specs": "17400103000090"
+        },
+        {
+            "sku": "EL-CAP-MIR-023",
+            "name": "Capacitor Compresor Mirage 17400104000015",
+            "category": "Eléctricos",
+            "brand": "Mirage",
+            "specs": "17400104000015"
+        },
+        {
+            "sku": "EL-CAP-MIR-024",
+            "name": "Capacitor Compresor Mirage 17400103000061",
+            "category": "Eléctricos",
+            "brand": "Mirage",
+            "specs": "17400103000061"
+        },
+        {
+            "sku": "RE-MOT-MIR-003",
+            "name": "Motor Ventana Mirage 8000 BTU YSK65-4AT",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "8000 BTU YSK65-4AT"
+        },
+        {
+            "sku": "RE-MOT-MIR-004",
+            "name": "Motor Condensador Mirage 3 Ton WDK120-38G-W",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "3 Ton WDK120-38G-W"
+        },
+        {
+            "sku": "RE-MOT-MIR-005",
+            "name": "Motor Evaporador Mirage 3 Ton YY060-954P02-023",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "3 Ton YY060-954P02-023"
+        },
+        {
+            "sku": "RE-MOT-MIR-006",
+            "name": "Motor Condensador Mirage 1.5 Ton YKT-28-6-201",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "1.5 Ton YKT-28-6-201"
+        },
+        {
+            "sku": "RE-MOT-MIR-007",
+            "name": "Motor Condensador Mirage 1 Ton ZKFN-40-8-1L",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "1 Ton ZKFN-40-8-1L"
+        },
+        {
+            "sku": "RE-MOT-MIR-008",
+            "name": "Motor Evaporador Mirage 3 Ton SIC-55CVL-F159-1",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "3 Ton SIC-55CVL-F159-1"
+        },
+        {
+            "sku": "RE-COM-MIR-001",
+            "name": "Compresor Mirage 1.5 Ton 220V R410A",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "1.5 Ton 220V R410A"
+        },
+        {
+            "sku": "RE-MOT-MIR-009",
+            "name": "Motor Oscilador Mirage MP24BA",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "MP24BA"
+        },
+        {
+            "sku": "RE-MOT-MIR-010",
+            "name": "Motor Condensador Mirage 2 Ton FW 68B",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "2 Ton FW 68B"
+        },
+        {
+            "sku": "RE-MOT-MIR-011",
+            "name": "Motor Oscilador Mirage 1 Ton MP24GA5",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "1 Ton MP24GA5"
+        },
+        {
+            "sku": "RE-MOT-MIR-012",
+            "name": "Motor Evaporador Mirage 2 Ton RPG45B",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "2 Ton RPG45B"
+        },
+        {
+            "sku": "RE-MOT-MIR-013",
+            "name": "Motor Evaporador Mirage 1 Ton YRLA-15-4-0003-290",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "1 Ton YRLA-15-4-0003-290"
+        },
+        {
+            "sku": "RE-MOT-MIR-014",
+            "name": "Motor Condensador Mirage 1 Ton YKT-32-6-3L",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "1 Ton YKT-32-6-3L"
+        },
+        {
+            "sku": "RE-TAR-MIR-014",
+            "name": "Tarjeta Evaporador Mirage US1-KFR64G",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "US1-KFR64G"
+        },
+        {
+            "sku": "RE-TAR-MIR-015",
+            "name": "Tarjeta Evaporador Mirage US1-KFR53G",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "US1-KFR53G"
+        },
+        {
+            "sku": "RE-TAR-MIR-016",
+            "name": "Tarjeta Condensador Mirage W8633B",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "W8633B"
+        },
+        {
+            "sku": "RE-TAR-MIR-017",
+            "name": "Tarjeta Display Mirage UL-KC15-Y-F2D211",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "UL-KC15-Y-F2D211"
+        },
+        {
+            "sku": "RE-TAR-MIR-018",
+            "name": "Tarjeta Evaporador Mirage F06803-03G",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "F06803-03G"
+        },
+        {
+            "sku": "RE-TAR-MIR-019",
+            "name": "Tarjeta Evaporador Mirage GAL0809LK-01R-K0202",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "GAL0809LK-01R-K0202"
+        },
+        {
+            "sku": "RE-TAR-MIR-020",
+            "name": "Tarjeta Display Mirage CE-KC53-FYD04XS",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "CE-KC53-FYD04XS"
+        },
+        {
+            "sku": "RE-TAR-MIR-021",
+            "name": "Tarjeta Display Mirage CE-KC35-FY",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "CE-KC35-FY"
+        },
+        {
+            "sku": "RE-TAR-MIR-022",
+            "name": "Tarjeta Evaporador Mirage USI-KFR35G",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "USI-KFR35G"
+        },
+        {
+            "sku": "RE-TAR-MIR-023",
+            "name": "Tarjeta Evaporador Mirage PH-KF53G",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "PH-KF53G"
+        },
+        {
+            "sku": "RE-TAR-MIR-024",
+            "name": "Módulo Tarjeta Condensador Mirage",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "Condensador"
+        },
+        {
+            "sku": "RE-TAR-MIR-025",
+            "name": "Tarjeta Display Mirage US-KC15-N1Y-KB",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "US-KC15-N1Y-KB"
+        },
+        {
+            "sku": "RE-TAR-MIR-026",
+            "name": "Tarjeta Display Mirage KGK-18010103-0010",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "KGK-18010103-0010"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "RE-IGN-MIR-003",
+            "price": 212.04,
+            "url": "https://www.tiendamirage.mx/refacciones/1093-sistema-de-ignicion-de-pulso-bp06zr09.html",
+            "raw_id": "2acb2416-6d6f-4c10-80d7-e6c281cca41a"
+        },
+        {
+            "sku": "RE-ELC-MIR-001",
+            "price": 21.9,
+            "url": "https://www.tiendamirage.mx/refacciones/1073-electrodo-de-encendido-bpchb06zr06.html",
+            "raw_id": "2d46e2cb-e906-400b-9871-47de24b204fc"
+        },
+        {
+            "sku": "RE-ELC-MIR-002",
+            "price": 82.82,
+            "url": "https://www.tiendamirage.mx/refacciones/1052-electrodo-de-encendido-02040400004.html",
+            "raw_id": "ebf4d291-5f6e-406d-9e14-ce7de00f68e7"
+        },
+        {
+            "sku": "AC-INS-MIR-001",
+            "price": 1015.58,
+            "url": "https://www.tiendamirage.mx/refacciones/1021-kit-de-instalacion-mirage-1-4-x-1-2-cobre.html",
+            "raw_id": "09b00c05-5c2a-4914-a09f-cf59a8fd6cb9"
+        },
+        {
+            "sku": "RE-ASP-MIR-002",
+            "price": 727.1,
+            "url": "https://www.tiendamirage.mx/refacciones/923-aspa-condensador-12100105000084.html",
+            "raw_id": "38921207-ee4e-4247-a096-1bf2de0974ac"
+        },
+        {
+            "sku": "EL-TRA-MIR-001",
+            "price": 123.22,
+            "url": "https://www.tiendamirage.mx/refacciones/988-transformador-x2.html",
+            "raw_id": "6f832697-89b3-419d-8ea6-ce17a2dfc8f0"
+        },
+        {
+            "sku": "RF-BOY-R22-002",
+            "price": 4121.48,
+            "url": "https://www.tiendamirage.mx/refacciones/1014-boya-de-gas-refrigerante-22-136kg.html",
+            "raw_id": "fea91bb3-0239-4931-8802-4ea2c5715245"
+        },
+        {
+            "sku": "RE-ASP-MIR-003",
+            "price": 356.93,
+            "url": "https://www.tiendamirage.mx/refacciones/931-aspa-condensador-12100105000051.html",
+            "raw_id": "8af9bb2d-7563-430c-914b-dd2ba4b9cf7f"
+        },
+        {
+            "sku": "RE-ASP-MIR-004",
+            "price": 374.68,
+            "url": "https://www.tiendamirage.mx/refacciones/928-aspa-condensador-diametro-46-cm-x-ancho-14-cm-12.html",
+            "raw_id": "1de3ba80-aa36-4721-9b52-1717fc65f2a0"
+        },
+        {
+            "sku": "RE-ASP-MIR-005",
+            "price": 594.91,
+            "url": "https://www.tiendamirage.mx/refacciones/922-aspa-condensador-12100105000181.html",
+            "raw_id": "690351d8-3be5-48ae-b310-22e5733edc83"
+        },
+        {
+            "sku": "RE-TUR-MIR-001",
+            "price": 243.6,
+            "url": "https://www.tiendamirage.mx/refacciones/879-turbina-izquierda-evaporador-largo-523-cm-x-diametro-108-cmint.html",
+            "raw_id": "58834c91-1274-4e19-89db-45fffe8da83b"
+        },
+        {
+            "sku": "RE-TUR-MIR-002",
+            "price": 818.17,
+            "url": "https://www.tiendamirage.mx/refacciones/886-turbina-12100102000084.html",
+            "raw_id": "f37082ef-9f9d-4ff3-ab73-cda863ef5563"
+        },
+        {
+            "sku": "RE-TUR-MIR-003",
+            "price": 572.44,
+            "url": "https://www.tiendamirage.mx/refacciones/884-turbina-12100102000131.html",
+            "raw_id": "9a3beb3b-4d8c-4cbc-a0f6-f99de9885565"
+        },
+        {
+            "sku": "EQ-PIT-YOR-008",
+            "price": 214.04,
+            "url": "https://www.grupocoresa.com/evaporadora-york-piso-techo-york-yhffxc048bba-4tr-solo-frio-r22",
+            "raw_id": "3ce929d8-9301-4cd0-8b28-44d916ecd30e"
+        },
+        {
+            "sku": "EQ-PIT-YOR-008",
+            "price": 214.04,
+            "url": "https://www.grupocoresa.com/evaporadora-york-piso-techo-york-yhffxc048bba-4tr-solo-frio-r22",
+            "raw_id": "6ff6edfd-9074-4978-a9c2-df181c550932"
+        },
+        {
+            "sku": "RE-TUR-MIR-004",
+            "price": 419.79,
+            "url": "https://www.tiendamirage.mx/refacciones/883-turbina-12100102000044.html",
+            "raw_id": "59a6b802-7cdc-400b-9b9f-f48e7b9b5f0a"
+        },
+        {
+            "sku": "RE-TUR-MIR-005",
+            "price": 699.65,
+            "url": "https://www.tiendamirage.mx/refacciones/874-turbina-12100102000018.html",
+            "raw_id": "30887932-a928-4997-b160-a9495adbacb5"
+        },
+        {
+            "sku": "EL-CAP-MIR-018",
+            "price": 292.63,
+            "url": "https://www.tiendamirage.mx/refacciones/815-capacitor-de-compresor-17400103000052.html",
+            "raw_id": "b5d5b675-b23b-41c8-b8f6-2859bfed58ce"
+        },
+        {
+            "sku": "EL-CAP-MIR-019",
+            "price": 319.92,
+            "url": "https://www.tiendamirage.mx/refacciones/814-capacitor-de-motor-17400101000011.html",
+            "raw_id": "e12baaef-65fa-4a25-9139-9a4b636d4e6c"
+        },
+        {
+            "sku": "EL-CAP-MIR-020",
+            "price": 476.18,
+            "url": "https://www.tiendamirage.mx/refacciones/810-capacitor-de-compresor-17400103000033.html",
+            "raw_id": "cede9e1c-4050-4081-a3f2-e949f7e07a54"
+        },
+        {
+            "sku": "EL-CAP-MIR-021",
+            "price": 235.65,
+            "url": "https://www.tiendamirage.mx/refacciones/808-capacitor-de-compresor-17400103000055.html",
+            "raw_id": "b45dfb7b-44c9-4cd6-9d7e-9841118bfd98"
+        },
+        {
+            "sku": "EL-CAP-MIR-022",
+            "price": 483.98,
+            "url": "https://www.tiendamirage.mx/refacciones/807-capacitor-de-compresor-17400103000090.html",
+            "raw_id": "31dbef09-7ece-45c3-b64a-92ce6ae3763b"
+        },
+        {
+            "sku": "EL-CAP-MIR-023",
+            "price": 282.9,
+            "url": "https://www.tiendamirage.mx/refacciones/805-capacitor-de-compresor-17400104000015.html",
+            "raw_id": "3bab3413-0907-4b9a-9655-6f1233b7abe7"
+        },
+        {
+            "sku": "EL-CAP-MIR-024",
+            "price": 489.17,
+            "url": "https://www.tiendamirage.mx/refacciones/801-capacitor-de-compresor-17400103000061.html",
+            "raw_id": "bdcbdf51-9ea0-4318-9485-e090513d1229"
+        },
+        {
+            "sku": "RE-MOT-MIR-003",
+            "price": 496.29,
+            "url": "https://www.tiendamirage.mx/refacciones/644-motor-ventana-8000btus-ysk65-4at.html",
+            "raw_id": "13dd731e-4265-4776-af86-1912c66bd10d"
+        },
+        {
+            "sku": "RE-MOT-MIR-004",
+            "price": 3884.63,
+            "url": "https://www.tiendamirage.mx/refacciones/623-motor-condensador-3-ton-wdk120-38g-w.html",
+            "raw_id": "06e7d78f-1e7d-4d56-a37f-de4dd5c22a17"
+        },
+        {
+            "sku": "RE-MOT-MIR-005",
+            "price": 1015.49,
+            "url": "https://www.tiendamirage.mx/refacciones/605-motor-evaporador-3-ton-yy060-954p02-023.html",
+            "raw_id": "c205db93-3cd3-4365-919e-75341e2a38f0"
+        },
+        {
+            "sku": "RE-MOT-MIR-006",
+            "price": 625.46,
+            "url": "https://www.tiendamirage.mx/refacciones/629-motor-condensador-15-ton-ykt-28-6-201.html",
+            "raw_id": "6cc2ead3-1dbc-4a49-8863-dc2f6e5d57f5"
+        },
+        {
+            "sku": "RE-MOT-MIR-007",
+            "price": 890.44,
+            "url": "https://www.tiendamirage.mx/refacciones/615-motor-condensador-1-ton-zkfn-40-8-1l.html",
+            "raw_id": "796b34ef-785e-421e-b106-9d0839b61a69"
+        },
+        {
+            "sku": "RE-MOT-MIR-008",
+            "price": 1748.65,
+            "url": "https://www.tiendamirage.mx/refacciones/614-motor-evaporador-3-ton-sic-55cvl-f159-1.html",
+            "raw_id": "45b1a823-32ff-440b-8335-963224ea085c"
+        },
+        {
+            "sku": "RE-COM-MIR-001",
+            "price": 5232.85,
+            "url": "https://www.tiendamirage.mx/refacciones/115-compresor-15-ton-220v-r410a.html",
+            "raw_id": "b0859ddb-f096-4f18-985a-28f0945e433e"
+        },
+        {
+            "sku": "RE-MOT-MIR-009",
+            "price": 158.34,
+            "url": "https://www.tiendamirage.mx/refacciones/606-motor-oscilador-mp24ba.html",
+            "raw_id": "19e5a393-3288-40c9-8f2c-138dc7e5b83a"
+        },
+        {
+            "sku": "RE-MOT-MIR-010",
+            "price": 899.42,
+            "url": "https://www.tiendamirage.mx/refacciones/601-motor-condensador-2-ton-220v-mod-fw-68bydk68-6n.html",
+            "raw_id": "d728ca41-f517-4732-aac9-8a0e43b4e31f"
+        },
+        {
+            "sku": "RE-MOT-MIR-011",
+            "price": 166.51,
+            "url": "https://www.tiendamirage.mx/refacciones/592-motor-oscilador-1-ton-mp24ga5.html",
+            "raw_id": "b5764ab5-6a9d-4ef2-9b6f-5ae5115472ee"
+        },
+        {
+            "sku": "RE-MOT-MIR-012",
+            "price": 1098.53,
+            "url": "https://www.tiendamirage.mx/refacciones/591-motor-evaporador-2-ton-rpg45b.html",
+            "raw_id": "ba0ec718-3869-4a4d-b3e0-0294929a436e"
+        },
+        {
+            "sku": "RE-MOT-MIR-013",
+            "price": 651.05,
+            "url": "https://www.tiendamirage.mx/refacciones/589-motor-evaporador-1-ton-yrla-15-4-0003-290.html",
+            "raw_id": "a8a6743a-8b76-4689-9e50-5e87855f1383"
+        },
+        {
+            "sku": "RE-MOT-MIR-014",
+            "price": 834.64,
+            "url": "https://www.tiendamirage.mx/refacciones/575-motor-condensador-1-ton-ykt-32-6-3l.html",
+            "raw_id": "79a96d07-4420-4321-b44a-c7b591ae04b8"
+        },
+        {
+            "sku": "RE-TAR-MIR-014",
+            "price": 1196.91,
+            "url": "https://www.tiendamirage.mx/refacciones/464-tarjeta-de-evaporador-us1-kfr64g-bp3n1y-11p1.html",
+            "raw_id": "76523186-4e9a-4537-a336-936d91a73f69"
+        },
+        {
+            "sku": "RE-TAR-MIR-015",
+            "price": 777.01,
+            "url": "https://www.tiendamirage.mx/refacciones/454-tarjeta-de-evaporador-us1-kfr53g-bp3n1y-abaq.html",
+            "raw_id": "3dc373f4-ff62-471d-90e5-2977362b2b22"
+        },
+        {
+            "sku": "RE-TAR-MIR-016",
+            "price": 1856.0,
+            "url": "https://www.tiendamirage.mx/refacciones/508-tarjeta-de-condensador-w8633b.html",
+            "raw_id": "4ce9d434-559e-4007-a666-2264da919985"
+        },
+        {
+            "sku": "RE-TAR-MIR-017",
+            "price": 339.74,
+            "url": "https://www.tiendamirage.mx/refacciones/434-tarjeta-display-ul-kc15-y-f2d211.html",
+            "raw_id": "d135c61d-118b-41d7-9efa-05ae3532be6e"
+        },
+        {
+            "sku": "RE-TAR-MIR-018",
+            "price": 103.29,
+            "url": "https://www.tiendamirage.mx/refacciones/428-tarjeta-de-evaporador-f06803-03g.html",
+            "raw_id": "8a063490-8dc7-4748-8652-432371ec2cb4"
+        },
+        {
+            "sku": "RE-TAR-MIR-019",
+            "price": 566.72,
+            "url": "https://www.tiendamirage.mx/refacciones/477-tarjeta-de-evaporador-gal0809lk-01r-k0202.html",
+            "raw_id": "cd92198b-f735-4204-b576-f622585756c8"
+        },
+        {
+            "sku": "RE-TAR-MIR-020",
+            "price": 339.74,
+            "url": "https://www.tiendamirage.mx/refacciones/462-tarjeta-display-ce-kc53-fyd04xs.html",
+            "raw_id": "3773bdff-7f75-4765-86b0-73389da4c509"
+        },
+        {
+            "sku": "RE-TAR-MIR-021",
+            "price": 339.74,
+            "url": "https://www.tiendamirage.mx/refacciones/461-tarjeta-display-ce-kc35-fy.html",
+            "raw_id": "13cddf15-6fe2-4c44-8cd9-ec45a4deb174"
+        },
+        {
+            "sku": "RE-TAR-MIR-022",
+            "price": 928.57,
+            "url": "https://www.tiendamirage.mx/refacciones/457-tarjeta-de-evaporador-usi-kfr35g-bp3n1y-abaq.html",
+            "raw_id": "a87ae6fe-193b-4970-b2c1-1923a906a4fb"
+        },
+        {
+            "sku": "RE-TAR-MIR-023",
+            "price": 829.57,
+            "url": "https://www.tiendamirage.mx/refacciones/451-tarjeta-de-evaporador-ph-kf53g-bp2n1y-abc.html",
+            "raw_id": "3e8f45da-895e-48b6-8859-9092dac68c24"
+        },
+        {
+            "sku": "RE-TAR-MIR-024",
+            "price": 4097.91,
+            "url": "https://www.tiendamirage.mx/refacciones/351-modulo-de-tarjetas-de-condensador.html",
+            "raw_id": "4f7f5e69-8f01-4ef6-87e1-f4d95ad46a9a"
+        },
+        {
+            "sku": "RE-TAR-MIR-025",
+            "price": 339.74,
+            "url": "https://www.tiendamirage.mx/refacciones/433-tarjeta-display-us-kc15-n1y-kb.html",
+            "raw_id": "d90d3711-7b5b-4ab4-a978-787d9e94ac13"
+        },
+        {
+            "sku": "RE-TAR-MIR-026",
+            "price": 339.74,
+            "url": "https://www.tiendamirage.mx/refacciones/426-tarjeta-display-kgk-18010103-0010.html",
+            "raw_id": "44ccbf76-2092-4088-ac45-7b1b1b47181f"
+        }
+    ]
+}

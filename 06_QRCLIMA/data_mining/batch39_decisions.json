@@ -1,0 +1,337 @@
+{
+    "new_products": [
+        {
+            "sku": "EQ-MSO-15T220-012",
+            "name": "Minisplit On/Off Samsung 1.5 Ton Solo Frío 220V",
+            "category": "Equipos",
+            "brand": "Samsung",
+            "specs": "1.5 Ton Solo Frío 220V"
+        },
+        {
+            "sku": "EQ-MSO-2T220-011",
+            "name": "Minisplit On/Off York High Wall 2 Ton Solo Frío 220V R410A",
+            "category": "Equipos",
+            "brand": "York",
+            "specs": "2 Ton Solo Frío 220V"
+        },
+        {
+            "sku": "RE-CON-PEN-002",
+            "name": "Control de Presión Penn P70CA-2C SPST 50/450",
+            "category": "Refacciones",
+            "brand": "Penn",
+            "specs": "50/450 PSI"
+        },
+        {
+            "sku": "EQ-UCD-BOH-002",
+            "name": "Unidad Condensadora Bohn Scroll 3 HP R22/404A/507 220V 3F",
+            "category": "Equipos",
+            "brand": "Bohn",
+            "specs": "3HP 220V 3F"
+        },
+        {
+            "sku": "EQ-REF-CRI-011",
+            "name": "Congelador Horizontal Criotec Tipo Cofre 15 Pulgadas",
+            "category": "Equipos",
+            "brand": "Criotec",
+            "specs": "15\""
+        },
+        {
+            "sku": "EQ-REF-CRI-012",
+            "name": "Refrigerador Vertical Criotec 42 Pulgadas 2 Puertas",
+            "category": "Equipos",
+            "brand": "Criotec",
+            "specs": "42\" 2 Puertas"
+        },
+        {
+            "sku": "EQ-MSI-YOR-033",
+            "name": "Minisplit Inverter York 1 Ton Solo Frío 110V R410A",
+            "category": "Equipos",
+            "brand": "York",
+            "specs": "1 Ton Solo Frío 110V"
+        },
+        {
+            "sku": "LI-FCL-ADE-004",
+            "name": "Foam Cleaner Adesa Desengrasante 4L",
+            "category": "Limpieza",
+            "brand": "Adesa",
+            "specs": "4L"
+        },
+        {
+            "sku": "LI-FCL-ADE-005",
+            "name": "Foam Cleaner Adesa Desengrasante 20L",
+            "category": "Limpieza",
+            "brand": "Adesa",
+            "specs": "20L"
+        },
+        {
+            "sku": "LI-FCL-ADE-006",
+            "name": "Foam Cleaner Adesa Alta Espuma 1L",
+            "category": "Limpieza",
+            "brand": "Adesa",
+            "specs": "1L"
+        },
+        {
+            "sku": "EQ-MSO-15T220-013",
+            "name": "Minisplit On/Off York 1.5 Ton Frío-Calor 220V R410A",
+            "category": "Equipos",
+            "brand": "York",
+            "specs": "1.5 Ton Frío-Calor 220V"
+        },
+        {
+            "sku": "EQ-MSO-15T220-014",
+            "name": "Minisplit On/Off York 1.5 Ton Solo Frío 220V R410A",
+            "category": "Equipos",
+            "brand": "York",
+            "specs": "1.5 Ton Solo Frío 220V"
+        },
+        {
+            "sku": "RE-CON-HOL-001",
+            "name": "Conexión Holtec Hembra 1/2 Pulgada 16 UNF",
+            "category": "Refacciones",
+            "brand": "Holtec",
+            "specs": "1/2\" 16 UNF"
+        },
+        {
+            "sku": "LI-FCL-ADE-007",
+            "name": "Foam Cleaner Canela Adesa 1L",
+            "category": "Limpieza",
+            "brand": "Adesa",
+            "specs": "1L Canela"
+        },
+        {
+            "sku": "EQ-MSO-15T220-015",
+            "name": "Minisplit On/Off Midea 1.5 Ton Frío-Calor 220V",
+            "category": "Equipos",
+            "brand": "Midea",
+            "specs": "1.5 Ton Frío-Calor 220V"
+        },
+        {
+            "sku": "RE-MOT-BOH-003",
+            "name": "Motor Bohn 1/3 HP 208-230V 1075 RPM",
+            "category": "Refacciones",
+            "brand": "Bohn",
+            "specs": "1/3HP 208-230V"
+        },
+        {
+            "sku": "RE-COM-COP-014",
+            "name": "Compresor Copeland Hermético 1.2 HP R404A 230V 3F",
+            "category": "Refacciones",
+            "brand": "Copeland",
+            "specs": "1.2HP 230V 3F"
+        },
+        {
+            "sku": "HE-CHE-ACE-011",
+            "name": "Aceite Acemire MO Frío 300 SUS 1L",
+            "category": "Herramientas",
+            "brand": "Acemire",
+            "specs": "MO 300 1L"
+        },
+        {
+            "sku": "LI-FCL-ADE-008",
+            "name": "Foam Cleaner Canela Adesa 20L",
+            "category": "Limpieza",
+            "brand": "Adesa",
+            "specs": "20L Canela"
+        },
+        {
+            "sku": "HE-CHE-ACE-012",
+            "name": "Aceite Acemire AB HFC 150 SUS 1L",
+            "category": "Herramientas",
+            "brand": "Acemire",
+            "specs": "AB HFC 150 1L"
+        },
+        {
+            "sku": "HE-CHE-ACE-013",
+            "name": "Aceite Acemire AB 300 SUS 1L",
+            "category": "Herramientas",
+            "brand": "Acemire",
+            "specs": "AB 300 1L"
+        },
+        {
+            "sku": "EL-CAB-GEN-001",
+            "name": "Cable Calibre 4 Por Metro",
+            "category": "Eléctricos",
+            "brand": "Genérico",
+            "specs": "Calibre 4"
+        },
+        {
+            "sku": "HE-ACC-GEN-001",
+            "name": "Rondana Plana Galvanizada 3/8",
+            "category": "Herramientas",
+            "brand": "Genérico",
+            "specs": "3/8\""
+        },
+        {
+            "sku": "LI-ACC-SON-001",
+            "name": "Toalla de Limpieza Sontara (1 Pieza)",
+            "category": "Limpieza",
+            "brand": "Sontara",
+            "specs": "1 Pza"
+        },
+        {
+            "sku": "HE-ACC-GEN-002",
+            "name": "Tuerca Galvanizada 3/8",
+            "category": "Herramientas",
+            "brand": "Genérico",
+            "specs": "3/8\""
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "EQ-MSO-1T220-013",
+            "price": 6346.10,
+            "url": "https://reacsa.mx/products/minisplit-york-1-ton-solo-frio-220v-r410a-estandar",
+            "raw_id": "3633"
+        },
+        {
+            "sku": "EQ-MSO-15T220-012",
+            "price": 9465.55,
+            "url": "https://reacsa.mx/products/samsung-minisplit-essential-solo-frio-1-5-ton-220-1-on-off",
+            "raw_id": "3634"
+        },
+        {
+            "sku": "EQ-MSO-2T220-011",
+            "price": 12854.05,
+            "url": "https://reacsa.mx/products/minisplit-york-compresor-on-off-solo-frio-2-ton-220v-r-410a",
+            "raw_id": "3635"
+        },
+        {
+            "sku": "RE-CON-PEN-002",
+            "price": 2262.29,
+            "url": "https://reacsa.mx/products/p70ca-2c-control-spst-pressure-50-450-1-4male",
+            "raw_id": "3636"
+        },
+        {
+            "sku": "EQ-UCD-BOH-002",
+            "price": 107194.96,
+            "url": "https://reacsa.mx/products/mbzx0300m6c-unidad-condensadora-bohn-scroll-3hp-r22-404a-507-220v-3trifasico",
+            "raw_id": "3637"
+        },
+        {
+            "sku": "EQ-REF-CRI-011",
+            "price": 19932.20,
+            "url": "https://reacsa.mx/products/ctcc-15-congelador-criotec-tipo-cofre-15",
+            "raw_id": "3638"
+        },
+        {
+            "sku": "EQ-REF-CRI-012",
+            "price": 46761.14,
+            "url": "https://reacsa.mx/products/cfx-42-2p-refrigerador-vertical-42-2-puetas-abatibles",
+            "raw_id": "3639"
+        },
+        {
+            "sku": "EQ-MSI-YOR-033",
+            "price": 5947.27,
+            "url": "https://reacsa.mx/products/minisplit-york-12mbh-solo-frio-115-1v-r-410",
+            "raw_id": "3640"
+        },
+        {
+            "sku": "LI-FCL-ADE-004",
+            "price": 171.66,
+            "url": "https://reacsa.mx/products/foam-cleaner-adesa-desengrasante-4-l",
+            "raw_id": "3641"
+        },
+        {
+            "sku": "LI-FCL-ADE-005",
+            "price": 831.73,
+            "url": "https://reacsa.mx/products/foam-cleaner-adesa-desengrasante-20-litros",
+            "raw_id": "3642"
+        },
+        {
+            "sku": "LI-FCL-ADE-006",
+            "price": 56.17,
+            "url": "https://reacsa.mx/products/foam-cleaner-adesa-desengrasante-alta-espuma-1-litro",
+            "raw_id": "3643"
+        },
+        {
+            "sku": "EQ-MSO-15T220-013",
+            "price": 7931.54,
+            "url": "https://reacsa.mx/products/minisplit-york-1-5-ton-frio-calor-220v-estandar",
+            "raw_id": "3644"
+        },
+        {
+            "sku": "EQ-MSO-15T220-014",
+            "price": 6943.17,
+            "url": "https://reacsa.mx/products/minisplit-york-1-5-ton-solo-frio-220v-r410a-estandar",
+            "raw_id": "3645"
+        },
+        {
+            "sku": "RE-CON-HOL-001",
+            "price": 65.07,
+            "url": "https://reacsa.mx/products/conexion-holtec-hembra-16-unf-1-2-inc",
+            "raw_id": "3646"
+        },
+        {
+            "sku": "LI-FCL-ADE-007",
+            "price": 44.10,
+            "url": "https://reacsa.mx/products/foam-cleaner-canela-para-evaporadores-1l",
+            "raw_id": "3647"
+        },
+        {
+            "sku": "EQ-MSO-15T220-015",
+            "price": 9965.62,
+            "url": "https://reacsa.mx/products/minisplit-midea-1-5-ton-frio-calor-220v-estandar",
+            "raw_id": "3648"
+        },
+        {
+            "sku": "RE-MOT-BOH-003",
+            "price": 8352.24,
+            "url": "https://reacsa.mx/products/motor-1-3hp-208-230v-1075rpm",
+            "raw_id": "3649"
+        },
+        {
+            "sku": "RE-COM-COP-014",
+            "price": 15422.86,
+            "url": "https://reacsa.mx/products/compresor-hermetico-copeland-2hp-r-404a-230-3-60",
+            "raw_id": "3650"
+        },
+        {
+            "sku": "HE-CHE-ACE-011",
+            "price": 232.81,
+            "url": "https://reacsa.mx/products/aceite-acemire-mo-frio-300-sus-1l",
+            "raw_id": "3651"
+        },
+        {
+            "sku": "LI-FCL-ADE-008",
+            "price": 815.80,
+            "url": "https://reacsa.mx/products/foam-cleaner-canela-evaporadores-20l",
+            "raw_id": "3652"
+        },
+        {
+            "sku": "HE-CHE-ACE-012",
+            "price": 633.28,
+            "url": "https://reacsa.mx/products/aceite-acemire-ab-hfc-150-sus-1l",
+            "raw_id": "3653"
+        },
+        {
+            "sku": "HE-CHE-ACE-013",
+            "price": 520.36,
+            "url": "https://reacsa.mx/products/aceite-ab-acemire-300-sus-o-32-cst-1-litro",
+            "raw_id": "3654"
+        },
+        {
+            "sku": "EL-CAB-GEN-001",
+            "price": 100.10,
+            "url": "https://reacsa.mx/products/cable-calibre-4-en-metro",
+            "raw_id": "3655"
+        },
+        {
+            "sku": "HE-ACC-GEN-001",
+            "price": 1.22,
+            "url": "https://reacsa.mx/products/rondana-plana-de-galvaanizada-de-3-8",
+            "raw_id": "3656"
+        },
+        {
+            "sku": "LI-ACC-SON-001",
+            "price": 6.36,
+            "url": "https://reacsa.mx/products/toalla-de-limpieza-sontara-1-pza",
+            "raw_id": "3657"
+        },
+        {
+            "sku": "HE-ACC-GEN-002",
+            "price": 1.08,
+            "url": "https://reacsa.mx/products/tuerca-galvanizada-de-3-8",
+            "raw_id": "3658"
+        }
+    ]
+}

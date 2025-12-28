@@ -52,13 +52,8 @@ export default function BrandingScreen() {
             }
 
             const profile = await getUserProfile(user.uid);
-            if (!isUserPro(profile)) {
-                Alert.alert('Función PRO', 'Esta función está disponible solo para usuarios PRO.', [
-                    { text: 'OK', onPress: () => router.back() }
-                ]);
-                return;
-            }
 
+            // All users can access branding now
             setHasAccess(true);
             setIsProPlus(profile?.subscription === 'Pro+');
 
@@ -196,6 +191,17 @@ export default function BrandingScreen() {
 
             <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
                 <View className="p-4">
+                    {/* Info Note */}
+                    <View className="bg-indigo-50 p-4 rounded-xl border border-indigo-100 mb-4 flex-row">
+                        <Ionicons name="information-circle" size={24} color="#6366F1" />
+                        <View className="flex-1 ml-3">
+                            <Text className="text-indigo-800 font-bold mb-1">¿Cómo funciona?</Text>
+                            <Text className="text-indigo-600 text-sm">
+                                Configura tu logo y colores aquí. Podrás usarlos canjeando tokens de PDF Premium en la tienda.{'\n'}
+                                <Text className="font-bold">Usuarios PRO</Text> tienen PDFs ilimitados sin marca de agua.
+                            </Text>
+                        </View>
+                    </View>
                     {/* Logo Section */}
                     <View className="bg-white p-4 rounded-xl border border-gray-200 mb-4">
                         <View className="flex-row items-center mb-3">

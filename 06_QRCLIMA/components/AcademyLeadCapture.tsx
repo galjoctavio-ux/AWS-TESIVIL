@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { supabase } from '../services/supabase-client';
 
 interface Props {
     source?: string;
@@ -12,8 +13,6 @@ export default function AcademyLeadCapture({ source = 'qrclima_profile', onSucce
     const [contactValue, setContactValue] = useState('');
     const [loading, setLoading] = useState(false);
     const [joined, setJoined] = useState(false);
-
-    const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3001';
 
     const handleJoin = async () => {
         const trimmed = contactValue.trim();
@@ -42,20 +41,21 @@ export default function AcademyLeadCapture({ source = 'qrclima_profile', onSucce
 
         setLoading(true);
         try {
-            const response = await fetch(`${API_URL}/api/academy/waitlist`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contactType,
-                    contactValue: trimmed.toLowerCase(),
-                    source,
-                }),
+            const { error } = await supabase.from('academy_waitlist').insert({
+                contact_type: contactType,
+                contact_value: trimmed.toLowerCase(),
+                source,
+                created_at: new Date().toISOString()
             });
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || 'Error al registrar');
+            if (error) {
+                // Ignore duplicate error - still mark as joined
+                if (error.code === '23505') {
+                    setJoined(true);
+                    onSuccess?.();
+                    return;
+                }
+                throw new Error(error.message || 'Error al registrar');
             }
 
             setJoined(true);
@@ -90,14 +90,14 @@ export default function AcademyLeadCapture({ source = 'qrclima_profile', onSucce
                     <Ionicons name="timer-outline" size={22} color="#2563EB" />
                 </View>
                 <View className="flex-1 ml-3">
-                    <Text className="text-gray-800 font-bold text-base">El Método de las 50 Horas</Text>
+                    <Text className="text-gray-800 font-bold text-base">El Método de las 50 Horas*</Text>
                     <Text className="text-blue-600 text-sm">Capacitación Intensiva con IA</Text>
                 </View>
             </View>
 
             {/* Copy persuasivo */}
             <Text className="text-gray-600 mb-3 leading-5">
-                ¿Sabías que esta app se diseñó y programó en menos de 50 horas?{' '}
+                ¿Sabías que esta app se diseñó y programó en menos de 50 horas*?{' '}
                 <Text className="text-gray-800 font-semibold">
                     Estoy preparando una capacitación para enseñarte mi flujo de trabajo exacto.
                 </Text>
@@ -108,8 +108,8 @@ export default function AcademyLeadCapture({ source = 'qrclima_profile', onSucce
                 <TouchableOpacity
                     onPress={() => setContactType('whatsapp')}
                     className={`flex-1 flex-row items-center justify-center py-2.5 rounded-xl border ${contactType === 'whatsapp'
-                            ? 'bg-green-50 border-green-400'
-                            : 'bg-white border-gray-200'
+                        ? 'bg-green-50 border-green-400'
+                        : 'bg-white border-gray-200'
                         }`}
                 >
                     <Ionicons
@@ -126,8 +126,8 @@ export default function AcademyLeadCapture({ source = 'qrclima_profile', onSucce
                 <TouchableOpacity
                     onPress={() => setContactType('email')}
                     className={`flex-1 flex-row items-center justify-center py-2.5 rounded-xl border ${contactType === 'email'
-                            ? 'bg-blue-50 border-blue-400'
-                            : 'bg-white border-gray-200'
+                        ? 'bg-blue-50 border-blue-400'
+                        : 'bg-white border-gray-200'
                         }`}
                 >
                     <Ionicons
@@ -174,6 +174,9 @@ export default function AcademyLeadCapture({ source = 'qrclima_profile', onSucce
             {/* Footer */}
             <Text className="text-gray-400 text-xs text-center mt-2">
                 Sin spam. Solo actualizaciones del curso.
+            </Text>
+            <Text className="text-gray-300 text-[10px] text-center mt-1">
+                *50 horas laborales
             </Text>
         </View>
     );

@@ -1,0 +1,642 @@
+{
+    "new_products": [
+        {
+            "sku": "RE-CON-MIR-005",
+            "name": "Control Remoto Mirage RG36B/BGE",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "RG36B/BGE"
+        },
+        {
+            "sku": "RE-COM-COP-011",
+            "name": "Compresor Hermético Copeland 1.7HP R22/404A 220V 3F",
+            "category": "Refacciones",
+            "brand": "Copeland",
+            "specs": "1.7HP R22/404A 220V 3F"
+        },
+        {
+            "sku": "TU-COB-BOH-001",
+            "name": "Tubo Cobre Rígido Bohn 5/8 Tramo 6.1m",
+            "category": "Tuberías/Aislamientos",
+            "brand": "Bohn",
+            "specs": "5/8 Rígido Tramo 6.1m"
+        },
+        {
+            "sku": "TU-COB-BOH-002",
+            "name": "Tubo Cobre Rígido Bohn 3/8 Tramo 6.1m",
+            "category": "Tuberías/Aislamientos",
+            "brand": "Bohn",
+            "specs": "3/8 Rígido Tramo 6.1m"
+        },
+        {
+            "sku": "TU-COB-BOH-003",
+            "name": "Tubo Cobre Rígido Bohn 3/4 Tramo 6.1m",
+            "category": "Tuberías/Aislamientos",
+            "brand": "Bohn",
+            "specs": "3/4 Rígido Tramo 6.1m"
+        },
+        {
+            "sku": "TU-COB-BOH-004",
+            "name": "Tubo Cobre Rígido Bohn 2 1/8 Tramo 6.1m",
+            "category": "Tuberías/Aislamientos",
+            "brand": "Bohn",
+            "specs": "2 1/8 Rígido Tramo 6.1m"
+        },
+        {
+            "sku": "TU-COB-BOH-005",
+            "name": "Tubo Cobre Rígido Bohn 1 5/8 Tramo 6.1m",
+            "category": "Tuberías/Aislamientos",
+            "brand": "Bohn",
+            "specs": "1 5/8 Rígido Tramo 6.1m"
+        },
+        {
+            "sku": "TU-COB-BOH-006",
+            "name": "Tubo Cobre Rígido Bohn 1 3/8 Tramo 6.1m",
+            "category": "Tuberías/Aislamientos",
+            "brand": "Bohn",
+            "specs": "1 3/8 Rígido Tramo 6.1m"
+        },
+        {
+            "sku": "TU-COB-BOH-007",
+            "name": "Tubo Cobre Rígido Bohn 1/2 Tramo 6.1m",
+            "category": "Tuberías/Aislamientos",
+            "brand": "Bohn",
+            "specs": "1/2 Rígido Tramo 6.1m"
+        },
+        {
+            "sku": "RE-FIL-MAN-001",
+            "name": "Cartucho Filtro Agua Primario Manitowoc AR-20000",
+            "category": "Refacciones",
+            "brand": "Manitowoc",
+            "specs": "AR-20000"
+        },
+        {
+            "sku": "RF-BOY-MO5-001",
+            "name": "Gas Refrigerante Isceon MO59 (R-417A) Boya 11.35kg",
+            "category": "Refrigerantes",
+            "brand": "Chemours",
+            "specs": "MO59 Boya 11.35kg"
+        },
+        {
+            "sku": "TU-COB-BOH-008",
+            "name": "Tubo Cobre Rígido Bohn 1 1/8 Tramo 6.1m",
+            "category": "Tuberías/Aislamientos",
+            "brand": "Bohn",
+            "specs": "1 1/8 Rígido Tramo 6.1m"
+        },
+        {
+            "sku": "TU-COB-BOH-009",
+            "name": "Tubo Cobre Flexible Bohn 1/4 Rollo 15.2m",
+            "category": "Tuberías/Aislamientos",
+            "brand": "Bohn",
+            "specs": "1/4 Flexible Rollo 15.2m"
+        },
+        {
+            "sku": "RE-FIL-MIR-001",
+            "name": "Lámpara Filtro UV-6W Mirage H60",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "UV-6W H60"
+        },
+        {
+            "sku": "RE-VAL-MIR-001",
+            "name": "Válvula Servicio Líquido 2 Vías Mirage",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "Servicio Líquido 2 Vías"
+        },
+        {
+            "sku": "RE-TAR-MIR-005",
+            "name": "Módulo Tarjeta Condensador Mirage Magnum 19 2T 220V",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "Magnum 19 2T 220V"
+        },
+        {
+            "sku": "RE-TAR-MIR-006",
+            "name": "Tarjeta Condensador Mirage US1-KFR53W",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "US1-KFR53W"
+        },
+        {
+            "sku": "RE-TAR-MIR-007",
+            "name": "Tarjeta Condensador Mirage US1-KFR35W",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "US1-KFR35W"
+        },
+        {
+            "sku": "RE-TAR-MIR-008",
+            "name": "Módulo Tarjeta Condensador Mirage Magnum 19 1T 110V",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "Magnum 19 1T 110V"
+        },
+        {
+            "sku": "RE-TAR-MIR-009",
+            "name": "Tarjeta Evaporador Mirage US1-KFR70G",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "US1-KFR70G"
+        },
+        {
+            "sku": "RE-TAR-MIR-010",
+            "name": "Tarjeta Evaporador Mirage US1-KF51G",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "US1-KF51G"
+        },
+        {
+            "sku": "RE-TAN-MIR-001",
+            "name": "Tanque 8 Litros Mirage RO10TA8L",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "8 Litros"
+        },
+        {
+            "sku": "RE-TAR-MIR-011",
+            "name": "Kit Tarjeta Evaporador + Caja Control Mirage US1-KFR67G",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "US1-KFR67G Kit"
+        },
+        {
+            "sku": "RE-TAR-MIR-012",
+            "name": "Kit Tarjeta Evaporador + Caja Control Mirage US1-KFR35G",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "US1-KFR35G Kit"
+        },
+        {
+            "sku": "RE-TAN-MIR-002",
+            "name": "Tanque 4 Litros Mirage RO10TA4L",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "4 Litros"
+        },
+        {
+            "sku": "RE-MOT-MIR-002",
+            "name": "Motor Evaporador Mirage 1 Ton ZKFP-20-8-113",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "1 Ton ZKFP-20-8-113"
+        },
+        {
+            "sku": "RE-ASP-MIR-001",
+            "name": "Aspa Condensador Mirage 12100105000004",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "Condensador"
+        },
+        {
+            "sku": "RE-FIL-MIR-002",
+            "name": "Kit Filtro Fábrica Hielo Mirage KFH5110",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "KFH5110"
+        },
+        {
+            "sku": "RE-CON-MIR-003",
+            "name": "Codo 90 Mirage RO100CRM003",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "RO100CRM003"
+        },
+        {
+            "sku": "RE-FIL-MIR-003",
+            "name": "Filtro Carbón Mirage RO20GACM033",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "RO20GACM033"
+        },
+        {
+            "sku": "RE-FIL-MIR-004",
+            "name": "Filtro Carbón Mirage RO20CTOM032",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "RO20CTOM032"
+        },
+        {
+            "sku": "RE-FIL-MIR-005",
+            "name": "Filtro Sedimento Mirage FSQ1110",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "FSQ1110"
+        },
+        {
+            "sku": "RE-FIL-MIR-006",
+            "name": "Filtro Post Membrana Mirage FAQ5110",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "FAQ5110"
+        },
+        {
+            "sku": "RE-TAR-MIR-013",
+            "name": "Tarjeta Display Mirage DISX 30",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "DISX 30"
+        },
+        {
+            "sku": "RE-TAN-MIR-003",
+            "name": "Tanque Agua Caliente Mirage 13320023805",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "13320023805"
+        },
+        {
+            "sku": "RE-ACC-MIR-001",
+            "name": "Tapón Desagüe Mirage DA10BB04",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "DA10BB04"
+        },
+        {
+            "sku": "RE-INT-MIR-001",
+            "name": "Set Switches Mirage DA10BB02",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "DA10BB02"
+        },
+        {
+            "sku": "RE-CON-MIR-004",
+            "name": "Condensador Dispensador Mirage MDD10CB-12",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "MDD10CB-12"
+        },
+        {
+            "sku": "RE-TAN-MIR-004",
+            "name": "Tanque Agua Fría Mirage MDD10CB-04",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "MDD10CB-04"
+        },
+        {
+            "sku": "RE-ACC-MIR-002",
+            "name": "Tapa Superior Tanque Mirage MDD10CB-03",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "MDD10CB-03"
+        },
+        {
+            "sku": "RE-ACC-MIR-003",
+            "name": "Tapa Superior Mirage MDD10CB-02",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "MDD10CB-02"
+        },
+        {
+            "sku": "RE-MGU-MIR-001",
+            "name": "Manguera Gas Mirage 3/8 80cm",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "3/8 80cm"
+        },
+        {
+            "sku": "RE-MGU-MIR-002",
+            "name": "Manguera Gas Mirage 3/8 60cm",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "3/8 60cm"
+        },
+        {
+            "sku": "RE-MGU-MIR-003",
+            "name": "Manguera Agua Mirage 1/2 60cm",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "1/2 60cm"
+        },
+        {
+            "sku": "RE-IGN-MIR-001",
+            "name": "Sistema Ignición Pulso Mirage BB06SI",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "BB06SI"
+        },
+        {
+            "sku": "RE-IGN-MIR-002",
+            "name": "Sistema Ignición Pulso Mirage Flux 6 Blanco",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "Flux 6 Blanco"
+        },
+        {
+            "sku": "RE-VAL-MIR-002",
+            "name": "Válvula Gas Natural Mirage Flux 6",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "Flux 6 Gas Natural"
+        },
+        {
+            "sku": "RE-VAL-MIR-003",
+            "name": "Válvula Gas LP Mirage Flux 6",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "Flux 6 Gas LP"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "RE-CON-MIR-005",
+            "price": 649.1,
+            "url": "https://www.tiendamirage.mx/refacciones/957-control-remoto-rg36bbge.html",
+            "raw_id": "81123748-aeb2-4b25-91c6-515ec66b5465"
+        },
+        {
+            "sku": "RE-COM-COP-011",
+            "price": 17924.95,
+            "url": "https://reacsa.mx/products/compresor-hermetico-copeland-3hp-media-temperatura-r22-404a-208-230-1-monofasico",
+            "raw_id": "6999c483-1e63-431e-9d42-2bcebdc2bb1c"
+        },
+        {
+            "sku": "TU-COB-BOH-001",
+            "price": 873.35,
+            "url": "https://reacsa.mx/products/tubo-cobre-rig-bohn-tramo-5-8-x-6-1m",
+            "raw_id": "081f3374-4ba7-4faf-98ab-01b7cb58d5b4"
+        },
+        {
+            "sku": "TU-COB-BOH-002",
+            "price": 424.84,
+            "url": "https://reacsa.mx/products/tubo-cobre-rig-bohn-tramo-3-8-x-6-1m",
+            "raw_id": "9fcf7e8f-8346-402f-af2f-7664a8abf277"
+        },
+        {
+            "sku": "TU-COB-BOH-003",
+            "price": 1171.04,
+            "url": "https://reacsa.mx/products/tubo-cobre-rigido-acr-3-4-x-20",
+            "raw_id": "cfdf7a0f-91a0-4291-98df-e1440a3a77a0"
+        },
+        {
+            "sku": "TU-COB-BOH-004",
+            "price": 6405.92,
+            "url": "https://reacsa.mx/products/tubo-cobre-rig-bohn-tramo-2-1-8",
+            "raw_id": "62109ea0-0bf4-43a0-a503-a136f317f91c"
+        },
+        {
+            "sku": "TU-COB-BOH-005",
+            "price": 3569.42,
+            "url": "https://reacsa.mx/products/tubo-cobre-rig-bohn-tramo-1-5-8-x-6-1m",
+            "raw_id": "0afc7faa-195d-4537-a6f4-d75b86414dd1"
+        },
+        {
+            "sku": "TU-COB-BOH-006",
+            "price": 2727.82,
+            "url": "https://reacsa.mx/products/tubo-cobre-rig-bohn-tramo-1-3-8",
+            "raw_id": "5b868436-2f27-4e50-ae4f-45040f8770a6"
+        },
+        {
+            "sku": "TU-COB-BOH-007",
+            "price": 577.09,
+            "url": "https://reacsa.mx/products/tubo-de-cobre-rigido-bohn-tramo-1-2-de-6-1-metros",
+            "raw_id": "18abe0b9-592a-4cc7-a92a-47e2a1e580d6"
+        },
+        {
+            "sku": "RE-FIL-MAN-001",
+            "price": 22147.68,
+            "url": "https://reacsa.mx/products/ar-20000-filtro-ar-20000-filtro-primario",
+            "raw_id": "719bbced-0bd0-493c-959e-c7fb4ac3a244"
+        },
+        {
+            "sku": "RF-BOY-134-001",
+            "price": 3209.49,
+            "url": "https://reacsa.mx/products/re-134a-13-6-gas-refrigerante-chemours-r-134a-boya-13-6kg",
+            "raw_id": "86718153-8535-4161-a4ee-6c83e0ab127c"
+        },
+        {
+            "sku": "RF-BOY-MO5-001",
+            "price": 6072.54,
+            "url": "https://reacsa.mx/products/gi-mo59-11-35-gas-isceon-mo59-boya-de-11-35-kilos",
+            "raw_id": "ee1af1e4-9257-44dc-88ab-da70cbcf0440"
+        },
+        {
+            "sku": "RF-BOY-438-001",
+            "price": 4908.12,
+            "url": "https://reacsa.mx/products/gi-mo99-11-3-gas-isceon-chemours-mo99-cilindro-desechable-boya-11-35kg",
+            "raw_id": "22899587-0401-4420-a75b-d066ce68943f"
+        },
+        {
+            "sku": "TU-COB-BOH-008",
+            "price": 2108.59,
+            "url": "https://reacsa.mx/products/acr-tubo-de-cobre-rigido-bohn-tramo-de-6-1-metros",
+            "raw_id": "24123365-d760-44b8-b37d-dd7243e93740"
+        },
+        {
+            "sku": "TU-COB-BOH-009",
+            "price": 681.46,
+            "url": "https://reacsa.mx/products/acr-f12x50-tubo-de-cobre-flexible-bohn-rollo-1-2-x-15-2-m",
+            "raw_id": "25450ca6-225c-49d7-93e9-c64043cf719c"
+        },
+        {
+            "sku": "RE-FIL-MIR-001",
+            "price": 875.5,
+            "url": "https://www.tiendamirage.mx/refacciones/1392-lampara-filtro-uv-6w.html",
+            "raw_id": "fcd7fa22-6b02-42b7-86b9-56bb6172cbbe"
+        },
+        {
+            "sku": "RE-VAL-MIR-001",
+            "price": 167.27,
+            "url": "https://www.tiendamirage.mx/refacciones/1354-valvula-de-servicioliquido-2-vias.html",
+            "raw_id": "82b9fa83-e507-48e8-a377-c44a806fa9ab"
+        },
+        {
+            "sku": "RE-TAR-MIR-005",
+            "price": 3101.38,
+            "url": "https://www.tiendamirage.mx/refacciones/1341-modulo-de-tarjeta-de-condensador-2-ton-calor-220v-magnum-19.html",
+            "raw_id": "3f6aa094-de9c-490b-994a-6e03d518abc1"
+        },
+        {
+            "sku": "RE-TAR-MIR-006",
+            "price": 3142.44,
+            "url": "https://www.tiendamirage.mx/refacciones/1340-modulo-de-tarjetas-de-condensador-us1-kfr53w-bp3n1-b01pz.html",
+            "raw_id": "f518c29e-91b8-4819-84a9-39921799c739"
+        },
+        {
+            "sku": "RE-TAR-MIR-007",
+            "price": 2281.09,
+            "url": "https://www.tiendamirage.mx/refacciones/1338-modulo-de-tarjetas-de-condensador-us1-kfr35w-bp3n1-b30s0.html",
+            "raw_id": "2d5b76d3-273f-479b-a011-d7d8c0ba0d79"
+        },
+        {
+            "sku": "RE-TAR-MIR-008",
+            "price": 3067.61,
+            "url": "https://www.tiendamirage.mx/refacciones/1336-modulo-de-tarjeta-de-condensador-1-ton-calor-110v-magnum-19.html",
+            "raw_id": "9245117b-35cc-46d3-bea7-accfb416806a"
+        },
+        {
+            "sku": "RE-TAR-MIR-009",
+            "price": 865.01,
+            "url": "https://www.tiendamirage.mx/refacciones/1335-tarjeta-de-evaporador-us1-kfr70g-bp3n1y-abeq.html",
+            "raw_id": "309bc86a-bb59-4876-8915-efd6061d6c2c"
+        },
+        {
+            "sku": "RE-TAR-MIR-010",
+            "price": 793.47,
+            "url": "https://www.tiendamirage.mx/refacciones/1331-tarjeta-de-evaporador-us1-kf51g-bp3n1y-a.html",
+            "raw_id": "6d59619c-ee47-4910-9c62-7601fbc1010c"
+        },
+        {
+            "sku": "RE-TAN-MIR-001",
+            "price": 284.77,
+            "url": "https://www.tiendamirage.mx/refacciones/1268-tanque-de-8-lt-ro10ta8lm068.html",
+            "raw_id": "897e1d62-1dfe-44f7-9163-0103b32646d5"
+        },
+        {
+            "sku": "RE-TAR-MIR-011",
+            "price": 1044.14,
+            "url": "https://www.tiendamirage.mx/refacciones/1322-kit-tarjetas-de-evaporador-mas-caja-de-control-us1-kfr67g-bp3n.html",
+            "raw_id": "208848e0-f37f-4ab8-9a5e-9219ad6095f1"
+        },
+        {
+            "sku": "RE-TAR-MIR-012",
+            "price": 1044.14,
+            "url": "https://www.tiendamirage.mx/refacciones/1319-kit-tarjeta-de-evaporador-mas-caja-de-control-us1-kfr35g-bp3n.html",
+            "raw_id": "d8b619b9-83f9-44d0-8f27-3ad717025132"
+        },
+        {
+            "sku": "RE-TAN-MIR-002",
+            "price": 240.96,
+            "url": "https://www.tiendamirage.mx/refacciones/1267-tanque-de-4-lt-ro10ta4lm067.html",
+            "raw_id": "17f43c2e-e741-44bd-b49b-97ed9339ee81"
+        },
+        {
+            "sku": "RE-MOT-MIR-002",
+            "price": 1137.51,
+            "url": "https://www.tiendamirage.mx/refacciones/1311-motor-evaporador-1-ton-zkfp-20-8-113.html",
+            "raw_id": "5836bcc5-bee1-467a-8917-7ec13933ede9"
+        },
+        {
+            "sku": "RE-ASP-MIR-001",
+            "price": 357.37,
+            "url": "https://www.tiendamirage.mx/refacciones/1300-aspa-condensador-12100105000004.html",
+            "raw_id": "83f207ad-5872-4ecc-828b-e4887d8e900e"
+        },
+        {
+            "sku": "RE-FIL-MIR-002",
+            "price": 318.07,
+            "url": "https://www.tiendamirage.mx/refacciones/1249-kit-de-filtro-p-fabrica-de-hielo-kfh5110.html",
+            "raw_id": "4b342107-58fd-445c-ae5c-7bee73d46b81"
+        },
+        {
+            "sku": "RE-CON-MIR-003",
+            "price": 28.93,
+            "url": "https://www.tiendamirage.mx/refacciones/1218-codo-90-ro100crm003.html",
+            "raw_id": "cfe05eca-9a73-4f11-92e6-ee9e1de3109d"
+        },
+        {
+            "sku": "RE-FIL-MIR-003",
+            "price": 97.83,
+            "url": "https://www.tiendamirage.mx/refacciones/1211-filtro-de-carbon-ro20gacm033.html",
+            "raw_id": "502f2d88-972a-413e-921d-09eb9a608660"
+        },
+        {
+            "sku": "RE-FIL-MIR-004",
+            "price": 50.39,
+            "url": "https://www.tiendamirage.mx/refacciones/1210-filtro-de-carbon-ro20ctom032.html",
+            "raw_id": "225669aa-0047-4464-bb0c-4fe674b23124"
+        },
+        {
+            "sku": "RE-FIL-MIR-005",
+            "price": 104.92,
+            "url": "https://www.tiendamirage.mx/refacciones/1208-filtro-para-sedimento-fsq1110.html",
+            "raw_id": "0eb8158b-9434-42a6-988a-7021085733e1"
+        },
+        {
+            "sku": "RE-FIL-MIR-006",
+            "price": 96.38,
+            "url": "https://www.tiendamirage.mx/refacciones/1207-filtro-post-mebrana-faq5110.html",
+            "raw_id": "cf1ae789-2781-4098-9aed-0547c3593c8a"
+        },
+        {
+            "sku": "RE-TAR-MIR-013",
+            "price": 339.74,
+            "url": "https://www.tiendamirage.mx/refacciones/1180-tarjeta-display-disx-30-117300624.html",
+            "raw_id": "02c82ba0-a499-4924-8f8a-2112c7466d1e"
+        },
+        {
+            "sku": "RE-TAN-MIR-003",
+            "price": 556.21,
+            "url": "https://www.tiendamirage.mx/refacciones/1172-tanque-de-agua-caliente-13320023805.html",
+            "raw_id": "3c1b412f-68b6-4a1e-80f6-48c24753a4ac"
+        },
+        {
+            "sku": "RE-ACC-MIR-001",
+            "price": 6.58,
+            "url": "https://www.tiendamirage.mx/refacciones/1160-tapon-de-desague-da10bb04.html",
+            "raw_id": "54542cb6-e2fc-4502-9b08-0e20ef4cfc44"
+        },
+        {
+            "sku": "RE-INT-MIR-001",
+            "price": 81.06,
+            "url": "https://www.tiendamirage.mx/refacciones/1159-set-de-switches-da10bb02.html",
+            "raw_id": "5092c7c5-c536-4d45-af90-b9e13ef632b5"
+        },
+        {
+            "sku": "RE-CON-MIR-004",
+            "price": 144.57,
+            "url": "https://www.tiendamirage.mx/refacciones/1142-condensador-para-dispensador-mdd10cb-12.html",
+            "raw_id": "40819b0a-ae42-4c57-a301-f3d1ff1cf826"
+        },
+        {
+            "sku": "RE-TAN-MIR-004",
+            "price": 228.91,
+            "url": "https://www.tiendamirage.mx/refacciones/1137-tanque-de-agua-fria-mdd10cb-04.html",
+            "raw_id": "dc435e56-76b1-4da2-a36c-5302b64fc3ff"
+        },
+        {
+            "sku": "RE-ACC-MIR-002",
+            "price": 24.1,
+            "url": "https://www.tiendamirage.mx/refacciones/1136-tapa-superior-de-tanque-mdd10cb-03.html",
+            "raw_id": "259d194e-42db-4524-958e-6f822b81ac99"
+        },
+        {
+            "sku": "RE-ACC-MIR-003",
+            "price": 94.2,
+            "url": "https://www.tiendamirage.mx/refacciones/1135-tapa-superior-mdd10cb-02.html",
+            "raw_id": "1b95a7f6-9f6a-4137-af75-a151e1ed40ac"
+        },
+        {
+            "sku": "RE-MGU-MIR-001",
+            "price": 94.2,
+            "url": "https://www.tiendamirage.mx/refacciones/1125-manguera-de-gas-mangas38-80.html",
+            "raw_id": "9fe60a26-17e0-457d-b331-0b25bf34899e"
+        },
+        {
+            "sku": "RE-MGU-MIR-002",
+            "price": 85.43,
+            "url": "https://www.tiendamirage.mx/refacciones/1124-manguera-de-gas-mangas38-60.html",
+            "raw_id": "11d153ec-b108-4644-a59b-b49905dfc22b"
+        },
+        {
+            "sku": "RE-MGU-MIR-003",
+            "price": 76.68,
+            "url": "https://www.tiendamirage.mx/refacciones/1122-manguera-de-agua-managua12-60.html",
+            "raw_id": "55e4e97b-aa07-4731-a73f-8fb3430bd83b"
+        },
+        {
+            "sku": "RE-IGN-MIR-001",
+            "price": 211.99,
+            "url": "https://www.tiendamirage.mx/refacciones/1108-sistema-de-ignicion-de-pulso-bb06si.html",
+            "raw_id": "a729448b-1924-4f96-adf9-a65774c3c8a3"
+        },
+        {
+            "sku": "RE-IGN-MIR-002",
+            "price": 211.99,
+            "url": "https://www.tiendamirage.mx/refacciones/1106-sistema-de-ignicion-de-pulso-02040100185.html",
+            "raw_id": "893caebc-33eb-4550-844d-dc450a873276"
+        },
+        {
+            "sku": "RE-VAL-MIR-002",
+            "price": 763.36,
+            "url": "https://www.tiendamirage.mx/refacciones/1103-valvula-de-linea-de-gas-02090300549.html",
+            "raw_id": "b4b435b0-5ea3-49b0-a27a-f116153c6a98"
+        },
+        {
+            "sku": "RE-VAL-MIR-003",
+            "price": 622.85,
+            "url": "https://www.tiendamirage.mx/refacciones/1102-valvula-de-linea-de-gas-02090300541.html",
+            "raw_id": "0945dcc2-1961-4c06-9d20-b940e7018660"
+        }
+    ]
+}

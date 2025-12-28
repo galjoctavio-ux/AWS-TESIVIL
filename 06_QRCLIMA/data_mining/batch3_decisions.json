@@ -1,0 +1,699 @@
+{
+    "new_products": [
+        {
+            "sku": "EQ-MAN-YOR-001",
+            "nombre_estandarizado": "Manejadora York 20 Ton Solo Frío 220-460V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Manejadoras",
+            "marca": "York",
+            "modelo": "Manejadora",
+            "descripcion_tecnica": "20 Ton Solo Frío Dial 11 EER",
+            "capacidad": "20 Ton",
+            "voltaje": "220-460V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-CEN-YOR-004",
+            "nombre_estandarizado": "Juego Dividido Central York 2 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Centrales Divididos",
+            "marca": "York",
+            "modelo": "Americano",
+            "descripcion_tecnica": "2 Ton 220V Solo Frío 13 SEER",
+            "capacidad": "2 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Juego"
+        },
+        {
+            "sku": "EQ-MSO-15T220-005",
+            "nombre_estandarizado": "Minisplit High Wall York 1.5 Ton Frío-Calor 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits On/Off",
+            "marca": "York",
+            "modelo": "High Wall",
+            "descripcion_tecnica": "1.5 Ton 220V Frío-Calor 11 SEER",
+            "capacidad": "1.5 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-FAN-YOR-002",
+            "nombre_estandarizado": "Fan&Coil Agua Helada York 1 Ton Solo Frío 120V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Fan&Coil",
+            "marca": "York",
+            "modelo": "Agua Helada",
+            "descripcion_tecnica": "1 Ton 120V Solo Frío",
+            "capacidad": "1 Ton",
+            "voltaje": "120V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MAN-YOR-002",
+            "nombre_estandarizado": "Manejadora York 10 Ton Solo Frío 220-460V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Manejadoras",
+            "marca": "York",
+            "modelo": "Manejadora",
+            "descripcion_tecnica": "10 Ton Solo Frío 11 EER Dual",
+            "capacidad": "10 Ton",
+            "voltaje": "220-460V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MAN-YOR-003",
+            "nombre_estandarizado": "Manejadora Agua Helada York 20 Ton Solo Frío 230V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Manejadoras",
+            "marca": "York",
+            "modelo": "Agua Helada",
+            "descripcion_tecnica": "20 Ton 230V 3F Solo Frío",
+            "capacidad": "20 Ton",
+            "voltaje": "230V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-PIT-YOR-002",
+            "nombre_estandarizado": "Juego Piso Techo Inverter York 4 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Piso Techo",
+            "marca": "York",
+            "modelo": "Piso Techo",
+            "descripcion_tecnica": "4 Ton 220V Solo Frío Inverter 16 SEER",
+            "capacidad": "4 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Juego"
+        },
+        {
+            "sku": "EQ-CAS-YOR-001",
+            "nombre_estandarizado": "Juego Cassette Inverter York 2 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Cassettes",
+            "marca": "York",
+            "modelo": "Cassette",
+            "descripcion_tecnica": "2 Ton 220V Solo Frío Inverter 20 SEER",
+            "capacidad": "2 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Juego"
+        },
+        {
+            "sku": "EQ-CAS-YOR-002",
+            "nombre_estandarizado": "Juego Cassette Inverter York 3 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Cassettes",
+            "marca": "York",
+            "modelo": "Cassette",
+            "descripcion_tecnica": "3 Ton 220V Solo Frío Inverter 17 SEER",
+            "capacidad": "3 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Juego"
+        },
+        {
+            "sku": "EQ-CAS-YOR-003",
+            "nombre_estandarizado": "Juego Cassette Inverter York 4 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Cassettes",
+            "marca": "York",
+            "modelo": "Cassette",
+            "descripcion_tecnica": "4 Ton 220V Solo Frío Inverter 16 SEER",
+            "capacidad": "4 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Juego"
+        },
+        {
+            "sku": "EQ-FAN-YOR-003",
+            "nombre_estandarizado": "Juego Fan&Coil Inverter York 3 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Fan&Coil",
+            "marca": "York",
+            "modelo": "Inverter",
+            "descripcion_tecnica": "3 Ton 220V Solo Frío Inverter 17 SEER",
+            "capacidad": "3 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Juego"
+        },
+        {
+            "sku": "EQ-PAQ-LEN-001",
+            "nombre_estandarizado": "Paquete Residencial Lennox 4 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Paquetes",
+            "marca": "Lennox",
+            "modelo": "Residencial",
+            "descripcion_tecnica": "4 Ton 220V Solo Frío 13 SEER",
+            "capacidad": "4 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-PAQ-YOR-004",
+            "nombre_estandarizado": "Paquete Comercial York 10 Ton Solo Frío 460V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Paquetes",
+            "marca": "York",
+            "modelo": "Comercial",
+            "descripcion_tecnica": "10 Ton 460V 3F Solo Frío 11.2 SEER",
+            "capacidad": "10 Ton",
+            "voltaje": "460V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-PAQ-YOR-005",
+            "nombre_estandarizado": "Paquete Comercial York 15 Ton Solo Frío 440V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Paquetes",
+            "marca": "York",
+            "modelo": "Comercial",
+            "descripcion_tecnica": "15 Ton 440V 3F Solo Frío 11.5 SEER",
+            "capacidad": "15 Ton",
+            "voltaje": "440V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-PAQ-YOR-006",
+            "nombre_estandarizado": "Paquete Comercial York 10 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Paquetes",
+            "marca": "York",
+            "modelo": "Comercial",
+            "descripcion_tecnica": "10 Ton 220V 3F Solo Frío 11.2 SEER",
+            "capacidad": "10 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSO-1T110-005",
+            "nombre_estandarizado": "Minisplit On/Off Mirage Life 12+ 1 Ton Solo Frío 110V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits On/Off",
+            "marca": "Mirage",
+            "modelo": "Life 12+",
+            "descripcion_tecnica": "1 Ton 110V Solo Frío",
+            "capacidad": "1 Ton",
+            "voltaje": "110V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-FAN-YOR-004",
+            "nombre_estandarizado": "Juego Fan&Coil Inverter York 4 Ton Frío-Calor 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Fan&Coil",
+            "marca": "York",
+            "modelo": "Inverter",
+            "descripcion_tecnica": "4 Ton 220V Frío-Calor Inverter 15 SEER",
+            "capacidad": "4 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Juego"
+        },
+        {
+            "sku": "EQ-PAQ-YOR-007",
+            "nombre_estandarizado": "Paquete Residencial Inverter York 3 Ton Frío-Calor 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Paquetes",
+            "marca": "York",
+            "modelo": "Residencial Inverter",
+            "descripcion_tecnica": "3 Ton 220V Frío-Calor Inverter 18.5 SEER",
+            "capacidad": "3 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "EQ-MAN-YOR-001",
+            "precio": 107023.8,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00007991",
+            "url": "https://www.grupocoresa.com/manejadora-20tr-s-f-r410a-220-460-3-60-dual-11eer-1997",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1250
+        },
+        {
+            "sku": "EQ-MAN-YOR-001",
+            "precio": 107023.8,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00007991",
+            "url": "https://www.grupocoresa.com/manejadora-20tr-s-f-r410a-220-460-3-60-dual-11eer-1997",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1251
+        },
+        {
+            "sku": "EQ-CEN-YOR-004",
+            "precio": 29838.83,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00008602",
+            "url": "https://www.grupocoresa.com/juego-dividido-tipo-americano-2tr-s-f-r410a-220-1-60-13seer-2068",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1252
+        },
+        {
+            "sku": "EQ-CEN-YOR-004",
+            "precio": 29838.83,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00008602",
+            "url": "https://www.grupocoresa.com/juego-dividido-tipo-americano-2tr-s-f-r410a-220-1-60-13seer-2068",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1253
+        },
+        {
+            "sku": "EQ-MSO-15T220-005",
+            "precio": 7490.68,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00008912",
+            "url": "https://www.grupocoresa.com/minisplit-1-5tr-h-p-220v-r410a-ef-estandar-11seer-2198",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1254
+        },
+        {
+            "sku": "EQ-MSO-15T220-005",
+            "precio": 7490.68,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00008912",
+            "url": "https://www.grupocoresa.com/minisplit-1-5tr-h-p-220v-r410a-ef-estandar-11seer-2198",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1255
+        },
+        {
+            "sku": "EQ-CEN-YOR-003",
+            "precio": 29287.96,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00009602",
+            "url": "https://www.grupocoresa.com/juego-dividido-tipo-americano-3tr-s-f-r410a-220-1-60-13seer-2069",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1256
+        },
+        {
+            "sku": "EQ-CEN-YOR-003",
+            "precio": 29287.96,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00009602",
+            "url": "https://www.grupocoresa.com/juego-dividido-tipo-americano-3tr-s-f-r410a-220-1-60-13seer-2069",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1257
+        },
+        {
+            "sku": "EQ-FAN-YOR-002",
+            "precio": 8926.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181104-00003062",
+            "url": "https://www.grupocoresa.com/fan-coil-agua-1tr-s-f-4h-1m-120-1-60-izq-2603",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1258
+        },
+        {
+            "sku": "EQ-FAN-YOR-002",
+            "precio": 8926.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181104-00003062",
+            "url": "https://www.grupocoresa.com/fan-coil-agua-1tr-s-f-4h-1m-120-1-60-izq-2603",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1259
+        },
+        {
+            "sku": "EQ-FAN-YOR-002",
+            "precio": 7587.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181104-00004062",
+            "url": "https://www.grupocoresa.com/fan-coil-agua-1tr-s-f-4h-1m-120-1-60-der-2604",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1260
+        },
+        {
+            "sku": "EQ-FAN-YOR-002",
+            "precio": 7587.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181104-00004062",
+            "url": "https://www.grupocoresa.com/fan-coil-agua-1tr-s-f-4h-1m-120-1-60-der-2604",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1261
+        },
+        {
+            "sku": "EQ-MAN-YOR-002",
+            "precio": 76110.27,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00004968",
+            "url": "https://www.grupocoresa.com/manejadora-10tr-s-f-r410a-220-460-3-60-dual-11eer-8694",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1262
+        },
+        {
+            "sku": "EQ-MAN-YOR-002",
+            "precio": 76110.27,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00004968",
+            "url": "https://www.grupocoresa.com/manejadora-10tr-s-f-r410a-220-460-3-60-dual-11eer-8694",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1263
+        },
+        {
+            "sku": "EQ-MAN-YOR-003",
+            "precio": 118888.98,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190227-00061101",
+            "url": "https://www.grupocoresa.com/manejadora-agua-helada-20tr-s-f-3h-230-3-60-10116",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1264
+        },
+        {
+            "sku": "EQ-MAN-YOR-003",
+            "precio": 118888.98,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190227-00061101",
+            "url": "https://www.grupocoresa.com/manejadora-agua-helada-20tr-s-f-3h-230-3-60-10116",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1265
+        },
+        {
+            "sku": "EQ-MSO-1T110-004",
+            "precio": 4544.43,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190530-00080501",
+            "url": "https://www.grupocoresa.com/minisplit-1tr-s-f-110v-r410a-ef-estandar-11seer-10508",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1266
+        },
+        {
+            "sku": "EQ-MSO-1T110-004",
+            "precio": 4544.43,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190530-00080501",
+            "url": "https://www.grupocoresa.com/minisplit-1tr-s-f-110v-r410a-ef-estandar-11seer-10508",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1267
+        },
+        {
+            "sku": "EQ-PIT-YOR-002",
+            "precio": 38822.89,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190802-00022801",
+            "url": "https://www.grupocoresa.com/juego-pisotecho-4tr-s-f-220-1-60-r410-inverter-16seer-10822",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1268
+        },
+        {
+            "sku": "EQ-PIT-YOR-002",
+            "precio": 38822.89,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190802-00022801",
+            "url": "https://www.grupocoresa.com/juego-pisotecho-4tr-s-f-220-1-60-r410-inverter-16seer-10822",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1269
+        },
+        {
+            "sku": "EQ-CAS-YOR-001",
+            "precio": 25130.66,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200115-00038411",
+            "url": "https://www.grupocoresa.com/juego-cassette-2tr-s-f-220-1-60-r410a-inverter-20seer-11483",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1270
+        },
+        {
+            "sku": "EQ-CAS-YOR-001",
+            "precio": 25130.66,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200115-00038411",
+            "url": "https://www.grupocoresa.com/juego-cassette-2tr-s-f-220-1-60-r410a-inverter-20seer-11483",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1271
+        },
+        {
+            "sku": "EQ-CAS-YOR-002",
+            "precio": 31756.37,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200115-00048411",
+            "url": "https://www.grupocoresa.com/juego-cassette-3tr-s-f-220-1-60-r410a-inverter-17seer-11484",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1272
+        },
+        {
+            "sku": "EQ-CAS-YOR-002",
+            "precio": 31756.37,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200115-00048411",
+            "url": "https://www.grupocoresa.com/juego-cassette-3tr-s-f-220-1-60-r410a-inverter-17seer-11484",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1273
+        },
+        {
+            "sku": "EQ-CAS-YOR-003",
+            "precio": 40890.16,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200115-00058411",
+            "url": "https://www.grupocoresa.com/juego-cassette-4tr-s-f-220-1-60-r410a-inverter-16seer-11485",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1274
+        },
+        {
+            "sku": "EQ-CAS-YOR-003",
+            "precio": 40890.16,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200115-00058411",
+            "url": "https://www.grupocoresa.com/juego-cassette-4tr-s-f-220-1-60-r410a-inverter-16seer-11485",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1275
+        },
+        {
+            "sku": "EQ-FAN-YOR-003",
+            "precio": 30841.29,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200115-00087411",
+            "url": "https://www.grupocoresa.com/juego-fan-coil-3tr-s-f-220-1-60-r410a-inverter-17seer-11478",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1276
+        },
+        {
+            "sku": "EQ-FAN-YOR-003",
+            "precio": 30841.29,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200115-00087411",
+            "url": "https://www.grupocoresa.com/juego-fan-coil-3tr-s-f-220-1-60-r410a-inverter-17seer-11478",
+            "scraped_at": "2025-12-26 19:25:29.574989+00",
+            "raw_id": 1277
+        },
+        {
+            "sku": "EQ-PAQ-LEN-001",
+            "precio": 19667.48,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200205-00033511",
+            "url": "https://www.grupocoresa.com/paquete-4tr-s-f-220-1-60-13seer-11533",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1278
+        },
+        {
+            "sku": "EQ-PAQ-LEN-001",
+            "precio": 19667.48,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200205-00033511",
+            "url": "https://www.grupocoresa.com/paquete-4tr-s-f-220-1-60-13seer-11533",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1279
+        },
+        {
+            "sku": "EQ-PAQ-YOR-004",
+            "precio": 161695.64,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200321-00096611",
+            "url": "https://www.grupocoresa.com/paquete-zz-10tr-s-f-r410-460-3-60-11-2seer-11669",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1280
+        },
+        {
+            "sku": "EQ-PAQ-YOR-004",
+            "precio": 161695.64,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200321-00096611",
+            "url": "https://www.grupocoresa.com/paquete-zz-10tr-s-f-r410-460-3-60-11-2seer-11669",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1281
+        },
+        {
+            "sku": "EQ-PAQ-YOR-005",
+            "precio": 228805.44,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200325-00008611",
+            "url": "https://www.grupocoresa.com/paquete-zz-15tr-s-f-r410-440-3-60-11-5seer-11680",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1282
+        },
+        {
+            "sku": "EQ-PAQ-YOR-005",
+            "precio": 228805.44,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200325-00008611",
+            "url": "https://www.grupocoresa.com/paquete-zz-15tr-s-f-r410-440-3-60-11-5seer-11680",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1283
+        },
+        {
+            "sku": "EQ-PAQ-YOR-006",
+            "precio": 140662.79,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200325-00067611",
+            "url": "https://www.grupocoresa.com/paquete-zz-10tr-s-f-r410-220-3-60-11-2seer-11676",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1284
+        },
+        {
+            "sku": "EQ-PAQ-YOR-006",
+            "precio": 140662.79,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200325-00067611",
+            "url": "https://www.grupocoresa.com/paquete-zz-10tr-s-f-r410-220-3-60-11-2seer-11676",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1285
+        },
+        {
+            "sku": "EQ-MSO-1T110-005",
+            "precio": 5207.87,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200514-00089711",
+            "url": "https://www.grupocoresa.com/minisplit-1tr-s-f-110v-r410a-12seer-life12-11798",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1286
+        },
+        {
+            "sku": "EQ-MSO-1T110-005",
+            "precio": 5207.87,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200514-00089711",
+            "url": "https://www.grupocoresa.com/minisplit-1tr-s-f-110v-r410a-12seer-life12-11798",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1287
+        },
+        {
+            "sku": "EQ-FAN-YOR-004",
+            "precio": 42025.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200529-00034811",
+            "url": "https://www.grupocoresa.com/juego-fan-coil-4tr-h-p-220-1-60-r410a-inverter-15seer-11843",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1288
+        },
+        {
+            "sku": "EQ-FAN-YOR-004",
+            "precio": 42025.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200529-00034811",
+            "url": "https://www.grupocoresa.com/juego-fan-coil-4tr-h-p-220-1-60-r410a-inverter-15seer-11843",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1289
+        },
+        {
+            "sku": "EQ-PAQ-YOR-007",
+            "precio": 46913.51,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-201013-00087321",
+            "url": "https://www.grupocoresa.com/paquete-residencial-inverter-3tr-h-p-r410-220-1-60-18-5seer-12378",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1290
+        },
+        {
+            "sku": "EQ-PAQ-YOR-007",
+            "precio": 46913.51,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-201013-00087321",
+            "url": "https://www.grupocoresa.com/paquete-residencial-inverter-3tr-h-p-r410-220-1-60-18-5seer-12378",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1291
+        },
+        {
+            "sku": "EQ-MSO-2T220-002",
+            "precio": 11204.2,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-20220805-00005631",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-life12-mirage-setclc261t-2tr-24-000btus-frio-calor-220-1-60-r410a-12seer",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1292
+        },
+        {
+            "sku": "EQ-MSO-2T220-002",
+            "precio": 11204.2,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-20220805-00005631",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-life12-mirage-setclc261t-2tr-24-000btus-frio-calor-220-1-60-r410a-12seer",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1293
+        },
+        {
+            "sku": "EQ-MSI-1T110-002",
+            "precio": 8452.1,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-20220805-00026631",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-magnum22-mirage-setcmc120v-1tr-12-000btus-frio-calor-110-1-60-r410a-21-8seer",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1294
+        },
+        {
+            "sku": "EQ-MSI-1T110-002",
+            "precio": 8452.1,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-20220805-00026631",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-magnum22-mirage-setcmc120v-1tr-12-000btus-frio-calor-110-1-60-r410a-21-8seer",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1295
+        },
+        {
+            "sku": "EQ-MSI-1T220-002",
+            "precio": 8227.52,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-20220805-00046631",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-magnum22-mirage-setcmc121v-1-toneladas-12-000btus-frio-calor-220-1-60-r410a-22-3seer",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1296
+        },
+        {
+            "sku": "EQ-MSI-1T220-002",
+            "precio": 8227.52,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-20220805-00046631",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-magnum22-mirage-setcmc121v-1-toneladas-12-000btus-frio-calor-220-1-60-r410a-22-3seer",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1297
+        },
+        {
+            "sku": "EQ-MSI-15T220-004",
+            "precio": 11442.95,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-20220805-00056631",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-magnum22-mirage-setcmc181v-1-5tr-18-000btus-frio-calor-220-1-60-r410a-21-6seer",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1298
+        },
+        {
+            "sku": "EQ-MSI-15T220-004",
+            "precio": 11442.95,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-20220805-00056631",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-magnum22-mirage-setcmc181v-1-5tr-18-000btus-frio-calor-220-1-60-r410a-21-6seer",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1299
+        },
+        {
+            "sku": "EQ-MSO-1T110-005",
+            "precio": 4861.66,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-20220805-00066631",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-life12-mirage-setclf120t-1-toneladas-12-000btus-solo-frio-110-1-60-r410a-12seer",
+            "scraped_at": "2025-12-26 19:25:33.808869+00",
+            "raw_id": 1300
+        }
+    ]
+}

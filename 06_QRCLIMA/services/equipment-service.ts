@@ -200,13 +200,25 @@ interface AddEquipmentInput {
  * Add new equipment to Firestore with auto-generated 6-char token.
  * Returns the token (not document ID) for QR generation.
  */
+/**
+ * Helper to remove undefined values from an object (Firestore doesn't accept undefined)
+ */
+const removeUndefined = <T extends Record<string, any>>(obj: T): Partial<T> => {
+    return Object.fromEntries(
+        Object.entries(obj).filter(([_, value]) => value !== undefined)
+    ) as Partial<T>;
+};
+
 export const addEquipment = async (equipmentData: AddEquipmentInput): Promise<{ id: string; token: string }> => {
     try {
         // Generate unique 6-char token
         const token = await generateUniqueToken();
 
+        // Clean undefined values - Firestore doesn't accept undefined
+        const cleanedData = removeUndefined(equipmentData);
+
         const docRef = await addDoc(collection(db, 'equipments'), {
-            ...equipmentData,
+            ...cleanedData,
             token: token.toLowerCase(),
             createdAt: serverTimestamp(),
         });

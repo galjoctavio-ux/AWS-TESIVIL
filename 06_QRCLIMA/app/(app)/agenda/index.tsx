@@ -210,11 +210,14 @@ export default function AgendaScreen() {
                     </View>
 
                     <TouchableOpacity
-                        onPress={() => router.push('/(app)/agenda/wizard')}
+                        onPress={() => router.push('/(app)/agenda/reminders')}
                         className="bg-white/20 px-4 py-2 rounded-full flex-row items-center"
                     >
-                        <Ionicons name="add" size={20} color="white" />
-                        <Text className="text-white font-bold ml-1">Nueva</Text>
+                        <Ionicons name="notifications" size={18} color="white" />
+                        <Text className="text-white font-bold ml-1">Recordatorios</Text>
+                        <View className="bg-indigo-400 px-1.5 py-0.5 rounded ml-1">
+                            <Text className="text-white text-[10px] font-bold">PRO</Text>
+                        </View>
                     </TouchableOpacity>
                 </View>
 
@@ -309,6 +312,15 @@ export default function AgendaScreen() {
                     </View>
                 </ScrollView>
             </View>
+
+            {/* FAB - Nueva Cita */}
+            <TouchableOpacity
+                onPress={() => router.push('/(app)/agenda/wizard')}
+                className="absolute right-4 bg-blue-600 w-14 h-14 rounded-full items-center justify-center shadow-lg"
+                style={{ bottom: insets.bottom + 70 }}
+            >
+                <Ionicons name="add" size={28} color="white" />
+            </TouchableOpacity>
 
             {/* Bottom Navigation */}
             <BottomNav />

@@ -1,0 +1,888 @@
+{
+    "new_products": [
+        {
+            "sku": "HE-SOL-UNI-004",
+            "nombre_estandarizado": "Kit Equipo Unitorch Completo Uniweld",
+            "grupo_general": "HE",
+            "grupo_especializado": "Soldadura",
+            "marca": "Uniweld",
+            "modelo": "MKT-4L",
+            "descripcion_tecnica": "Kit Equipo Unitorch Completo",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Soldadura",
+            "unidad": "Kit"
+        },
+        {
+            "sku": "HE-HER-GEN-003",
+            "nombre_estandarizado": "Llave Servicio Compresor 1/2 Brida 3/8F",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Genérico",
+            "modelo": "LL-502",
+            "descripcion_tecnica": "Llave Servicio Compresor 1/2 Brida 3/8F",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Servicio",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-MAN-YEL-003",
+            "nombre_estandarizado": "Manómetro Baja Presión Yellow Jacket 3-1/8\" Azul",
+            "grupo_general": "HE",
+            "grupo_especializado": "Manómetros",
+            "marca": "Yellow Jacket",
+            "modelo": "49138",
+            "descripcion_tecnica": "Manómetro 3 1/8\" Baja Azul 30\"-0-350 PSI R22/404A/410A",
+            "capacidad": "30\"-0-350 PSI",
+            "voltaje": "N/A",
+            "tipo_operacion": "Medición",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "AC-ACC-EAS-001",
+            "nombre_estandarizado": "Kit Clavija Freeze Free Easy Heat",
+            "grupo_general": "AC",
+            "grupo_especializado": "Accesorios",
+            "marca": "Easy Heat",
+            "modelo": "10802",
+            "descripcion_tecnica": "Kit Clavija Freeze Free",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Instalación",
+            "unidad": "Kit"
+        },
+        {
+            "sku": "HE-MAN-UNI-002",
+            "nombre_estandarizado": "Juego Manifold Uniweld Soft Magic R22/404A/134A",
+            "grupo_general": "HE",
+            "grupo_especializado": "Manómetros",
+            "marca": "Uniweld",
+            "modelo": "QAL3SM-5",
+            "descripcion_tecnica": "Juego Manifold R22/404A/134A Psi-Kg/Cm2 con 3 Mangueras",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Medición",
+            "unidad": "Juego"
+        },
+        {
+            "sku": "HE-HER-RIN-001",
+            "nombre_estandarizado": "Báscula Electrónica Contadora Rinho 30Kg",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Rinho",
+            "modelo": "BACO-30",
+            "descripcion_tecnica": "Báscula Electrónica Contadora 30Kg/1G",
+            "capacidad": "30 Kg",
+            "voltaje": "N/A",
+            "tipo_operacion": "Medición",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-SOL-UNI-005",
+            "nombre_estandarizado": "Boquilla con Regulador Uniweld RP3T5",
+            "grupo_general": "HE",
+            "grupo_especializado": "Soldadura",
+            "marca": "Uniweld",
+            "modelo": "RP3T5",
+            "descripcion_tecnica": "Boquilla con Regulador",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Soldadura",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "RE-SEN-BOH-001",
+            "nombre_estandarizado": "Montaje Verde Sensor Temperatura Bohn",
+            "grupo_general": "RE",
+            "grupo_especializado": "Sensores",
+            "marca": "Bohn",
+            "modelo": "C138-501-1121",
+            "descripcion_tecnica": "Montaje Verde de Sensor de Temperatura 10\"",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Medición",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-YEL-003",
+            "nombre_estandarizado": "Peine Serpentín Yellow Jacket Blanco/Azul",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Yellow Jacket",
+            "modelo": "61170",
+            "descripcion_tecnica": "Peine Serpentín Blanco/Azul con Mango Grande",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Mantenimiento",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-MGU-UNI-005",
+            "nombre_estandarizado": "Juego Mangueras Uniweld Soft Magic 36\"",
+            "grupo_general": "HE",
+            "grupo_especializado": "Mangueras",
+            "marca": "Uniweld",
+            "modelo": "HC3SMB",
+            "descripcion_tecnica": "Juego 3 Mangueras Soft Magic 36\" Rojo/Azul/Amarillo",
+            "capacidad": "36 pulg",
+            "voltaje": "N/A",
+            "tipo_operacion": "Carga",
+            "unidad": "Juego"
+        },
+        {
+            "sku": "HE-CIN-NAS-001",
+            "nombre_estandarizado": "Cinta Aluminio Nashua 3\" x 50 Yd",
+            "grupo_general": "HE",
+            "grupo_especializado": "Materiales",
+            "marca": "Nashua",
+            "modelo": "1087629",
+            "descripcion_tecnica": "Cinta Aluminio 3\" x 50 Yd",
+            "capacidad": "3\" x 50 Yd",
+            "voltaje": "N/A",
+            "tipo_operacion": "Aislamiento",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-UNI-004",
+            "nombre_estandarizado": "Carrito para Tanque Nitrógeno Uniweld",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Uniweld",
+            "modelo": "515",
+            "descripcion_tecnica": "Carrito para Tanque Nitrógeno 20 Pies Cúbicos",
+            "capacidad": "20 ft3",
+            "voltaje": "N/A",
+            "tipo_operacion": "Transporte",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-BOM-YEL-002",
+            "nombre_estandarizado": "Bomba para Cargar Aceite Yellow Jacket",
+            "grupo_general": "HE",
+            "grupo_especializado": "Bombas",
+            "marca": "Yellow Jacket",
+            "modelo": "77940",
+            "descripcion_tecnica": "Bomba para Cargar Aceite con Manguera",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Mantenimiento",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-MAN-YEL-004",
+            "nombre_estandarizado": "Manifold Yellow Jacket R22 60\"",
+            "grupo_general": "HE",
+            "grupo_especializado": "Manómetros",
+            "marca": "Yellow Jacket",
+            "modelo": "41215",
+            "descripcion_tecnica": "Manifold R22 con 3 Mangueras 60\"",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Medición",
+            "unidad": "Juego"
+        },
+        {
+            "sku": "HE-HER-UNI-005",
+            "nombre_estandarizado": "Abocinador Golpe Múltiple Uniweld 3/16-5/8",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Uniweld",
+            "modelo": "70006",
+            "descripcion_tecnica": "Abocinador Golpe Múltiple 3/16\" a 5/8\"",
+            "capacidad": "3/16-5/8\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Tubería",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-UNI-006",
+            "nombre_estandarizado": "Dobla Tubo de Resorte Uniweld 3/4\"",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Uniweld",
+            "modelo": "70021",
+            "descripcion_tecnica": "Dobla Tubo de Resorte 3/4\"",
+            "capacidad": "3/4\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Tubería",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-ACC-MAS-001",
+            "nombre_estandarizado": "Cople Rápido Master Cool 1/2 a 1/4 R134A",
+            "grupo_general": "HE",
+            "grupo_especializado": "Accesorios",
+            "marca": "Master Cool",
+            "modelo": "82934-C",
+            "descripcion_tecnica": "Cople Rápido 1/2 A 1/4 R134A",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Conexión",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-DIV-002",
+            "nombre_estandarizado": "Pistola Alta Presión Limpieza Diversitech",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Diversitech",
+            "modelo": "GG-1",
+            "descripcion_tecnica": "Pistola Alta Presión para Limpieza",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Limpieza",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-MGU-UNI-006",
+            "nombre_estandarizado": "Manguera Metálica Uniweld 36\" Alta Presión",
+            "grupo_general": "HE",
+            "grupo_especializado": "Mangueras",
+            "marca": "Uniweld",
+            "modelo": "91404",
+            "descripcion_tecnica": "Manguera Metálica 36\" Alta Presión",
+            "capacidad": "36 pulg",
+            "voltaje": "N/A",
+            "tipo_operacion": "Carga",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-MAN-UNI-003",
+            "nombre_estandarizado": "Manómetro Baja Uniweld R134A",
+            "grupo_general": "HE",
+            "grupo_especializado": "Manómetros",
+            "marca": "Uniweld",
+            "modelo": "G10LAD15",
+            "descripcion_tecnica": "Manómetro Baja R134A Psi Kg/cm²",
+            "capacidad": "Baja",
+            "voltaje": "N/A",
+            "tipo_operacion": "Medición",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-CIN-MAS-001",
+            "nombre_estandarizado": "Cinta Aislante Foam Tape Master Cool",
+            "grupo_general": "HE",
+            "grupo_especializado": "Materiales",
+            "marca": "Master Cool",
+            "modelo": "VA-K501",
+            "descripcion_tecnica": "Cinta Aislante Foam Tape 1/8x2x30'",
+            "capacidad": "1/8x2x30'",
+            "voltaje": "N/A",
+            "tipo_operacion": "Aislamiento",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-ADE-005",
+            "nombre_estandarizado": "Aspersora Adesa 4 Litros",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Adesa",
+            "modelo": "AD-A-5",
+            "descripcion_tecnica": "Aspersora 4 Litros",
+            "capacidad": "4 L",
+            "voltaje": "N/A",
+            "tipo_operacion": "Limpieza",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-MAN-UNI-004",
+            "nombre_estandarizado": "Manómetro Alta Uniweld R134A 2.5\"",
+            "grupo_general": "HE",
+            "grupo_especializado": "Manómetros",
+            "marca": "Uniweld",
+            "modelo": "G9LAD",
+            "descripcion_tecnica": "Manómetro Alta Rojo 2.5\" R134A con Protector",
+            "capacidad": "Alta",
+            "voltaje": "N/A",
+            "tipo_operacion": "Medición",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-MGU-YEL-006",
+            "nombre_estandarizado": "Manguera Yellow Jacket 36\" Azul 1/4\"",
+            "grupo_general": "HE",
+            "grupo_especializado": "Mangueras",
+            "marca": "Yellow Jacket",
+            "modelo": "21236",
+            "descripcion_tecnica": "Manguera 36\" Azul Conexión 1/4\"",
+            "capacidad": "36 pulg",
+            "voltaje": "N/A",
+            "tipo_operacion": "Carga",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-ADE-006",
+            "nombre_estandarizado": "Pistola Reforzada para Bote Adesa",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Adesa",
+            "modelo": "AD-PLR",
+            "descripcion_tecnica": "Pistola Reforzada para Bote 1 Litro",
+            "capacidad": "1 L",
+            "voltaje": "N/A",
+            "tipo_operacion": "Limpieza",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-MGU-UNI-007",
+            "nombre_estandarizado": "Manguera Uniweld Soft Magic 60\" Amarilla",
+            "grupo_general": "HE",
+            "grupo_especializado": "Mangueras",
+            "marca": "Uniweld",
+            "modelo": "H5SMBY",
+            "descripcion_tecnica": "Manguera Soft Magic 60\" Amarilla",
+            "capacidad": "60 pulg",
+            "voltaje": "N/A",
+            "tipo_operacion": "Carga",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "AC-CAN-REC-002",
+            "nombre_estandarizado": "Cople para Canaleta Rectorseal 3-1/2\"",
+            "grupo_general": "AC",
+            "grupo_especializado": "Canaletas",
+            "marca": "Rectorseal",
+            "modelo": "84010",
+            "descripcion_tecnica": "Cople para Canaleta 3 1/2\"",
+            "capacidad": "3-1/2\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Instalación",
+            "unidad": "Pieza"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "HE-ACE-MAS-001",
+            "precio": 94.24,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001386",
+            "url": "https://www.grupocoresa.com/botella-con-aceite-para-armado-de-valvulas-6831",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2459
+        },
+        {
+            "sku": "HE-SOL-UNI-004",
+            "precio": 1080.88,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001405",
+            "url": "https://www.grupocoresa.com/kit-equipo-unitorch-completo-5041",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2460
+        },
+        {
+            "sku": "HE-SOL-UNI-004",
+            "precio": 1080.88,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001405",
+            "url": "https://www.grupocoresa.com/kit-equipo-unitorch-completo-5041",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2461
+        },
+        {
+            "sku": "HE-HER-GEN-003",
+            "precio": 34.8,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001433",
+            "url": "https://www.grupocoresa.com/llave-he-servicio-compresor-3-8f-1-2-brida-3341",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2462
+        },
+        {
+            "sku": "HE-HER-GEN-003",
+            "precio": 34.8,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001433",
+            "url": "https://www.grupocoresa.com/llave-he-servicio-compresor-3-8f-1-2-brida-3341",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2463
+        },
+        {
+            "sku": "HE-MAN-YEL-003",
+            "precio": 812.29,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001445",
+            "url": "https://www.grupocoresa.com/manometro-3-1-8-baja-azul-para-f-30-0-350psi-r22-404a-410a-yellow-jacket-5441",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2464
+        },
+        {
+            "sku": "HE-MAN-YEL-003",
+            "precio": 812.29,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001445",
+            "url": "https://www.grupocoresa.com/manometro-3-1-8-baja-azul-para-f-30-0-350psi-r22-404a-410a-yellow-jacket-5441",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2465
+        },
+        {
+            "sku": "AC-ACC-EAS-001",
+            "precio": 2665.25,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001477",
+            "url": "https://www.grupocoresa.com/kit-clavija-freeze-free-10802-easy-heat-7741",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2466
+        },
+        {
+            "sku": "AC-ACC-EAS-001",
+            "precio": 2665.25,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001477",
+            "url": "https://www.grupocoresa.com/kit-clavija-freeze-free-10802-easy-heat-7741",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2467
+        },
+        {
+            "sku": "HE-MAN-UNI-002",
+            "precio": 1088.09,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001505",
+            "url": "https://www.grupocoresa.com/juego-manifuld-para-r22-404a-134a-psi-kg-cm2-c-con-3-mangueras-soft-magic-5051",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2468
+        },
+        {
+            "sku": "HE-MAN-UNI-002",
+            "precio": 1088.09,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001505",
+            "url": "https://www.grupocoresa.com/juego-manifuld-para-r22-404a-134a-psi-kg-cm2-c-con-3-mangueras-soft-magic-5051",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2469
+        },
+        {
+            "sku": "HE-HER-RIN-001",
+            "precio": 3729.99,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001577",
+            "url": "https://www.grupocoresa.com/bascula-electronica-contadora-rinho-baco-30-30kg-1g-7751",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2470
+        },
+        {
+            "sku": "HE-HER-RIN-001",
+            "precio": 3729.99,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001577",
+            "url": "https://www.grupocoresa.com/bascula-electronica-contadora-rinho-baco-30-30kg-1g-7751",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2471
+        },
+        {
+            "sku": "HE-SOL-UNI-005",
+            "precio": 989.21,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001605",
+            "url": "https://www.grupocoresa.com/boquilla-con-regulador-5061",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2472
+        },
+        {
+            "sku": "HE-SOL-UNI-005",
+            "precio": 989.21,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001605",
+            "url": "https://www.grupocoresa.com/boquilla-con-regulador-5061",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2473
+        },
+        {
+            "sku": "RE-SEN-BOH-001",
+            "precio": 1368.06,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001607",
+            "url": "https://www.grupocoresa.com/10-montaje-verde-de-sensor-de-temperatura-7061",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2474
+        },
+        {
+            "sku": "RE-SEN-BOH-001",
+            "precio": 1368.06,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001607",
+            "url": "https://www.grupocoresa.com/10-montaje-verde-de-sensor-de-temperatura-7061",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2475
+        },
+        {
+            "sku": "HE-HER-YEL-003",
+            "precio": 410.64,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001645",
+            "url": "https://www.grupocoresa.com/peine-serpentin-blanco-azul-con-mango-grande-yellow-jacket-5461",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2476
+        },
+        {
+            "sku": "HE-HER-YEL-003",
+            "precio": 410.64,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001645",
+            "url": "https://www.grupocoresa.com/peine-serpentin-blanco-azul-con-mango-grande-yellow-jacket-5461",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2477
+        },
+        {
+            "sku": "HE-MGU-UNI-005",
+            "precio": 518.94,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001647",
+            "url": "https://www.grupocoresa.com/juego-3-mangueras-hc3smb-soft-magicr-36-rojo-azul-amarillo-7461",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2478
+        },
+        {
+            "sku": "HE-MGU-UNI-005",
+            "precio": 518.94,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001647",
+            "url": "https://www.grupocoresa.com/juego-3-mangueras-hc3smb-soft-magicr-36-rojo-azul-amarillo-7461",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2479
+        },
+        {
+            "sku": "HE-CIN-NAS-001",
+            "precio": 242.05,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001677",
+            "url": "https://www.grupocoresa.com/cinta-aluminio-3-x-50-yd-652008b-7761",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2480
+        },
+        {
+            "sku": "HE-CIN-NAS-001",
+            "precio": 242.05,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001677",
+            "url": "https://www.grupocoresa.com/cinta-aluminio-3-x-50-yd-652008b-7761",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2481
+        },
+        {
+            "sku": "HE-HER-UNI-004",
+            "precio": 684.93,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001694",
+            "url": "https://www.grupocoresa.com/carrito-para-tanque-nitrogeno-de-20-pies-cubicos-4961",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2482
+        },
+        {
+            "sku": "HE-HER-UNI-004",
+            "precio": 684.93,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001694",
+            "url": "https://www.grupocoresa.com/carrito-para-tanque-nitrogeno-de-20-pies-cubicos-4961",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2483
+        },
+        {
+            "sku": "HE-BOM-YEL-002",
+            "precio": 3631.93,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001745",
+            "url": "https://www.grupocoresa.com/bomba-para-cargar-aceite-con-manguera-yellow-jacket-5471",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2484
+        },
+        {
+            "sku": "HE-BOM-YEL-002",
+            "precio": 3631.93,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001745",
+            "url": "https://www.grupocoresa.com/bomba-para-cargar-aceite-con-manguera-yellow-jacket-5471",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2485
+        },
+        {
+            "sku": "HE-MAN-YEL-004",
+            "precio": 3663.94,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001747",
+            "url": "https://www.grupocoresa.com/manifold-f-r22-con-3-mangueras-60-yellow-jacket-7471",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2486
+        },
+        {
+            "sku": "HE-MAN-YEL-004",
+            "precio": 3663.94,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001747",
+            "url": "https://www.grupocoresa.com/manifold-f-r22-con-3-mangueras-60-yellow-jacket-7471",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2487
+        },
+        {
+            "sku": "HE-HER-UNI-005",
+            "precio": 180.88,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001794",
+            "url": "https://www.grupocoresa.com/abocinador-c-golpe-multiple-3-16-a-5-8-4971",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2488
+        },
+        {
+            "sku": "HE-HER-UNI-005",
+            "precio": 180.88,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001794",
+            "url": "https://www.grupocoresa.com/abocinador-c-golpe-multiple-3-16-a-5-8-4971",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2489
+        },
+        {
+            "sku": "HE-HER-UNI-006",
+            "precio": 117.51,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001894",
+            "url": "https://www.grupocoresa.com/dobla-tubo-de-resorte-3-4-4981",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2490
+        },
+        {
+            "sku": "HE-HER-UNI-006",
+            "precio": 117.51,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001894",
+            "url": "https://www.grupocoresa.com/dobla-tubo-de-resorte-3-4-4981",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2491
+        },
+        {
+            "sku": "HE-ACC-MAS-001",
+            "precio": 935.27,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001936",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2492
+        },
+        {
+            "sku": "HE-ACC-MAS-001",
+            "precio": 935.27,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001936",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2493
+        },
+        {
+            "sku": "HE-HER-DIV-002",
+            "precio": 299.33,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001975",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2494
+        },
+        {
+            "sku": "HE-HER-DIV-002",
+            "precio": 299.33,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001975",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:15.79478+00",
+            "raw_id": 2495
+        },
+        {
+            "sku": "HE-MGU-UNI-006",
+            "precio": 227.29,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001994",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2496
+        },
+        {
+            "sku": "HE-MGU-UNI-006",
+            "precio": 227.29,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001994",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2497
+        },
+        {
+            "sku": "HE-MAN-UNI-003",
+            "precio": 139.5,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002005",
+            "url": "https://www.grupocoresa.com/manometro-baja-r-134a-psi-kg-cm-gc-gf-5002",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2498
+        },
+        {
+            "sku": "HE-MAN-UNI-003",
+            "precio": 139.5,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002005",
+            "url": "https://www.grupocoresa.com/manometro-baja-r-134a-psi-kg-cm-gc-gf-5002",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2499
+        },
+        {
+            "sku": "HE-CIN-MAS-001",
+            "precio": 126.72,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002046",
+            "url": "https://www.grupocoresa.com/cinta-aislante-foam-tape-1-8-x-2-x-30-avaly-6402",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2500
+        },
+        {
+            "sku": "HE-CIN-MAS-001",
+            "precio": 126.72,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002046",
+            "url": "https://www.grupocoresa.com/cinta-aislante-foam-tape-1-8-x-2-x-30-avaly-6402",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2501
+        },
+        {
+            "sku": "HE-HER-ADE-005",
+            "precio": 1321.53,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002054",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2502
+        },
+        {
+            "sku": "HE-HER-ADE-005",
+            "precio": 1321.53,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002054",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2503
+        },
+        {
+            "sku": "HE-MAN-UNI-004",
+            "precio": 116.09,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002105",
+            "url": "https://www.grupocoresa.com/manometro-alta-rojo-g9lad-lpftm-2-5-psi-f-p-r134a-c-protector-de-goma-5012",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2504
+        },
+        {
+            "sku": "HE-MAN-UNI-004",
+            "precio": 116.09,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002105",
+            "url": "https://www.grupocoresa.com/manometro-alta-rojo-g9lad-lpftm-2-5-psi-f-p-r134a-c-protector-de-goma-5012",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2505
+        },
+        {
+            "sku": "HE-MGU-YEL-006",
+            "precio": 412.52,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002145",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2506
+        },
+        {
+            "sku": "HE-MGU-YEL-006",
+            "precio": 412.52,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002145",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2507
+        },
+        {
+            "sku": "HE-HER-ADE-006",
+            "precio": 58.87,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002154",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2508
+        },
+        {
+            "sku": "HE-HER-ADE-006",
+            "precio": 58.87,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002154",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2509
+        },
+        {
+            "sku": "HE-MGU-UNI-007",
+            "precio": 270.55,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002205",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2510
+        },
+        {
+            "sku": "HE-MGU-UNI-007",
+            "precio": 270.55,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002205",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2511
+        },
+        {
+            "sku": "AC-CAN-REC-002",
+            "precio": 85.33,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002234",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2512
+        },
+        {
+            "sku": "AC-CAN-REC-002",
+            "precio": 85.33,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002234",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2513
+        },
+        {
+            "sku": "HE-MGU-YEL-007",
+            "precio": 1256.47,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002245",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2514
+        },
+        {
+            "sku": "HE-MGU-YEL-007",
+            "precio": 1256.47,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002245",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2515
+        },
+        {
+            "sku": "HE-HER-AVA-004",
+            "precio": 100.63,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002246",
+            "url": "https://www.grupocoresa.com/cortatubo-1-8-a-5-8-avaly-6422",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2516
+        },
+        {
+            "sku": "HE-HER-AVA-004",
+            "precio": 100.63,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002246",
+            "url": "https://www.grupocoresa.com/cortatubo-1-8-a-5-8-avaly-6422",
+            "scraped_at": "2025-12-26 19:28:18.653311+00",
+            "raw_id": 2517
+        }
+    ]
+}

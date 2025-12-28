@@ -1,0 +1,790 @@
+{
+    "new_products": [
+        {
+            "sku": "EQ-MSI-1T110-006",
+            "nombre_estandarizado": "Minisplit Inverter York 1 Ton Frío-Calor 110V 17 SEER",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "York",
+            "modelo": "Inverter",
+            "descripcion_tecnica": "1 Ton 110V R32 Frío-Calor 17.18 SEER",
+            "capacidad": "1 Ton",
+            "voltaje": "110V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-15T220-013",
+            "nombre_estandarizado": "Minisplit Inverter York 1.5 Ton Frío-Calor 220V 17.6 SEER",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "York",
+            "modelo": "Inverter",
+            "descripcion_tecnica": "1.5 Ton 220V R32 Frío-Calor 17.6 SEER",
+            "capacidad": "1.5 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-1T220-011",
+            "nombre_estandarizado": "Minisplit Inverter York 1 Ton Solo Frío 220V 17 SEER",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "York",
+            "modelo": "Inverter",
+            "descripcion_tecnica": "1 Ton 220V R32 Solo Frío 17.18 SEER",
+            "capacidad": "1 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-1T110-007",
+            "nombre_estandarizado": "Minisplit Inverter Mirage X32 1 Ton Solo Frío 110V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "Mirage",
+            "modelo": "Inverter X32",
+            "descripcion_tecnica": "1 Ton 110V R32 Solo Frío 17 SEER",
+            "capacidad": "1 Ton",
+            "voltaje": "110V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-2T220-010",
+            "nombre_estandarizado": "Minisplit Inverter York 2 Ton Frío-Calor 220V 17 SEER",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "York",
+            "modelo": "Inverter",
+            "descripcion_tecnica": "2 Ton 220V R32 Frío-Calor 17 SEER",
+            "capacidad": "2 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-15T220-014",
+            "nombre_estandarizado": "Minisplit Inverter York 1.5 Ton Solo Frío 220V 17.5 SEER",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "York",
+            "modelo": "Inverter",
+            "descripcion_tecnica": "1.5 Ton 220V R32 Solo Frío 17.57 SEER",
+            "capacidad": "1.5 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-1T220-012",
+            "nombre_estandarizado": "Minisplit Inverter Mirage X32 1 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "Mirage",
+            "modelo": "Inverter X32",
+            "descripcion_tecnica": "1 Ton 220V R32 Solo Frío 17 SEER",
+            "capacidad": "1 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-2T220-011",
+            "nombre_estandarizado": "Minisplit Inverter York 2 Ton Solo Frío 220V 17 SEER",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "York",
+            "modelo": "Inverter",
+            "descripcion_tecnica": "2 Ton 220V R32 Solo Frío 17.04 SEER",
+            "capacidad": "2 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-15T220-015",
+            "nombre_estandarizado": "Minisplit Inverter Mirage X32 1.5 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "Mirage",
+            "modelo": "Inverter X32",
+            "descripcion_tecnica": "1.5 Ton 220V R32 Solo Frío 17 SEER",
+            "capacidad": "1.5 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-15T220-016",
+            "nombre_estandarizado": "Minisplit Inverter Mirage V32 1.5 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "Mirage",
+            "modelo": "V32",
+            "descripcion_tecnica": "1.5 Ton 220V R32 Solo Frío 17 SEER",
+            "capacidad": "1.5 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MAN-YOR-001",
+            "nombre_estandarizado": "Manejadora York 12.5 Ton Solo Frío 230V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Manejadoras",
+            "marca": "York",
+            "modelo": "Horizontal",
+            "descripcion_tecnica": "12.5 Ton 230V 3F Solo Frío 5000CFM",
+            "capacidad": "12.5 Ton",
+            "voltaje": "230V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-PAQ-YOR-012",
+            "nombre_estandarizado": "Paquete Comercial York 7.5 Ton Solo Frío 230V 11.6 EER",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Paquetes",
+            "marca": "York",
+            "modelo": "Comercial",
+            "descripcion_tecnica": "7.5 Ton 230V 3F Solo Frío 11.6 EER",
+            "capacidad": "7.5 Ton",
+            "voltaje": "230V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-FAN-YOR-001",
+            "nombre_estandarizado": "Fan&Coil Agua Helada York 2.5 Ton Solo Frío 127V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Fan&Coil",
+            "marca": "York",
+            "modelo": "Agua Helada",
+            "descripcion_tecnica": "2.5 Ton 127V Solo Frío",
+            "capacidad": "2.5 Ton",
+            "voltaje": "127V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MAN-YOR-002",
+            "nombre_estandarizado": "Manejadora York 10 Ton Solo Frío 220V Variador",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Manejadoras",
+            "marca": "York",
+            "modelo": "NL Series",
+            "descripcion_tecnica": "10 Ton 220V 3F Solo Frío Variador",
+            "capacidad": "10 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-PAQ-YOR-013",
+            "nombre_estandarizado": "Paquete Comercial York 7.5 Ton Solo Frío 440V 11.6 EER",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Paquetes",
+            "marca": "York",
+            "modelo": "Comercial",
+            "descripcion_tecnica": "7.5 Ton 440V 3F Solo Frío 11.6 EER",
+            "capacidad": "7.5 Ton",
+            "voltaje": "440V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-1T220-013",
+            "nombre_estandarizado": "Minisplit Inverter Mirage V32 1 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "Mirage",
+            "modelo": "V32",
+            "descripcion_tecnica": "1 Ton 220V R32 Solo Frío 17 SEER",
+            "capacidad": "1 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MAN-YOR-003",
+            "nombre_estandarizado": "Manejadora York 7.5 Ton Solo Frío 440V Variador",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Manejadoras",
+            "marca": "York",
+            "modelo": "NL Series",
+            "descripcion_tecnica": "7.5 Ton 440V 3F Solo Frío Variador",
+            "capacidad": "7.5 Ton",
+            "voltaje": "440V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-1T110-008",
+            "nombre_estandarizado": "Minisplit Inverter Mirage Magnum 22 1 Ton Solo Frío 110V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "Mirage",
+            "modelo": "Magnum 22",
+            "descripcion_tecnica": "1 Ton 110V R410A Solo Frío 21.8 SEER",
+            "capacidad": "1 Ton",
+            "voltaje": "110V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-PAQ-YOR-014",
+            "nombre_estandarizado": "Paquete Comercial York 10 Ton Solo Frío 230V 11.2 EER",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Paquetes",
+            "marca": "York",
+            "modelo": "Comercial",
+            "descripcion_tecnica": "10 Ton 230V 3F Solo Frío 11.2 EER",
+            "capacidad": "10 Ton",
+            "voltaje": "230V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MAN-YOR-004",
+            "nombre_estandarizado": "Manejadora York 10 Ton Solo Frío 230V 4000CFM",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Manejadoras",
+            "marca": "York",
+            "modelo": "Horizontal",
+            "descripcion_tecnica": "10 Ton 230V 3F Solo Frío 4000CFM",
+            "capacidad": "10 Ton",
+            "voltaje": "230V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MAN-YOR-005",
+            "nombre_estandarizado": "Manejadora York 10 Ton Solo Frío 440V Variador",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Manejadoras",
+            "marca": "York",
+            "modelo": "NL Series",
+            "descripcion_tecnica": "10 Ton 440V 3F Solo Frío Variador",
+            "capacidad": "10 Ton",
+            "voltaje": "440V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-CON-YOR-001",
+            "nombre_estandarizado": "Condensadora York 7.5 Ton Solo Frío 440V 13 EER",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Condensadoras",
+            "marca": "York",
+            "modelo": "YE Series",
+            "descripcion_tecnica": "7.5 Ton 440V 3F Solo Frío 13 EER",
+            "capacidad": "7.5 Ton",
+            "voltaje": "440V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "LI-TAB-PAN-001",
+            "nombre_estandarizado": "Tabletas Pan Clean (6 Piezas)",
+            "grupo_general": "LI",
+            "grupo_especializado": "Limpieza",
+            "marca": "Pan Clean",
+            "modelo": "AD-PC-6",
+            "descripcion_tecnica": "Bote con 6 tabletas para charolas",
+            "capacidad": "6 Piezas",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Bote"
+        },
+        {
+            "sku": "LI-CCL-COI-001",
+            "nombre_estandarizado": "Coil Cleaner 1 Litro",
+            "grupo_general": "LI",
+            "grupo_especializado": "Limpieza",
+            "marca": "Coil Cleaner",
+            "modelo": "AD-CC-07",
+            "descripcion_tecnica": "Botella 1 Litro",
+            "capacidad": "1 Litro",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Botella"
+        },
+        {
+            "sku": "LI-FCL-FOA-001",
+            "nombre_estandarizado": "Foam Cleaner Galón 3.78L",
+            "grupo_general": "LI",
+            "grupo_especializado": "Limpieza",
+            "marca": "Foam Cleaner",
+            "modelo": "AD-FC-08",
+            "descripcion_tecnica": "Galón 3.78 Litros",
+            "capacidad": "3.78 Litros",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Galón"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "EQ-MSI-15T220-012",
+            "precio": 10888.03,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00022641",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-magnum-22-mirage-setcmf181v-1-5tr-18-000btus-solo-frio-220-1-60-r410a-21-8seer",
+            "scraped_at": "2025-12-26 19:25:57.121174+00",
+            "raw_id": 1455
+        },
+        {
+            "sku": "EQ-MSI-1T110-006",
+            "precio": 6782.31,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00023051",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-york-yhkf12zx6axkorx-1tr-12-000btus-frio-calor-110-1-60-r32-17-18seer",
+            "scraped_at": "2025-12-26 19:25:57.121174+00",
+            "raw_id": 1456
+        },
+        {
+            "sku": "EQ-MSI-1T110-006",
+            "precio": 6782.31,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00023051",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-york-yhkf12zx6axkorx-1tr-12-000btus-frio-calor-110-1-60-r32-17-18seer",
+            "scraped_at": "2025-12-26 19:25:57.121174+00",
+            "raw_id": 1457
+        },
+        {
+            "sku": "EQ-MSI-15T220-013",
+            "precio": 9236.77,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00030441",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-york-yhkf18zj6axtorx-1-5tr-18-000btus-frio-calor-220-1-60-r32-17-6seer",
+            "scraped_at": "2025-12-26 19:25:57.121174+00",
+            "raw_id": 1458
+        },
+        {
+            "sku": "EQ-MSI-15T220-013",
+            "precio": 9236.77,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00030441",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-york-yhkf18zj6axtorx-1-5tr-18-000btus-frio-calor-220-1-60-r32-17-6seer",
+            "scraped_at": "2025-12-26 19:25:57.121174+00",
+            "raw_id": 1459
+        },
+        {
+            "sku": "EQ-MSI-1T220-011",
+            "precio": 5942.67,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00032841",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-york-yhjf12zj6axtorx-1tr-12-000btus-solo-frio-220-1-60-r32-17-18seer",
+            "scraped_at": "2025-12-26 19:25:57.121174+00",
+            "raw_id": 1460
+        },
+        {
+            "sku": "EQ-MSI-1T220-011",
+            "precio": 5942.67,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00032841",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-york-yhjf12zj6axtorx-1tr-12-000btus-solo-frio-220-1-60-r32-17-18seer",
+            "scraped_at": "2025-12-26 19:25:57.121174+00",
+            "raw_id": 1461
+        },
+        {
+            "sku": "EQ-MSI-1T110-007",
+            "precio": 5603.83,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00037741",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-x32-mirage-setcwf120e-1tr-12-000btus-solo-frio-110-1-60-r32-17seer",
+            "scraped_at": "2025-12-26 19:25:57.121174+00",
+            "raw_id": 1462
+        },
+        {
+            "sku": "EQ-MSI-1T110-007",
+            "precio": 5603.83,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00037741",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-x32-mirage-setcwf120e-1tr-12-000btus-solo-frio-110-1-60-r32-17seer",
+            "scraped_at": "2025-12-26 19:25:57.121174+00",
+            "raw_id": 1463
+        },
+        {
+            "sku": "EQ-MSI-2T220-010",
+            "precio": 12127.36,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00040441",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-york-yhkf24zj6axtorx-2tr-24-000btus-frio-calor-220-1-60-r32-17seer",
+            "scraped_at": "2025-12-26 19:25:57.121174+00",
+            "raw_id": 1464
+        },
+        {
+            "sku": "EQ-MSI-2T220-010",
+            "precio": 12127.36,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00040441",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-york-yhkf24zj6axtorx-2tr-24-000btus-frio-calor-220-1-60-r32-17seer",
+            "scraped_at": "2025-12-26 19:25:57.121174+00",
+            "raw_id": 1465
+        },
+        {
+            "sku": "EQ-MSI-15T220-014",
+            "precio": 8493.98,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00042841",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-york-yhjf18zj6axtorx-1-5tr-18-000btus-solo-frio-220-1-60-r32-17-57seer",
+            "scraped_at": "2025-12-26 19:25:57.121174+00",
+            "raw_id": 1466
+        },
+        {
+            "sku": "EQ-MSI-15T220-014",
+            "precio": 8493.98,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00042841",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-york-yhjf18zj6axtorx-1-5tr-18-000btus-solo-frio-220-1-60-r32-17-57seer",
+            "scraped_at": "2025-12-26 19:25:57.121174+00",
+            "raw_id": 1467
+        },
+        {
+            "sku": "EQ-MSI-1T220-012",
+            "precio": 5398.27,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00047741",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-x32-mirage-setcwf121e-1tr-12-000btus-solo-frio-220-1-60-r32-17seer",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1468
+        },
+        {
+            "sku": "EQ-MSI-1T220-012",
+            "precio": 5398.27,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00047741",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-x32-mirage-setcwf121e-1tr-12-000btus-solo-frio-220-1-60-r32-17seer",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1469
+        },
+        {
+            "sku": "EQ-MSI-2T220-011",
+            "precio": 11206.99,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00052841",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-york-yhjf24zj6axtorx-2tr-24-000btus-solo-frio-220-1-60-r32-17-04-seer",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1470
+        },
+        {
+            "sku": "EQ-MSI-2T220-011",
+            "precio": 11206.99,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00052841",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-york-yhjf24zj6axtorx-2tr-24-000btus-solo-frio-220-1-60-r32-17-04-seer",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1471
+        },
+        {
+            "sku": "EQ-MSI-15T220-015",
+            "precio": 8093.24,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00057741",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-x32-mirage-setcwf181e-1-5tr-18-000btus-solo-frio-220-1-60-r32-17seer",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1472
+        },
+        {
+            "sku": "EQ-MSI-15T220-015",
+            "precio": 8093.24,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00057741",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-x32-mirage-setcwf181e-1-5tr-18-000btus-solo-frio-220-1-60-r32-17seer",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1473
+        },
+        {
+            "sku": "EQ-MSI-15T220-016",
+            "precio": 7856.78,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00062941",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-v32-mirage-setcvf181e-1-5tr-18-000btus-solo-frio-220-1-60-r32-17seer",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1474
+        },
+        {
+            "sku": "EQ-MSI-15T220-016",
+            "precio": 7856.78,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00062941",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-v32-mirage-setcvf181e-1-5tr-18-000btus-solo-frio-220-1-60-r32-17seer",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1475
+        },
+        {
+            "sku": "EQ-MAN-YOR-001",
+            "precio": 93283.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00067241",
+            "url": "https://www.grupocoresa.com/manejadora-aire-horizontal-york-yah10bsh00c0f0l0g-12-5tr-5-hileras-solo-frio-230-3-60-uso-interior-5000cfm-filtros-g1-izquierda",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1476
+        },
+        {
+            "sku": "EQ-MAN-YOR-001",
+            "precio": 93283.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00067241",
+            "url": "https://www.grupocoresa.com/manejadora-aire-horizontal-york-yah10bsh00c0f0l0g-12-5tr-5-hileras-solo-frio-230-3-60-uso-interior-5000cfm-filtros-g1-izquierda",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1477
+        },
+        {
+            "sku": "EQ-PAQ-YOR-012",
+            "precio": 111404.83,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00073141",
+            "url": "https://www.grupocoresa.com/paquete-comercial-york-ymmrzc090baakbx-7-5tr-solo-frio-r410a-90mbtu-230-3-60-11-6seer",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1478
+        },
+        {
+            "sku": "EQ-PAQ-YOR-012",
+            "precio": 111404.83,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00073141",
+            "url": "https://www.grupocoresa.com/paquete-comercial-york-ymmrzc090baakbx-7-5tr-solo-frio-r410a-90mbtu-230-3-60-11-6seer",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1479
+        },
+        {
+            "sku": "EQ-FAN-YOR-001",
+            "precio": 12981.72,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00077241",
+            "url": "https://www.grupocoresa.com/fan-coil-de-agua-helada-york-ygfc10cc4hxxxbleh-2-5tr-solo-frio-127-1-60-4h-izquierda",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1480
+        },
+        {
+            "sku": "EQ-FAN-YOR-001",
+            "precio": 12981.72,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00077241",
+            "url": "https://www.grupocoresa.com/fan-coil-de-agua-helada-york-ygfc10cc4hxxxbleh-2-5tr-solo-frio-127-1-60-4h-izquierda",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1481
+        },
+        {
+            "sku": "EQ-MAN-YOR-002",
+            "precio": 125530.13,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00078241",
+            "url": "https://www.grupocoresa.com/manejadora-york-nl120c00c2baa4-10tr-solo-frio-r410a-220v-3ph-variador-de-frecuencia",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1482
+        },
+        {
+            "sku": "EQ-MAN-YOR-002",
+            "precio": 125530.13,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00078241",
+            "url": "https://www.grupocoresa.com/manejadora-york-nl120c00c2baa4-10tr-solo-frio-r410a-220v-3ph-variador-de-frecuencia",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1483
+        },
+        {
+            "sku": "EQ-PAQ-YOR-013",
+            "precio": 112716.77,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00083141",
+            "url": "https://www.grupocoresa.com/paquete-comercial-york-ymmrzc090bajkbgx-7-5tr-solo-frio-r410a-90mbtu-440-3-60-eer11-6",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1484
+        },
+        {
+            "sku": "EQ-PAQ-YOR-013",
+            "precio": 112716.77,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00083141",
+            "url": "https://www.grupocoresa.com/paquete-comercial-york-ymmrzc090bajkbgx-7-5tr-solo-frio-r410a-90mbtu-440-3-60-eer11-6",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1485
+        },
+        {
+            "sku": "EQ-MSI-1T220-013",
+            "precio": 5049.99,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00086841",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-v32-mirage-setcvf121e-1tr-12-000btus-solo-frio-220-1-60-r32-17seer",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1486
+        },
+        {
+            "sku": "EQ-MSI-1T220-013",
+            "precio": 5049.99,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00086841",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-v32-mirage-setcvf121e-1tr-12-000btus-solo-frio-220-1-60-r32-17seer",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1487
+        },
+        {
+            "sku": "EQ-MAN-YOR-003",
+            "precio": 87859.22,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00088241",
+            "url": "https://www.grupocoresa.com/manejadora-york-nl090c00b4baa2-7-5tr-solo-frio-r410a-440v-3ph-variador-de-frecuencia",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1488
+        },
+        {
+            "sku": "EQ-MAN-YOR-003",
+            "precio": 87859.22,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00088241",
+            "url": "https://www.grupocoresa.com/manejadora-york-nl090c00b4baa2-7-5tr-solo-frio-r410a-440v-3ph-variador-de-frecuencia",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1489
+        },
+        {
+            "sku": "EQ-MSI-1T110-008",
+            "precio": 7336.73,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00091051",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-magnum-22-mirage-setcmf120v-1tr-12-000btus-solo-frio-110-1-60-r410a-21-8seer",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1490
+        },
+        {
+            "sku": "EQ-MSI-1T110-008",
+            "precio": 7336.73,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00091051",
+            "url": "https://www.grupocoresa.com/minisplit-high-wall-inverter-magnum-22-mirage-setcmf120v-1tr-12-000btus-solo-frio-110-1-60-r410a-21-8seer",
+            "scraped_at": "2025-12-26 19:26:00.448498+00",
+            "raw_id": 1491
+        },
+        {
+            "sku": "EQ-PAQ-YOR-014",
+            "precio": 141287.91,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00096141",
+            "url": "https://www.grupocoresa.com/paquete-comercial-york-ymmrzc120baakbx-10tr-solo-frio-r410a-120mbtu-230-3-60-11-2seer",
+            "scraped_at": "2025-12-26 19:26:03.74178+00",
+            "raw_id": 1492
+        },
+        {
+            "sku": "EQ-PAQ-YOR-014",
+            "precio": 141287.91,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00096141",
+            "url": "https://www.grupocoresa.com/paquete-comercial-york-ymmrzc120baakbx-10tr-solo-frio-r410a-120mbtu-230-3-60-11-2seer",
+            "scraped_at": "2025-12-26 19:26:03.74178+00",
+            "raw_id": 1493
+        },
+        {
+            "sku": "EQ-MAN-YOR-004",
+            "precio": 183642.73,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00097241",
+            "url": "https://www.grupocoresa.com/manejadora-aire-horizontal-york-yah08bsh0000f0r0g-10tr-5-hileras-solo-frio-230-3-60-uso-interior-4000cfm-filtros-g1-derecha",
+            "scraped_at": "2025-12-26 19:26:03.74178+00",
+            "raw_id": 1494
+        },
+        {
+            "sku": "EQ-MAN-YOR-004",
+            "precio": 183642.73,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00097241",
+            "url": "https://www.grupocoresa.com/manejadora-aire-horizontal-york-yah08bsh0000f0r0g-10tr-5-hileras-solo-frio-230-3-60-uso-interior-4000cfm-filtros-g1-derecha",
+            "scraped_at": "2025-12-26 19:26:03.74178+00",
+            "raw_id": 1495
+        },
+        {
+            "sku": "EQ-MAN-YOR-005",
+            "precio": 129302.2,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00098241",
+            "url": "https://www.grupocoresa.com/manejadora-york-nl120c00c4baa4-10tr-solo-frio-r410a-440v-3ph-variador-de-frecuencia",
+            "scraped_at": "2025-12-26 19:26:03.74178+00",
+            "raw_id": 1496
+        },
+        {
+            "sku": "EQ-MAN-YOR-005",
+            "precio": 129302.2,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00098241",
+            "url": "https://www.grupocoresa.com/manejadora-york-nl120c00c4baa4-10tr-solo-frio-r410a-440v-3ph-variador-de-frecuencia",
+            "scraped_at": "2025-12-26 19:26:03.74178+00",
+            "raw_id": 1497
+        },
+        {
+            "sku": "EQ-CON-YOR-001",
+            "precio": 69169.87,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00099841",
+            "url": "https://www.grupocoresa.com/condensadora-york-ye090c00a4aaa-7-5tr-solo-frio-r410a-440-3-60-13eer",
+            "scraped_at": "2025-12-26 19:26:03.74178+00",
+            "raw_id": 1498
+        },
+        {
+            "sku": "EQ-CON-YOR-001",
+            "precio": 69169.87,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251007-00099841",
+            "url": "https://www.grupocoresa.com/condensadora-york-ye090c00a4aaa-7-5tr-solo-frio-r410a-440-3-60-13eer",
+            "scraped_at": "2025-12-26 19:26:03.74178+00",
+            "raw_id": 1499
+        },
+        {
+            "sku": "LI-TAB-PAN-001",
+            "precio": 1471.37,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000154",
+            "url": "https://www.grupocoresa.com/tableta-pan-clean-bote-con-6-piezas-4510",
+            "scraped_at": "2025-12-26 19:26:04.072519+00",
+            "raw_id": 1500
+        },
+        {
+            "sku": "LI-TAB-PAN-001",
+            "precio": 1471.37,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000154",
+            "url": "https://www.grupocoresa.com/tableta-pan-clean-bote-con-6-piezas-4510",
+            "scraped_at": "2025-12-26 19:26:04.072519+00",
+            "raw_id": 1501
+        },
+        {
+            "sku": "LI-CCL-COI-001",
+            "precio": 45.45,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000447",
+            "url": "https://www.grupocoresa.com/coil-cleaner-1-litro-7440",
+            "scraped_at": "2025-12-26 19:26:04.072519+00",
+            "raw_id": 1502
+        },
+        {
+            "sku": "LI-CCL-COI-001",
+            "precio": 45.45,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000447",
+            "url": "https://www.grupocoresa.com/coil-cleaner-1-litro-7440",
+            "scraped_at": "2025-12-26 19:26:04.072519+00",
+            "raw_id": 1503
+        },
+        {
+            "sku": "LI-FCL-FOA-001",
+            "precio": 265.0,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000547",
+            "url": "https://www.grupocoresa.com/foam-cleaner-de-galon-7450",
+            "scraped_at": "2025-12-26 19:26:04.072519+00",
+            "raw_id": 1504
+        },
+        {
+            "sku": "LI-FCL-FOA-001",
+            "precio": 265.0,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000547",
+            "url": "https://www.grupocoresa.com/foam-cleaner-de-galon-7450",
+            "scraped_at": "2025-12-26 19:26:04.072519+00",
+            "raw_id": 1505
+        }
+    ]
+}

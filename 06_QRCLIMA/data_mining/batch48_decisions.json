@@ -1,0 +1,565 @@
+{
+    "new_products": [
+        {
+            "sku": "HE-ACC-GEN-002",
+            "name": "Tuerca Galvanizada 3/8",
+            "category": "Herramientas",
+            "brand": "Genérico",
+            "specs": "3/8 Galvanizada"
+        },
+        {
+            "sku": "RE-TAR-MIR-004",
+            "name": "Tarjeta Electrónica Mirage 17222000008408",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "17222000008408"
+        },
+        {
+            "sku": "TU-AIS-KFL-070",
+            "name": "Aislamiento Térmico K-Flex 1/4 x 1/2",
+            "category": "Tuberías/Aislamientos",
+            "brand": "K-Flex",
+            "specs": "1/4 x 1/2"
+        },
+        {
+            "sku": "RE-MOT-EME-006",
+            "name": "Motor Emerson 1/2HP 220V 1075RPM",
+            "category": "Refacciones",
+            "brand": "Emerson",
+            "specs": "1/2HP 220V 1075RPM"
+        },
+        {
+            "sku": "RE-MOT-EME-007",
+            "name": "Motor Emerson 1/12-1/20HP 115/230V 1550RPM",
+            "category": "Refacciones",
+            "brand": "Emerson",
+            "specs": "1/12-1/20HP 115/230V 1550RPM"
+        },
+        {
+            "sku": "RE-MOT-UEI-001",
+            "name": "Motor UEI 9 Watts Aluminio",
+            "category": "Refacciones",
+            "brand": "UEI",
+            "specs": "9W Aluminio"
+        },
+        {
+            "sku": "EQ-MSO-MID-007",
+            "name": "Minisplit Midea 1 Ton Solo Frío On/Off 220V",
+            "category": "Equipos",
+            "brand": "Midea",
+            "specs": "1 Ton Solo Frío On/Off 220V"
+        },
+        {
+            "sku": "EQ-MSI-HIS-020",
+            "name": "Minisplit Inverter Hisense 1 Ton Solo Frío 220V",
+            "category": "Equipos",
+            "brand": "Hisense",
+            "specs": "1 Ton Solo Frío Inverter 220V"
+        },
+        {
+            "sku": "EQ-MSO-HIS-002",
+            "name": "Minisplit On/Off Hisense 1.5 Ton Solo Frío 220V",
+            "category": "Equipos",
+            "brand": "Hisense",
+            "specs": "1.5 Ton Solo Frío On/Off 220V"
+        },
+        {
+            "sku": "RE-MOT-AVA-001",
+            "name": "Micromotor Polo Sombreado Avaly 1/40HP 127V",
+            "category": "Refacciones",
+            "brand": "Avaly",
+            "specs": "1/40HP 127V 1550RPM"
+        },
+        {
+            "sku": "HE-MAN-UNI-018",
+            "name": "Manifold Uniweld con Mangueras",
+            "category": "Herramientas",
+            "brand": "Uniweld",
+            "specs": "Con Mangueras"
+        },
+        {
+            "sku": "HE-MAN-ERO-003",
+            "name": "Manifold Ero Sin Mirilla R22/410A/404 60pulg",
+            "category": "Herramientas",
+            "brand": "Ero International",
+            "specs": "Sin Mirilla R22/410A/404"
+        },
+        {
+            "sku": "HE-MAN-BAR-004",
+            "name": "Manifold Barreto con Mirilla R12/134/404",
+            "category": "Herramientas",
+            "brand": "Barreto",
+            "specs": "Con Mirilla R12/134/404"
+        },
+        {
+            "sku": "RE-FIL-AVA-001",
+            "name": "Filtro Deshidratador Avaly 1/4 Soldable",
+            "category": "Refacciones",
+            "brand": "Avaly",
+            "specs": "1/4 Soldable"
+        },
+        {
+            "sku": "RE-FIL-AVA-002",
+            "name": "Filtro Deshidratador Avaly 1/4 Sin Capilar",
+            "category": "Refacciones",
+            "brand": "Avaly",
+            "specs": "1/4 Sin Capilar"
+        },
+        {
+            "sku": "RE-FIL-AVA-003",
+            "name": "Filtro Deshidratador Avaly A-254",
+            "category": "Refacciones",
+            "brand": "Avaly",
+            "specs": "A-254"
+        },
+        {
+            "sku": "RE-FIL-EME-003",
+            "name": "Filtro Deshidratador Piedra Emerson 3/8 ODF",
+            "category": "Refacciones",
+            "brand": "Emerson",
+            "specs": "3/8 ODF Piedra"
+        },
+        {
+            "sku": "RE-FIL-EME-004",
+            "name": "Filtro Deshidratador Piedra Emerson 3/8 S",
+            "category": "Refacciones",
+            "brand": "Emerson",
+            "specs": "3/8 S Piedra"
+        },
+        {
+            "sku": "RE-FIL-ERO-001",
+            "name": "Filtro Deshidratador Ero 1/4 S Conexiones Largas",
+            "category": "Refacciones",
+            "brand": "Ero International",
+            "specs": "1/4 S Largas"
+        },
+        {
+            "sku": "HE-SOL-TUR-004",
+            "name": "Boquilla Turner Bronce Encendido Automático",
+            "category": "Herramientas",
+            "brand": "Turner",
+            "specs": "Encendido Automático"
+        },
+        {
+            "sku": "HE-CHE-ACE-014",
+            "name": "Aceite Acemire AB 150 3.7L",
+            "category": "Herramientas",
+            "brand": "Acemire",
+            "specs": "AB 150 3.7L"
+        },
+        {
+            "sku": "HE-CHE-ACE-015",
+            "name": "Aceite Acemire AB 150 19L",
+            "category": "Herramientas",
+            "brand": "Acemire",
+            "specs": "AB 150 19L"
+        },
+        {
+            "sku": "RE-COM-EMB-016",
+            "name": "Compresor Hermético Embraco 1HP R134a 230V 1F",
+            "category": "Refacciones",
+            "brand": "Embraco",
+            "specs": "1HP R134a 230V 1F"
+        },
+        {
+            "sku": "RE-COM-EMB-017",
+            "name": "Compresor Hermético Embraco 1/3HP R134a 115V",
+            "category": "Refacciones",
+            "brand": "Embraco",
+            "specs": "1/3HP R134a 115V"
+        },
+        {
+            "sku": "RE-COM-EMB-018",
+            "name": "Compresor Hermético Embraco 1/2HP R134a 115V",
+            "category": "Refacciones",
+            "brand": "Embraco",
+            "specs": "1/2HP R134a 115V"
+        },
+        {
+            "sku": "RE-COM-DAN-010",
+            "name": "Compresor Fraccionario Danfoss 1/4HP R134a 115V",
+            "category": "Refacciones",
+            "brand": "Danfoss",
+            "specs": "1/4HP R134a 115V"
+        },
+        {
+            "sku": "RE-COM-DAN-011",
+            "name": "Compresor Fraccionario Danfoss 1/3HP R134a 115V",
+            "category": "Refacciones",
+            "brand": "Danfoss",
+            "specs": "1/3HP R134a 115V"
+        },
+        {
+            "sku": "RE-COM-DAN-012",
+            "name": "Compresor Fraccionario Danfoss Huayi 1/3HP R134a",
+            "category": "Refacciones",
+            "brand": "Danfoss",
+            "specs": "1/3HP R134a"
+        },
+        {
+            "sku": "HE-INS-SPE-005",
+            "name": "Kit Inyección Colorante Fluorescente Spectroline",
+            "category": "Herramientas",
+            "brand": "Spectroline",
+            "specs": "Inyección Colorante"
+        },
+        {
+            "sku": "HE-CHE-SPE-005",
+            "name": "Cartucho Tinta Fluorescente Spectroline",
+            "category": "Herramientas",
+            "brand": "Spectroline",
+            "specs": "Cartucho"
+        },
+        {
+            "sku": "AC-EXT-SOL-003",
+            "name": "Extractor Pared S&P 900m3/hr",
+            "category": "Accesorios",
+            "brand": "Soler & Palau",
+            "specs": "900m3/hr"
+        },
+        {
+            "sku": "AC-EXT-SOL-004",
+            "name": "Extractor Pared S&P 400m3/hr",
+            "category": "Accesorios",
+            "brand": "Soler & Palau",
+            "specs": "400m3/hr"
+        },
+        {
+            "sku": "AC-VEN-SOL-028",
+            "name": "Extractor Baño Future 120 S&P",
+            "category": "Accesorios",
+            "brand": "Soler & Palau",
+            "specs": "Future 120"
+        },
+        {
+            "sku": "AC-VEN-SOL-029",
+            "name": "Extractor Baño Future 150 S&P",
+            "category": "Accesorios",
+            "brand": "Soler & Palau",
+            "specs": "Future 150"
+        },
+        {
+            "sku": "EQ-MSI-MID-008",
+            "name": "Minisplit Inverter Midea 1.5 Ton Solo Frío 220V",
+            "category": "Equipos",
+            "brand": "Midea",
+            "specs": "1.5 Ton Solo Frío Inverter 220V"
+        },
+        {
+            "sku": "TU-AIS-DUR-001",
+            "name": "Aislamiento Térmico Durkee 1/2 x 3/8",
+            "category": "Tuberías/Aislamientos",
+            "brand": "Durkee",
+            "specs": "1/2 x 3/8"
+        },
+        {
+            "sku": "RE-MOT-MIR-001",
+            "name": "Motor Condensador Mirage 1 Ton 110V 616",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "616 1 Ton 110V"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "HE-ACC-GEN-002",
+            "price": 1.08,
+            "url": "https://reacsa.mx/products/tuerca-galvanizada-de-3-8",
+            "raw_id": "a22b43ff-5888-4476-8d8c-44509551ab1b"
+        },
+        {
+            "sku": "RE-TAR-MIR-004",
+            "price": 339.74,
+            "url": "https://www.tiendamirage.mx/refacciones/1631-tarjeta-display-17222000008408.html",
+            "raw_id": "49e46c0c-20c0-4e1a-9006-bcb7168245dc"
+        },
+        {
+            "sku": "TU-AIS-KFL-025",
+            "price": 36.58,
+            "url": "https://reacsa.mx/products/aislante-armaflex-k-flex-1-1-8-x-3-8-w-x-72-216",
+            "raw_id": "954aa089-a9b6-40b3-a33c-03de0fc78469"
+        },
+        {
+            "sku": "TU-AIS-KFL-013",
+            "price": 53.26,
+            "url": "https://reacsa.mx/products/aislante-armaflex-k-flex-1-1-8x1-2w-x72",
+            "raw_id": "2282114d-1572-4624-901b-afcd63da5552"
+        },
+        {
+            "sku": "TU-AIS-KFL-030",
+            "price": 36.05,
+            "url": "https://reacsa.mx/products/aislante-armaflex-k-flex-3-8-x-1-2-w-x72-456",
+            "raw_id": "77734083-1de8-4073-b10b-b66b01c43202"
+        },
+        {
+            "sku": "TU-AIS-KFL-070",
+            "price": 33.54,
+            "url": "https://reacsa.mx/products/aislante-armaflex-k-flex-1-4-x-1-2-w-x72-510",
+            "raw_id": "dc0e3149-88e7-4a1a-8a0f-bb8b41ae664f"
+        },
+        {
+            "sku": "TU-AIS-KFL-018",
+            "price": 42.68,
+            "url": "https://reacsa.mx/products/aislante-armaflex-k-flex-5-8-x-1-2-w-x-72",
+            "raw_id": "c51359ea-2f0c-493b-be7d-555f47074b04"
+        },
+        {
+            "sku": "TU-AIS-KFL-031",
+            "price": 29.05,
+            "url": "https://reacsa.mx/products/aislante-armaflex-k-flex-5-8-x-3-8-w-x-72",
+            "raw_id": "b454b558-c681-4893-a160-eae3b3ac30fe"
+        },
+        {
+            "sku": "TU-AIS-KFL-003",
+            "price": 32.28,
+            "url": "https://reacsa.mx/products/aislante-armaflex-k-flex-7-8-x-3-8-w-x-72",
+            "raw_id": "dd06e9e7-c683-4fdd-b2f5-d7b2a9076a30"
+        },
+        {
+            "sku": "TU-AIS-KFL-045",
+            "price": 37.48,
+            "url": "https://reacsa.mx/products/aislante-armaflex-k-flex-7-8-x-1-2-w-x-72",
+            "raw_id": "0a45f5ab-b912-44bf-8708-358cd8ff4768"
+        },
+        {
+            "sku": "RE-MOT-EME-006",
+            "price": 2967.94,
+            "url": "https://reacsa.mx/products/1862-motor-emerson-1-2hp-a-c-1075-rvrs-220-1",
+            "raw_id": "d3e7b7c3-042f-4e89-925c-7f132e15308b"
+        },
+        {
+            "sku": "RE-MOT-EME-007",
+            "price": 1705.27,
+            "url": "https://reacsa.mx/products/5934-9664-motor-emerson-1-12-1-20-1550-rpm-115-220v",
+            "raw_id": "7febcb86-faaa-4bfd-b54e-4530960e3d56"
+        },
+        {
+            "sku": "RE-MOT-UEI-001",
+            "price": 824.03,
+            "url": "https://reacsa.mx/products/m1091al-motor-9-watts-aluminio-ue",
+            "raw_id": "3401c9b2-e622-41cd-b525-21e80aed78f5"
+        },
+        {
+            "sku": "EQ-MSI-YOR-012",
+            "price": 6831.47,
+            "url": "https://reacsa.mx/products/minisplit-york-inverter-tipo-muro-solo-frio-1-ton-220v",
+            "raw_id": "489dcab9-fe7f-41ff-a42f-52efa9711ea9"
+        },
+        {
+            "sku": "EQ-MSO-MID-007",
+            "price": 5416.94,
+            "url": "https://reacsa.mx/products/minisplit-midea-estandar-1-ton-solo-frio-220v",
+            "raw_id": "a4185045-eb00-4001-a67a-afdf25bf05b1"
+        },
+        {
+            "sku": "EQ-MSI-HIS-020",
+            "price": 9047.56,
+            "url": "https://reacsa.mx/products/hisense-minisplit-inverter-220v-solo-frio-frio-calor",
+            "raw_id": "f9f9ed02-d524-4c47-83d9-b6e03f693d2d"
+        },
+        {
+            "sku": "EQ-MSO-HIS-002",
+            "price": 10420.37,
+            "url": "https://reacsa.mx/products/minisplit-hisense-estandar-1-5-ton-solo-frio-220v",
+            "raw_id": "dd7f5578-509f-47b8-b87f-56e77098fc42"
+        },
+        {
+            "sku": "RE-MOT-AVA-001",
+            "price": 585.93,
+            "url": "https://reacsa.mx/products/va-140-18w-micromotor-de-polo-sombreado-1-40-hp-127v-18w-1550-rpm",
+            "raw_id": "630c0241-6418-44be-8211-7d5a6a7cd832"
+        },
+        {
+            "sku": "HE-MAN-UNI-018",
+            "price": 1330.82,
+            "url": "https://reacsa.mx/products/qs8n3sm-5-manifold-uniweld-con-manometro-y-mangueras",
+            "raw_id": "b7c43c1f-a710-40c7-81e6-00b7089e05e1"
+        },
+        {
+            "sku": "HE-MAN-ERO-003",
+            "price": 985.29,
+            "url": "https://reacsa.mx/products/manifold-mfreha004-coldtek-m-l-r-22-r410a-r404-60",
+            "raw_id": "e502d238-6544-4b1d-ab7f-1038d77d57ea"
+        },
+        {
+            "sku": "HE-MAN-BAR-004",
+            "price": 682.72,
+            "url": "https://reacsa.mx/products/ct-536-manifold-con-mirilla-para-r12-r134-r404-502",
+            "raw_id": "29e2544f-c88f-4b34-b681-b3e51caa38e9"
+        },
+        {
+            "sku": "HE-HER-AVA-002",
+            "price": 1649.04,
+            "url": "https://reacsa.mx/products/juego-de-abocinador-flare-y-expansor-1-8-3-16-1-4-5-16-1-2-5-8-3-4",
+            "raw_id": "7a7630d8-74c9-491d-afaf-9087f136cd77"
+        },
+        {
+            "sku": "RE-FIL-AVA-001",
+            "price": 35.98,
+            "url": "https://reacsa.mx/products/filtros-secadores-domesticos-o-comerciales-avaly",
+            "raw_id": "973fdd2b-f8e2-4c4a-8abc-547d49f9034e"
+        },
+        {
+            "sku": "RE-FIL-AVA-002",
+            "price": 131.11,
+            "url": "https://reacsa.mx/products/filtros-secadores-domesticos-o-comerciales-1",
+            "raw_id": "127a01ce-742f-40cb-a22c-368dfc45fa40"
+        },
+        {
+            "sku": "RE-FIL-AVA-003",
+            "price": 61.03,
+            "url": "https://reacsa.mx/products/filtros-secadores-domesticos-o-comerciales",
+            "raw_id": "fdb0cd72-b92f-4810-bc6e-ced038811cb1"
+        },
+        {
+            "sku": "RE-FIL-EME-003",
+            "price": 459.09,
+            "url": "https://reacsa.mx/products/td-0163-s-filtros-deshidratadores-de-emerson",
+            "raw_id": "d8b6ed01-3607-4fd0-b50e-70db92085887"
+        },
+        {
+            "sku": "RE-FIL-EME-004",
+            "price": 353.46,
+            "url": "https://reacsa.mx/products/td-0083-s-filtro-deshidratador-de-piedra-3-8s",
+            "raw_id": "31afa4e5-262f-430c-81a6-abc784905734"
+        },
+        {
+            "sku": "RE-FIL-ERO-001",
+            "price": 47.62,
+            "url": "https://reacsa.mx/products/filtro-deshidratador-1-4s-conexiones-largas-refrigeracion-ero",
+            "raw_id": "50a34616-94f2-4a1c-9890-637df7518e80"
+        },
+        {
+            "sku": "HE-HER-AVA-012",
+            "price": 577.42,
+            "url": "https://reacsa.mx/products/cortador-de-tubo-avaly-1-8-a-1-1-8",
+            "raw_id": "207f68fe-42a7-438a-88b7-90698a6f8e81"
+        },
+        {
+            "sku": "HE-SOL-TUR-004",
+            "price": 644.88,
+            "url": "https://reacsa.mx/products/ht-802b-boquilla-perilla-bronce-autoenc-turner",
+            "raw_id": "45d01cb4-3000-4a8a-9d55-a5182372744c"
+        },
+        {
+            "sku": "HE-CHE-ACE-014",
+            "price": 1696.3,
+            "url": "https://reacsa.mx/products/150-4-aceite-ab-acemire-150-3-7-litros",
+            "raw_id": "bef228fd-7fc0-4efb-b846-2c0b668823f6"
+        },
+        {
+            "sku": "HE-CHE-ACE-015",
+            "price": 7854.2,
+            "url": "https://reacsa.mx/products/150-19-aceite-ab-acemire-150-19-litros",
+            "raw_id": "9dca7da2-cd98-4d96-a13e-12206cdbe6d6"
+        },
+        {
+            "sku": "RE-COM-EMB-016",
+            "price": 8208.38,
+            "url": "https://reacsa.mx/products/nj6220z-b-compresor-hermetico-embraco-1hp-r-134a-208-230-1",
+            "raw_id": "7d3b47c9-8c64-43b3-a107-32e23a799160"
+        },
+        {
+            "sku": "RE-COM-EMB-017",
+            "price": 3457.88,
+            "url": "https://reacsa.mx/products/ffi10hbx-compresor-hermetico-embraco-1-3hp-115-1-60-r134a",
+            "raw_id": "ca3bdb37-936f-48da-b2ad-1cb6b0777a24"
+        },
+        {
+            "sku": "RE-COM-EMB-018",
+            "price": 3363.73,
+            "url": "https://reacsa.mx/products/ffi12hbx-compresor-hermetico-embraco-1-2hp-134a-115v",
+            "raw_id": "ec7db014-b8d2-4c23-83ca-d0294ee7f1a2"
+        },
+        {
+            "sku": "RE-COM-DAN-010",
+            "price": 2599.96,
+            "url": "https://reacsa.mx/products/compresor-fraccionario-danfoss-1-4-hp-115v-r-134a-nf9fx",
+            "raw_id": "1fe9ae2b-32f2-4e55-8de5-80626b9d6400"
+        },
+        {
+            "sku": "RE-COM-DAN-011",
+            "price": 2771.76,
+            "url": "https://reacsa.mx/products/compresor-fraccionario-danfoss-1-3p-hp-r134a-115-1-60",
+            "raw_id": "7651b908-562c-4e3c-bb12-90b23b00877c"
+        },
+        {
+            "sku": "RE-COM-DAN-012",
+            "price": 2771.76,
+            "url": "https://reacsa.mx/products/compresor-fraccionado-danfoss-huayi-1-3-hp-r134a",
+            "raw_id": "fa2db62c-ccbf-4b82-9957-c31c11960721"
+        },
+        {
+            "sku": "HE-INS-SPE-003",
+            "price": 4538.0,
+            "url": "https://reacsa.mx/products/kit-de-deteccion-de-fugas-por-fluorescencia-spectroline",
+            "raw_id": "98c1e42f-955b-4121-b2c9-4feca8a14431"
+        },
+        {
+            "sku": "HE-INS-SPE-005",
+            "price": 4097.74,
+            "url": "https://reacsa.mx/products/kit-de-inyeccion-de-colorante-fluorescente-spectroline",
+            "raw_id": "e2bc1fd2-98c2-4976-9658-2af31b09c3a9"
+        },
+        {
+            "sku": "HE-CHE-SPE-005",
+            "price": 421.07,
+            "url": "https://reacsa.mx/products/cartucho-de-tinta-fluorescente-spectroline-para-deteccion-de-fugas",
+            "raw_id": "9453b1f6-ba37-4f28-bfaa-2d2e27d9d3a1"
+        },
+        {
+            "sku": "AC-EXT-SOL-003",
+            "price": 3053.13,
+            "url": "https://reacsa.mx/products/extractor-para-pared-y-ventana-s-p-900m3-hr",
+            "raw_id": "b8ac03e0-a9c2-47fd-8bfb-51030afbf1dc"
+        },
+        {
+            "sku": "AC-EXT-SOL-004",
+            "price": 1698.09,
+            "url": "https://reacsa.mx/products/extractor-para-pared-y-ventana-s-p-400m3-hr",
+            "raw_id": "87ca1642-dde9-4757-ab78-7684bb7092a3"
+        },
+        {
+            "sku": "AC-VEN-SOL-028",
+            "price": 1105.4,
+            "url": "https://reacsa.mx/products/extractor-p-bano-2500rpm-127v",
+            "raw_id": "42281cef-f59c-474a-a66c-05d30061d956"
+        },
+        {
+            "sku": "AC-VEN-SOL-029",
+            "price": 1698.09,
+            "url": "https://reacsa.mx/products/extractor-s-p-habitat-future-150",
+            "raw_id": "d749a19b-7049-4fa1-a3d7-c9dcfa166381"
+        },
+        {
+            "sku": "EQ-MSI-MID-008",
+            "price": 12336.02,
+            "url": "https://reacsa.mx/products/minisplit-midea-aurora-inverter-frio-calor-1-5-ton-220v",
+            "raw_id": "98e7af53-fb92-4ccf-861d-e657aa138a36"
+        },
+        {
+            "sku": "EQ-REF-CRI-003",
+            "price": 92414.8,
+            "url": "https://reacsa.mx/products/vitrina-carnicera-criotec-2-metros",
+            "raw_id": "a9d6c6f6-e7f7-4642-a140-a8b00ebf3b97"
+        },
+        {
+            "sku": "RF-BOY-404-001",
+            "price": 2537.31,
+            "url": "https://reacsa.mx/products/gs-hp62-10-9-gas-refrigerante-freon-r-404a-10-896-kg",
+            "raw_id": "f57e8837-4eb9-4f72-9da4-65d8d163bfae"
+        },
+        {
+            "sku": "TU-AIS-DUR-001",
+            "price": 15.96,
+            "url": "https://reacsa.mx/products/armaflex-durkee-1-2-x-3-8",
+            "raw_id": "331d5195-9aaa-448d-bd67-20d6a16cacad"
+        },
+        {
+            "sku": "RE-MOT-MIR-001",
+            "price": 588.15,
+            "url": "https://www.tiendamirage.mx/refacciones/616-motor-condensador-1-ton-ykt-32-6-202l.html",
+            "raw_id": "84230deb-d9fe-4851-a590-b9c24a9faa6c"
+        }
+    ]
+}

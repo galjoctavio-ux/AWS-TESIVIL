@@ -1,0 +1,673 @@
+{
+    "new_products": [
+        {
+            "sku": "EQ-MSO-1T220-005",
+            "nombre_estandarizado": "Minisplit On/Off Mirage Life 12 1 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits On/Off",
+            "marca": "Mirage",
+            "modelo": "Life 12",
+            "descripcion_tecnica": "1 Ton 220V Solo Frío",
+            "capacidad": "1 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-VEN-075T110-001",
+            "nombre_estandarizado": "Aire Acondicionado Ventana Mirage 0.75 Ton Solo Frío 110V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Aire de Ventana",
+            "marca": "Mirage",
+            "modelo": "Ventana",
+            "descripcion_tecnica": "0.75 Ton 110V Solo Frío (8000 BTU)",
+            "capacidad": "0.75 Ton",
+            "voltaje": "110V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-POR-MIR-003",
+            "nombre_estandarizado": "Aire Acondicionado Portátil Mirage 14000 BTU Frío-Calor 110V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Portátiles",
+            "marca": "Mirage",
+            "modelo": "Portátil",
+            "descripcion_tecnica": "14000 BTU 110V Frío-Calor",
+            "capacidad": "14000 BTU",
+            "voltaje": "110V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSI-1T110-003",
+            "nombre_estandarizado": "Minisplit Inverter Mirage V32 1 Ton Frío-Calor 110V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits Inverter",
+            "marca": "Mirage",
+            "modelo": "V32",
+            "descripcion_tecnica": "1 Ton 110V Frío-Calor",
+            "capacidad": "1 Ton",
+            "voltaje": "110V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSO-15T220-004",
+            "nombre_estandarizado": "Minisplit On/Off Mirage Life 12 1.5 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits On/Off",
+            "marca": "Mirage",
+            "modelo": "Life 12",
+            "descripcion_tecnica": "1.5 Ton 220V Solo Frío",
+            "capacidad": "1.5 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSO-2T220-005",
+            "nombre_estandarizado": "Minisplit On/Off Mirage Life 12 2 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits On/Off",
+            "marca": "Mirage",
+            "modelo": "Life 12",
+            "descripcion_tecnica": "2 Ton 220V Solo Frío",
+            "capacidad": "2 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-CEN-YOR-001",
+            "nombre_estandarizado": "Juego Dividido Central York 4 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Centrales Divididos",
+            "marca": "York",
+            "modelo": "Americano",
+            "descripcion_tecnica": "4 Ton 220V Solo Frío 13 SEER",
+            "capacidad": "4 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Juego"
+        },
+        {
+            "sku": "EQ-MSO-1T110-004",
+            "nombre_estandarizado": "Minisplit High Wall York 1 Ton Frío-Calor 110V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits On/Off",
+            "marca": "York",
+            "modelo": "High Wall",
+            "descripcion_tecnica": "1 Ton 110V Frío-Calor 11 SEER",
+            "capacidad": "1 Ton",
+            "voltaje": "110V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-CEN-YOR-002",
+            "nombre_estandarizado": "Juego Dividido Central York 5 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Centrales Divididos",
+            "marca": "York",
+            "modelo": "Americano",
+            "descripcion_tecnica": "5 Ton 220V Solo Frío 13 SEER",
+            "capacidad": "5 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Juego"
+        },
+        {
+            "sku": "EQ-PAQ-YOR-001",
+            "nombre_estandarizado": "Paquete Comercial York 25 Ton Solo Frío 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Paquetes",
+            "marca": "York",
+            "modelo": "Comercial",
+            "descripcion_tecnica": "25 Ton 220V 3F Solo Frío 10 EER",
+            "capacidad": "25 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-CEN-YOR-003",
+            "nombre_estandarizado": "Juego Dividido Central York 3 Ton Frío-Calor 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Centrales Divididos",
+            "marca": "York",
+            "modelo": "Americano",
+            "descripcion_tecnica": "3 Ton 220V Frío-Calor 13 SEER",
+            "capacidad": "3 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Juego"
+        },
+        {
+            "sku": "EQ-FAN-YOR-001",
+            "nombre_estandarizado": "Fan&Coil Agua Helada York 3 Ton Solo Frío 120V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Fan&Coil",
+            "marca": "York",
+            "modelo": "Agua Helada",
+            "descripcion_tecnica": "3 Ton 120V Solo Frío",
+            "capacidad": "3 Ton",
+            "voltaje": "120V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-PAQ-YOR-002",
+            "nombre_estandarizado": "Paquete Residencial York 3 Ton Frío-Calor 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Paquetes",
+            "marca": "York",
+            "modelo": "Residencial",
+            "descripcion_tecnica": "3 Ton 220V Frío-Calor 14 SEER",
+            "capacidad": "3 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-PAQ-YOR-003",
+            "nombre_estandarizado": "Paquete Residencial York 4 Ton Frío-Calor 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Paquetes",
+            "marca": "York",
+            "modelo": "Residencial",
+            "descripcion_tecnica": "4 Ton 220V Frío-Calor 14 SEER",
+            "capacidad": "4 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-PIT-YOR-001",
+            "nombre_estandarizado": "Evaporadora Piso Techo York 1.5 Ton Solo Frío 230V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Piso Techo",
+            "marca": "York",
+            "modelo": "Piso Techo",
+            "descripcion_tecnica": "1.5 Ton 230V Solo Frío (Evaporadora)",
+            "capacidad": "1.5 Ton",
+            "voltaje": "230V",
+            "tipo_operacion": "Solo Frío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EQ-MSO-1T220-006",
+            "nombre_estandarizado": "Minisplit High Wall York 1 Ton Frío-Calor 220V",
+            "grupo_general": "EQ",
+            "grupo_especializado": "Minisplits On/Off",
+            "marca": "York",
+            "modelo": "High Wall",
+            "descripcion_tecnica": "1 Ton 220V Frío-Calor 11.3 SEER",
+            "capacidad": "1 Ton",
+            "voltaje": "220V",
+            "tipo_operacion": "Frío-Calor",
+            "unidad": "Pieza"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "EQ-MSI-1T220-005",
+            "precio": 5999.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCMF121J",
+            "url": "https://airesaurum.com.mx/productos/minisplit-inverter-220v-mirage-1-tonelada-12b-magnum-22-seer/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1199
+        },
+        {
+            "sku": "EQ-MSI-1T110-001",
+            "precio": 6199.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCMF120J",
+            "url": "https://airesaurum.com.mx/productos/minisplit-inverter-x32-220v-mirage-1-5-toneladas-18000-b-r321/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1200
+        },
+        {
+            "sku": "EQ-MSI-15T220-006",
+            "precio": 9499.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCWC181E",
+            "url": "https://airesaurum.com.mx/productos/minisplit-inverter-x-110v-mirage-1-tonelada-12-btu-r32-frio/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1201
+        },
+        {
+            "sku": "EQ-MSO-1T220-005",
+            "precio": 4999.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCLF121H",
+            "url": "https://airesaurum.com.mx/productos/aire-minisplit-220v-mirage-1-tonelada-12000-btu-nex-2025/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1202
+        },
+        {
+            "sku": "EQ-MSI-1T110-001",
+            "precio": 6199.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCMF120J",
+            "url": "https://airesaurum.com.mx/productos/aire-minisplit-220v-mirage-1-5-toneladas-18000-btu-nex-frio/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1203
+        },
+        {
+            "sku": "EQ-MSI-15T220-006",
+            "precio": 8599.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCWF181E",
+            "url": "https://airesaurum.com.mx/productos/minisplit-inverter-x32-frio-calor-220v-mirage-1-5-toneladas/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1204
+        },
+        {
+            "sku": "EQ-MSI-1T220-005",
+            "precio": 5999.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCMF121J",
+            "url": "https://airesaurum.com.mx/productos/minisplit-inverter-v32-frio-calor-220v-mirage-2-toneladas1/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1205
+        },
+        {
+            "sku": "EQ-VEN-15T220-001",
+            "precio": 7799.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "MACC1821N",
+            "url": "https://airesaurum.com.mx/productos/mirage-xlife-1-1-2-tons/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1206
+        },
+        {
+            "sku": "EQ-MSI-1T220-003",
+            "precio": 5799.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCWF121E",
+            "url": "https://airesaurum.com.mx/productos/minisplit-inverter-x32-110v-mirage-1-tonelada-12000-btu-r32/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1207
+        },
+        {
+            "sku": "EQ-MSI-15T220-006",
+            "precio": 8599.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCWF181E",
+            "url": "https://airesaurum.com.mx/productos/minisplit-inverter-220v-mirage-1-5-tonelada-18-btu-magnum-22/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1208
+        },
+        {
+            "sku": "EQ-VEN-075T110-001",
+            "precio": 4299.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "MACC0811N",
+            "url": "https://airesaurum.com.mx/productos/aire-minisplit-220v-mirage-1-5-toneladas-18000-btu-life-12/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1209
+        },
+        {
+            "sku": "EQ-POR-MIR-003",
+            "precio": 9499.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "MAPS1411H",
+            "url": "https://airesaurum.com.mx/productos/aire-minisplit-220v-mirage-1-tonelada-12000-btu-x-life/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1210
+        },
+        {
+            "sku": "EQ-MSI-1T110-003",
+            "precio": 6199.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCVC120E",
+            "url": "https://airesaurum.com.mx/productos/aire-clima-portatil-110v-1-ton-frio-calor-14-000-btu-mirage/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1211
+        },
+        {
+            "sku": "EQ-MSI-2T220-001",
+            "precio": 18499.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCMF261J",
+            "url": "https://airesaurum.com.mx/productos/minisplit-inverter-220v-mirage-frio-calor-2-toneladas-24000-btu-magnum-22/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1212
+        },
+        {
+            "sku": "EQ-MSO-1T220-005",
+            "precio": 5199.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCLC121H",
+            "url": "https://airesaurum.com.mx/productos/aire-minisplit-220v-frio-calor-mirage-1-5-toneladas-18k-nex/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1213
+        },
+        {
+            "sku": "EQ-MSI-15T220-006",
+            "precio": 9499.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCWC181E",
+            "url": "https://airesaurum.com.mx/productos/aire-minisplit-frio-calor-220v-mirage-1-5-tonelada-life-12/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1214
+        },
+        {
+            "sku": "EQ-MSO-15T220-003",
+            "precio": 7799.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCHC181T",
+            "url": "https://airesaurum.com.mx/productos/aire-minisplit-220v-frio-calor-mirage-2-toneladas-r410-nex/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1215
+        },
+        {
+            "sku": "EQ-VEN-075T110-001",
+            "precio": 4299.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "MACC0811N",
+            "url": "https://airesaurum.com.mx/productos/aire-minisplit-220v-mirage-1-tonelada-12000-btu-life-12/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1216
+        },
+        {
+            "sku": "EQ-MSI-1T110-001",
+            "precio": 6199.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCMF120J",
+            "url": "https://airesaurum.com.mx/productos/minisplit-inverter-220v-mirage-3-ton-magnum-18-frio-calor/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1217
+        },
+        {
+            "sku": "EQ-POR-MIR-003",
+            "precio": 9499.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "MAPS1411H",
+            "url": "https://airesaurum.com.mx/productos/aire-minisplit-110v-mirage-1-tonelada-12000-btu-life-12/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1218
+        },
+        {
+            "sku": "EQ-MSI-1T110-003",
+            "precio": 6399.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCWC120E",
+            "url": "https://airesaurum.com.mx/productos/minisplit-inverter-220v-frio-calor-mirage-1-ton-magnum-22-se/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1219
+        },
+        {
+            "sku": "EQ-MSI-3T220-001",
+            "precio": 22999.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCWC361C",
+            "url": "https://airesaurum.com.mx/productos/minisplit-inverter-x-frio-y-calor-220v-mirage-1-tonelada-12000-btu-r32/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1220
+        },
+        {
+            "sku": "EQ-MSO-1T220-005",
+            "precio": 4999.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCLF121H",
+            "url": "https://airesaurum.com.mx/productos/aire-acondicionado-ventana-mirage-110v-8000-btu-3-4-tonelada/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1221
+        },
+        {
+            "sku": "EQ-MSO-2T220-004",
+            "precio": 9499.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCHF261T",
+            "url": "https://airesaurum.com.mx/productos/aire-acondicionado-ventana-mirage-110v-5000-btu-1-2-tonelada/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1222
+        },
+        {
+            "sku": "EQ-MSO-15T220-004",
+            "precio": 8399.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCLF181H",
+            "url": "https://airesaurum.com.mx/productos/mirage-x-one-maps1211c-blanco-127v/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1223
+        },
+        {
+            "sku": "EQ-MSO-15T220-003",
+            "precio": 7799.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCHC181T",
+            "url": "https://airesaurum.com.mx/productos/minisplit-220v-frio-calor-mirage-1-tonelada-12-btu-life-12/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1224
+        },
+        {
+            "sku": "EQ-VEN-075T110-001",
+            "precio": 4299.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "MACC0811N",
+            "url": "https://airesaurum.com.mx/productos/aire-minisplit-220v-mirage-1-tonelada-12000-btu-x-life1/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1225
+        },
+        {
+            "sku": "EQ-MSO-2T220-005",
+            "precio": 10999.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCLF261T",
+            "url": "https://airesaurum.com.mx/productos/aire-acondicionado-ventana-mirage-220-v-1-5-ton-18-000-btu/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1226
+        },
+        {
+            "sku": "EQ-MSI-15T220-006",
+            "precio": 9499.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCWC181E",
+            "url": "https://airesaurum.com.mx/productos/minisplit-inverter-x-220v-mirage-2-toneladas-24000-btu-r32-m/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1227
+        },
+        {
+            "sku": "EQ-MSI-1T220-005",
+            "precio": 6399.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCMC121J",
+            "url": "https://airesaurum.com.mx/productos/aire-minisplit-220v-frio-calor-mirage-1-tonelada-x-life/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1228
+        },
+        {
+            "sku": "EQ-MSO-15T220-004",
+            "precio": 8099.0,
+            "proveedor": "Aires Aurum",
+            "sku_original": "SETCLF181H",
+            "url": "https://airesaurum.com.mx/productos/aire-minisplit-220v-mirage-1-5-toneladas-18000-bt-x-life/",
+            "scraped_at": "2025-12-26 18:59:18.685003+00",
+            "raw_id": 1229
+        },
+        {
+            "sku": "EQ-CEN-YOR-001",
+            "precio": 35762.08,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00000702",
+            "url": "https://www.grupocoresa.com/juego-dividido-tipo-americano-4tr-s-f-r410a-220-1-60-13seer-2070",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1230
+        },
+        {
+            "sku": "EQ-CEN-YOR-001",
+            "precio": 35762.08,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00000702",
+            "url": "https://www.grupocoresa.com/juego-dividido-tipo-americano-4tr-s-f-r410a-220-1-60-13seer-2070",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1231
+        },
+        {
+            "sku": "EQ-MSO-1T110-004",
+            "precio": 5081.12,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00001091",
+            "url": "https://www.grupocoresa.com/minisplit-1-tr-h-p-110v-r410a-ef-estandar-11seer-1901",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1232
+        },
+        {
+            "sku": "EQ-MSO-1T110-004",
+            "precio": 5081.12,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00001091",
+            "url": "https://www.grupocoresa.com/minisplit-1-tr-h-p-110v-r410a-ef-estandar-11seer-1901",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1233
+        },
+        {
+            "sku": "EQ-CEN-YOR-002",
+            "precio": 41615.92,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00001702",
+            "url": "https://www.grupocoresa.com/juego-dividido-tipo-americano-5tr-s-f-r410a-220-1-60-13seer-2071",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1234
+        },
+        {
+            "sku": "EQ-CEN-YOR-002",
+            "precio": 41615.92,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00001702",
+            "url": "https://www.grupocoresa.com/juego-dividido-tipo-americano-5tr-s-f-r410a-220-1-60-13seer-2071",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1235
+        },
+        {
+            "sku": "EQ-PAQ-YOR-001",
+            "precio": 347199.3,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00002012",
+            "url": "https://www.grupocoresa.com/paquete-25tr-s-f-r410a-220-3-60-10eer-2102",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1236
+        },
+        {
+            "sku": "EQ-PAQ-YOR-001",
+            "precio": 347199.3,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00002012",
+            "url": "https://www.grupocoresa.com/paquete-25tr-s-f-r410a-220-3-60-10eer-2102",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1237
+        },
+        {
+            "sku": "EQ-CEN-YOR-003",
+            "precio": 49361.45,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00004702",
+            "url": "https://www.grupocoresa.com/juego-dividido-tipo-americano-3tr-h-p-r410a-220-1-60-13seer-2074",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1238
+        },
+        {
+            "sku": "EQ-CEN-YOR-003",
+            "precio": 49361.45,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00004702",
+            "url": "https://www.grupocoresa.com/juego-dividido-tipo-americano-3tr-h-p-r410a-220-1-60-13seer-2074",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1239
+        },
+        {
+            "sku": "EQ-FAN-YOR-001",
+            "precio": 14422.62,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00005302",
+            "url": "https://www.grupocoresa.com/fan-coil-agua-3tr-s-f-4h-2m-120-1-60-der-2035",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1240
+        },
+        {
+            "sku": "EQ-FAN-YOR-001",
+            "precio": 14422.62,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00005302",
+            "url": "https://www.grupocoresa.com/fan-coil-agua-3tr-s-f-4h-2m-120-1-60-der-2035",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1241
+        },
+        {
+            "sku": "EQ-PAQ-YOR-002",
+            "precio": 33887.92,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00005602",
+            "url": "https://www.grupocoresa.com/paquete-3tr-h-p-r410a-220-1-60-14-seer-2065",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1242
+        },
+        {
+            "sku": "EQ-PAQ-YOR-002",
+            "precio": 33887.92,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00005602",
+            "url": "https://www.grupocoresa.com/paquete-3tr-h-p-r410a-220-1-60-14-seer-2065",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1243
+        },
+        {
+            "sku": "EQ-PAQ-YOR-003",
+            "precio": 47265.95,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00006602",
+            "url": "https://www.grupocoresa.com/paquete-4tr-h-p-r410a-220-1-60-14seer-2066",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1244
+        },
+        {
+            "sku": "EQ-PAQ-YOR-003",
+            "precio": 47265.95,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00006602",
+            "url": "https://www.grupocoresa.com/paquete-4tr-h-p-r410a-220-1-60-14seer-2066",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1245
+        },
+        {
+            "sku": "EQ-PIT-YOR-001",
+            "precio": 1580.7,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00006802",
+            "url": "https://www.grupocoresa.com/evaporadora-pisotecho-1-5tr-s-f-230-1-60-2086",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1246
+        },
+        {
+            "sku": "EQ-PIT-YOR-001",
+            "precio": 1580.7,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00006802",
+            "url": "https://www.grupocoresa.com/evaporadora-pisotecho-1-5tr-s-f-230-1-60-2086",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1247
+        },
+        {
+            "sku": "EQ-MSO-1T220-006",
+            "precio": 4701.9,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00007912",
+            "url": "https://www.grupocoresa.com/minisplit-1tr-h-p-220v-r410a-ef-estandar-11-3seer-2197",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1248
+        },
+        {
+            "sku": "EQ-MSO-1T220-006",
+            "precio": 4701.9,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181029-00007912",
+            "url": "https://www.grupocoresa.com/minisplit-1tr-h-p-220v-r410a-ef-estandar-11-3seer-2197",
+            "scraped_at": "2025-12-26 19:25:26.188819+00",
+            "raw_id": 1249
+        }
+    ]
+}

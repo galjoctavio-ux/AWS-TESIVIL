@@ -2,7 +2,7 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { ServiceData } from './services-service';
 import { ClientData } from './clients-service';
-import { UserProfile } from './user-service';
+import { UserProfile, isUserPro } from './user-service';
 import { QuoteData, QuoteItem, formatCurrency, calculateLineTotal } from './quotes-service';
 
 interface ReportData {
@@ -10,13 +10,23 @@ interface ReportData {
     client: ClientData & { id: string };
     technicianProfile?: UserProfile;
     warrantyText?: string;
+    forcePremium?: boolean;  // Force premium features (for users who purchased PDF credits)
 }
 
 /**
  * Generates a professional PDF report for a service and opens the share dialog.
+ * Supports PRO branding (custom logo, colors) vs FREE (QRclima branding + CTA)
  */
 export const generateServiceReport = async (data: ReportData): Promise<void> => {
-    const { service, client, technicianProfile, warrantyText } = data;
+    console.log('📄 [PDF] Starting generateServiceReport...');
+    const { service, client, technicianProfile, warrantyText, forcePremium } = data;
+    console.log('📄 [PDF] Data extracted:', { serviceId: service.id, clientName: client.name, hasTechProfile: !!technicianProfile, forcePremium });
+
+    // Determine if user is PRO for branding (or forced premium via token purchase)
+    const isPro = forcePremium || isUserPro(technicianProfile || null);
+    const branding = technicianProfile?.branding;
+    const primaryColor = isPro && branding?.primaryColor ? branding.primaryColor : '#2563EB';
+    console.log('📄 [PDF] PRO status:', { isPro, forcePremium, primaryColor, hasBranding: !!branding });
 
     const serviceDate = service.date?.toDate
         ? service.date.toDate().toLocaleDateString('es-MX', {
@@ -25,6 +35,12 @@ export const generateServiceReport = async (data: ReportData): Promise<void> => 
             day: 'numeric'
         })
         : new Date().toLocaleDateString('es-MX');
+    console.log('📄 [PDF] Service date:', serviceDate);
+
+    // Determine warranty display
+    const warrantyMonths = service.warrantyMonths ?? 0;
+    const hasWarranty = warrantyMonths > 0;
+    console.log('📄 [PDF] Warranty:', { warrantyMonths, hasWarranty });
 
     const html = `
     <!DOCTYPE html>
@@ -36,14 +52,14 @@ export const generateServiceReport = async (data: ReportData): Promise<void> => 
             @page { margin: 0; }
             body {
                 font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-                color: #1F2937;
+                color: #333333;
                 line-height: 1.5;
                 margin: 0;
                 padding: 40px 50px;
                 font-size: 11px;
             }
             .header-container {
-                border-bottom: 2px solid #2563EB;
+                border-bottom: 2px solid ${primaryColor};
                 padding-bottom: 20px;
                 margin-bottom: 25px;
                 display: flex;
@@ -51,7 +67,7 @@ export const generateServiceReport = async (data: ReportData): Promise<void> => 
                 align-items: flex-end;
             }
             .brand-section h1 {
-                color: #2563EB;
+                color: ${primaryColor};
                 font-size: 24px;
                 margin: 0 0 5px 0;
                 text-transform: uppercase;
@@ -62,16 +78,32 @@ export const generateServiceReport = async (data: ReportData): Promise<void> => 
                 font-size: 14px;
                 font-weight: 500;
             }
+            .brand-section .technician-name {
+                color: #374151;
+                font-size: 11px;
+                margin-top: 4px;
+            }
             .meta-info {
                 text-align: right;
                 font-size: 10px;
                 color: #6B7280;
             }
-            .meta-info .date {
+            .meta-info .folio {
+                font-family: 'Courier New', monospace;
                 font-weight: bold;
                 color: #374151;
                 font-size: 12px;
                 margin-top: 4px;
+            }
+            .status-badge {
+                display: inline-block;
+                background: ${service.status === 'Terminado' ? '#D1FAE5' : '#FEF3C7'};
+                color: ${service.status === 'Terminado' ? '#065F46' : '#92400E'};
+                padding: 4px 12px;
+                border-radius: 12px;
+                font-size: 10px;
+                font-weight: bold;
+                margin-top: 8px;
             }
             
             .two-columns {
@@ -80,9 +112,7 @@ export const generateServiceReport = async (data: ReportData): Promise<void> => 
                 margin-bottom: 25px;
                 gap: 20px;
             }
-            .column {
-                width: 48%;
-            }
+            .column { width: 48%; }
             
             .info-box {
                 background: #F9FAFB;
@@ -92,7 +122,7 @@ export const generateServiceReport = async (data: ReportData): Promise<void> => 
                 height: 100%;
             }
             .box-title {
-                color: #2563EB;
+                color: ${primaryColor};
                 font-size: 10px;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
@@ -101,39 +131,23 @@ export const generateServiceReport = async (data: ReportData): Promise<void> => 
                 padding-bottom: 4px;
                 border-bottom: 1px solid #E5E7EB;
             }
-            .info-row {
-                margin-bottom: 4px;
-                display: flex;
-            }
-            .info-label {
-                color: #6B7280;
-                font-size: 10px;
-                width: 65px;
-                flex-shrink: 0;
-            }
-            .info-value {
-                color: #111827;
-                font-weight: 500;
-            }
+            .info-row { margin-bottom: 4px; display: flex; }
+            .info-label { color: #6B7280; font-size: 10px; width: 65px; flex-shrink: 0; }
+            .info-value { color: #111827; font-weight: 500; }
 
             .section-title {
-                background: #EFF6FF;
-                color: #1E40AF;
+                background: ${primaryColor}15;
+                color: ${primaryColor};
                 padding: 6px 10px;
                 border-radius: 6px;
                 font-weight: bold;
                 font-size: 11px;
                 margin-bottom: 10px;
-                border-left: 3px solid #2563EB;
+                border-left: 3px solid ${primaryColor};
                 margin-top: 15px;
             }
 
-            .grid-container {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 10px;
-                margin-bottom: 15px;
-            }
+            .grid-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
             .grid-item {
                 background: #F3F4F6;
                 padding: 6px 10px;
@@ -143,78 +157,83 @@ export const generateServiceReport = async (data: ReportData): Promise<void> => 
                 border: 1px solid #E5E7EB;
             }
 
-            .checklist-container {}
-            .checklist-item {
-                display: flex;
+            .checklist-item { display: flex; align-items: center; margin-bottom: 6px; font-size: 10px; }
+            .check-icon { 
+                display: inline-flex;
                 align-items: center;
-                margin-bottom: 4px;
+                justify-content: center;
+                width: 16px;
+                height: 16px;
+                background: ${primaryColor};
+                color: white;
+                border-radius: 50%;
+                margin-right: 8px;
                 font-size: 10px;
-            }
-            .check-icon {
-                color: #16A34A;
-                margin-right: 6px;
                 font-weight: bold;
-                font-size: 12px;
             }
 
-            .photos-grid {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 10px;
-                margin-top: 10px;
-            }
+            .photos-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
             .photo-item {
                 width: 31%;
-                height: 100px;
-                border-radius: 4px;
-                border: 1px solid #E5E7EB;
-                object-fit: cover;
-                background: #F3F4F6;
+                height: 150px;
+                border-radius: 12px;
+                border: 1px solid #E0E0E0;
+                object-fit: contain;
+                background: #F9F9F9;
             }
 
             .warranty-box {
-                background: #F5F3FF;
-                border: 1px solid #DDD6FE;
+                background: ${hasWarranty ? '#ECFDF5' : '#F9FAFB'};
+                border: 1px solid ${hasWarranty ? '#A7F3D0' : '#E5E7EB'};
                 border-radius: 8px;
                 padding: 12px;
                 margin-top: 20px;
                 page-break-inside: avoid;
+                display: flex;
+                align-items: center;
+            }
+            .warranty-icon {
+                font-size: 24px;
+                margin-right: 12px;
             }
             .warranty-title {
-                color: #5B21B6;
+                color: ${hasWarranty ? '#065F46' : '#374151'};
                 font-weight: bold;
-                margin-bottom: 4px;
-                font-size: 10px;
-                text-transform: uppercase;
+                font-size: 11px;
             }
             .warranty-text {
-                color: #4C1D95;
+                color: ${hasWarranty ? '#047857' : '#6B7280'};
                 font-size: 10px;
+                margin-top: 2px;
+            }
+            .warranty-disclaimer {
+                color: #9CA3AF;
+                font-size: 8px;
+                font-style: italic;
+                margin-top: 4px;
             }
 
-            .signatures-container {
-                display: flex;
-                justify-content: space-between;
-                margin-top: 40px;
-                page-break-inside: avoid;
+            .recommendation-box {
+                background: #FFFBEB;
+                border-left: 4px solid #F59E0B;
+                border-radius: 8px;
+                padding: 12px 14px;
+                margin-top: 12px;
             }
-            .signature-box {
-                width: 45%;
-                text-align: center;
-            }
-            .signature-image {
-                height: 50px; 
-                margin-bottom: 5px;
-                object-fit: contain;
-            }
-            .signature-line {
-                border-top: 1px solid #9CA3AF;
-                padding-top: 6px;
-                color: #4B5563;
+            .recommendation-title {
+                color: #92400E;
+                font-weight: bold;
                 font-size: 10px;
-                font-weight: 500;
+                margin-bottom: 6px;
             }
-            
+            .recommendation-text {
+                font-family: 'Courier New', monospace;
+                color: #78350F;
+                font-size: 10px;
+                line-height: 1.4;
+                font-style: italic;
+            }
+
             .diagnosis-section {
                 border: 1px solid #FECACA;
                 background: #FEF2F2;
@@ -223,78 +242,117 @@ export const generateServiceReport = async (data: ReportData): Promise<void> => 
                 margin-bottom: 15px;
             }
 
+            .signatures-container {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 40px;
+                page-break-inside: avoid;
+            }
+            .signature-box { width: 45%; text-align: center; }
+            .signature-image { height: 50px; margin-bottom: 5px; object-fit: contain; }
+            .signature-line {
+                border-top: 1px solid #9CA3AF;
+                padding-top: 6px;
+                color: #4B5563;
+                font-size: 10px;
+                font-weight: 500;
+            }
+
             .footer {
                 position: fixed;
                 bottom: 20px;
                 left: 50px;
                 right: 50px;
                 text-align: center;
-                color: #9CA3AF;
                 font-size: 9px;
                 border-top: 1px solid #E5E7EB;
                 padding-top: 8px;
             }
+            .footer-pro {
+                color: #6B7280;
+            }
+            .footer-free {
+                background: #F3F4F6;
+                padding: 12px;
+                border-radius: 8px;
+                margin-top: 8px;
+            }
+            .footer-cta {
+                color: #2563EB;
+                font-weight: bold;
+                font-size: 10px;
+            }
+            .pro-badge {
+                display: inline-block;
+                background: ${primaryColor};
+                color: white;
+                padding: 4px 10px;
+                border-radius: 10px;
+                font-size: 9px;
+                font-weight: bold;
+            }
         </style>
     </head>
     <body>
-        <div class="header-container">
-            <div class="brand-section">
-                <h1>QRclima</h1>
-                <div class="subtitle">Reporte de Servicio Técnico</div>
+        <!-- Professional Header with Logo -->
+        <div class="header-container" style="background: linear-gradient(135deg, ${primaryColor}08 0%, ${primaryColor}15 100%); border-radius: 12px; padding: 20px; margin-bottom: 25px; border-bottom: 3px solid ${primaryColor};">
+            <div class="brand-section" style="display: flex; align-items: center;">
+                ${isPro && branding?.logoURL
+            ? `<img src="${branding.logoURL}" style="height: 50px; max-width: 120px; object-fit: contain; margin-right: 15px; border-radius: 8px;" />`
+            : `<div style="width: 50px; height: 50px; background: ${primaryColor}; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                        <span style="color: white; font-size: 24px; font-weight: bold;">❄️</span>
+                       </div>`
+        }
+                <div>
+                    <h1 style="color: ${primaryColor}; font-size: 22px; margin: 0; letter-spacing: 0.5px;">${isPro && technicianProfile?.businessName ? technicianProfile.businessName : 'QRclima'}</h1>
+                    <div style="color: #6B7280; font-size: 12px; font-weight: 500;">Reporte de Servicio Técnico</div>
+                    ${!isPro && technicianProfile?.businessName ? `<div style="color: #9CA3AF; font-size: 10px; margin-top: 2px;">Técnico: ${technicianProfile.businessName}</div>` : ''}
+                </div>
             </div>
-            <div class="meta-info">
-                <div>FOLIO DE SERVICIO</div>
-                <div class="date">#${service.id.substring(0, 8).toUpperCase()}</div>
-                <div style="margin-top: 4px;">Fecha: ${serviceDate}</div>
+            <div class="meta-info" style="text-align: right;">
+                <div style="background: #F3F4F6; padding: 10px 15px; border-radius: 8px;">
+                    <div style="color: #6B7280; font-size: 9px; text-transform: uppercase; letter-spacing: 1px;">Folio de Servicio</div>
+                    <div style="font-family: 'Courier New', monospace; font-weight: bold; color: #111827; font-size: 14px;">#${service.id.substring(0, 8).toUpperCase()}</div>
+                    <div style="color: #6B7280; font-size: 10px; margin-top: 4px;">${serviceDate}</div>
+                </div>
+                <div class="status-badge" style="margin-top: 10px;">${service.status.toUpperCase()}</div>
             </div>
         </div>
 
+        <!-- Client & Equipment Info Cards -->
         <div class="two-columns">
             <div class="column">
-                <div class="info-box">
-                    <div class="box-title">Cliente</div>
-                    <div class="info-row">
-                        <span class="info-value" style="font-size: 12px;">${client.name}</span>
+                <div class="info-box" style="box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                    <div class="box-title" style="display: flex; align-items: center;">
+                        <span style="margin-right: 6px;">👤</span> Cliente
                     </div>
+                    <div style="font-size: 14px; font-weight: 600; color: #111827; margin-bottom: 8px;">${client.name}</div>
                     ${client.phone ? `
-                    <div class="info-row">
-                        <span class="info-label">Teléfono:</span>
-                        <span class="info-value">${client.phone}</span>
+                    <div style="display: flex; align-items: center; margin-bottom: 4px; color: #4B5563; font-size: 10px;">
+                        <span style="margin-right: 6px;">📞</span> ${client.phone}
                     </div>` : ''}
                     ${client.address ? `
-                    <div class="info-row">
-                        <span class="info-label">Dirección:</span>
-                        <span class="info-value">${client.address}</span>
+                    <div style="display: flex; align-items: flex-start; color: #4B5563; font-size: 10px;">
+                        <span style="margin-right: 6px;">📍</span> ${client.address}
                     </div>` : ''}
                 </div>
             </div>
             <div class="column">
-                <div class="info-box">
-                    <div class="box-title">Servicio y Equipo</div>
-                    <div class="info-row">
-                        <span class="info-label">Tipo:</span>
-                        <span class="info-value">${service.type}</span>
+                <div class="info-box" style="box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                    <div class="box-title" style="display: flex; align-items: center;">
+                        <span style="margin-right: 6px;">❄️</span> Equipo
+                    </div>
+                    <div style="display: inline-block; background: ${primaryColor}15; color: ${primaryColor}; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-bottom: 8px;">
+                        ${service.type}
                     </div>
                     ${service.equipment ? `
-                    <div class="info-row">
-                        <span class="info-label">Equipo:</span>
-                        <span class="info-value">${service.equipment.type} ${service.equipment.brand}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Modelo:</span>
-                        <span class="info-value">${service.equipment.model}</span>
-                    </div>
+                    <div style="font-size: 12px; font-weight: 600; color: #111827;">${service.equipment.brand} ${service.equipment.model}</div>
+                    <div style="color: #6B7280; font-size: 10px;">${service.equipment.type}</div>
                     ${service.equipment.capacityBTU ? `
-                    <div class="info-row">
-                        <span class="info-label">Capacidad:</span>
-                        <span class="info-value">${service.equipment.capacityBTU} BTU</span>
+                    <div style="display: inline-block; background: #F3F4F6; padding: 3px 8px; border-radius: 4px; font-size: 10px; color: #374151; margin-top: 6px;">
+                        ${service.equipment.capacityBTU} BTU
                     </div>` : ''}
                     ` : ''}
-                    <div class="info-row" style="margin-top: 4px;">
-                        <span class="info-value" style="color: ${service.status === 'Terminado' ? '#166534' : '#92400E'}; font-weight: bold; font-size: 10px;">
-                            ESTADO: ${service.status.toUpperCase()}
-                        </span>
-                    </div>
                 </div>
             </div>
         </div>
@@ -318,9 +376,9 @@ export const generateServiceReport = async (data: ReportData): Promise<void> => 
                 </div>` : '<div style="color: #9CA3AF; font-style: italic;">No especificados</div>'}
                 
                 ${service.notes ? `
-                <div style="margin-top: 10px; font-size: 10px;">
-                    <strong>Notas Adicionales:</strong><br>
-                    ${service.notes}
+                <div class="recommendation-box">
+                    <div class="recommendation-title">⚠️ Recomendaciones del Experto</div>
+                    <div class="recommendation-text">${service.notes}</div>
                 </div>` : ''}
             </div>
             
@@ -345,13 +403,16 @@ export const generateServiceReport = async (data: ReportData): Promise<void> => 
         </div>
         ` : ''}
 
-        ${warrantyText ? `
         <div class="warranty-box">
-            <div class="warranty-title">Garantía del Servicio</div>
-            <div class="warranty-text">
-                ${warrantyText}
+            <div class="warranty-icon">${hasWarranty ? '🛡️' : '✅'}</div>
+            <div>
+                <div class="warranty-title">${hasWarranty ? `Garantía de Servicio: ${warrantyMonths} ${warrantyMonths === 1 ? 'Mes' : 'Meses'}` : 'Certificación de Entrega'}</div>
+                <div class="warranty-text">${hasWarranty
+            ? 'Cubre exclusivamente la mano de obra realizada.'
+            : 'Equipo operando correctamente. Entrega a satisfacción del cliente.'}</div>
+                ${hasWarranty ? '<div class="warranty-disclaimer">No incluye partes eléctricas, fugas de gas refrigerante ni daños por uso indebido.</div>' : ''}
             </div>
-        </div>` : ''}
+        </div>
 
         <div class="signatures-container">
             <div class="signature-box">
@@ -372,34 +433,56 @@ export const generateServiceReport = async (data: ReportData): Promise<void> => 
         </div>
 
         <div class="footer">
-            Este documento es un comprobante de servicio digital generado por QRclima App.<br>
-            Powered by TESIVIL
+            ${isPro ? `
+                <div class="footer-pro">
+                    <span class="pro-badge">Técnico Verificado</span>
+                    <div style="margin-top: 6px;">
+                        ${branding?.footerText || `Este documento es un comprobante de servicio técnico profesional.`}
+                    </div>
+                </div>
+            ` : `
+                <div class="footer-free">
+                    <div class="footer-cta">¿Eres el dueño de este equipo?</div>
+                    <div style="color: #6B7280; margin-top: 4px;">
+                        Escanea el código QR en tu equipo para ver el historial de mantenimientos.
+                    </div>
+                </div>
+                <div style="color: #9CA3AF; margin-top: 8px;">
+                    Powered by QRclima | TESIVIL
+                </div>
+            `}
         </div>
     </body>
     </html>
     `;
 
+    console.log('📄 [PDF] HTML template built, length:', html.length);
+
     try {
         // Generate PDF file
+        console.log('📄 [PDF] Calling Print.printToFileAsync...');
         const { uri } = await Print.printToFileAsync({
             html,
             base64: false,
         });
 
-        console.log('PDF generated at:', uri);
+        console.log('📄 [PDF] PDF generated at:', uri);
 
         // Check if sharing is available and share
+        console.log('📄 [PDF] Checking if sharing is available...');
         if (await Sharing.isAvailableAsync()) {
+            console.log('📄 [PDF] Sharing available, opening share dialog...');
             await Sharing.shareAsync(uri, {
                 mimeType: 'application/pdf',
                 dialogTitle: 'Compartir Reporte de Servicio',
                 UTI: 'com.adobe.pdf',
             });
+            console.log('📄 [PDF] Share dialog closed');
         } else {
             throw new Error('Compartir no está disponible en este dispositivo');
         }
     } catch (error) {
-        console.error('Error generating PDF:', error);
+        console.error('📄 [PDF] Error generating PDF:', error);
         throw error;
     }
 };

@@ -1,0 +1,794 @@
+{
+    "new_products": [
+        {
+            "sku": "EL-CAP-GEN-035",
+            "nombre_estandarizado": "Capacitor de Arranque 108-130 MFD 110V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Capacitores",
+            "marca": "Genérico",
+            "modelo": "108-130-110",
+            "descripcion_tecnica": "Capacitor Arranque 108-130 MFD 110V",
+            "capacidad": "108-130 MFD",
+            "voltaje": "110V",
+            "tipo_operacion": "Arranque",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CAP-MAR-044",
+            "nombre_estandarizado": "Capacitor Dual Mars 45+5 MFD 370V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Capacitores",
+            "marca": "Mars",
+            "modelo": "12769",
+            "descripcion_tecnica": "Capacitor Dual 45+5 MFD 370V",
+            "capacidad": "45+5 MFD",
+            "voltaje": "370V",
+            "tipo_operacion": "Dual",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CON-SQD-009",
+            "nombre_estandarizado": "Contactor Square D 3 Polos 30A 24V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Contactores",
+            "marca": "Square D",
+            "modelo": "8910DPA33V14",
+            "descripcion_tecnica": "Contactor 3P 30A Bobina 24V",
+            "capacidad": "30 A",
+            "voltaje": "24V",
+            "tipo_operacion": "Fuerza",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CAP-MAR-045",
+            "nombre_estandarizado": "Capacitor Estado Sólido Mars 2.0 MFD 450V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Capacitores",
+            "marca": "Mars",
+            "modelo": "12382",
+            "descripcion_tecnica": "Capacitor Estado Sólido 2.0 MFD 450V",
+            "capacidad": "2.0 MFD",
+            "voltaje": "450V",
+            "tipo_operacion": "Sólido",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CAP-GEN-036",
+            "nombre_estandarizado": "Capacitor de Arranque 161-193 MFD 220V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Capacitores",
+            "marca": "Genérico",
+            "modelo": "161-193-220",
+            "descripcion_tecnica": "Capacitor Arranque 161-193 MFD 220V",
+            "capacidad": "161-193 MFD",
+            "voltaje": "220V",
+            "tipo_operacion": "Arranque",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CAP-MAR-046",
+            "nombre_estandarizado": "Capacitor Dual Mars 35+4 MFD 440V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Capacitores",
+            "marca": "Mars",
+            "modelo": "12870",
+            "descripcion_tecnica": "Capacitor Dual 35+4 MFD 440V",
+            "capacidad": "35+4 MFD",
+            "voltaje": "440V",
+            "tipo_operacion": "Dual",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CAP-GEN-037",
+            "nombre_estandarizado": "Capacitor de Trabajo 20 MFD 370V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Capacitores",
+            "marca": "Genérico",
+            "modelo": "20-370",
+            "descripcion_tecnica": "Capacitor Trabajo 20 MFD 370V",
+            "capacidad": "20 MFD",
+            "voltaje": "370V",
+            "tipo_operacion": "Trabajo",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CON-MAR-011",
+            "nombre_estandarizado": "Contactor Mars 3 Polos 30A 120V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Contactores",
+            "marca": "Mars",
+            "modelo": "17336",
+            "descripcion_tecnica": "Contactor 3P 30A Bobina 120V",
+            "capacidad": "30 A",
+            "voltaje": "120V",
+            "tipo_operacion": "Fuerza",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CAP-GEN-038",
+            "nombre_estandarizado": "Capacitor de Trabajo 35 MFD 370V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Capacitores",
+            "marca": "Genérico",
+            "modelo": "35-370",
+            "descripcion_tecnica": "Capacitor Trabajo 35 MFD 370V",
+            "capacidad": "35 MFD",
+            "voltaje": "370V",
+            "tipo_operacion": "Trabajo",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CON-MAR-012",
+            "nombre_estandarizado": "Contactor Mars 3 Polos 50A 220V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Contactores",
+            "marca": "Mars",
+            "modelo": "17537",
+            "descripcion_tecnica": "Contactor 3P 50A Bobina 220V",
+            "capacidad": "50 A",
+            "voltaje": "220V",
+            "tipo_operacion": "Fuerza",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CAP-GEN-039",
+            "nombre_estandarizado": "Capacitor de Trabajo 55+5 MFD 370V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Capacitores",
+            "marca": "Genérico",
+            "modelo": "55+5-370",
+            "descripcion_tecnica": "Capacitor Trabajo 55+5 MFD 370V",
+            "capacidad": "55+5 MFD",
+            "voltaje": "370V",
+            "tipo_operacion": "Dual",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-TRA-GEN-009",
+            "nombre_estandarizado": "Transformador 100VA 220-24V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Transformadores",
+            "marca": "Genérico",
+            "modelo": "100-220-24",
+            "descripcion_tecnica": "Transformador 100VA Primario 220V Secundario 24V",
+            "capacidad": "100 VA",
+            "voltaje": "220/24V",
+            "tipo_operacion": "Control",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-INT-IUS-004",
+            "nombre_estandarizado": "Interruptor Termomagnético IUSA 1P 40A",
+            "grupo_general": "EL",
+            "grupo_especializado": "Interruptores",
+            "marca": "IUSA",
+            "modelo": "IU1C40",
+            "descripcion_tecnica": "Interruptor Termomagnético 1 Polo 40A",
+            "capacidad": "40 A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Protección",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CAP-MAR-047",
+            "nombre_estandarizado": "Capacitor de Arranque Mars 216-259 MFD 110V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Capacitores",
+            "marca": "Mars",
+            "modelo": "11917",
+            "descripcion_tecnica": "Capacitor Arranque 216-259 MFD 110V",
+            "capacidad": "216-259 MFD",
+            "voltaje": "110V",
+            "tipo_operacion": "Arranque",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CAP-MIR-012",
+            "nombre_estandarizado": "Capacitor para Mirage MMCC1821C/1821H",
+            "grupo_general": "EL",
+            "grupo_especializado": "Capacitores",
+            "marca": "Mirage",
+            "modelo": "MMCC1821C",
+            "descripcion_tecnica": "Capacitor 20 MFD para MMCC1821C, 1821H",
+            "capacidad": "20 MFD",
+            "voltaje": "N/A",
+            "tipo_operacion": "Motor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-TRA-GEN-010",
+            "nombre_estandarizado": "Transformador 60VA 115-24V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Transformadores",
+            "marca": "Genérico",
+            "modelo": "60-115-24",
+            "descripcion_tecnica": "Transformador 60VA Primario 115V Secundario 24V",
+            "capacidad": "60 VA",
+            "voltaje": "115/24V",
+            "tipo_operacion": "Control",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CAP-MAR-048",
+            "nombre_estandarizado": "Capacitor de Arranque Mars 108-130 MFD 220V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Capacitores",
+            "marca": "Mars",
+            "modelo": "11946",
+            "descripcion_tecnica": "Capacitor Arranque 108-130 MFD 220V",
+            "capacidad": "108-130 MFD",
+            "voltaje": "220V",
+            "tipo_operacion": "Arranque",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CON-DAN-001",
+            "nombre_estandarizado": "Contactor Danfoss 2 Polos 25A 220V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Contactores",
+            "marca": "Danfoss",
+            "modelo": "DP 25-2",
+            "descripcion_tecnica": "Contactor 2P 25A Bobina 220V",
+            "capacidad": "25 A",
+            "voltaje": "220V",
+            "tipo_operacion": "Fuerza",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-TRA-MAR-003",
+            "nombre_estandarizado": "Transformador Mars 60VA Multi-Tap",
+            "grupo_general": "EL",
+            "grupo_especializado": "Transformadores",
+            "marca": "Mars",
+            "modelo": "50312",
+            "descripcion_tecnica": "Transformador 60VA 120/208/240-24V",
+            "capacidad": "60 VA",
+            "voltaje": "Multi-Tap/24V",
+            "tipo_operacion": "Control",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CAP-MIR-013",
+            "nombre_estandarizado": "Capacitor para Mirage CCC090B/CCF090B",
+            "grupo_general": "EL",
+            "grupo_especializado": "Capacitores",
+            "marca": "Mirage",
+            "modelo": "CCC090B",
+            "descripcion_tecnica": "Capacitor para CCC090B, CCF090B",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Motor",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CON-EME-017",
+            "nombre_estandarizado": "Contactor Emerson 2 Polos 30A 220V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Contactores",
+            "marca": "Emerson",
+            "modelo": "6624-90-246",
+            "descripcion_tecnica": "Contactor 2P 30A Bobina 220V",
+            "capacidad": "30 A",
+            "voltaje": "220V",
+            "tipo_operacion": "Fuerza",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CAP-MAR-049",
+            "nombre_estandarizado": "Capacitor de Trabajo Mars 7.5 MFD 370V Ovalado",
+            "grupo_general": "EL",
+            "grupo_especializado": "Capacitores",
+            "marca": "Mars",
+            "modelo": "12907",
+            "descripcion_tecnica": "Capacitor Trabajo 7.5 MFD 370V Ovalado",
+            "capacidad": "7.5 MFD",
+            "voltaje": "370V",
+            "tipo_operacion": "Trabajo",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-REL-GEN-007",
+            "nombre_estandarizado": "Relevador 1/3 HP Para Capacitor 110V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Relevadores",
+            "marca": "Genérico",
+            "modelo": "MTRP-6218",
+            "descripcion_tecnica": "Relevador 1/3 HP Para Capacitor 110V",
+            "capacidad": "1/3 HP",
+            "voltaje": "110V",
+            "tipo_operacion": "Arranque",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CON-EME-018",
+            "nombre_estandarizado": "Contactor Emerson 3 Polos 50A 24V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Contactores",
+            "marca": "Emerson",
+            "modelo": "6632-92-459",
+            "descripcion_tecnica": "Contactor 3P 50A Bobina 24V",
+            "capacidad": "50 A",
+            "voltaje": "24V",
+            "tipo_operacion": "Fuerza",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CAP-MAR-050",
+            "nombre_estandarizado": "Capacitor de Trabajo Mars 40 MFD 440V Ovalado Copeland",
+            "grupo_general": "EL",
+            "grupo_especializado": "Capacitores",
+            "marca": "Mars",
+            "modelo": "12945",
+            "descripcion_tecnica": "Capacitor Trabajo 40 MFD 440V Ovalado Copeland",
+            "capacidad": "40 MFD",
+            "voltaje": "440V",
+            "tipo_operacion": "Trabajo",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CAP-GEN-040",
+            "nombre_estandarizado": "Capacitor de Arranque 124-149 MFD 110V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Capacitores",
+            "marca": "Genérico",
+            "modelo": "124-149-110",
+            "descripcion_tecnica": "Capacitor Arranque 124-149 MFD 110V",
+            "capacidad": "124-149 MFD",
+            "voltaje": "110V",
+            "tipo_operacion": "Arranque",
+            "unidad": "Pieza"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "EL-CAP-GEN-035",
+            "precio": 29.93,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005363",
+            "url": "https://www.grupocoresa.com/capacitor-arranque-1-8-1-4-hp-108-130-mfd-110v-3635",
+            "scraped_at": "2025-12-26 19:27:26.365577+00",
+            "raw_id": 2109
+        },
+        {
+            "sku": "EL-CAP-MAR-044",
+            "precio": 153.03,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005404",
+            "url": "https://www.grupocoresa.com/capacitor-de-trabajo-dual-45-5-mfd-370v-4045",
+            "scraped_at": "2025-12-26 19:27:26.365577+00",
+            "raw_id": 2110
+        },
+        {
+            "sku": "EL-CAP-MAR-044",
+            "precio": 153.03,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005404",
+            "url": "https://www.grupocoresa.com/capacitor-de-trabajo-dual-45-5-mfd-370v-4045",
+            "scraped_at": "2025-12-26 19:27:26.365577+00",
+            "raw_id": 2111
+        },
+        {
+            "sku": "EL-CON-SQD-009",
+            "precio": 1665.52,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005484",
+            "url": "https://www.grupocoresa.com/contactor-30amp-3-polos-bobina-24v-4845",
+            "scraped_at": "2025-12-26 19:27:26.365577+00",
+            "raw_id": 2112
+        },
+        {
+            "sku": "EL-CON-SQD-009",
+            "precio": 1665.52,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005484",
+            "url": "https://www.grupocoresa.com/contactor-30amp-3-polos-bobina-24v-4845",
+            "scraped_at": "2025-12-26 19:27:26.365577+00",
+            "raw_id": 2113
+        },
+        {
+            "sku": "EL-CAP-MAR-045",
+            "precio": 27.62,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005504",
+            "url": "https://www.grupocoresa.com/capacitor-estado-solido-2-0-mfd-450v-4055",
+            "scraped_at": "2025-12-26 19:27:26.365577+00",
+            "raw_id": 2114
+        },
+        {
+            "sku": "EL-CAP-MAR-045",
+            "precio": 27.62,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005504",
+            "url": "https://www.grupocoresa.com/capacitor-estado-solido-2-0-mfd-450v-4055",
+            "scraped_at": "2025-12-26 19:27:26.365577+00",
+            "raw_id": 2115
+        },
+        {
+            "sku": "EL-CAP-GEN-036",
+            "precio": 47.42,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005563",
+            "url": "https://www.grupocoresa.com/capacitor-arranque-1-hp-161-193-mfd-220v-3655",
+            "scraped_at": "2025-12-26 19:27:26.365577+00",
+            "raw_id": 2116
+        },
+        {
+            "sku": "EL-CAP-GEN-036",
+            "precio": 47.42,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005563",
+            "url": "https://www.grupocoresa.com/capacitor-arranque-1-hp-161-193-mfd-220v-3655",
+            "scraped_at": "2025-12-26 19:27:26.365577+00",
+            "raw_id": 2117
+        },
+        {
+            "sku": "EL-CAP-MAR-046",
+            "precio": 95.46,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005604",
+            "url": "https://www.grupocoresa.com/capacitor-de-trabajo-dual-35-4-mfd-440v-4065",
+            "scraped_at": "2025-12-26 19:27:26.365577+00",
+            "raw_id": 2118
+        },
+        {
+            "sku": "EL-CAP-MAR-046",
+            "precio": 95.46,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005604",
+            "url": "https://www.grupocoresa.com/capacitor-de-trabajo-dual-35-4-mfd-440v-4065",
+            "scraped_at": "2025-12-26 19:27:26.365577+00",
+            "raw_id": 2119
+        },
+        {
+            "sku": "EL-CAP-GEN-037",
+            "precio": 48.01,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005663",
+            "url": "https://www.grupocoresa.com/capacitor-trabajo-20-mfd-370v-3665",
+            "scraped_at": "2025-12-26 19:27:26.365577+00",
+            "raw_id": 2120
+        },
+        {
+            "sku": "EL-CAP-GEN-037",
+            "precio": 48.01,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005663",
+            "url": "https://www.grupocoresa.com/capacitor-trabajo-20-mfd-370v-3665",
+            "scraped_at": "2025-12-26 19:27:26.365577+00",
+            "raw_id": 2121
+        },
+        {
+            "sku": "EL-CON-MAR-011",
+            "precio": 336.4,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005704",
+            "url": "https://www.grupocoresa.com/contactor-3polos-30amperes-bobina-120v-4075",
+            "scraped_at": "2025-12-26 19:27:26.365577+00",
+            "raw_id": 2122
+        },
+        {
+            "sku": "EL-CON-MAR-011",
+            "precio": 336.4,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005704",
+            "url": "https://www.grupocoresa.com/contactor-3polos-30amperes-bobina-120v-4075",
+            "scraped_at": "2025-12-26 19:27:26.365577+00",
+            "raw_id": 2123
+        },
+        {
+            "sku": "EL-CAP-GEN-038",
+            "precio": 69.5,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005763",
+            "url": "https://www.grupocoresa.com/capacitor-trabajo-35-mfd-370v-3675",
+            "scraped_at": "2025-12-26 19:27:26.365577+00",
+            "raw_id": 2124
+        },
+        {
+            "sku": "EL-CAP-GEN-038",
+            "precio": 69.5,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005763",
+            "url": "https://www.grupocoresa.com/capacitor-trabajo-35-mfd-370v-3675",
+            "scraped_at": "2025-12-26 19:27:26.365577+00",
+            "raw_id": 2125
+        },
+        {
+            "sku": "EL-CON-MAR-012",
+            "precio": 1109.57,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005804",
+            "url": "https://www.grupocoresa.com/contactor-3polos-50amperes-bobina-220v-4085",
+            "scraped_at": "2025-12-26 19:27:26.365577+00",
+            "raw_id": 2126
+        },
+        {
+            "sku": "EL-CON-MAR-012",
+            "precio": 1109.57,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005804",
+            "url": "https://www.grupocoresa.com/contactor-3polos-50amperes-bobina-220v-4085",
+            "scraped_at": "2025-12-26 19:27:26.365577+00",
+            "raw_id": 2127
+        },
+        {
+            "sku": "EL-CAP-GEN-039",
+            "precio": 140.31,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005863",
+            "url": "https://www.grupocoresa.com/capacitor-trabajo-55-5-mfd-370v-3685",
+            "scraped_at": "2025-12-26 19:27:26.365577+00",
+            "raw_id": 2128
+        },
+        {
+            "sku": "EL-CAP-GEN-039",
+            "precio": 140.31,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005863",
+            "url": "https://www.grupocoresa.com/capacitor-trabajo-55-5-mfd-370v-3685",
+            "scraped_at": "2025-12-26 19:27:26.365577+00",
+            "raw_id": 2129
+        },
+        {
+            "sku": "EL-TRA-GEN-009",
+            "precio": 1176.47,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005967",
+            "url": "https://www.grupocoresa.com/transformador-100va-220-24v-7695",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2130
+        },
+        {
+            "sku": "EL-TRA-GEN-009",
+            "precio": 1176.47,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005967",
+            "url": "https://www.grupocoresa.com/transformador-100va-220-24v-7695",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2131
+        },
+        {
+            "sku": "EL-INT-IUS-004",
+            "precio": 41.67,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005987",
+            "url": "https://www.grupocoresa.com/interruptor-termomagnetico-1p-40a-7895",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2132
+        },
+        {
+            "sku": "EL-INT-IUS-004",
+            "precio": 41.67,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005987",
+            "url": "https://www.grupocoresa.com/interruptor-termomagnetico-1p-40a-7895",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2133
+        },
+        {
+            "sku": "EL-CAP-MAR-047",
+            "precio": 83.97,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006004",
+            "url": "https://www.grupocoresa.com/capacitor-de-arranque-216-259-mfd-110v-4006",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2134
+        },
+        {
+            "sku": "EL-CAP-MAR-047",
+            "precio": 83.97,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006004",
+            "url": "https://www.grupocoresa.com/capacitor-de-arranque-216-259-mfd-110v-4006",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2135
+        },
+        {
+            "sku": "EL-CAP-MIR-012",
+            "precio": 54.98,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006006",
+            "url": "https://www.grupocoresa.com/capacitor-20mfd-para-mmcc1821c-1821h-6006",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2136
+        },
+        {
+            "sku": "EL-CAP-MIR-012",
+            "precio": 54.98,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006006",
+            "url": "https://www.grupocoresa.com/capacitor-20mfd-para-mmcc1821c-1821h-6006",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2137
+        },
+        {
+            "sku": "EL-TRA-GEN-010",
+            "precio": 486.85,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006077",
+            "url": "https://www.grupocoresa.com/transformador-60va-115-24v-7706",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2138
+        },
+        {
+            "sku": "EL-TRA-GEN-010",
+            "precio": 486.85,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006077",
+            "url": "https://www.grupocoresa.com/transformador-60va-115-24v-7706",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2139
+        },
+        {
+            "sku": "EL-CAP-MAR-048",
+            "precio": 124.75,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006104",
+            "url": "https://www.grupocoresa.com/capacitor-de-arranque-108-130-mfd-220v-4016",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2140
+        },
+        {
+            "sku": "EL-CAP-MAR-048",
+            "precio": 124.75,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006104",
+            "url": "https://www.grupocoresa.com/capacitor-de-arranque-108-130-mfd-220v-4016",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2141
+        },
+        {
+            "sku": "EL-CON-DAN-001",
+            "precio": 173.97,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006113",
+            "url": "https://www.grupocoresa.com/contactor-danfoss-dp25-2-2polos-220-60-25amp-3116",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2142
+        },
+        {
+            "sku": "EL-CON-DAN-001",
+            "precio": 173.97,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006113",
+            "url": "https://www.grupocoresa.com/contactor-danfoss-dp25-2-2polos-220-60-25amp-3116",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2143
+        },
+        {
+            "sku": "EL-TRA-MAR-003",
+            "precio": 580.57,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006114",
+            "url": "https://www.grupocoresa.com/transformador-60va-120-208-240-24v-4116",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2144
+        },
+        {
+            "sku": "EL-TRA-MAR-003",
+            "precio": 580.57,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006114",
+            "url": "https://www.grupocoresa.com/transformador-60va-120-208-240-24v-4116",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2145
+        },
+        {
+            "sku": "EL-CAP-MIR-013",
+            "precio": 16.24,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006116",
+            "url": "https://www.grupocoresa.com/capacitor-para-ccc090b-ccf090b-6116",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2146
+        },
+        {
+            "sku": "EL-CAP-MIR-013",
+            "precio": 16.24,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006116",
+            "url": "https://www.grupocoresa.com/capacitor-para-ccc090b-ccf090b-6116",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2147
+        },
+        {
+            "sku": "EL-CON-EME-017",
+            "precio": 347.06,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006184",
+            "url": "https://www.grupocoresa.com/contactor-2-polos-30-ampers-bobina-220v-4816",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2148
+        },
+        {
+            "sku": "EL-CON-EME-017",
+            "precio": 347.06,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006184",
+            "url": "https://www.grupocoresa.com/contactor-2-polos-30-ampers-bobina-220v-4816",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2149
+        },
+        {
+            "sku": "EL-CAP-MAR-049",
+            "precio": 43.19,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006204",
+            "url": "https://www.grupocoresa.com/capacitor-de-trabajo-7-5-mfd-370v-ovalado-4026",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2150
+        },
+        {
+            "sku": "EL-CAP-MAR-049",
+            "precio": 43.19,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006204",
+            "url": "https://www.grupocoresa.com/capacitor-de-trabajo-7-5-mfd-370v-ovalado-4026",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2151
+        },
+        {
+            "sku": "EL-REL-GEN-007",
+            "precio": 28.55,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006277",
+            "url": "https://www.grupocoresa.com/relevador-1-3-hp-para-capacitor-110v-7726",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2152
+        },
+        {
+            "sku": "EL-REL-GEN-007",
+            "precio": 28.55,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006277",
+            "url": "https://www.grupocoresa.com/relevador-1-3-hp-para-capacitor-110v-7726",
+            "scraped_at": "2025-12-26 19:27:29.3522+00",
+            "raw_id": 2153
+        },
+        {
+            "sku": "EL-CON-EME-018",
+            "precio": 2775.58,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006284",
+            "url": "https://www.grupocoresa.com/contactor-3-polos-50-ampers-bobina-24v-4826",
+            "scraped_at": "2025-12-26 19:27:31.803509+00",
+            "raw_id": 2154
+        },
+        {
+            "sku": "EL-CON-EME-018",
+            "precio": 2775.58,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006284",
+            "url": "https://www.grupocoresa.com/contactor-3-polos-50-ampers-bobina-24v-4826",
+            "scraped_at": "2025-12-26 19:27:31.803509+00",
+            "raw_id": 2155
+        },
+        {
+            "sku": "EL-CAP-MAR-050",
+            "precio": 113.47,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006304",
+            "url": "https://www.grupocoresa.com/capacitor-de-trabajo-40-mfd-440v-ovalado-copeland-304-014003718-4036",
+            "scraped_at": "2025-12-26 19:27:31.803509+00",
+            "raw_id": 2156
+        },
+        {
+            "sku": "EL-CAP-MAR-050",
+            "precio": 113.47,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006304",
+            "url": "https://www.grupocoresa.com/capacitor-de-trabajo-40-mfd-440v-ovalado-copeland-304-014003718-4036",
+            "scraped_at": "2025-12-26 19:27:31.803509+00",
+            "raw_id": 2157
+        },
+        {
+            "sku": "EL-CAP-GEN-040",
+            "precio": 31.61,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006363",
+            "url": "https://www.grupocoresa.com/capacitor-arranque-1-4-hp-124-149-mfd-110v-3636",
+            "scraped_at": "2025-12-26 19:27:31.803509+00",
+            "raw_id": 2158
+        }
+    ]
+}

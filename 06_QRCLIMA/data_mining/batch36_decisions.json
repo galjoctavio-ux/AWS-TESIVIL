@@ -1,0 +1,635 @@
+{
+    "new_products": [
+        {
+            "sku": "RF-BOY-IGA-003",
+            "name": "Gas Refrigerante R-410A iGas Boya 11.3kg",
+            "category": "Refrigerantes",
+            "brand": "iGas",
+            "specs": "11.3kg R-410A"
+        },
+        {
+            "sku": "TU-COB-GEN-006",
+            "name": "Tubo Cobre Flexible 1/4 Por Metro",
+            "category": "Tuberías",
+            "brand": "Genérico",
+            "specs": "1/4\" Metro"
+        },
+        {
+            "sku": "TU-COB-GEN-007",
+            "name": "Tubo Cobre Flexible 1/4 Tipo L Por Metro",
+            "category": "Tuberías",
+            "brand": "Genérico",
+            "specs": "1/4\" Tipo L Metro"
+        },
+        {
+            "sku": "TU-COB-GEN-008",
+            "name": "Tubo Cobre Flexible 5/16 Por Metro",
+            "category": "Tuberías",
+            "brand": "Genérico",
+            "specs": "5/16\" Metro"
+        },
+        {
+            "sku": "TU-COB-GEN-009",
+            "name": "Tubo Cobre Flexible 1/2 Tipo L Por Metro",
+            "category": "Tuberías",
+            "brand": "Genérico",
+            "specs": "1/2\" Tipo L Metro"
+        },
+        {
+            "sku": "TU-COB-GEN-010",
+            "name": "Tubo Cobre Flexible 3/4 Tipo L Por Metro",
+            "category": "Tuberías",
+            "brand": "Genérico",
+            "specs": "3/4\" Tipo L Metro"
+        },
+        {
+            "sku": "RE-FIL-BAR-001",
+            "name": "Filtro Deshidratador Barreto 25gr 1/4 Soldable",
+            "category": "Refacciones",
+            "brand": "Barreto",
+            "specs": "25gr 1/4\""
+        },
+        {
+            "sku": "RE-CON-BAR-001",
+            "name": "Unión Barreto 3/8 10 Piezas",
+            "category": "Refacciones",
+            "brand": "Barreto",
+            "specs": "3/8\""
+        },
+        {
+            "sku": "RE-VAL-COL-001",
+            "name": "Válvula Check Seguridad Coldtek 5/16 x 1/4",
+            "category": "Refacciones",
+            "brand": "Coldtek",
+            "specs": "5/16\" x 1/4\""
+        },
+        {
+            "sku": "RE-VAL-COL-002",
+            "name": "Válvula Check Coldtek para Lata Gas 1/4",
+            "category": "Refacciones",
+            "brand": "Coldtek",
+            "specs": "1/4\""
+        },
+        {
+            "sku": "AC-ACC-HON-001",
+            "name": "Cámara de Seguridad WiFi Honeywell C1",
+            "category": "Accesorios",
+            "brand": "Honeywell",
+            "specs": "WiFi"
+        },
+        {
+            "sku": "EQ-ENF-POR-003",
+            "name": "Enfriador Evaporativo Portátil Apex 2000",
+            "category": "Equipos",
+            "brand": "Apex",
+            "specs": "Portátil"
+        },
+        {
+            "sku": "EQ-MSI-PRI-024",
+            "name": "Minisplit Prime Brgth 1 Ton Solo Frío Inverter 220V",
+            "category": "Equipos",
+            "brand": "Prime",
+            "specs": "1T 220V SF Inverter"
+        },
+        {
+            "sku": "EQ-MSO-1T220-017",
+            "name": "Minisplit On/Off Prime Elite 3 1 Ton Solo Frío 220V",
+            "category": "Equipos",
+            "brand": "Prime",
+            "specs": "1T 220V SF"
+        },
+        {
+            "sku": "EQ-CAS-YOR-006",
+            "name": "Juego Cassette York 5 Ton Solo Frío Inverter 220V",
+            "category": "Equipos",
+            "brand": "York",
+            "specs": "5T 220V SF Inverter"
+        },
+        {
+            "sku": "EQ-PAQ-LG-001",
+            "name": "Paquete LG 3 Ton Solo Frío Inverter 220V",
+            "category": "Equipos",
+            "brand": "LG",
+            "specs": "3T 220V SF Inverter"
+        },
+        {
+            "sku": "EQ-PAQ-YOR-018",
+            "name": "Paquete York 3 Ton Solo Frío R410A 220V",
+            "category": "Equipos",
+            "brand": "York",
+            "specs": "3T 220V SF"
+        },
+        {
+            "sku": "RE-COM-EMB-017",
+            "name": "Compresor Hermético Embraco 1/4 HP R134A 115V",
+            "category": "Refacciones",
+            "brand": "Embraco",
+            "specs": "1/4HP 115V R134A"
+        },
+        {
+            "sku": "EQ-MSI-HIS-020",
+            "name": "Minisplit Inverter Hisense 1 Ton Solo Frío 220V",
+            "category": "Equipos",
+            "brand": "Hisense",
+            "specs": "1T 220V SF Inverter"
+        },
+        {
+            "sku": "EQ-MSO-1T110-009",
+            "name": "Minisplit On/Off Hisense 1 Ton Solo Frío 110V",
+            "category": "Equipos",
+            "brand": "Hisense",
+            "specs": "1T 110V SF"
+        },
+        {
+            "sku": "EQ-MSO-1T110-010",
+            "name": "Minisplit On/Off York 1 Ton Solo Frío 110V",
+            "category": "Equipos",
+            "brand": "York",
+            "specs": "1T 110V SF"
+        },
+        {
+            "sku": "EQ-MSI-1T110-010",
+            "name": "Minisplit Inverter Hisense 1 Ton Frío-Calor 110V",
+            "category": "Equipos",
+            "brand": "Hisense",
+            "specs": "1T 110V FC Inverter"
+        },
+        {
+            "sku": "EQ-MSO-1T110-011",
+            "name": "Minisplit On/Off Midea 1 Ton Frío-Calor 110V",
+            "category": "Equipos",
+            "brand": "Midea",
+            "specs": "1T 110V FC"
+        },
+        {
+            "sku": "EQ-MSI-1T220-015",
+            "name": "Minisplit Inverter Midea 1 Ton Solo Frío R32 220V",
+            "category": "Equipos",
+            "brand": "Midea",
+            "specs": "1T 220V SF R32 Inverter"
+        },
+        {
+            "sku": "RE-COM-EMB-018",
+            "name": "Compresor Hermético Embraco 1 1/4 HP R134A 230V",
+            "category": "Refacciones",
+            "brand": "Embraco",
+            "specs": "1 1/4HP 230V R134A"
+        },
+        {
+            "sku": "EQ-MSO-15T220-012",
+            "name": "Minisplit On/Off York 1.5 Ton Frío-Calor 220V",
+            "category": "Equipos",
+            "brand": "York",
+            "specs": "1.5T 220V FC"
+        },
+        {
+            "sku": "HE-BOM-AVA-004",
+            "name": "Bomba de Vacío Avaly 3 CFM",
+            "category": "Herramientas",
+            "brand": "Avaly",
+            "specs": "3 CFM"
+        },
+        {
+            "sku": "HE-BOM-BAR-001",
+            "name": "Bomba de Vacío Barreto 1.8 CFM 1/4 HP",
+            "category": "Herramientas",
+            "brand": "Barreto",
+            "specs": "1.8 CFM"
+        },
+        {
+            "sku": "EQ-MSO-2T220-011",
+            "name": "Minisplit On/Off York 2 Ton Frío-Calor 220V",
+            "category": "Equipos",
+            "brand": "York",
+            "specs": "2T 220V FC"
+        },
+        {
+            "sku": "RE-TAR-YOR-004",
+            "name": "Tarjeta York Control Evaporador 00H11800323K",
+            "category": "Refacciones",
+            "brand": "York",
+            "specs": "00H11800323K"
+        },
+        {
+            "sku": "RE-FIL-GEN-001",
+            "name": "Filtro Deshidratador Universal DXA-5",
+            "category": "Refacciones",
+            "brand": "Genérico",
+            "specs": "DXA-5"
+        },
+        {
+            "sku": "RE-VAL-DIV-001",
+            "name": "Válvulas Diversitech Pivote 1/8 (6 Piezas)",
+            "category": "Refacciones",
+            "brand": "Diversitech",
+            "specs": "1/8\""
+        },
+        {
+            "sku": "RE-VAL-DAN-008",
+            "name": "Válvula Solenoide Danfoss 5/8 Soldable",
+            "category": "Refacciones",
+            "brand": "Danfoss",
+            "specs": "5/8\""
+        },
+        {
+            "sku": "RE-PIE-DAN-001",
+            "name": "Piedra Desecante Danfoss 48-DA",
+            "category": "Refacciones",
+            "brand": "Danfoss",
+            "specs": "48-DA"
+        },
+        {
+            "sku": "RE-FIL-LG-001",
+            "name": "Filtro para Evaporador LG Artcool",
+            "category": "Refacciones",
+            "brand": "LG",
+            "specs": "C122HR"
+        },
+        {
+            "sku": "EL-ACC-GEN-001",
+            "name": "Línea Tomacorriente 3x16",
+            "category": "Eléctricos",
+            "brand": "Genérico",
+            "specs": "3x16"
+        },
+        {
+            "sku": "AC-FIL-GEN-001",
+            "name": "Filtros Bolsa Superficie Extendida 12x24x2",
+            "category": "Accesorios",
+            "brand": "Genérico",
+            "specs": "12x24x2"
+        },
+        {
+            "sku": "RE-VAL-GEN-002",
+            "name": "Válvula Termostática Expansión 7 Ton R22",
+            "category": "Refacciones",
+            "brand": "Genérico",
+            "specs": "7T R22"
+        },
+        {
+            "sku": "RE-ACC-DAN-001",
+            "name": "Carcasa Danfoss para Filtro Recargable DCR0487S",
+            "category": "Refacciones",
+            "brand": "Danfoss",
+            "specs": "DCR0487S"
+        },
+        {
+            "sku": "EQ-MSI-1T110-011",
+            "name": "Minisplit Inverter Prime 1 Ton Frío-Calor 110V",
+            "category": "Equipos",
+            "brand": "Prime",
+            "specs": "1T 110V FC Inverter"
+        },
+        {
+            "sku": "EQ-MSI-LG-019",
+            "name": "Minisplit Inverter LG Artcool Mirror 1 Ton Frío-Calor 220V",
+            "category": "Equipos",
+            "brand": "LG",
+            "specs": "1T 220V FC Inverter"
+        },
+        {
+            "sku": "EQ-MSI-15T220-018",
+            "name": "Minisplit Inverter Prime 1.5 Ton Frío-Calor 220V",
+            "category": "Equipos",
+            "brand": "Prime",
+            "specs": "1.5T 220V FC Inverter"
+        },
+        {
+            "sku": "EQ-MSI-1T110-012",
+            "name": "Minisplit Inverter Prime 1 Ton Frío-Calor R32 110V",
+            "category": "Equipos",
+            "brand": "Prime",
+            "specs": "1T 110V FC R32 Inverter"
+        },
+        {
+            "sku": "EQ-MSO-1T220-018",
+            "name": "Minisplit On/Off Hisense 1 Ton Frío-Calor 220V",
+            "category": "Equipos",
+            "brand": "Hisense",
+            "specs": "1T 220V FC"
+        },
+        {
+            "sku": "EQ-MSI-LG-020",
+            "name": "Minisplit Inverter LG Artcool Mirror 2 Ton Frío-Calor 220V",
+            "category": "Equipos",
+            "brand": "LG",
+            "specs": "2T 220V FC Inverter"
+        },
+        {
+            "sku": "EQ-MSI-HIS-021",
+            "name": "Minisplit Inverter Hisense 1.5 Ton Solo Frío WiFi 220V",
+            "category": "Equipos",
+            "brand": "Hisense",
+            "specs": "1.5T 220V SF WiFi Inverter"
+        },
+        {
+            "sku": "EQ-MSI-1T220-016",
+            "name": "Minisplit Inverter Midea 1 Ton Frío-Calor 220V",
+            "category": "Equipos",
+            "brand": "Midea",
+            "specs": "1T 220V FC Inverter"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "RF-BOY-IGA-003",
+            "price": 2549.0,
+            "url": "NA",
+            "raw_id": "3240"
+        },
+        {
+            "sku": "TU-COB-GEN-006",
+            "price": 83.52,
+            "url": "https://plomeriauniversal.mx/products/tubo-cobre-flexible?variant=39637645852824",
+            "raw_id": "3241"
+        },
+        {
+            "sku": "TU-COB-GEN-007",
+            "price": 104.4,
+            "url": "https://plomeriauniversal.mx/products/tubo-cobre-flexible?variant=39637645951128",
+            "raw_id": "3243"
+        },
+        {
+            "sku": "TU-COB-GEN-008",
+            "price": 95.7,
+            "url": "https://plomeriauniversal.mx/products/tubo-cobre-flexible?variant=40204746883224",
+            "raw_id": "3245"
+        },
+        {
+            "sku": "TU-COB-GEN-009",
+            "price": 182.7,
+            "url": "https://plomeriauniversal.mx/products/tubo-cobre-flexible?variant=39637646147736",
+            "raw_id": "3247"
+        },
+        {
+            "sku": "TU-COB-GEN-010",
+            "price": 304.5,
+            "url": "https://plomeriauniversal.mx/products/tubo-cobre-flexible?variant=39637646213272",
+            "raw_id": "3249"
+        },
+        {
+            "sku": "RE-FIL-BAR-001",
+            "price": 75.0,
+            "url": "NA",
+            "raw_id": "3251"
+        },
+        {
+            "sku": "RE-CON-BAR-001",
+            "price": 400.0,
+            "url": "NA",
+            "raw_id": "3252"
+        },
+        {
+            "sku": "RE-VAL-COL-001",
+            "price": 120.0,
+            "url": "NA",
+            "raw_id": "3253"
+        },
+        {
+            "sku": "RE-VAL-COL-002",
+            "price": 55.0,
+            "url": "NA",
+            "raw_id": "3254"
+        },
+        {
+            "sku": "AC-ACC-HON-001",
+            "price": 1001.82,
+            "url": "https://reacsa.mx/products/chc8080w1000-u-camara-de-seguridad-wifi-c1-instroment-honeywell",
+            "raw_id": "3258"
+        },
+        {
+            "sku": "EQ-ENF-POR-003",
+            "price": 90499.98,
+            "url": "https://reacsa.mx/products/enfriador-evap-portatil-apex-2000",
+            "raw_id": "3337"
+        },
+        {
+            "sku": "EQ-MSI-PRI-024",
+            "price": 6090.61,
+            "url": "https://reacsa.mx/products/minisplit-prime-brgth-1-ton-solo-frio-inverter-220v",
+            "raw_id": "3338"
+        },
+        {
+            "sku": "EQ-MSO-1T220-017",
+            "price": 4918.31,
+            "url": "https://reacsa.mx/products/minisplit-prime-elit3-1-ton-solo-frio-estandar-220v",
+            "raw_id": "3339"
+        },
+        {
+            "sku": "EQ-CAS-YOR-006",
+            "price": 51255.43,
+            "url": "https://reacsa.mx/products/minisplit-york-casete-5-ton-solo-frio-inverter-220v",
+            "raw_id": "3340"
+        },
+        {
+            "sku": "EQ-PAQ-LG-001",
+            "price": 59957.2,
+            "url": "https://reacsa.mx/products/aire-acondicionado-paquete-lg-3-ton-solo-frio-inverter-220v",
+            "raw_id": "3341"
+        },
+        {
+            "sku": "EQ-PAQ-YOR-018",
+            "price": 39914.23,
+            "url": "https://reacsa.mx/products/aire-acondicionado-de-paquete-york-3-ton-solo-frio-r410a-220v",
+            "raw_id": "3342"
+        },
+        {
+            "sku": "RE-COM-EMB-017",
+            "price": 6221.88,
+            "url": "https://reacsa.mx/products/compresor-hermetico-embraco-1-4hp-r404a-115-1-r134a",
+            "raw_id": "3343"
+        },
+        {
+            "sku": "EQ-MSI-HIS-020",
+            "price": 5835.5,
+            "url": "https://reacsa.mx/products/minisplit-hisense-1-ton-solo-frio-inverter-220v",
+            "raw_id": "3344"
+        },
+        {
+            "sku": "EQ-MSO-1T110-009",
+            "price": 5596.83,
+            "url": "https://reacsa.mx/products/minisplit-hisense-1-ton-solo-frio-estandar-110v",
+            "raw_id": "3345"
+        },
+        {
+            "sku": "EQ-MSO-1T110-010",
+            "price": 6261.49,
+            "url": "https://reacsa.mx/products/minisplit-york-1-ton-solo-frio-estandar-110v",
+            "raw_id": "3346"
+        },
+        {
+            "sku": "EQ-MSI-1T110-010",
+            "price": 6920.87,
+            "url": "https://reacsa.mx/products/minisplit-hisense-1-ton-frio-y-calor-inverter-110v",
+            "raw_id": "3347"
+        },
+        {
+            "sku": "EQ-MSO-1T110-011",
+            "price": 5420.02,
+            "url": "https://reacsa.mx/products/minisplit-midea-modelo-care-plus-1-ton-frio-calor-110v-r410a-estandar",
+            "raw_id": "3348"
+        },
+        {
+            "sku": "EQ-MSI-1T220-015",
+            "price": 6991.03,
+            "url": "https://reacsa.mx/products/minisplit-midea-1-ton-ecmt-solo-frio-r32-inverter-220v",
+            "raw_id": "3349"
+        },
+        {
+            "sku": "RE-BOM-ASP-003",
+            "price": 2622.22,
+            "url": "https://reacsa.mx/products/bomba-aspen-mini-orange-maxi-230v",
+            "raw_id": "3350"
+        },
+        {
+            "sku": "RE-COM-EMB-018",
+            "price": 8106.13,
+            "url": "https://reacsa.mx/products/nj6226z-b-compresor-hermetico-embraco-1-1-4hp-r-134a-208-230v",
+            "raw_id": "3351"
+        },
+        {
+            "sku": "EQ-MSO-15T220-012",
+            "price": 8901.99,
+            "url": "https://reacsa.mx/products/minisplit-york-compresor-on-off-frio-calor-1-5-ton-220v-r-410a",
+            "raw_id": "3352"
+        },
+        {
+            "sku": "HE-BOM-UNI-002",
+            "price": 7534.33,
+            "url": "NA",
+            "raw_id": "3353"
+        },
+        {
+            "sku": "HE-BOM-AVA-004",
+            "price": 7294.92,
+            "url": "https://reacsa.mx/products/bomba-avaly-vacio-3cfm-1725-rpm-2-etapas-110v",
+            "raw_id": "3354"
+        },
+        {
+            "sku": "HE-BOM-BAR-001",
+            "price": 3391.73,
+            "url": "NA",
+            "raw_id": "3355"
+        },
+        {
+            "sku": "EQ-BOM-ARM-001",
+            "price": 3005.99,
+            "url": "https://reacsa.mx/products/bomba-presurizadora-armstrong-2-servicios-46-l-m-c-s-127v",
+            "raw_id": "3356"
+        },
+        {
+            "sku": "EQ-MSO-2T220-011",
+            "price": 13559.57,
+            "url": "https://reacsa.mx/products/minisplit-york-compresor-on-off-frio-calor-2-ton-220v-r-410a",
+            "raw_id": "3357"
+        },
+        {
+            "sku": "RE-TAR-YOR-004",
+            "price": 838.16,
+            "url": "https://reacsa.mx/products/tarjeta-york-control-para-evaporador-00h11800323k",
+            "raw_id": "3358"
+        },
+        {
+            "sku": "RE-FIL-GEN-001",
+            "price": 200.4,
+            "url": "NA",
+            "raw_id": "3372"
+        },
+        {
+            "sku": "RE-VAL-DIV-001",
+            "price": 314.58,
+            "url": "NA",
+            "raw_id": "3375"
+        },
+        {
+            "sku": "RE-VAL-DAN-008",
+            "price": 1355.11,
+            "url": "NA",
+            "raw_id": "3378"
+        },
+        {
+            "sku": "RE-PIE-DAN-001",
+            "price": 618.05,
+            "url": "NA",
+            "raw_id": "3379"
+        },
+        {
+            "sku": "RE-FIL-LG-001",
+            "price": 93.0,
+            "url": "NA",
+            "raw_id": "3389"
+        },
+        {
+            "sku": "EL-ACC-GEN-001",
+            "price": 47.03,
+            "url": "NA",
+            "raw_id": "3406"
+        },
+        {
+            "sku": "AC-FIL-GEN-001",
+            "price": 406.0,
+            "url": "NA",
+            "raw_id": "3408"
+        },
+        {
+            "sku": "RE-VAL-GEN-002",
+            "price": 1283.52,
+            "url": "NA",
+            "raw_id": "3412"
+        },
+        {
+            "sku": "RE-ACC-DAN-001",
+            "price": 1764.09,
+            "url": "NA",
+            "raw_id": "3413"
+        },
+        {
+            "sku": "EQ-MSI-1T110-011",
+            "price": 6672.03,
+            "url": "https://reacsa.mx/products/copia-de-minisplit-prime-1-5-ton-solo-frio-inverter-220v",
+            "raw_id": "3418"
+        },
+        {
+            "sku": "EQ-MSI-LG-019",
+            "price": 16427.0,
+            "url": "https://reacsa.mx/products/minisplit-lg-vr-series-inverter-artcool-wifi-frio-calor-1-ton-220v",
+            "raw_id": "3419"
+        },
+        {
+            "sku": "EQ-MSI-15T220-018",
+            "price": 9967.79,
+            "url": "https://reacsa.mx/products/minisplit-prime-1-5-ton-frio-calor-inverter-220v",
+            "raw_id": "3420"
+        },
+        {
+            "sku": "EQ-MSI-1T110-012",
+            "price": 6672.03,
+            "url": "https://reacsa.mx/products/minisplit-prime-1-ton-frio-y-calor-inverter-r32-110v",
+            "raw_id": "3421"
+        },
+        {
+            "sku": "EQ-MSO-1T220-018",
+            "price": 6163.66,
+            "url": "https://reacsa.mx/products/copia-de-minisplit-hisense-estandar-1-5-ton-frio-calor-220-v",
+            "raw_id": "3422"
+        },
+        {
+            "sku": "EQ-MSI-LG-020",
+            "price": 23323.83,
+            "url": "https://reacsa.mx/products/minisplit-lg-artcool-tipo-espejo-wifi-frio-calor-2-ton-220v-inverter",
+            "raw_id": "3423"
+        },
+        {
+            "sku": "EQ-MSI-HIS-021",
+            "price": 11962.76,
+            "url": "https://reacsa.mx/products/minisplit-hisense-1-5-ton-solo-frio-wfi-inverter",
+            "raw_id": "3424"
+        },
+        {
+            "sku": "EQ-MSI-1T220-016",
+            "price": 7710.35,
+            "url": "https://reacsa.mx/products/minisplit-midea-frst-1-ton-frio-y-calor-inverter-220v",
+            "raw_id": "3425"
+        }
+    ]
+}

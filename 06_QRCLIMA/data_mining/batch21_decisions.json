@@ -1,0 +1,728 @@
+{
+    "new_products": [
+        {
+            "sku": "HE-INS-DAN-001",
+            "nombre_estandarizado": "Medidor Energia Eléctrica Danfoss WATTNODEP1",
+            "grupo_general": "HE",
+            "grupo_especializado": "Instrumentos",
+            "marca": "Danfoss",
+            "modelo": "WATTNODEP1",
+            "descripcion_tecnica": "Medidor Energia Eléctrica 120/208-204V",
+            "capacidad": "120/208-204V",
+            "voltaje": "204 V",
+            "tipo_operacion": "Medición Eléctrica",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-YEL-013",
+            "nombre_estandarizado": "Mini Corta Tubo Yellow Jacket 1/8\" a 5/8\"",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Yellow Jacket",
+            "modelo": "60160",
+            "descripcion_tecnica": "Mini Corta Tubo 1/8\" a 5/8\"",
+            "capacidad": "1/8-5/8\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Corte",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-SOL-UNI-017",
+            "nombre_estandarizado": "Boquilla Doble con Regulador Uniweld RP3T2",
+            "grupo_general": "HE",
+            "grupo_especializado": "Soldadura",
+            "marca": "Uniweld",
+            "modelo": "RP3T2",
+            "descripcion_tecnica": "Boquilla Doble con Regulador",
+            "capacidad": "Doble",
+            "voltaje": "N/A",
+            "tipo_operacion": "Soldadura",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-YEL-014",
+            "nombre_estandarizado": "Peine Serpentín Verde Yellow Jacket 12-14 Aletas",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Yellow Jacket",
+            "modelo": "61154",
+            "descripcion_tecnica": "Peine para Serpentín Verde 12-14 Aletas",
+            "capacidad": "12-14 Aletas",
+            "voltaje": "N/A",
+            "tipo_operacion": "Mantenimiento",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-MGU-UNI-013",
+            "nombre_estandarizado": "Juego Mangueras Automotriz Uniweld 60\" R134A",
+            "grupo_general": "HE",
+            "grupo_especializado": "Mangueras",
+            "marca": "Uniweld",
+            "modelo": "90040",
+            "descripcion_tecnica": "Juego Mangueras Automotriz para R134A 60\"",
+            "capacidad": "60 pulg",
+            "voltaje": "N/A",
+            "tipo_operacion": "Carga",
+            "unidad": "Juego"
+        },
+        {
+            "sku": "HE-INS-YEL-005",
+            "nombre_estandarizado": "Detector de Fugas Yellow Jacket 69336",
+            "grupo_general": "HE",
+            "grupo_especializado": "Instrumentos",
+            "marca": "Yellow Jacket",
+            "modelo": "69336",
+            "descripcion_tecnica": "Detector de Fugas",
+            "capacidad": "Electrónico",
+            "voltaje": "N/A",
+            "tipo_operacion": "Detección",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-MGU-YEL-013",
+            "nombre_estandarizado": "Juego 3 Mangueras Yellow Jacket 72\"",
+            "grupo_general": "HE",
+            "grupo_especializado": "Mangueras",
+            "marca": "Yellow Jacket",
+            "modelo": "21986",
+            "descripcion_tecnica": "Juego de 3 Mangueras 72\" Rojo/Azul/Amarillo",
+            "capacidad": "72 pulg",
+            "voltaje": "N/A",
+            "tipo_operacion": "Carga",
+            "unidad": "Juego"
+        },
+        {
+            "sku": "HE-HER-UNI-022",
+            "nombre_estandarizado": "Herramienta Flare 45° Uniweld Multipunto",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Uniweld",
+            "modelo": "70003",
+            "descripcion_tecnica": "Herramienta 45° Flare 3/16\" a 5/8\"",
+            "capacidad": "3/16-5/8\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Tubería",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-BOM-YEL-001",
+            "nombre_estandarizado": "Bomba Vacío Bullet Yellow Jacket 7CFM",
+            "grupo_general": "HE",
+            "grupo_especializado": "Bombas",
+            "marca": "Yellow Jacket",
+            "modelo": "93600",
+            "descripcion_tecnica": "Bomba de Vacío Bullet 7Cfm 1/2Hp 115V",
+            "capacidad": "7 CFM",
+            "voltaje": "115 V",
+            "tipo_operacion": "Vacío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-UNI-023",
+            "nombre_estandarizado": "Dobla Tubo Resorte Uniweld 1/2\"",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Uniweld",
+            "modelo": "70019",
+            "descripcion_tecnica": "Dobla Tubo de Resorte 1/2\"",
+            "capacidad": "1/2\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Tubería",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-MAS-003",
+            "nombre_estandarizado": "Corta Tubo Master Cool 1/8\" a 7/8\"",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Master Cool",
+            "modelo": "80021",
+            "descripcion_tecnica": "Corta Tubo 1/8\" a 7/8\"",
+            "capacidad": "1/8-7/8\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Corte",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-ACC-YEL-004",
+            "nombre_estandarizado": "Caja Amarilla Vacía Yellow Jacket 1 Orificio",
+            "grupo_general": "HE",
+            "grupo_especializado": "Accesorios",
+            "marca": "Yellow Jacket",
+            "modelo": "XALK01",
+            "descripcion_tecnica": "Caja Amarilla Vacía 1 Orificio",
+            "capacidad": "1 Orificio",
+            "voltaje": "N/A",
+            "tipo_operacion": "Almacenamiento",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-DIV-006",
+            "nombre_estandarizado": "Peine Serpentín P/P 12-14 Aletas Diversitech",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Diversitech",
+            "modelo": "T-412",
+            "descripcion_tecnica": "Peine para Serpentín 2 Medidas 12 y 14 Aletas",
+            "capacidad": "12-14 Aletas",
+            "voltaje": "N/A",
+            "tipo_operacion": "Mantenimiento",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-DIV-007",
+            "nombre_estandarizado": "Destornillador Bolsillo 4 en 1 Diversitech",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Diversitech",
+            "modelo": "6-T744",
+            "descripcion_tecnica": "Destornillador de Bolsillo 4 en 1 130Mm",
+            "capacidad": "4 en 1",
+            "voltaje": "N/A",
+            "tipo_operacion": "Mantenimiento",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-MAN-YEL-020",
+            "nombre_estandarizado": "Juego Manifold °F Yellow Jacket R22/134/404",
+            "grupo_general": "HE",
+            "grupo_especializado": "Manómetros",
+            "marca": "Yellow Jacket",
+            "modelo": "49987",
+            "descripcion_tecnica": "Juego Manifold °F R22/134A/404A 60\" Rojo/Azul con Manguera",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Medición",
+            "unidad": "Juego"
+        },
+        {
+            "sku": "HE-HER-UNI-024",
+            "nombre_estandarizado": "Mini Corta Tubo Uniweld UTC702",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Uniweld",
+            "modelo": "UTC702",
+            "descripcion_tecnica": "Mini Corta Tubo 1/8\" a 1 1/8\"",
+            "capacidad": "1/8-1 1/8\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Corte",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-MAN-YEL-021",
+            "nombre_estandarizado": "Manifold Yellow Jacket R404/410/22 Sin Mangueras",
+            "grupo_general": "HE",
+            "grupo_especializado": "Manómetros",
+            "marca": "Yellow Jacket",
+            "modelo": "42001",
+            "descripcion_tecnica": "Manifold °F R404/410/22 Sin Mangueras",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Medición",
+            "unidad": "Juego"
+        },
+        {
+            "sku": "HE-MAN-YEL-022",
+            "nombre_estandarizado": "Manómetro Baja Yellow Jacket 3-1/8\" R22",
+            "grupo_general": "HE",
+            "grupo_especializado": "Manómetros",
+            "marca": "Yellow Jacket",
+            "modelo": "49106",
+            "descripcion_tecnica": "Manómetro 3 1/8\" Baja Azul R22/134A/404A",
+            "capacidad": "Baja",
+            "voltaje": "N/A",
+            "tipo_operacion": "Medición",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-YEL-015",
+            "nombre_estandarizado": "Peine Serpentín Rojo Yellow Jacket 18-20 Aletas",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Yellow Jacket",
+            "modelo": "61156",
+            "descripcion_tecnica": "Peine para Serpentín Rojo 18-20 Aletas",
+            "capacidad": "18-20 Aletas",
+            "voltaje": "N/A",
+            "tipo_operacion": "Mantenimiento",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-AVA-011",
+            "nombre_estandarizado": "Corta Tubo Avaly 3/8\" a 2-5/8\"",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Avaly",
+            "modelo": "VA-206",
+            "descripcion_tecnica": "Corta Tubo 3/8\" a 2 5/8\"",
+            "capacidad": "3/8-2 5/8\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Corte",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-YEL-016",
+            "nombre_estandarizado": "Herramienta Flare Pesado Yellow Jacket",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Yellow Jacket",
+            "modelo": "60290",
+            "descripcion_tecnica": "Herramienta Flare Uso Pesado 45° 3/4\" a 1 1/8\"",
+            "capacidad": "3/4-1 1/8\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Tubería",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-INS-AVA-001",
+            "nombre_estandarizado": "Medidor Digital Inalámbrico Avaly",
+            "grupo_general": "HE",
+            "grupo_especializado": "Instrumentos",
+            "marca": "Avaly",
+            "modelo": "VA-GW760",
+            "descripcion_tecnica": "Medidor Digital Inalámbrico",
+            "capacidad": "Inalámbrico",
+            "voltaje": "N/A",
+            "tipo_operacion": "Medición",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-INS-AVA-002",
+            "nombre_estandarizado": "Termo-higrómetro Digital Avaly",
+            "grupo_general": "HE",
+            "grupo_especializado": "Instrumentos",
+            "marca": "Avaly",
+            "modelo": "VA-DTL51H",
+            "descripcion_tecnica": "Termo-higrómetro Digital",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Medición Ambientales",
+            "unidad": "Pieza"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "AC-VIB-GEN-005",
+            "precio": 897.11,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009377",
+            "url": "https://www.grupocoresa.com/eliminador-de-vibracion-con-malla-de-cobre-7-8-largo-12-7739",
+            "scraped_at": "2025-12-26 19:29:21.030155+00",
+            "raw_id": 2959
+        },
+        {
+            "sku": "HE-INS-DAN-001",
+            "precio": 19273.31,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009423",
+            "url": "https://www.grupocoresa.com/medidor-energia-electrica120-208-204v-3249",
+            "scraped_at": "2025-12-26 19:29:21.030155+00",
+            "raw_id": 2960
+        },
+        {
+            "sku": "HE-INS-DAN-001",
+            "precio": 19273.31,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009423",
+            "url": "https://www.grupocoresa.com/medidor-energia-electrica120-208-204v-3249",
+            "scraped_at": "2025-12-26 19:29:21.030155+00",
+            "raw_id": 2961
+        },
+        {
+            "sku": "HE-HER-YEL-013",
+            "precio": 493.95,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009445",
+            "url": "https://www.grupocoresa.com/mini-cortatubo-de-1-8-a-5-8-yellow-jacket-5449",
+            "scraped_at": "2025-12-26 19:29:21.030155+00",
+            "raw_id": 2962
+        },
+        {
+            "sku": "HE-HER-YEL-013",
+            "precio": 493.95,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009445",
+            "url": "https://www.grupocoresa.com/mini-cortatubo-de-1-8-a-5-8-yellow-jacket-5449",
+            "scraped_at": "2025-12-26 19:29:21.030155+00",
+            "raw_id": 2963
+        },
+        {
+            "sku": "HE-SOL-UNI-017",
+            "precio": 1634.0,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009505",
+            "url": "https://www.grupocoresa.com/boquilla-doble-con-regulador-5059",
+            "scraped_at": "2025-12-26 19:29:21.030155+00",
+            "raw_id": 2964
+        },
+        {
+            "sku": "HE-SOL-UNI-017",
+            "precio": 1634.0,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009505",
+            "url": "https://www.grupocoresa.com/boquilla-doble-con-regulador-5059",
+            "scraped_at": "2025-12-26 19:29:21.030155+00",
+            "raw_id": 2965
+        },
+        {
+            "sku": "HE-HER-YEL-014",
+            "precio": 85.35,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009545",
+            "url": "https://www.grupocoresa.com/peine-para-serpentin-verde-12-14-aletas-yellow-jacket-5459",
+            "scraped_at": "2025-12-26 19:29:21.030155+00",
+            "raw_id": 2966
+        },
+        {
+            "sku": "HE-HER-YEL-014",
+            "precio": 85.35,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009545",
+            "url": "https://www.grupocoresa.com/peine-para-serpentin-verde-12-14-aletas-yellow-jacket-5459",
+            "scraped_at": "2025-12-26 19:29:21.030155+00",
+            "raw_id": 2967
+        },
+        {
+            "sku": "HE-MGU-UNI-013",
+            "precio": 662.36,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009547",
+            "url": "https://www.grupocoresa.com/juego-mangueras-automotriz-para-r134a-60-7459",
+            "scraped_at": "2025-12-26 19:29:24.671778+00",
+            "raw_id": 2968
+        },
+        {
+            "sku": "HE-MGU-UNI-013",
+            "precio": 662.36,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009547",
+            "url": "https://www.grupocoresa.com/juego-mangueras-automotriz-para-r134a-60-7459",
+            "scraped_at": "2025-12-26 19:29:24.671778+00",
+            "raw_id": 2969
+        },
+        {
+            "sku": "HE-INS-YEL-005",
+            "precio": 7882.4,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009645",
+            "url": "https://www.grupocoresa.com/detector-de-fugas-yellow-jacket-5469",
+            "scraped_at": "2025-12-26 19:29:24.671778+00",
+            "raw_id": 2970
+        },
+        {
+            "sku": "HE-INS-YEL-005",
+            "precio": 7882.4,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009645",
+            "url": "https://www.grupocoresa.com/detector-de-fugas-yellow-jacket-5469",
+            "scraped_at": "2025-12-26 19:29:24.671778+00",
+            "raw_id": 2971
+        },
+        {
+            "sku": "HE-MGU-YEL-013",
+            "precio": 2568.83,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009647",
+            "url": "https://www.grupocoresa.com/juego-3-mangueras-72-amarillo-rojo-azul-yellow-jacket-7469",
+            "scraped_at": "2025-12-26 19:29:24.671778+00",
+            "raw_id": 2972
+        },
+        {
+            "sku": "HE-MGU-YEL-013",
+            "precio": 2568.83,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009647",
+            "url": "https://www.grupocoresa.com/juego-3-mangueras-72-amarillo-rojo-azul-yellow-jacket-7469",
+            "scraped_at": "2025-12-26 19:29:24.671778+00",
+            "raw_id": 2973
+        },
+        {
+            "sku": "HE-HER-UNI-022",
+            "precio": 568.49,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009694",
+            "url": "https://www.grupocoresa.com/herramienta-45-flare-3-16-1-4-5-16-3-8-7-16-1-2-y-5-8-4969",
+            "scraped_at": "2025-12-26 19:29:24.671778+00",
+            "raw_id": 2974
+        },
+        {
+            "sku": "HE-HER-UNI-022",
+            "precio": 568.49,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009694",
+            "url": "https://www.grupocoresa.com/herramienta-45-flare-3-16-1-4-5-16-3-8-7-16-1-2-y-5-8-4969",
+            "scraped_at": "2025-12-26 19:29:24.671778+00",
+            "raw_id": 2975
+        },
+        {
+            "sku": "HE-BOM-YEL-001",
+            "precio": 14589.33,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009745",
+            "url": "https://www.grupocoresa.com/bomba-vacio-bullet-1-2hp-7cfm-115v-yellow-jacket-5479",
+            "scraped_at": "2025-12-26 19:29:24.671778+00",
+            "raw_id": 2976
+        },
+        {
+            "sku": "HE-BOM-YEL-001",
+            "precio": 14589.33,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009745",
+            "url": "https://www.grupocoresa.com/bomba-vacio-bullet-1-2hp-7cfm-115v-yellow-jacket-5479",
+            "scraped_at": "2025-12-26 19:29:24.671778+00",
+            "raw_id": 2977
+        },
+        {
+            "sku": "HE-HER-UNI-023",
+            "precio": 96.69,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009794",
+            "url": "https://www.grupocoresa.com/dobla-tubo-de-resorte-1-2-4979",
+            "scraped_at": "2025-12-26 19:29:24.671778+00",
+            "raw_id": 2980
+        },
+        {
+            "sku": "HE-HER-UNI-023",
+            "precio": 96.69,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009794",
+            "url": "https://www.grupocoresa.com/dobla-tubo-de-resorte-1-2-4979",
+            "scraped_at": "2025-12-26 19:29:24.671778+00",
+            "raw_id": 2981
+        },
+        {
+            "sku": "HE-HER-MAS-003",
+            "precio": 254.76,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009836",
+            "url": "https://www.grupocoresa.com/cortatubo-1-8-a-7-8-mastercool-6389",
+            "scraped_at": "2025-12-26 19:29:24.671778+00",
+            "raw_id": 2982
+        },
+        {
+            "sku": "HE-HER-MAS-003",
+            "precio": 254.76,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009836",
+            "url": "https://www.grupocoresa.com/cortatubo-1-8-a-7-8-mastercool-6389",
+            "scraped_at": "2025-12-26 19:29:24.671778+00",
+            "raw_id": 2983
+        },
+        {
+            "sku": "HE-ACC-YEL-004",
+            "precio": 247.89,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009865",
+            "url": "https://www.grupocoresa.com/caja-amarilla-vacia-1-orificio-5689",
+            "scraped_at": "2025-12-26 19:29:24.671778+00",
+            "raw_id": 2984
+        },
+        {
+            "sku": "HE-ACC-YEL-004",
+            "precio": 247.89,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009865",
+            "url": "https://www.grupocoresa.com/caja-amarilla-vacia-1-orificio-5689",
+            "scraped_at": "2025-12-26 19:29:24.671778+00",
+            "raw_id": 2985
+        },
+        {
+            "sku": "HE-HER-DIV-006",
+            "precio": 74.43,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009975",
+            "url": "https://www.grupocoresa.com/peine-para-serpentin-2-medidas-12-y-14-aletas-p-p-5799",
+            "scraped_at": "2025-12-26 19:29:24.671778+00",
+            "raw_id": 2988
+        },
+        {
+            "sku": "HE-HER-DIV-006",
+            "precio": 74.43,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009975",
+            "url": "https://www.grupocoresa.com/peine-para-serpentin-2-medidas-12-y-14-aletas-p-p-5799",
+            "scraped_at": "2025-12-26 19:29:24.671778+00",
+            "raw_id": 2989
+        },
+        {
+            "sku": "HE-HER-DIV-007",
+            "precio": 62.71,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190111-00009189",
+            "url": "https://www.grupocoresa.com/destornillador-de-bolsillo-4-en-1-130mm-9819",
+            "scraped_at": "2025-12-26 19:29:24.671778+00",
+            "raw_id": 2990
+        },
+        {
+            "sku": "HE-HER-DIV-007",
+            "precio": 62.71,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190111-00009189",
+            "url": "https://www.grupocoresa.com/destornillador-de-bolsillo-4-en-1-130mm-9819",
+            "scraped_at": "2025-12-26 19:29:24.671778+00",
+            "raw_id": 2991
+        },
+        {
+            "sku": "HE-MAN-YEL-020",
+            "precio": 7277.02,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190207-00002999",
+            "url": "https://www.grupocoresa.com/juego-manifold-f-r22-134a-404a-con-manguera-60-rojo-azul-psi-yellow-jacket-9992",
+            "scraped_at": "2025-12-26 19:29:28.571152+00",
+            "raw_id": 2992
+        },
+        {
+            "sku": "HE-MAN-YEL-020",
+            "precio": 7277.02,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190207-00002999",
+            "url": "https://www.grupocoresa.com/juego-manifold-f-r22-134a-404a-con-manguera-60-rojo-azul-psi-yellow-jacket-9992",
+            "scraped_at": "2025-12-26 19:29:28.571152+00",
+            "raw_id": 2993
+        },
+        {
+            "sku": "HE-HER-UNI-024",
+            "precio": 306.05,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190219-00045001",
+            "url": "https://www.grupocoresa.com/mini-corta-tubo-1-8-a-1-1-8-10054",
+            "scraped_at": "2025-12-26 19:29:28.571152+00",
+            "raw_id": 2996
+        },
+        {
+            "sku": "HE-HER-UNI-024",
+            "precio": 306.05,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190219-00045001",
+            "url": "https://www.grupocoresa.com/mini-corta-tubo-1-8-a-1-1-8-10054",
+            "scraped_at": "2025-12-26 19:29:28.571152+00",
+            "raw_id": 2997
+        },
+        {
+            "sku": "HE-MAN-YEL-021",
+            "precio": 2421.51,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190311-00046101",
+            "url": "https://www.grupocoresa.com/manifold-f-r404-410-22-sin-mangueras-yellow-jacket-10164",
+            "scraped_at": "2025-12-26 19:29:28.571152+00",
+            "raw_id": 3000
+        },
+        {
+            "sku": "HE-MAN-YEL-021",
+            "precio": 2421.51,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190311-00046101",
+            "url": "https://www.grupocoresa.com/manifold-f-r404-410-22-sin-mangueras-yellow-jacket-10164",
+            "scraped_at": "2025-12-26 19:29:28.571152+00",
+            "raw_id": 3001
+        },
+        {
+            "sku": "HE-MAN-YEL-022",
+            "precio": 812.29,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190311-00056101",
+            "url": "https://www.grupocoresa.com/manometro-3-1-8-baja-azul-para-f-30-0-120psi-r22-134a-404a-yellow-jacket-10165",
+            "scraped_at": "2025-12-26 19:29:28.571152+00",
+            "raw_id": 3002
+        },
+        {
+            "sku": "HE-MAN-YEL-022",
+            "precio": 812.29,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190311-00056101",
+            "url": "https://www.grupocoresa.com/manometro-3-1-8-baja-azul-para-f-30-0-120psi-r22-134a-404a-yellow-jacket-10165",
+            "scraped_at": "2025-12-26 19:29:28.571152+00",
+            "raw_id": 3003
+        },
+        {
+            "sku": "HE-HER-YEL-015",
+            "precio": 96.91,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190312-00017101",
+            "url": "https://www.grupocoresa.com/peine-para-serpentin-rojo-18-20-aletas-yellow-jacket-10171",
+            "scraped_at": "2025-12-26 19:29:28.571152+00",
+            "raw_id": 3004
+        },
+        {
+            "sku": "HE-HER-YEL-015",
+            "precio": 96.91,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190312-00017101",
+            "url": "https://www.grupocoresa.com/peine-para-serpentin-rojo-18-20-aletas-yellow-jacket-10171",
+            "scraped_at": "2025-12-26 19:29:28.571152+00",
+            "raw_id": 3005
+        },
+        {
+            "sku": "HE-HER-AVA-011",
+            "precio": 1099.75,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190429-00030401",
+            "url": "https://www.grupocoresa.com/cortatubo-3-8-a-2-5-8-avaly-10403",
+            "scraped_at": "2025-12-26 19:29:28.571152+00",
+            "raw_id": 3006
+        },
+        {
+            "sku": "HE-HER-AVA-011",
+            "precio": 1099.75,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190429-00030401",
+            "url": "https://www.grupocoresa.com/cortatubo-3-8-a-2-5-8-avaly-10403",
+            "scraped_at": "2025-12-26 19:29:28.571152+00",
+            "raw_id": 3007
+        },
+        {
+            "sku": "HE-HER-YEL-016",
+            "precio": 3150.55,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190515-00014401",
+            "url": "https://www.grupocoresa.com/herramienta-flare-uso-pesado-45-para-3-4-7-8-1-1-1-8-yellow-jacket-10441",
+            "scraped_at": "2025-12-26 19:29:28.571152+00",
+            "raw_id": 3008
+        },
+        {
+            "sku": "HE-HER-YEL-016",
+            "precio": 3150.55,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190515-00014401",
+            "url": "https://www.grupocoresa.com/herramienta-flare-uso-pesado-45-para-3-4-7-8-1-1-1-8-yellow-jacket-10441",
+            "scraped_at": "2025-12-26 19:29:28.571152+00",
+            "raw_id": 3009
+        },
+        {
+            "sku": "HE-INS-AVA-001",
+            "precio": 4949.35,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190711-00054701",
+            "url": "https://www.grupocoresa.com/medidor-digital-inalambrico-10745",
+            "scraped_at": "2025-12-26 19:29:28.571152+00",
+            "raw_id": 3010
+        },
+        {
+            "sku": "HE-INS-AVA-001",
+            "precio": 4949.35,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190711-00054701",
+            "url": "https://www.grupocoresa.com/medidor-digital-inalambrico-10745",
+            "scraped_at": "2025-12-26 19:29:28.571152+00",
+            "raw_id": 3011
+        },
+        {
+            "sku": "HE-INS-AVA-002",
+            "precio": 1274.1,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190711-00094701",
+            "url": "https://www.grupocoresa.com/termo-higrometro-va-dtl51h-digital-10749",
+            "scraped_at": "2025-12-26 19:29:28.571152+00",
+            "raw_id": 3014
+        },
+        {
+            "sku": "HE-INS-AVA-002",
+            "precio": 1274.1,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190711-00094701",
+            "url": "https://www.grupocoresa.com/termo-higrometro-va-dtl51h-digital-10749",
+            "scraped_at": "2025-12-26 19:29:28.571152+00",
+            "raw_id": 3015
+        }
+    ]
+}

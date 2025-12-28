@@ -1,0 +1,418 @@
+{
+    "new_products": [
+        {
+            "sku": "AC-VEN-SOL-031",
+            "name": "Extractor Baño Soler&Palau Future 150",
+            "category": "Accesorios",
+            "brand": "Soler&Palau",
+            "specs": "Future 150"
+        },
+        {
+            "sku": "EQ-MSI-MID-007",
+            "name": "Minisplit Inverter Midea 1.5 Ton Solo Frío 220V",
+            "category": "Equipos",
+            "brand": "Midea",
+            "specs": "1.5 Ton Solo Frío 220V"
+        },
+        {
+            "sku": "EQ-MSI-LG-019",
+            "name": "Minisplit LG Artcool Mirror Inverter 1.5 Ton Solo Frío 220V",
+            "category": "Equipos",
+            "brand": "LG",
+            "specs": "1.5 Ton Solo Frío 220V"
+        },
+        {
+            "sku": "TU-AIS-DUR-001",
+            "name": "Aislamiento Térmico Durkee 1/2 x 3/8",
+            "category": "Tuberías",
+            "brand": "Durkee",
+            "specs": "1/2 x 3/8"
+        },
+        {
+            "sku": "RE-COM-COP-011",
+            "name": "Compresor Copeland Hermético 1.7 HP Media R22/R404A 220V 3F",
+            "category": "Refacciones",
+            "brand": "Copeland",
+            "specs": "1.7HP Media 220V 3F"
+        },
+        {
+            "sku": "TU-COB-BOH-001",
+            "name": "Tubo Cobre Rígido Bohn 5/8 Tramo 6.1m",
+            "category": "Tuberías",
+            "brand": "Bohn",
+            "specs": "5/8 Rígido"
+        },
+        {
+            "sku": "TU-COB-BOH-002",
+            "name": "Tubo Cobre Rígido Bohn 3/8 Tramo 6.1m",
+            "category": "Tuberías",
+            "brand": "Bohn",
+            "specs": "3/8 Rígido"
+        },
+        {
+            "sku": "TU-COB-BOH-003",
+            "name": "Tubo Cobre Rígido Bohn 3/4 Tramo 6.1m",
+            "category": "Tuberías",
+            "brand": "Bohn",
+            "specs": "3/4 Rígido"
+        },
+        {
+            "sku": "TU-COB-BOH-004",
+            "name": "Tubo Cobre Rígido Bohn 2 1/8 Tramo 6.1m",
+            "category": "Tuberías",
+            "brand": "Bohn",
+            "specs": "2 1/8 Rígido"
+        },
+        {
+            "sku": "TU-COB-BOH-005",
+            "name": "Tubo Cobre Rígido Bohn 1 5/8 Tramo 6.1m",
+            "category": "Tuberías",
+            "brand": "Bohn",
+            "specs": "1 5/8 Rígido"
+        },
+        {
+            "sku": "TU-COB-BOH-006",
+            "name": "Tubo Cobre Rígido Bohn 1 3/8 Tramo 6.1m",
+            "category": "Tuberías",
+            "brand": "Bohn",
+            "specs": "1 3/8 Rígido"
+        },
+        {
+            "sku": "TU-COB-BOH-007",
+            "name": "Tubo Cobre Rígido Bohn 1/2 Tramo 6.1m",
+            "category": "Tuberías",
+            "brand": "Bohn",
+            "specs": "1/2 Rígido"
+        },
+        {
+            "sku": "RE-FIL-MAN-001",
+            "name": "Cartucho Filtro Agua Manitowoc AR-20000",
+            "category": "Refacciones",
+            "brand": "Manitowoc",
+            "specs": "AR-20000"
+        },
+        {
+            "sku": "RF-BOY-MO5-001",
+            "name": "Gas Refrigerante Isceon MO59 Boya 11.35kg",
+            "category": "Refrigerantes",
+            "brand": "Chemours",
+            "specs": "MO59 11.35kg"
+        },
+        {
+            "sku": "TU-COB-BOH-008",
+            "name": "Tubo Cobre Rígido Bohn 1 1/8 Tramo 6.1m",
+            "category": "Tuberías",
+            "brand": "Bohn",
+            "specs": "1 1/8 Rígido"
+        },
+        {
+            "sku": "TU-COB-BOH-009",
+            "name": "Tubo Cobre Flexible Bohn 1/4 Rollo 15.2m",
+            "category": "Tuberías",
+            "brand": "Bohn",
+            "specs": "1/4 Flexible 15m"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "AC-VEN-SOL-031",
+            "price": 1697.3,
+            "url": "https://reacsa.mx/products/extractor-s-p-habitat-future-150",
+            "raw_id": "3745"
+        },
+        {
+            "sku": "EQ-MSI-MID-007",
+            "price": 12336.02,
+            "url": "https://reacsa.mx/products/minisplit-midea-aurora-inverter-frio-calor-1-5-ton-220v",
+            "raw_id": "3746"
+        },
+        {
+            "sku": "EQ-MSI-LG-019",
+            "price": 18934.94,
+            "url": "https://reacsa.mx/products/minisplit-lg-vr-series-inverter-artcool-wifi-solo-frio-1-5-ton-220v",
+            "raw_id": "3747"
+        },
+        {
+            "sku": "EQ-REF-CRI-003",
+            "price": 92371.51,
+            "url": "https://reacsa.mx/products/vitrina-carnicera-criotec-2-metros",
+            "raw_id": "3748"
+        },
+        {
+            "sku": "RF-BOY-404-001",
+            "price": 2537.31,
+            "url": "https://reacsa.mx/products/gs-hp62-10-9-gas-refrigerante-freon-r-404a-10-896-kg",
+            "raw_id": "3749"
+        },
+        {
+            "sku": "TU-AIS-DUR-001",
+            "price": 15.95,
+            "url": "https://reacsa.mx/products/ye09013i-aislamiento-termico-armaflex-durkee-para-tuberia-1-2-x-3-8",
+            "raw_id": "3750"
+        },
+        {
+            "sku": "RE-COM-COP-011",
+            "price": 17916.55,
+            "url": "https://reacsa.mx/products/compresor-hermetico-copeland-3hp-media-temperatura-r22-404a-208-230-1-monofasico",
+            "raw_id": "3751"
+        },
+        {
+            "sku": "TU-COB-BOH-001",
+            "price": 872.94,
+            "url": "https://reacsa.mx/products/tubo-cobre-rig-bohn-tramo-5-8-x-6-1m",
+            "raw_id": "3752"
+        },
+        {
+            "sku": "TU-COB-BOH-002",
+            "price": 424.64,
+            "url": "https://reacsa.mx/products/tubo-cobre-rig-bohn-tramo-3-8-x-6-1m",
+            "raw_id": "3753"
+        },
+        {
+            "sku": "TU-COB-BOH-003",
+            "price": 1170.49,
+            "url": "https://reacsa.mx/products/tubo-cobre-rigido-acr-3-4-x-20",
+            "raw_id": "3754"
+        },
+        {
+            "sku": "TU-COB-BOH-004",
+            "price": 6402.92,
+            "url": "https://reacsa.mx/products/tubo-cobre-rig-bohn-tramo-2-1-8",
+            "raw_id": "3755"
+        },
+        {
+            "sku": "TU-COB-BOH-005",
+            "price": 3567.75,
+            "url": "https://reacsa.mx/products/tubo-cobre-rig-bohn-tramo-1-5-8-x-6-1m",
+            "raw_id": "3756"
+        },
+        {
+            "sku": "TU-COB-BOH-006",
+            "price": 2726.54,
+            "url": "https://reacsa.mx/products/tubo-cobre-rig-bohn-tramo-1-3-8",
+            "raw_id": "3757"
+        },
+        {
+            "sku": "TU-COB-BOH-007",
+            "price": 576.82,
+            "url": "https://reacsa.mx/products/tubo-de-cobre-rigido-bohn-tramo-1-2-de-6-1-metros",
+            "raw_id": "3758"
+        },
+        {
+            "sku": "RE-FIL-MAN-001",
+            "price": 22137.31,
+            "url": "https://reacsa.mx/products/ar-20000-cartucho-de-filtro-de-agua-primario-unico-manitowoc-ice",
+            "raw_id": "3780"
+        },
+        {
+            "sku": "RF-BOY-134-001",
+            "price": 3209.49,
+            "url": "https://reacsa.mx/products/gs-134a-13-6-gas-refrigerante-chemours-r-134a-boya-13-6kg",
+            "raw_id": "3789"
+        },
+        {
+            "sku": "RF-BOY-MO5-001",
+            "price": 6072.54,
+            "url": "https://reacsa.mx/products/gi-mo59-11-35-gas-isceon-mo59-boya-de-11-35-kilos",
+            "raw_id": "3790"
+        },
+        {
+            "sku": "RF-BOY-438-001",
+            "price": 4908.12,
+            "url": "https://reacsa.mx/products/gi-mo99-11-3-gas-isceon-chemours-mo99-cilindro-desechable-boya-11-35kg",
+            "raw_id": "3792"
+        },
+        {
+            "sku": "TU-COB-BOH-008",
+            "price": 2107.6,
+            "url": "https://reacsa.mx/products/acr-tubo-de-cobre-rigido-bohn-tramo-de-6-1-metros",
+            "raw_id": "3823"
+        },
+        {
+            "sku": "TU-COB-BOH-009",
+            "price": 681.14,
+            "url": "https://reacsa.mx/products/acr-f12x50-tubo-de-cobre-flexible-bohn-rollo-1-2-x-15-2-m",
+            "raw_id": "3846"
+        },
+        {
+            "sku": "EQ-MSI-TRA-005",
+            "price": 10600.0,
+            "url": "https://tienda.resurtidora.mx/products/minisplit-trane-frio-calor-220v",
+            "raw_id": "3889"
+        },
+        {
+            "sku": "EQ-MSI-TRA-006",
+            "price": 14440.0,
+            "url": "https://tienda.resurtidora.mx/products/minisplit-trane-frio-calor-220v",
+            "raw_id": "3890"
+        },
+        {
+            "sku": "HE-HER-MIR-001",
+            "price": 3090.0,
+            "url": "https://friorefacciones.com/products/escalera-telescopica-mirage-extensible-ligera-y-segura",
+            "raw_id": "cfa848b1-5077-4cf7-8766-e546e8d082b5"
+        },
+        {
+            "sku": "HE-CHE-COP-002",
+            "price": 2990.0,
+            "url": "https://friorefacciones.com/products/aceite-poliolester-ultra-32-3maf-copeland-galon-4l-para-compresores-de-refrigeracion",
+            "raw_id": "82565a57-fbf4-481b-866f-4b38ab3afc22"
+        },
+        {
+            "sku": "HE-CHE-TEX-010",
+            "price": 1490.0,
+            "url": "https://friorefacciones.com/products/aceite-sw32-galon-texas-lubricante-sintetico",
+            "raw_id": "44c90ce7-e900-4e00-8983-a0069883f6aa"
+        },
+        {
+            "sku": "HE-ACC-YEL-009",
+            "price": 1490.0,
+            "url": "https://friorefacciones.com/products/mancover-49095-yellow-jacket-proteccion-para-manifold-hvac",
+            "raw_id": "0b46eb54-e3f3-46e0-9999-dda386c36162"
+        },
+        {
+            "sku": "EL-REG-TEM-001",
+            "price": 1190.0,
+            "url": "https://friorefacciones.com/products/regulador-de-voltaje-temisa-rvr-1000",
+            "raw_id": "0ffae90f-63ea-4eb1-a988-0b3df5f69481"
+        },
+        {
+            "sku": "EL-REG-TEM-002",
+            "price": 1599.0,
+            "url": "https://friorefacciones.com/products/regulador-de-voltaje-temisa-rvr-1500-proteccion-estable",
+            "raw_id": "db2808eb-fb97-4b21-9b55-a6a865f4295d"
+        },
+        {
+            "sku": "EL-REG-TEM-003",
+            "price": 2290.0,
+            "url": "https://friorefacciones.com/products/regulador-de-voltaje-temisa-rvr-2000",
+            "raw_id": "662926a0-5568-40c8-a0e3-5ded7bb6d364"
+        },
+        {
+            "sku": "RE-CON-PAR-002",
+            "price": 2090.0,
+            "url": "https://friorefacciones.com/products/reloj-deshielo-paragon-8145-20ex-220v",
+            "raw_id": "6bffd696-f64b-4e0f-9682-b7b5139bedf8"
+        },
+        {
+            "sku": "HE-HER-YEL-028",
+            "price": 6390.0,
+            "url": "https://friorefacciones.com/products/llave-dinamometrica-digital-ajustable-yellow-jacket-60648-hvac",
+            "raw_id": "bc1a2fa9-acb4-456f-bacd-63443d104875"
+        },
+        {
+            "sku": "HE-BOM-YEL-004",
+            "price": 4199.0,
+            "url": "https://friorefacciones.com/products/bomba-para-cargar-aceite-yellow-jacket-maxflow-77940-hvac",
+            "raw_id": "b9882032-a91a-4016-b628-b5582be7a0cd"
+        },
+        {
+            "sku": "HE-HER-USA-001",
+            "price": 890.0,
+            "url": "https://friorefacciones.com/products/juego-de-flare-y-expansor-1-8-3-4-usa-parts",
+            "raw_id": "9d59f5e2-a15e-473b-b157-990de3820621"
+        },
+        {
+            "sku": "HE-MAN-YEL-028",
+            "price": 4190.0,
+            "url": "https://friorefacciones.com/products/manifold-heat-pump-para-r22-410a-407c-42044-yellow-jacket-60",
+            "raw_id": "4e68826f-e620-409f-b048-91be780f4de5"
+        },
+        {
+            "sku": "RE-BOB-DAN-001",
+            "price": 690.0,
+            "url": "https://friorefacciones.com/products/bobina-solenoide-danfoss-115v-018f6260",
+            "raw_id": "43af3f8c-7ef9-4c51-a236-ddca8ddaa71a"
+        },
+        {
+            "sku": "RE-VAL-DAN-003",
+            "price": 899.0,
+            "url": "https://friorefacciones.com/products/valvula-de-expansion-termostatica-068z3206-danfoss-t2-r22-r407c",
+            "raw_id": "f98c7a3d-ccd7-46ba-850a-f22ee52e7dc5"
+        },
+        {
+            "sku": "RE-VAL-DAN-004",
+            "price": 899.0,
+            "url": "https://friorefacciones.com/products/valvula-de-expansion-termostatica-068z3400-danfoss-t-2-r404a-r507a",
+            "raw_id": "6fa36f87-de7a-4642-a887-6d2f4e112341"
+        },
+        {
+            "sku": "RE-VAL-DAN-005",
+            "price": 1290.0,
+            "url": "https://friorefacciones.com/products/valvula-de-expansion-termostatica-danfoss-te2-r404a-r507a",
+            "raw_id": "ede98a32-7869-46c5-af67-c7061c43a83d"
+        },
+        {
+            "sku": "RE-VAL-DAN-006",
+            "price": 1050.0,
+            "url": "https://friorefacciones.com/products/valvula-de-expansion-termostatica-danfoss-te-2-r134a-r513a-068z3348",
+            "raw_id": "7aa31958-7011-4f60-b126-14a031a41533"
+        },
+        {
+            "sku": "RE-VAL-DAN-007",
+            "price": 799.0,
+            "url": "https://friorefacciones.com/products/valvula-de-expansion-termostatica-danfoss-te-2-r22-r407c",
+            "raw_id": "d92225fb-beff-4086-8b17-34918dfd14d2"
+        },
+        {
+            "sku": "RE-CON-DAN-004",
+            "price": 899.0,
+            "url": "https://friorefacciones.com/products/termostato-danfoss-ut72-30c\u00ba-a-30c\u00ba-060h1701",
+            "raw_id": "3d0f35d7-0286-41ee-a7a7-fe0388549450"
+        },
+        {
+            "sku": "RE-CON-DAN-005",
+            "price": 1490.0,
+            "url": "https://friorefacciones.com/products/presostato-kp15-danfoss",
+            "raw_id": "3d1b1511-0a12-4686-921b-df25fcd4192f"
+        },
+        {
+            "sku": "RE-CON-DAN-006",
+            "price": 990.0,
+            "url": "https://friorefacciones.com/products/presostato-kp5-de-alta-danfoss-manual-060117366",
+            "raw_id": "2fb43487-5602-49f0-b69e-3db66664ebbf"
+        },
+        {
+            "sku": "RE-CON-DAN-007",
+            "price": 990.0,
+            "url": "https://friorefacciones.com/products/presostato-danfoss-kp1-baja-060110166",
+            "raw_id": "e5203074-1de0-4bce-a9e9-f64826d745d3"
+        },
+        {
+            "sku": "HE-HER-USA-002",
+            "price": 690.0,
+            "url": "https://friorefacciones.com/products/doblador-de-tubos-3-en-1-ct-369a",
+            "raw_id": "0e036272-c3b1-4e3f-8648-b3d6003b56db"
+        },
+        {
+            "sku": "HE-REC-USA-001",
+            "price": 13400.0,
+            "url": "https://friorefacciones.com/products/recuperadora-de-gas-refrigerante-110v-3-4-hp-usa-tools",
+            "raw_id": "5854a7ed-3b0c-45f7-a5c3-90f2b96597c0"
+        },
+        {
+            "sku": "HE-INS-USA-001",
+            "price": 279.0,
+            "url": "https://friorefacciones.com/products/termohigrometro-int-ext-usa-parts",
+            "raw_id": "cc41d4ef-51a5-4e6c-832b-75e7008bf6e6"
+        },
+        {
+            "sku": "RE-CON-USA-001",
+            "price": 349.0,
+            "url": "https://friorefacciones.com/products/control-universal-2000-codigos",
+            "raw_id": "acc74bd7-6554-45b9-b37f-007f27b181ab"
+        },
+        {
+            "sku": "RE-CON-USA-002",
+            "price": 210.0,
+            "url": "https://friorefacciones.com/products/control-universal-1000-codigos",
+            "raw_id": "414982d3-fad6-47aa-81c3-d9f9df289141"
+        },
+        {
+            "sku": "HE-INS-DSZ-001",
+            "price": 3259.0,
+            "url": "https://friorefacciones.com/products/detector-de-fugas-dszh-rld382p",
+            "raw_id": "00c9dcca-abfd-44a5-9f89-ae6878cdf659"
+        }
+    ]
+}

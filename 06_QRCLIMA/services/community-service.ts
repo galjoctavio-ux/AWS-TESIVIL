@@ -284,10 +284,11 @@ export const createThread = async (
             toxicityScore,
         });
 
-        // 4. Award tokens
+        // 4. Award tokens and update stats
         const userRef = doc(db, 'users', threadData.authorId);
         await updateDoc(userRef, {
-            token_balance: increment(COMMUNITY_CONFIG.threadReward)
+            token_balance: increment(COMMUNITY_CONFIG.threadReward),
+            'stats.sosSolved': increment(1)  // Count towards profile guide
         });
 
         console.log('Thread created:', docRef.id);
@@ -577,10 +578,11 @@ export const markSolution = async (
             isSolution: true
         });
 
-        // 3. Award solver
+        // 3. Award solver and update stats
         const userRef = doc(db, 'users', solverId);
         batch.update(userRef, {
-            token_balance: increment(COMMUNITY_CONFIG.solutionReward)
+            token_balance: increment(COMMUNITY_CONFIG.solutionReward),
+            'stats.sosSolved': increment(1)  // Count towards profile guide
         });
 
         await batch.commit();

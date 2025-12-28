@@ -61,38 +61,92 @@ export default function ServiceDetail() {
         loadData();
     }, [id, user]);
 
-    const handleGeneratePdf = async () => {
+    const handleGeneratePdf = async (usePremium: boolean = false) => {
         if (!service || !client) {
             Alert.alert('Error', 'Faltan datos para generar el reporte');
             return;
         }
 
-        // Prepare warranty text
+        // Check if user has logo configured when using premium
+        if (usePremium && !technicianProfile?.branding?.logoURL) {
+            Alert.alert(
+                '⚠️ Configura tu logo',
+                'Para obtener el mejor resultado en PDFs premium, te recomendamos subir tu logo primero.',
+                [
+                    { text: 'Configurar logo', onPress: () => router.push('/(app)/profile/branding') },
+                    { text: 'Continuar sin logo', style: 'cancel', onPress: () => generatePdf(usePremium) }
+                ]
+            );
+            return;
+        }
+
+        await generatePdf(usePremium);
+    };
+
+    const generatePdf = async (usePremium: boolean) => {
+        // Prepare warranty text from saved service data
+        const savedWarranty = service!.warrantyMonths ?? 0;
         let warrantyText = '';
-        if (warrantyType === 0) {
-            warrantyText = 'Este trabajo no cuenta con garantía.';
+
+        if (savedWarranty === 0) {
+            warrantyText = 'Servicio verificado. Entrega a satisfacción del cliente.';
         } else {
-            const duration = warrantyType === -1 ? customWarranty : `${warrantyType} ${warrantyType === 1 ? 'mes' : 'meses'}`;
-            if (!duration && warrantyType === -1) {
-                Alert.alert('Error', 'Por favor especifica la duración de la garantía');
-                return;
-            }
+            const duration = savedWarranty === 1 ? '1 mes' : `${savedWarranty} meses`;
             warrantyText = `Este servicio cuenta con una garantía de ${duration} a partir de la fecha de entrega, cubriendo exclusivamente la mano de obra realizada. No incluye partes eléctricas, fugas de gas ni daños por uso indebido.`;
         }
 
         try {
             setGeneratingPdf(true);
+
+            // If using premium, consume a credit
+            if (usePremium) {
+                const { consumePdfUnlock } = await import('../../../services/store-service');
+                const consumed = await consumePdfUnlock(user!.uid);
+                if (!consumed) {
+                    Alert.alert('Error', 'No tienes créditos de PDF premium disponibles');
+                    return;
+                }
+            }
+
             await generateServiceReport({
-                service,
-                client,
+                service: service!,
+                client: client!,
                 technicianProfile: technicianProfile || undefined,
-                warrantyText
+                warrantyText,
+                forcePremium: usePremium  // Force PRO features when user selected premium
             });
         } catch (error: any) {
             console.error('Error generating PDF:', error);
             Alert.alert('Error', error?.message || 'No se pudo generar el PDF');
         } finally {
             setGeneratingPdf(false);
+        }
+    };
+
+    const showPdfOptions = () => {
+        const pdfCredits = (technicianProfile as any)?.pdfUnlocksAvailable || 0;
+        const isPro = technicianProfile?.subscription && technicianProfile.subscription !== 'free';
+
+        if (isPro) {
+            // PRO users always get premium PDF
+            handleGeneratePdf(true);
+            return;
+        }
+
+        if (pdfCredits > 0) {
+            // User has credits - show options
+            Alert.alert(
+                '📄 Generar PDF',
+                `Tienes ${pdfCredits} PDF(s) premium disponibles`,
+                [
+                    { text: 'PDF Estándar', onPress: () => handleGeneratePdf(false) },
+                    { text: `PDF Premium ✨ (${pdfCredits})`, onPress: () => handleGeneratePdf(true) },
+                    { text: 'Cancelar', style: 'cancel' }
+                ]
+            );
+        } else {
+            // No credits - generate standard
+            handleGeneratePdf(false);
         }
     };
 
@@ -252,7 +306,7 @@ export default function ServiceDetail() {
 
             {/* Floating Action Button - Generate PDF */}
             <TouchableOpacity
-                onPress={handleGeneratePdf}
+                onPress={showPdfOptions}
                 disabled={generatingPdf}
                 className={`absolute bottom-8 left-6 right-6 bg-blue-600 flex-row items-center justify-center p-4 rounded-2xl shadow-lg ${generatingPdf ? 'opacity-70' : ''
                     }`}

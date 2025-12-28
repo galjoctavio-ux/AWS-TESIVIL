@@ -1,0 +1,671 @@
+{
+    "new_products": [
+        {
+            "sku": "HE-MGU-UNI-002",
+            "nombre_estandarizado": "Manguera Autorecargable R134A Uniweld",
+            "grupo_general": "HE",
+            "grupo_especializado": "Mangueras",
+            "marca": "Uniweld",
+            "modelo": "49016",
+            "descripcion_tecnica": "Manguera Autorecargable R134A con Válvula",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Carga",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-BOM-YEL-001",
+            "nombre_estandarizado": "Bomba para Cargar Aceite Yellow Jacket Deluxe",
+            "grupo_general": "HE",
+            "grupo_especializado": "Bombas",
+            "marca": "Yellow Jacket",
+            "modelo": "77930",
+            "descripcion_tecnica": "Bomba para Cargar Aceite Deluxe",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Mantenimiento",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-MGU-YEL-003",
+            "nombre_estandarizado": "Juego 3 Mangueras Yellow Jacket 60\" Válvula Esférica",
+            "grupo_general": "HE",
+            "grupo_especializado": "Mangueras",
+            "marca": "Yellow Jacket",
+            "modelo": "29985",
+            "descripcion_tecnica": "Juego 3 Mangueras 60\" Conexión 1/4\" con Válvula Esférica",
+            "capacidad": "60 pulg",
+            "voltaje": "N/A",
+            "tipo_operacion": "Carga",
+            "unidad": "Juego"
+        },
+        {
+            "sku": "HE-CIN-GEN-002",
+            "nombre_estandarizado": "Cinta Aluminio Reforzada 2\" x 50 Yd",
+            "grupo_general": "HE",
+            "grupo_especializado": "Materiales",
+            "marca": "Genérico",
+            "modelo": "Reforzada",
+            "descripcion_tecnica": "Cinta Aluminio Reforzada 2\" x 50 Yd",
+            "capacidad": "2\" x 50 Yd",
+            "voltaje": "N/A",
+            "tipo_operacion": "Aislamiento",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-UNI-002",
+            "nombre_estandarizado": "Kit Abocinador de Golpe Uniweld 5 Piezas",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Uniweld",
+            "modelo": "70005",
+            "descripcion_tecnica": "Kit Abocinador Golpe 5 Piezas 1/4\" a 5/8\"",
+            "capacidad": "1/4-5/8\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Tubería",
+            "unidad": "Juego"
+        },
+        {
+            "sku": "HE-HER-DIV-001",
+            "nombre_estandarizado": "Aspersora Diversitech 2.25 Galones",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Diversitech",
+            "modelo": "2603",
+            "descripcion_tecnica": "Aspersora 2.25 Galones",
+            "capacidad": "2.25 Gal",
+            "voltaje": "N/A",
+            "tipo_operacion": "Limpieza",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-UNI-003",
+            "nombre_estandarizado": "Dobla Tubo de Resorte Uniweld 5/8\"",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Uniweld",
+            "modelo": "70020",
+            "descripcion_tecnica": "Dobla Tubo de Resorte 5/8\"",
+            "capacidad": "5/8\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Tubería",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-PRO-DIV-001",
+            "nombre_estandarizado": "Protector Digital Trifásico Diversitech DTP-3",
+            "grupo_general": "EL",
+            "grupo_especializado": "Protectores",
+            "marca": "Diversitech",
+            "modelo": "DTP-3",
+            "descripcion_tecnica": "Protector Digital de 3 Fases",
+            "capacidad": "Trifásico",
+            "voltaje": "N/A",
+            "tipo_operacion": "Protección",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-MGU-UNI-003",
+            "nombre_estandarizado": "Manguera Metálica Uniweld 24\" Alta Presión",
+            "grupo_general": "HE",
+            "grupo_especializado": "Mangueras",
+            "marca": "Uniweld",
+            "modelo": "91402",
+            "descripcion_tecnica": "Manguera Metálica 24\" Alta Presión",
+            "capacidad": "24 pulg",
+            "voltaje": "N/A",
+            "tipo_operacion": "Carga",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-SOL-UNI-003",
+            "nombre_estandarizado": "Iniciador de Chispa Uniweld con Repuestos",
+            "grupo_general": "HE",
+            "grupo_especializado": "Soldadura",
+            "marca": "Uniweld",
+            "modelo": "FL3437",
+            "descripcion_tecnica": "Iniciador de Chispa con Cinco Repuestos",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Soldadura",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-ADE-003",
+            "nombre_estandarizado": "Aspersora Adesa 1.5 Litros",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Adesa",
+            "modelo": "AD-A-1.5",
+            "descripcion_tecnica": "Aspersora 1.5 Litros",
+            "capacidad": "1.5 L",
+            "voltaje": "N/A",
+            "tipo_operacion": "Limpieza",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-MGU-YEL-004",
+            "nombre_estandarizado": "Manguera Yellow Jacket 72\" Amarilla 1/4\"",
+            "grupo_general": "HE",
+            "grupo_especializado": "Mangueras",
+            "marca": "Yellow Jacket",
+            "modelo": "21072",
+            "descripcion_tecnica": "Manguera 72\" Amarilla Conexión 1/4\"",
+            "capacidad": "72 pulg",
+            "voltaje": "N/A",
+            "tipo_operacion": "Carga",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-ADE-004",
+            "nombre_estandarizado": "Pistola Aspersora para Galón Adesa",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Adesa",
+            "modelo": "AD-PG",
+            "descripcion_tecnica": "Pistola Aspersora para Galón",
+            "capacidad": "Galón",
+            "voltaje": "N/A",
+            "tipo_operacion": "Limpieza",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-MGU-UNI-004",
+            "nombre_estandarizado": "Manguera Uniweld Soft Magic 60\" Roja",
+            "grupo_general": "HE",
+            "grupo_especializado": "Mangueras",
+            "marca": "Uniweld",
+            "modelo": "H5SMBR",
+            "descripcion_tecnica": "Manguera Soft Magic 60\" Roja",
+            "capacidad": "60 pulg",
+            "voltaje": "N/A",
+            "tipo_operacion": "Carga",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "AC-CAN-REC-001",
+            "nombre_estandarizado": "Terminal para Canaleta Rectorseal 3-1/2\"",
+            "grupo_general": "AC",
+            "grupo_especializado": "Canaletas",
+            "marca": "Rectorseal",
+            "modelo": "84007",
+            "descripcion_tecnica": "Terminal para Canaleta 3 1/2\"",
+            "capacidad": "3-1/2\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Instalación",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-MGU-YEL-005",
+            "nombre_estandarizado": "Manguera Yellow Jacket 60\" R410 Roja",
+            "grupo_general": "HE",
+            "grupo_especializado": "Mangueras",
+            "marca": "Yellow Jacket",
+            "modelo": "29465",
+            "descripcion_tecnica": "Manguera 60\" R410 Roja",
+            "capacidad": "60 pulg",
+            "voltaje": "N/A",
+            "tipo_operacion": "Carga",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-AVA-003",
+            "nombre_estandarizado": "Matraca Avaly 1/4\" a 5/16\"",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Avaly",
+            "modelo": "VA-122",
+            "descripcion_tecnica": "Matraca Reversible 1/4\" a 5/16\"",
+            "capacidad": "1/4-5/16\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Servicio",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-BOM-UNI-001",
+            "nombre_estandarizado": "Bomba de Vacío Uniweld 8 CFM",
+            "grupo_general": "HE",
+            "grupo_especializado": "Bombas",
+            "marca": "Uniweld",
+            "modelo": "HVP8",
+            "descripcion_tecnica": "Bomba de Vacío 8 CFM 2 Etapas",
+            "capacidad": "8 CFM",
+            "voltaje": "110/220V",
+            "tipo_operacion": "Vacío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-MAN-AVA-001",
+            "nombre_estandarizado": "Manómetro Glicerina Alta Avaly R134/404/22",
+            "grupo_general": "HE",
+            "grupo_especializado": "Manómetros",
+            "marca": "Avaly",
+            "modelo": "VA-500GL",
+            "descripcion_tecnica": "Manómetro Glicerina Alta Presión R134/404/22",
+            "capacidad": "Alta",
+            "voltaje": "N/A",
+            "tipo_operacion": "Medición",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-ACE-MAS-001",
+            "nombre_estandarizado": "Aceite para Armado de Válvulas Master Cool",
+            "grupo_general": "HE",
+            "grupo_especializado": "Químicos",
+            "marca": "Master Cool",
+            "modelo": "184001",
+            "descripcion_tecnica": "Botella con Aceite para Armado de Válvulas",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Mantenimiento",
+            "unidad": "Pieza"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "AC-ROD-GEN-001",
+            "precio": 95.0,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000582",
+            "url": "https://www.grupocoresa.com/766549-rodamiento-en-rondana-de-hule-1-2-2850",
+            "scraped_at": "2025-12-26 19:28:06.23535+00",
+            "raw_id": 2409
+        },
+        {
+            "sku": "HE-SOL-UNI-002",
+            "precio": 2076.42,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000605",
+            "url": "https://www.grupocoresa.com/boquilla-triple-con-regulador-5060",
+            "scraped_at": "2025-12-26 19:28:06.23535+00",
+            "raw_id": 2411
+        },
+        {
+            "sku": "HE-SOL-CLE-001",
+            "precio": 183.28,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000636",
+            "url": "https://www.grupocoresa.com/tanque-clean-burn-negro-6360",
+            "scraped_at": "2025-12-26 19:28:06.23535+00",
+            "raw_id": 2413
+        },
+        {
+            "sku": "HE-HER-YEL-002",
+            "precio": 87.02,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000645",
+            "url": "https://www.grupocoresa.com/peine-para-serpentin-morado-21-22-y-23-24-aletas-yellow-jacket-5460",
+            "scraped_at": "2025-12-26 19:28:06.23535+00",
+            "raw_id": 2415
+        },
+        {
+            "sku": "HE-SOL-AVA-001",
+            "precio": 133.74,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000646",
+            "url": "https://www.grupocoresa.com/tanque-soldar-negro-3600-f-mg9tbd-6460",
+            "scraped_at": "2025-12-26 19:28:06.23535+00",
+            "raw_id": 2417
+        },
+        {
+            "sku": "HE-CIN-GEN-001",
+            "precio": 149.52,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000677",
+            "url": "https://www.grupocoresa.com/cinta-aluminio-0802-de-2-x-50-yd-7760",
+            "scraped_at": "2025-12-26 19:28:06.23535+00",
+            "raw_id": 2419
+        },
+        {
+            "sku": "HE-MGU-UNI-002",
+            "precio": 265.19,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000694",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:06.23535+00",
+            "raw_id": 2420
+        },
+        {
+            "sku": "HE-MGU-UNI-002",
+            "precio": 265.19,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000694",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:06.23535+00",
+            "raw_id": 2421
+        },
+        {
+            "sku": "HE-BOM-YEL-001",
+            "precio": 4601.19,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000745",
+            "url": "https://www.grupocoresa.com/bomba-para-cargar-aceite-deluxe-yellow-jacket-5470",
+            "scraped_at": "2025-12-26 19:28:06.23535+00",
+            "raw_id": 2422
+        },
+        {
+            "sku": "HE-BOM-YEL-001",
+            "precio": 4601.19,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000745",
+            "url": "https://www.grupocoresa.com/bomba-para-cargar-aceite-deluxe-yellow-jacket-5470",
+            "scraped_at": "2025-12-26 19:28:06.23535+00",
+            "raw_id": 2423
+        },
+        {
+            "sku": "HE-MGU-YEL-003",
+            "precio": 3852.93,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000747",
+            "url": "https://www.grupocoresa.com/juego-3-mangueras-de-60-con-valvula-esferica-compacta-yellow-jacket-7470",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2424
+        },
+        {
+            "sku": "HE-MGU-YEL-003",
+            "precio": 3852.93,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000747",
+            "url": "https://www.grupocoresa.com/juego-3-mangueras-de-60-con-valvula-esferica-compacta-yellow-jacket-7470",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2425
+        },
+        {
+            "sku": "HE-CIN-GEN-002",
+            "precio": 187.24,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000777",
+            "url": "https://www.grupocoresa.com/cinta-aluminio-reforzada-2x-50-yd-7770",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2426
+        },
+        {
+            "sku": "HE-CIN-GEN-002",
+            "precio": 187.24,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000777",
+            "url": "https://www.grupocoresa.com/cinta-aluminio-reforzada-2x-50-yd-7770",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2427
+        },
+        {
+            "sku": "HE-HER-UNI-002",
+            "precio": 274.71,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000794",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2428
+        },
+        {
+            "sku": "HE-HER-UNI-002",
+            "precio": 274.71,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000794",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2429
+        },
+        {
+            "sku": "HE-HER-DIV-001",
+            "precio": 546.43,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000875",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2430
+        },
+        {
+            "sku": "HE-HER-DIV-001",
+            "precio": 546.43,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000875",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2431
+        },
+        {
+            "sku": "HE-HER-UNI-003",
+            "precio": 105.9,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000894",
+            "url": "https://www.grupocoresa.com/dobla-tubo-de-resorte-5-8-4980",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2432
+        },
+        {
+            "sku": "HE-HER-UNI-003",
+            "precio": 105.9,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000894",
+            "url": "https://www.grupocoresa.com/dobla-tubo-de-resorte-5-8-4980",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2433
+        },
+        {
+            "sku": "EL-PRO-DIV-001",
+            "precio": 5893.17,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000975",
+            "url": "https://www.grupocoresa.com/protector-digital-de-3-fases-5790",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2434
+        },
+        {
+            "sku": "EL-PRO-DIV-001",
+            "precio": 5893.17,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000975",
+            "url": "https://www.grupocoresa.com/protector-digital-de-3-fases-5790",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2435
+        },
+        {
+            "sku": "HE-MGU-UNI-003",
+            "precio": 195.82,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000994",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2436
+        },
+        {
+            "sku": "HE-MGU-UNI-003",
+            "precio": 195.82,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000994",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2437
+        },
+        {
+            "sku": "HE-SOL-UNI-003",
+            "precio": 139.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001005",
+            "url": "https://www.grupocoresa.com/iniciador-de-chispa-fl3437-con-cinco-repuestos-5001",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2438
+        },
+        {
+            "sku": "HE-SOL-UNI-003",
+            "precio": 139.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001005",
+            "url": "https://www.grupocoresa.com/iniciador-de-chispa-fl3437-con-cinco-repuestos-5001",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2439
+        },
+        {
+            "sku": "HE-HER-ADE-003",
+            "precio": 570.43,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001054",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2440
+        },
+        {
+            "sku": "HE-HER-ADE-003",
+            "precio": 570.43,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001054",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2441
+        },
+        {
+            "sku": "HE-MGU-YEL-004",
+            "precio": 892.53,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001145",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2442
+        },
+        {
+            "sku": "HE-MGU-YEL-004",
+            "precio": 892.53,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001145",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2443
+        },
+        {
+            "sku": "HE-HER-ADE-004",
+            "precio": 24.16,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001154",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2444
+        },
+        {
+            "sku": "HE-HER-ADE-004",
+            "precio": 24.16,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001154",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2445
+        },
+        {
+            "sku": "HE-MGU-UNI-004",
+            "precio": 270.55,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001205",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2446
+        },
+        {
+            "sku": "HE-MGU-UNI-004",
+            "precio": 270.55,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001205",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:09.316446+00",
+            "raw_id": 2447
+        },
+        {
+            "sku": "AC-CAN-REC-001",
+            "precio": 81.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001234",
+            "url": "https://www.grupocoresa.com/terminal-para-canaleta-3-1-2-4321",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2448
+        },
+        {
+            "sku": "AC-CAN-REC-001",
+            "precio": 81.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001234",
+            "url": "https://www.grupocoresa.com/terminal-para-canaleta-3-1-2-4321",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2449
+        },
+        {
+            "sku": "HE-MGU-YEL-005",
+            "precio": 1326.84,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001245",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2450
+        },
+        {
+            "sku": "HE-MGU-YEL-005",
+            "precio": 1326.84,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001245",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2451
+        },
+        {
+            "sku": "HE-HER-AVA-003",
+            "precio": 115.11,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001246",
+            "url": "https://www.grupocoresa.com/matraca-avaly-1-4-a-5-16-6421",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2452
+        },
+        {
+            "sku": "HE-HER-AVA-003",
+            "precio": 115.11,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001246",
+            "url": "https://www.grupocoresa.com/matraca-avaly-1-4-a-5-16-6421",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2453
+        },
+        {
+            "sku": "HE-BOM-UNI-001",
+            "precio": 15929.32,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001305",
+            "url": "https://www.grupocoresa.com/bomba-de-vacio-hvp8-8cfm-1-2hp-2etapas-110-220v-roja-5031",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2454
+        },
+        {
+            "sku": "HE-BOM-UNI-001",
+            "precio": 15929.32,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001305",
+            "url": "https://www.grupocoresa.com/bomba-de-vacio-hvp8-8cfm-1-2hp-2etapas-110-220v-roja-5031",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2455
+        },
+        {
+            "sku": "HE-MAN-AVA-001",
+            "precio": 432.62,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001346",
+            "url": "https://www.grupocoresa.com/manometro-glicerina-alta-r134-404-22-mh-6431",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2456
+        },
+        {
+            "sku": "HE-MAN-AVA-001",
+            "precio": 432.62,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001346",
+            "url": "https://www.grupocoresa.com/manometro-glicerina-alta-r134-404-22-mh-6431",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2457
+        },
+        {
+            "sku": "HE-ACE-MAS-001",
+            "precio": 94.24,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001386",
+            "url": "https://www.grupocoresa.com/botella-con-aceite-para-armado-de-valvulas-6831",
+            "scraped_at": "2025-12-26 19:28:12.826974+00",
+            "raw_id": 2458
+        }
+    ]
+}

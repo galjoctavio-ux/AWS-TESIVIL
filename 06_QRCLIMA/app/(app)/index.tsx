@@ -5,9 +5,11 @@ import { useState, useCallback, useMemo } from 'react';
 import { getClients, ClientData } from '../../services/clients-service';
 import { getUserProfile, UserProfile, UserRank } from '../../services/user-service';
 import { getRecentServices, getTotalServicesCount } from '../../services/services-service';
+import { getOrderedQuickActions, trackActionUsage, QuickAction } from '../../services/quick-actions-service';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomNav from '../../components/BottomNav';
+import QuickActionsEditor from '../../components/QuickActionsEditor';
 
 // Rank display helper
 const getRankLabel = (rank: UserRank | undefined) => {
@@ -30,6 +32,15 @@ export default function HomeScreen() {
 
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+
+    // Quick Actions - Dynamic hybrid system
+    const [quickActions, setQuickActions] = useState<QuickAction[]>([]);
+    const [showActionsEditor, setShowActionsEditor] = useState(false);
+
+    const loadQuickActions = async () => {
+        const actions = await getOrderedQuickActions();
+        setQuickActions(actions);
+    };
 
     const loadData = async () => {
         if (!user) return;
@@ -54,28 +65,26 @@ export default function HomeScreen() {
     useFocusEffect(
         useCallback(() => {
             setLoading(true);
-            loadData().finally(() => setLoading(false));
+            Promise.all([loadData(), loadQuickActions()]).finally(() => setLoading(false));
         }, [user])
     );
 
     const onRefresh = async () => {
         setRefreshing(true);
-        await loadData();
+        await Promise.all([loadData(), loadQuickActions()]);
         setRefreshing(false);
+    };
+
+    const handleQuickAction = async (action: QuickAction) => {
+        // Track usage for auto-ordering
+        await trackActionUsage(action.id);
+        router.push(action.route as any);
     };
 
     const displayName = profile?.alias || profile?.businessName || 'Técnico';
     const tokenBalance = profile?.tokenBalance || 0;
     const rankInfo = getRankLabel(profile?.rank);
     const nextService = upcomingServices[0];
-
-    // Quick actions - reduced to 4 main actions
-    const quickActions = [
-        { id: 'service', icon: 'add-circle', label: 'Nuevo Servicio', route: '/(app)/scanner?mode=service', primary: true },
-        { id: 'quote', icon: 'document-text', label: 'Cotizar', route: '/(app)/quotes/wizard', accent: true },
-        { id: 'scan', icon: 'qr-code', label: 'Escanear QR', route: '/(app)/scanner' },
-        { id: 'sos', icon: 'help-buoy', label: 'SOS', route: '/(app)/community', alert: true },
-    ];
 
     return (
         <View className="flex-1 bg-slate-50">
@@ -150,26 +159,33 @@ export default function HomeScreen() {
                 </View>
 
                 {/* ========================================== */}
-                {/* QUICK ACTIONS - 4 Clean Icons */}
+                {/* QUICK ACTIONS - Hybrid Dynamic System */}
                 {/* ========================================== */}
                 <View className="px-4 mt-6">
-                    <Text className="text-gray-800 font-bold text-lg mb-3">Accesos Rápidos</Text>
+                    <View className="flex-row justify-between items-center mb-3">
+                        <Text className="text-gray-800 font-bold text-lg">Accesos Rápidos</Text>
+                        <TouchableOpacity
+                            onPress={() => setShowActionsEditor(true)}
+                            className="bg-gray-100 p-2 rounded-full"
+                        >
+                            <Ionicons name="pencil" size={16} color="#6B7280" />
+                        </TouchableOpacity>
+                    </View>
                     <View className="flex-row justify-between">
                         {quickActions.map(action => (
                             <TouchableOpacity
                                 key={action.id}
-                                onPress={() => router.push(action.route as any)}
+                                onPress={() => handleQuickAction(action)}
                                 className="items-center flex-1"
                             >
                                 <View className={`w-14 h-14 rounded-2xl items-center justify-center mb-2 ${action.primary ? 'bg-blue-600' :
-                                    action.accent ? 'bg-green-600' :
-                                        action.alert ? 'bg-red-500' :
-                                            'bg-gray-100'
+                                    action.alert ? 'bg-red-500' :
+                                        action.color || 'bg-gray-100'
                                     }`}>
                                     <Ionicons
                                         name={action.icon as any}
                                         size={26}
-                                        color={action.primary || action.accent || action.alert ? 'white' : '#374151'}
+                                        color={action.primary || action.alert || action.color ? 'white' : '#374151'}
                                     />
                                 </View>
                                 <Text className="text-gray-600 text-xs font-medium text-center">{action.label}</Text>
@@ -290,6 +306,13 @@ export default function HomeScreen() {
 
             {/* Bottom Navigation */}
             <BottomNav />
+
+            {/* Quick Actions Editor Modal */}
+            <QuickActionsEditor
+                visible={showActionsEditor}
+                onClose={() => setShowActionsEditor(false)}
+                onSave={loadQuickActions}
+            />
         </View>
     );
 }

@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc, increment } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { spendTokens } from './wallet-service';
 
@@ -13,60 +13,13 @@ export interface StoreProduct {
     stock: number;
 }
 
-// HARDCODED CATALOG (Mock for now, would be in Firestore 'store_products')
-// Según master_plan.md - Módulo 8: Tienda y Recompensas
+// HARDCODED CATALOG - Solo productos digitales canjeables
+// Los productos físicos y adicionales se administrarán desde panel web
 const PRODUCT_CATALOG: StoreProduct[] = [
-    // ============================================
-    // PRODUCTOS FÍSICOS (MXN) - Etiquetas QR
-    // ============================================
-    {
-        id: 'qr-pack-20',
-        name: 'Pack Inicial (20 QRs)',
-        description: 'Etiquetas vinil resistente UV + adhesivo industrial. Ideal para probar el sistema.',
-        imageUrl: '',
-        price: 350,
-        currency: 'MXN',
-        category: 'Merch',
-        stock: 100
-    },
-    {
-        id: 'qr-pack-50',
-        name: 'Pack Taller (50 QRs)',
-        description: 'Mejor precio por unidad. Para técnicos con alta demanda.',
-        imageUrl: '',
-        price: 750,
-        currency: 'MXN',
-        category: 'Merch',
-        stock: 50
-    },
-    {
-        id: 'qr-pack-100',
-        name: 'Pack Flotilla (100 QRs)',
-        description: 'Margen máximo. Para empresas o técnicos con múltiples ayudantes.',
-        imageUrl: '',
-        price: 1200,
-        currency: 'MXN',
-        category: 'Merch',
-        stock: 30
-    },
-    {
-        id: 'gorra',
-        name: 'Gorra Oficial QRclima',
-        description: 'Bordado 3D de alta calidad. Protege del sol en la azotea.',
-        imageUrl: '',
-        price: 250,
-        currency: 'MXN',
-        category: 'Merch',
-        stock: 20
-    },
-
-    // ============================================
-    // PRODUCTOS DIGITALES (Tokens) - Margen 100%
-    // ============================================
     {
         id: 'boost-pro-week',
-        name: '🚀 Semana PRO',
-        description: 'Desbloquea TODAS las funciones Premium por 7 días. Cotizador Pro, PDFs sin marca, y más.',
+        name: 'Semana PRO',
+        description: 'Desbloquea TODAS las funciones Premium por 7 días: Cotizador Pro, PDFs sin marca, recordatorios, y más.',
         imageUrl: '',
         price: 500,
         currency: 'Tokens',
@@ -75,79 +28,18 @@ const PRODUCT_CATALOG: StoreProduct[] = [
     },
     {
         id: 'pdf-unlock-1',
-        name: '📄 1 PDF Sin Marca',
-        description: 'Genera un PDF de cotización profesional sin marca de agua.',
+        name: 'PDF Sin Marca',
+        description: 'Genera 1 PDF de cotización o reporte profesional sin marca de agua de QRclima.',
         imageUrl: '',
         price: 50,
         currency: 'Tokens',
         category: 'Digital',
         stock: 999
     },
-    {
-        id: 'sos-highlight',
-        name: '📢 Destacar Mi Pregunta',
-        description: 'Tu hilo SOS aparece al inicio del foro por 24 horas.',
-        imageUrl: '',
-        price: 100,
-        currency: 'Tokens',
-        category: 'Digital',
-        stock: 999
-    },
-    {
-        id: 'vrf-codes-york',
-        name: '🔧 Códigos VRF York',
-        description: 'Acceso permanente a biblioteca de errores de sistemas VRF York.',
-        imageUrl: '',
-        price: 300,
-        currency: 'Tokens',
-        category: 'Digital',
-        stock: 999
-    },
-    {
-        id: 'vrf-codes-lg',
-        name: '🔧 Códigos VRF LG',
-        description: 'Acceso permanente a biblioteca de errores de sistemas VRF LG.',
-        imageUrl: '',
-        price: 300,
-        currency: 'Tokens',
-        category: 'Digital',
-        stock: 999
-    },
-    {
-        id: 'cupon-qr-20',
-        name: '🎫 Cupón 20% en QRs',
-        description: 'Descuento del 20% en tu próxima compra de etiquetas QR físicas.',
-        imageUrl: '',
-        price: 200,
-        currency: 'Tokens',
-        category: 'Digital',
-        stock: 999
-    },
-
-    // ============================================
-    // HERRAMIENTAS FÍSICAS (Tokens altos)
-    // ============================================
-    {
-        id: 'tool-tape',
-        name: '🧰 Cinta Momia (Rollo)',
-        description: 'Cinta de alta resistencia para instalaciones. Envío gratis con pack QR.',
-        imageUrl: '',
-        price: 150,
-        currency: 'Tokens',
-        category: 'Herramientas',
-        stock: 30
-    },
-    {
-        id: 'tool-screwdriver',
-        name: '🧰 Desarmador de Bolsillo',
-        description: 'Desarmador compacto con puntas intercambiables.',
-        imageUrl: '',
-        price: 250,
-        currency: 'Tokens',
-        category: 'Herramientas',
-        stock: 20
-    },
 ];
+
+// 6 months in milliseconds
+const SIX_MONTHS_MS = 6 * 30 * 24 * 60 * 60 * 1000;
 
 export const getProducts = async (currencyFilter: 'MXN' | 'Tokens' | 'All' = 'All') => {
     // Simulate API delay
@@ -157,6 +49,30 @@ export const getProducts = async (currencyFilter: 'MXN' | 'Tokens' | 'All' = 'Al
     return PRODUCT_CATALOG.filter(p => p.currency === currencyFilter);
 };
 
+/**
+ * Check if user can purchase PRO week (max 1 per 6 months)
+ */
+export const canPurchaseProWeek = async (userId: string): Promise<{ canPurchase: boolean; waitDays?: number }> => {
+    const userRef = doc(db, 'users', userId);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) return { canPurchase: false };
+
+    const userData = userSnap.data();
+    const lastPurchase = userData.lastProWeekPurchase;
+
+    if (!lastPurchase) return { canPurchase: true };
+
+    const lastDate = lastPurchase.toDate ? lastPurchase.toDate() : new Date(lastPurchase);
+    const timeSince = Date.now() - lastDate.getTime();
+
+    if (timeSince >= SIX_MONTHS_MS) {
+        return { canPurchase: true };
+    }
+
+    const remainingDays = Math.ceil((SIX_MONTHS_MS - timeSince) / (24 * 60 * 60 * 1000));
+    return { canPurchase: false, waitDays: remainingDays };
+};
 
 export const purchaseProduct = async (userId: string, productId: string) => {
     // 1. Get Product
@@ -168,6 +84,14 @@ export const purchaseProduct = async (userId: string, productId: string) => {
     const userSnap = await getDoc(userRef);
 
     if (!userSnap.exists()) throw new Error("Usuario no encontrado");
+
+    // 2.5. Check PRO week restriction (1 per 6 months)
+    if (productId === 'boost-pro-week') {
+        const { canPurchase, waitDays } = await canPurchaseProWeek(userId);
+        if (!canPurchase) {
+            throw new Error(`Solo puedes comprar Semana PRO una vez cada 6 meses. Espera ${waitDays} días más.`);
+        }
+    }
 
     // 3. Logic for 'Tokens' purchase - Use wallet-service for proper logging
     if (product.currency === 'Tokens') {
@@ -202,12 +126,55 @@ export const purchaseProduct = async (userId: string, productId: string) => {
         if (product.id === 'boost-pro-week') {
             const { activateProSubscription } = await import('./user-service');
             await activateProSubscription(userId, 'Pro', 7); // 7 days PRO
+            // Record purchase date for 6-month restriction
+            await updateDoc(userRef, {
+                lastProWeekPurchase: serverTimestamp()
+            });
             console.log('PRO subscription activated for 7 days');
-        } else {
-            // TODO: Update user's unlocked features based on productId
-            console.log('Digital product activated:', product.id);
+        }
+        // Add PDF unlock credit
+        else if (product.id === 'pdf-unlock-1') {
+            await updateDoc(userRef, {
+                pdfUnlocksAvailable: increment(1)
+            });
+            console.log('PDF unlock credit added for user:', userId);
         }
     }
 
     return { success: true, message: `Has adquirido: ${product.name}` };
+};
+
+/**
+ * Consume one PDF unlock credit when generating a PDF without watermark
+ * Returns true if credit was consumed, false if no credits available
+ */
+export const consumePdfUnlock = async (userId: string): Promise<boolean> => {
+    const userRef = doc(db, 'users', userId);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) return false;
+
+    const userData = userSnap.data();
+    const credits = userData.pdfUnlocksAvailable || 0;
+
+    if (credits <= 0) return false;
+
+    await updateDoc(userRef, {
+        pdfUnlocksAvailable: increment(-1)
+    });
+
+    console.log('PDF unlock credit consumed for user:', userId);
+    return true;
+};
+
+/**
+ * Check if user has PDF unlock credits available
+ */
+export const hasPdfUnlocks = async (userId: string): Promise<number> => {
+    const userRef = doc(db, 'users', userId);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) return 0;
+
+    return userSnap.data().pdfUnlocksAvailable || 0;
 };

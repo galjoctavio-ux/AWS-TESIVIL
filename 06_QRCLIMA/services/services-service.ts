@@ -40,6 +40,9 @@ export interface ServiceData {
     isWarrantyClaim?: boolean;  // Is this a warranty service?
     routeEfficiencyColor?: 'green' | 'yellow' | 'red';  // Haversine efficiency
     distanceFromPrevious?: number;  // Distance in km from last appointment
+
+    // Warranty
+    warrantyMonths?: number;  // Duration of warranty (0, 1, 3, 6, 12)
 }
 
 export const addService = async (serviceData: ServiceData) => {
@@ -306,6 +309,66 @@ export const updateServiceDate = async (
         return true;
     } catch (e) {
         console.error('Error updating service date:', e);
+        return false;
+    }
+};
+
+/**
+ * Get all services with scheduled reminders (nextServiceDate set and in the future)
+ * Used by Recordatorios PRO screen
+ */
+export const getScheduledReminders = async (technicianId: string): Promise<(ServiceData & { id: string })[]> => {
+    try {
+        const now = new Date();
+
+        // Query services with reminderEnabled = true
+        const q = query(
+            collection(db, 'services'),
+            where('technicianId', '==', technicianId),
+            where('reminderEnabled', '==', true),
+            orderBy('nextServiceDate', 'asc')
+        );
+
+        const querySnapshot = await getDocs(q);
+        const reminders: (ServiceData & { id: string })[] = [];
+
+        querySnapshot.forEach((docSnap) => {
+            const data = docSnap.data() as ServiceData;
+
+            // Filter: only include future dates
+            if (data.nextServiceDate) {
+                const nextDate = data.nextServiceDate?.toDate
+                    ? data.nextServiceDate.toDate()
+                    : new Date(data.nextServiceDate);
+
+                // Include past reminders too (show as "vencido")
+                reminders.push({ id: docSnap.id, ...data });
+            }
+        });
+
+        return reminders;
+    } catch (e) {
+        console.error('Error fetching scheduled reminders:', e);
+        return [];
+    }
+};
+
+/**
+ * Update reminder date for a service
+ * Used by Recordatorios PRO screen for date editing
+ */
+export const updateReminderDate = async (
+    serviceId: string,
+    newDate: Date
+): Promise<boolean> => {
+    try {
+        await updateDoc(doc(db, 'services', serviceId), {
+            nextServiceDate: newDate
+        });
+        console.log('Reminder date updated:', serviceId, newDate);
+        return true;
+    } catch (e) {
+        console.error('Error updating reminder date:', e);
         return false;
     }
 };

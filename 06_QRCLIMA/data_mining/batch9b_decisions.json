@@ -1,0 +1,675 @@
+{
+    "new_products": [
+        {
+            "sku": "RE-BOM-ASP-001",
+            "nombre_estandarizado": "Bomba de Condensados Aspen Mini Naranja 2 Ton 220V",
+            "grupo_general": "RE",
+            "grupo_especializado": "Bombas",
+            "marca": "Aspen Pumps",
+            "modelo": "Mini Orange",
+            "descripcion_tecnica": "Bomba Mini Naranja 2TR 220V Univolt",
+            "capacidad": "2 TR",
+            "voltaje": "220V",
+            "tipo_operacion": "N/A",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "RE-BOM-ASP-002",
+            "nombre_estandarizado": "Bomba de Condensados Aspen Mini Blanca 2 Ton 230V",
+            "grupo_general": "RE",
+            "grupo_especializado": "Bombas",
+            "marca": "Aspen Pumps",
+            "modelo": "Mini White",
+            "descripcion_tecnica": "Bomba Mini Blanca 2TR 230V",
+            "capacidad": "2 TR",
+            "voltaje": "230V",
+            "tipo_operacion": "N/A",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "RE-BOM-ASP-003",
+            "nombre_estandarizado": "Bomba de Condensados Aspen Maxi Naranja 5 Ton 230V",
+            "grupo_general": "RE",
+            "grupo_especializado": "Bombas",
+            "marca": "Aspen Pumps",
+            "modelo": "Maxi Orange",
+            "descripcion_tecnica": "Bomba Maxi Naranja 5TR 230V",
+            "capacidad": "5 TR",
+            "voltaje": "230V",
+            "tipo_operacion": "N/A",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "RE-BOM-ASP-004",
+            "nombre_estandarizado": "Bomba de Condensados Aspen Aqua Mini 2 Ton 230V",
+            "grupo_general": "RE",
+            "grupo_especializado": "Bombas",
+            "marca": "Aspen Pumps",
+            "modelo": "Aqua Mini",
+            "descripcion_tecnica": "Bomba Aqua Mini 2TR 230V",
+            "capacidad": "2 TR",
+            "voltaje": "230V",
+            "tipo_operacion": "N/A",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "RE-BOM-DIV-001",
+            "nombre_estandarizado": "Bomba para Condensador Diversitech Ultra CP-22T 220V",
+            "grupo_general": "RE",
+            "grupo_especializado": "Bombas",
+            "marca": "Diversitech",
+            "modelo": "ULTRACP-22T-230",
+            "descripcion_tecnica": "Bomba Condensado 220V",
+            "capacidad": "N/A",
+            "voltaje": "220V",
+            "tipo_operacion": "N/A",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "RE-BOM-DIV-002",
+            "nombre_estandarizado": "Bomba para Minisplit Diversitech CVMINI",
+            "grupo_general": "RE",
+            "grupo_especializado": "Bombas",
+            "marca": "Diversitech",
+            "modelo": "CVMINI",
+            "descripcion_tecnica": "Bomba para Minisplit",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "RE-BOM-AVA-001",
+            "nombre_estandarizado": "Bomba de Condensados Avaly VA-BOCONA 110/220V",
+            "grupo_general": "RE",
+            "grupo_especializado": "Bombas",
+            "marca": "Avaly",
+            "modelo": "VA-BOCONA",
+            "descripcion_tecnica": "Bomba Condensado Bocona 110-220V",
+            "capacidad": "N/A",
+            "voltaje": "110/220V",
+            "tipo_operacion": "N/A",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "RE-BOM-LGI-001",
+            "nombre_estandarizado": "Bomba Sumergible Little Giant Serie 1 1/150HP 127V",
+            "grupo_general": "RE",
+            "grupo_especializado": "Bombas",
+            "marca": "Little Giant",
+            "modelo": "Serie 1",
+            "descripcion_tecnica": "Bomba Sumergible 1/150HP 127V",
+            "capacidad": "1/150 HP",
+            "voltaje": "127V",
+            "tipo_operacion": "N/A",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "RE-BOM-LGI-002",
+            "nombre_estandarizado": "Bomba Evaporativa Little Giant CP1-115 1/70HP 115V",
+            "grupo_general": "RE",
+            "grupo_especializado": "Bombas",
+            "marca": "Little Giant",
+            "modelo": "CP1-115",
+            "descripcion_tecnica": "Bomba Evaporativa 1/70HP 115V",
+            "capacidad": "1/70 HP",
+            "voltaje": "115V",
+            "tipo_operacion": "N/A",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "RE-BOM-DIV-003",
+            "nombre_estandarizado": "Bomba para Condensador Diversitech Ultra CP-22T 110V",
+            "grupo_general": "RE",
+            "grupo_especializado": "Bombas",
+            "marca": "Diversitech",
+            "modelo": "ULTRACP-22T",
+            "descripcion_tecnica": "Bomba Condensado 110V",
+            "capacidad": "N/A",
+            "voltaje": "110V",
+            "tipo_operacion": "N/A",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "RE-BOM-DIV-004",
+            "nombre_estandarizado": "Bomba para Condensador Diversitech TP-CP-20T 110V",
+            "grupo_general": "RE",
+            "grupo_especializado": "Bombas",
+            "marca": "Diversitech",
+            "modelo": "TP-CP-20T",
+            "descripcion_tecnica": "Bomba Condensado 110V",
+            "capacidad": "N/A",
+            "voltaje": "110V",
+            "tipo_operacion": "N/A",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "RE-BOM-LGI-003",
+            "nombre_estandarizado": "Bomba Evaporativa Little Giant CP2-230 1/50HP 230V",
+            "grupo_general": "RE",
+            "grupo_especializado": "Bombas",
+            "marca": "Little Giant",
+            "modelo": "CP2-230",
+            "descripcion_tecnica": "Bomba Evaporativa 1/50HP 230V",
+            "capacidad": "1/50 HP",
+            "voltaje": "230V",
+            "tipo_operacion": "N/A",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "RE-BOM-CON-001",
+            "nombre_estandarizado": "Bomba Condensadora Condens8 CP8 2 Ton 110-220V",
+            "grupo_general": "RE",
+            "grupo_especializado": "Bombas",
+            "marca": "Condens8",
+            "modelo": "CP8",
+            "descripcion_tecnica": "Bomba Condensado 2TR 110-220V",
+            "capacidad": "2 TR",
+            "voltaje": "110/220V",
+            "tipo_operacion": "N/A",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CAP-COP-001",
+            "nombre_estandarizado": "Capacitor de Marcha Copeland 35 MFD 440V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Capacitores",
+            "marca": "Copeland",
+            "modelo": "914-0006-17",
+            "descripcion_tecnica": "Capacitor Marcha 35 MFD 440V",
+            "capacidad": "35 MFD",
+            "voltaje": "440V",
+            "tipo_operacion": "Marcha",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-REL-SCH-001",
+            "nombre_estandarizado": "Relevador Schrack 220V 11 Puntas",
+            "grupo_general": "EL",
+            "grupo_especializado": "Relevadores",
+            "marca": "Schrack",
+            "modelo": "RUMC3AB1P7",
+            "descripcion_tecnica": "Relevador 220V",
+            "capacidad": "N/A",
+            "voltaje": "220V",
+            "tipo_operacion": "N/A",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CAP-MAR-001",
+            "nombre_estandarizado": "Capacitor de Arranque Mars 378-440 MFD 110V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Capacitores",
+            "marca": "Mars",
+            "modelo": "11923",
+            "descripcion_tecnica": "Capacitor Arranque 378-440 MFD 110V",
+            "capacidad": "378-440 MFD",
+            "voltaje": "110V",
+            "tipo_operacion": "Arranque",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CAP-MIR-001",
+            "nombre_estandarizado": "Capacitor para Mirage MACC0511J 15 MFD 250V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Capacitores",
+            "marca": "Mirage",
+            "modelo": "33000048",
+            "descripcion_tecnica": "Capacitor 15 MFD 250V",
+            "capacidad": "15 MFD",
+            "voltaje": "250V",
+            "tipo_operacion": "Marcha",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-TRA-GEN-001",
+            "nombre_estandarizado": "Transformador de Control 75VA 440/220V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Transformadores",
+            "marca": "Genérico",
+            "modelo": "75-440-220",
+            "descripcion_tecnica": "Transformador 75VA Primario 440V Secundario 220V",
+            "capacidad": "75 VA",
+            "voltaje": "440/220V",
+            "tipo_operacion": "Control",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CAP-MAR-002",
+            "nombre_estandarizado": "Capacitor de Arranque Mars 270-324 MFD 330V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Capacitores",
+            "marca": "Mars",
+            "modelo": "11970",
+            "descripcion_tecnica": "Capacitor Arranque 270-324 MFD 330V",
+            "capacidad": "270-324 MFD",
+            "voltaje": "330V",
+            "tipo_operacion": "Arranque",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CON-EME-001",
+            "nombre_estandarizado": "Contactor Emerson 2 Polos 40 Amperes Bobina 24V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Contactores",
+            "marca": "Emerson",
+            "modelo": "6625-90-247",
+            "descripcion_tecnica": "Contactor 2P 40A 24V",
+            "capacidad": "40 A",
+            "voltaje": "24V",
+            "tipo_operacion": "Fuerza",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "EL-CAP-MAR-003",
+            "nombre_estandarizado": "Capacitor de Trabajo Mars 40 MFD 370V",
+            "grupo_general": "EL",
+            "grupo_especializado": "Capacitores",
+            "marca": "Mars",
+            "modelo": "12721",
+            "descripcion_tecnica": "Capacitor Trabajo 40 MFD 370V",
+            "capacidad": "40 MFD",
+            "voltaje": "370V",
+            "tipo_operacion": "Trabajo",
+            "unidad": "Pieza"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "RE-BOM-ASP-001",
+            "precio": 2470.17,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000034",
+            "url": "https://www.grupocoresa.com/bomba-de-condensados-mini-naranja-univolt-aspen-2tr-4300",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1814
+        },
+        {
+            "sku": "RE-BOM-ASP-001",
+            "precio": 2470.17,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000034",
+            "url": "https://www.grupocoresa.com/bomba-de-condensados-mini-naranja-univolt-aspen-2tr-4300",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1815
+        },
+        {
+            "sku": "RE-BOM-ASP-002",
+            "precio": 2267.82,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001034",
+            "url": "https://www.grupocoresa.com/bomba-de-condensados-mini-blanca-aspen-230v-60hz-2tr-4301",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1816
+        },
+        {
+            "sku": "RE-BOM-ASP-002",
+            "precio": 2267.82,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001034",
+            "url": "https://www.grupocoresa.com/bomba-de-condensados-mini-blanca-aspen-230v-60hz-2tr-4301",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1817
+        },
+        {
+            "sku": "RE-BOM-ASP-003",
+            "precio": 3686.74,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002034",
+            "url": "https://www.grupocoresa.com/bomba-de-condensado-maxi-naranja-aspen-5-ton-230-1-60v-4302",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1818
+        },
+        {
+            "sku": "RE-BOM-ASP-003",
+            "precio": 3686.74,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002034",
+            "url": "https://www.grupocoresa.com/bomba-de-condensado-maxi-naranja-aspen-5-ton-230-1-60v-4302",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1819
+        },
+        {
+            "sku": "RE-BOM-ASP-001",
+            "precio": 2310.35,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00003034",
+            "url": "https://www.grupocoresa.com/bomba-de-condensado-mini-naranja-aspen-2-ton-230-1-60v-4303",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1820
+        },
+        {
+            "sku": "RE-BOM-ASP-001",
+            "precio": 2310.35,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00003034",
+            "url": "https://www.grupocoresa.com/bomba-de-condensado-mini-naranja-aspen-2-ton-230-1-60v-4303",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1821
+        },
+        {
+            "sku": "RE-BOM-ASP-004",
+            "precio": 2738.09,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005034",
+            "url": "https://www.grupocoresa.com/mini-bomba-aqua-aspen-230v-60hz-2-ton-4305",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1822
+        },
+        {
+            "sku": "RE-BOM-ASP-004",
+            "precio": 2738.09,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005034",
+            "url": "https://www.grupocoresa.com/mini-bomba-aqua-aspen-230v-60hz-2-ton-4305",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1823
+        },
+        {
+            "sku": "RE-BOM-DIV-001",
+            "precio": 2400.68,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007875",
+            "url": "https://www.grupocoresa.com/bomba-para-condensador-220v-5787",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1824
+        },
+        {
+            "sku": "RE-BOM-DIV-001",
+            "precio": 2400.68,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007875",
+            "url": "https://www.grupocoresa.com/bomba-para-condensador-220v-5787",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1825
+        },
+        {
+            "sku": "RE-BOM-DIV-002",
+            "precio": 2971.61,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00008875",
+            "url": "https://www.grupocoresa.com/bomba-para-minisplit-5788",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1826
+        },
+        {
+            "sku": "RE-BOM-DIV-002",
+            "precio": 2971.61,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00008875",
+            "url": "https://www.grupocoresa.com/bomba-para-minisplit-5788",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1827
+        },
+        {
+            "sku": "RE-BOM-AVA-001",
+            "precio": 1784.17,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200306-00083611",
+            "url": "https://www.grupocoresa.com/bomba-de-condensado-de-110-220v-11638",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1828
+        },
+        {
+            "sku": "RE-BOM-AVA-001",
+            "precio": 1784.17,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200306-00083611",
+            "url": "https://www.grupocoresa.com/bomba-de-condensado-de-110-220v-11638",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1829
+        },
+        {
+            "sku": "RE-BOM-LGI-001",
+            "precio": 2982.27,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-240520-00005751",
+            "url": "https://www.grupocoresa.com/bomba-sumergible-utilitaria-serie-1-para-transferencia-de-agua-recirculacion-fuentes-cascadas-y-arroyos-residenciales-marca-little-giant-modelo-1-127v-1-150-hp",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1830
+        },
+        {
+            "sku": "RE-BOM-LGI-001",
+            "precio": 2982.27,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-240520-00005751",
+            "url": "https://www.grupocoresa.com/bomba-sumergible-utilitaria-serie-1-para-transferencia-de-agua-recirculacion-fuentes-cascadas-y-arroyos-residenciales-marca-little-giant-modelo-1-127v-1-150-hp",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1831
+        },
+        {
+            "sku": "RE-BOM-LGI-002",
+            "precio": 1154.7,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-240611-00065851",
+            "url": "https://www.grupocoresa.com/bomba-little-giant-cp1-115-para-enfriadores-evaporativos-y-aire-acondicionado-1-70-hp-115-v",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1832
+        },
+        {
+            "sku": "RE-BOM-LGI-002",
+            "precio": 1154.7,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-240611-00065851",
+            "url": "https://www.grupocoresa.com/bomba-little-giant-cp1-115-para-enfriadores-evaporativos-y-aire-acondicionado-1-70-hp-115-v",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1833
+        },
+        {
+            "sku": "RE-BOM-DIV-003",
+            "precio": 2054.28,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250808-00048861",
+            "url": "https://www.grupocoresa.com/bomba-para-condensador-diversitech-ultracp-22t-110v",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1834
+        },
+        {
+            "sku": "RE-BOM-DIV-003",
+            "precio": 2054.28,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250808-00048861",
+            "url": "https://www.grupocoresa.com/bomba-para-condensador-diversitech-ultracp-22t-110v",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1835
+        },
+        {
+            "sku": "RE-BOM-DIV-004",
+            "precio": 2052.09,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-230202-00091241",
+            "url": "https://www.grupocoresa.com/bomba-para-condensador-diversitech-tp-cp-20t-110v",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1836
+        },
+        {
+            "sku": "RE-BOM-DIV-004",
+            "precio": 2052.09,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-230202-00091241",
+            "url": "https://www.grupocoresa.com/bomba-para-condensador-diversitech-tp-cp-20t-110v",
+            "scraped_at": "2025-12-26 19:26:44.81459+00",
+            "raw_id": 1837
+        },
+        {
+            "sku": "RE-BOM-LGI-003",
+            "precio": 1651.25,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-240425-00030751",
+            "url": "https://www.grupocoresa.com/bomba-para-aire-acondicionado-marca-little-giant-modelo-cp2-230-para-uso-en-enfriadores-evaporativos-230v-1-50",
+            "scraped_at": "2025-12-26 19:26:47.660413+00",
+            "raw_id": 1838
+        },
+        {
+            "sku": "RE-BOM-LGI-003",
+            "precio": 1651.25,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-240425-00030751",
+            "url": "https://www.grupocoresa.com/bomba-para-aire-acondicionado-marca-little-giant-modelo-cp2-230-para-uso-en-enfriadores-evaporativos-230v-1-50",
+            "scraped_at": "2025-12-26 19:26:47.660413+00",
+            "raw_id": 1839
+        },
+        {
+            "sku": "RE-BOM-CON-001",
+            "precio": 1912.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-240524-00058751",
+            "url": "https://www.grupocoresa.com/bomba-condensadora-condens8-cp8-2tr-110-220v",
+            "scraped_at": "2025-12-26 19:26:47.660413+00",
+            "raw_id": 1840
+        },
+        {
+            "sku": "RE-BOM-CON-001",
+            "precio": 1912.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-240524-00058751",
+            "url": "https://www.grupocoresa.com/bomba-condensadora-condens8-cp8-2tr-110-220v",
+            "scraped_at": "2025-12-26 19:26:47.660413+00",
+            "raw_id": 1841
+        },
+        {
+            "sku": "EL-CAP-COP-001",
+            "precio": 84.56,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000075",
+            "url": "https://www.grupocoresa.com/capacitor-de-marcha-35-mfd-440v-5700",
+            "scraped_at": "2025-12-26 19:26:48.137516+00",
+            "raw_id": 1842
+        },
+        {
+            "sku": "EL-CAP-COP-001",
+            "precio": 84.56,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000075",
+            "url": "https://www.grupocoresa.com/capacitor-de-marcha-35-mfd-440v-5700",
+            "scraped_at": "2025-12-26 19:26:48.137516+00",
+            "raw_id": 1843
+        },
+        {
+            "sku": "EL-REL-SCH-001",
+            "precio": 198.53,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000087",
+            "url": "https://www.grupocoresa.com/relevador-schrack-220v-11-puntas-7800",
+            "scraped_at": "2025-12-26 19:26:48.137516+00",
+            "raw_id": 1844
+        },
+        {
+            "sku": "EL-REL-SCH-001",
+            "precio": 198.53,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000087",
+            "url": "https://www.grupocoresa.com/relevador-schrack-220v-11-puntas-7800",
+            "scraped_at": "2025-12-26 19:26:48.137516+00",
+            "raw_id": 1845
+        },
+        {
+            "sku": "EL-CAP-MAR-001",
+            "precio": 101.73,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000104",
+            "url": "https://www.grupocoresa.com/capacitor-de-arranque-378-440-mfd-110v-4010",
+            "scraped_at": "2025-12-26 19:26:48.137516+00",
+            "raw_id": 1846
+        },
+        {
+            "sku": "EL-CAP-MAR-001",
+            "precio": 101.73,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000104",
+            "url": "https://www.grupocoresa.com/capacitor-de-arranque-378-440-mfd-110v-4010",
+            "scraped_at": "2025-12-26 19:26:48.137516+00",
+            "raw_id": 1847
+        },
+        {
+            "sku": "EL-CAP-MIR-001",
+            "precio": 39.46,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000116",
+            "url": "https://www.grupocoresa.com/capacitor-15mfd-250v-para-macc0511j-6110",
+            "scraped_at": "2025-12-26 19:26:48.137516+00",
+            "raw_id": 1848
+        },
+        {
+            "sku": "EL-CAP-MIR-001",
+            "precio": 39.46,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000116",
+            "url": "https://www.grupocoresa.com/capacitor-15mfd-250v-para-macc0511j-6110",
+            "scraped_at": "2025-12-26 19:26:48.137516+00",
+            "raw_id": 1849
+        },
+        {
+            "sku": "EL-TRA-GEN-001",
+            "precio": 469.24,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000177",
+            "url": "https://www.grupocoresa.com/transformador-75va-440-220v-7710",
+            "scraped_at": "2025-12-26 19:26:48.137516+00",
+            "raw_id": 1850
+        },
+        {
+            "sku": "EL-TRA-GEN-001",
+            "precio": 469.24,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000177",
+            "url": "https://www.grupocoresa.com/transformador-75va-440-220v-7710",
+            "scraped_at": "2025-12-26 19:26:48.137516+00",
+            "raw_id": 1851
+        },
+        {
+            "sku": "EL-CAP-MAR-002",
+            "precio": 233.06,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000204",
+            "url": "https://www.grupocoresa.com/capacitor-de-arranque-270-324-mfd-330v-copeland-304-014000610-4020",
+            "scraped_at": "2025-12-26 19:26:48.137516+00",
+            "raw_id": 1852
+        },
+        {
+            "sku": "EL-CAP-MAR-002",
+            "precio": 233.06,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000204",
+            "url": "https://www.grupocoresa.com/capacitor-de-arranque-270-324-mfd-330v-copeland-304-014000610-4020",
+            "scraped_at": "2025-12-26 19:26:48.137516+00",
+            "raw_id": 1853
+        },
+        {
+            "sku": "EL-CON-EME-001",
+            "precio": 662.33,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000284",
+            "url": "https://www.grupocoresa.com/contactor-2-polos-40-ampers-bobina-24v-4820",
+            "scraped_at": "2025-12-26 19:26:48.137516+00",
+            "raw_id": 1854
+        },
+        {
+            "sku": "EL-CON-EME-001",
+            "precio": 662.33,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000284",
+            "url": "https://www.grupocoresa.com/contactor-2-polos-40-ampers-bobina-24v-4820",
+            "scraped_at": "2025-12-26 19:26:48.137516+00",
+            "raw_id": 1855
+        },
+        {
+            "sku": "EL-CAP-MAR-003",
+            "precio": 139.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000304",
+            "url": "https://www.grupocoresa.com/capacitor-de-trabajo-40-mfd-370v-4030",
+            "scraped_at": "2025-12-26 19:26:48.137516+00",
+            "raw_id": 1856
+        },
+        {
+            "sku": "EL-CAP-MAR-003",
+            "precio": 139.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00000304",
+            "url": "https://www.grupocoresa.com/capacitor-de-trabajo-40-mfd-370v-4030",
+            "scraped_at": "2025-12-26 19:26:48.137516+00",
+            "raw_id": 1857
+        }
+    ]
+}

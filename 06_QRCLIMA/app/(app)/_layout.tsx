@@ -17,7 +17,6 @@ export default function AppLayout() {
                 <Stack.Screen name="dashboard" />
                 <Stack.Screen name="services" />
                 <Stack.Screen name="clients" />
-                <Stack.Screen name="quotes" />
                 <Stack.Screen name="cotizador" />
                 <Stack.Screen name="equipment" />
                 <Stack.Screen name="scanner" />

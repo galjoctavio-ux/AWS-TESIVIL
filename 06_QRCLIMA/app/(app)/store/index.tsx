@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getProducts, purchaseProduct, StoreProduct } from '../../../services/store-service';
+import { getProducts, purchaseProduct, StoreProduct, canPurchaseProWeek } from '../../../services/store-service';
 import { useAuth } from '../../../context/AuthContext';
 import { getUserProfile } from '../../../services/user-service';
 
@@ -17,21 +17,25 @@ export default function StoreCatalog() {
     const [balance, setBalance] = useState(0);
     const [filter, setFilter] = useState<'Tokens' | 'MXN'>('Tokens');
     const [processingId, setProcessingId] = useState<string | null>(null);
+    const [proWeekBlocked, setProWeekBlocked] = useState<{ blocked: boolean; waitDays?: number }>({ blocked: false });
 
     const loadData = async () => {
+        if (filter === 'MXN') return; // Skip for MXN - coming soon
         setLoading(true);
-        const [prods, userProfile] = await Promise.all([
+        const [prods, userProfile, proWeekStatus] = await Promise.all([
             getProducts(filter),
-            getUserProfile(user!.uid)
+            getUserProfile(user!.uid),
+            canPurchaseProWeek(user!.uid)
         ]);
         setProducts(prods);
         setBalance(userProfile?.tokenBalance || 0);
+        setProWeekBlocked({ blocked: !proWeekStatus.canPurchase, waitDays: proWeekStatus.waitDays });
         setLoading(false);
     };
 
     useFocusEffect(
         useCallback(() => {
-            if (user) loadData();
+            if (user && filter !== 'MXN') loadData();
         }, [user, filter])
     );
 
@@ -75,43 +79,67 @@ export default function StoreCatalog() {
         );
     };
 
-    const renderProduct = ({ item }: { item: StoreProduct }) => (
-        <View className="bg-white rounded-2xl mb-4 shadow-sm overflow-hidden border border-gray-100 flex-1 m-1">
-            <View className="h-32 bg-gray-100 items-center justify-center p-4">
-                {/* Placeholder Icon logic since we don't have real images yet */}
-                <Ionicons
-                    name={item.category === 'Merch' ? 'shirt' : item.category === 'Digital' ? 'phone-portrait' : 'hammer'}
-                    size={48}
-                    color="#CBD5E1"
-                />
-            </View>
-            <View className="p-3">
-                <Text className="font-bold text-gray-800 text-sm mb-1 h-10" numberOfLines={2}>{item.name}</Text>
+    // Get icon based on product ID
+    const getProductIcon = (productId: string): { name: keyof typeof Ionicons.glyphMap; color: string; bgColor: string } => {
+        switch (productId) {
+            case 'boost-pro-week':
+                return { name: 'rocket', color: '#7C3AED', bgColor: '#F5F3FF' };
+            case 'pdf-unlock-1':
+                return { name: 'document-text', color: '#2563EB', bgColor: '#EFF6FF' };
+            default:
+                return { name: 'gift', color: '#6B7280', bgColor: '#F3F4F6' };
+        }
+    };
 
-                <View className="flex-row items-center justify-between mt-2">
-                    <Text className={`font-bold text-lg ${item.currency === 'Tokens' ? 'text-yellow-600' : 'text-green-600'}`}>
-                        {item.currency === 'Tokens' ? '🪙 ' : '$'}{item.price}
-                    </Text>
-                    {item.currency === 'MXN' && <Text className="text-gray-400 text-xs">MXN</Text>}
+    const renderProduct = ({ item }: { item: StoreProduct }) => {
+        const icon = getProductIcon(item.id);
+        const isProWeek = item.id === 'boost-pro-week';
+        const isBlocked = isProWeek && proWeekBlocked.blocked;
+        const canBuy = balance >= item.price && !isBlocked;
+
+        return (
+            <View className="bg-white rounded-2xl mb-4 shadow-lg overflow-hidden border border-gray-100 flex-1 m-2">
+                {/* Icon Header */}
+                <View className="h-28 items-center justify-center" style={{ backgroundColor: icon.bgColor }}>
+                    <View className="w-16 h-16 rounded-full items-center justify-center" style={{ backgroundColor: icon.color + '20' }}>
+                        <Ionicons name={icon.name} size={32} color={icon.color} />
+                    </View>
                 </View>
 
-                <TouchableOpacity
-                    onPress={() => handlePurchase(item)}
-                    disabled={!!processingId}
-                    className={`mt-3 py-2 rounded-lg items-center ${item.currency === 'Tokens' ? 'bg-yellow-500' : 'bg-green-600'
-                        } ${processingId ? 'opacity-50' : ''}`}
-                >
-                    {processingId === item.id ? (
-                        <ActivityIndicator color="white" size="small" />
-                    ) : (
-                        <Text className="text-white font-bold text-xs uppercase">
-                            {item.currency === 'Tokens' ? 'Canjear' : 'Comprar'}
-                        </Text>
-                    )}
-                </TouchableOpacity>
+                {/* Content */}
+                <View className="p-4">
+                    <Text className="font-bold text-gray-800 text-base mb-1">{item.name}</Text>
+                    <Text className="text-gray-500 text-xs mb-3" numberOfLines={2}>{item.description}</Text>
+
+                    {/* Price */}
+                    <View className="flex-row items-center mb-3">
+                        <Text className="text-2xl">🪙</Text>
+                        <Text className="font-bold text-xl text-yellow-600 ml-1">{item.price}</Text>
+                        <Text className="text-gray-400 text-xs ml-1">tokens</Text>
+                    </View>
+
+                    {/* Button */}
+                    <TouchableOpacity
+                        onPress={() => handlePurchase(item)}
+                        disabled={!!processingId || !canBuy}
+                        className={`py-3 rounded-xl items-center ${canBuy ? 'bg-yellow-500' : 'bg-gray-300'} ${processingId ? 'opacity-50' : ''}`}
+                    >
+                        {processingId === item.id ? (
+                            <ActivityIndicator color="white" size="small" />
+                        ) : (
+                            <Text className={`font-bold text-center ${canBuy ? 'text-white' : 'text-gray-500'}`}>
+                                {isBlocked
+                                    ? `Espera ${proWeekBlocked.waitDays} días`
+                                    : balance >= item.price
+                                        ? 'Canjear'
+                                        : 'Tokens insuficientes'}
+                            </Text>
+                        )}
+                    </TouchableOpacity>
+                </View>
             </View>
-        </View>
-    );
+        );
+    };
 
     return (
         <View className="flex-1 bg-slate-50">
@@ -146,7 +174,25 @@ export default function StoreCatalog() {
             </View>
 
             {/* Content */}
-            {loading ? (
+            {filter === 'MXN' ? (
+                <View className="flex-1 justify-center items-center p-6">
+                    <View className="bg-white rounded-3xl p-8 items-center shadow-lg">
+                        <View className="bg-green-100 p-4 rounded-full mb-4">
+                            <Ionicons name="cart" size={48} color="#16A34A" />
+                        </View>
+                        <Text className="text-2xl font-bold text-gray-800 mb-2">Próximamente</Text>
+                        <Text className="text-gray-500 text-center">
+                            La tienda con productos en pesos mexicanos estará disponible muy pronto.
+                        </Text>
+                        <TouchableOpacity
+                            onPress={() => setFilter('Tokens')}
+                            className="mt-6 bg-yellow-500 px-6 py-3 rounded-xl"
+                        >
+                            <Text className="text-white font-bold">Ver productos con Tokens</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            ) : loading ? (
                 <View className="flex-1 justify-center items-center">
                     <ActivityIndicator size="large" color="#4F46E5" />
                 </View>

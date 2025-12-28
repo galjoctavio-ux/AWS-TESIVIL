@@ -220,13 +220,43 @@ export default function ProfileScreen() {
                 )}
 
                 {/* Show PRO badge for subscribed users */}
-                {profile?.subscription && profile.subscription !== 'free' && (
-                    <View className="mx-4 mb-6 bg-indigo-600 p-4 rounded-2xl">
-                        <View className="flex-row items-center">
-                            <Text className="text-2xl mr-3">⭐</Text>
-                            <View className="flex-1">
-                                <Text className="text-white font-bold">Usuario {profile.subscription}</Text>
-                                <Text className="text-white/80 text-sm">Todas las funciones desbloqueadas</Text>
+                {profile?.subscription && profile.subscription !== 'free' && (() => {
+                    const endDate = profile.subscriptionEndDate?.toDate?.() || profile.subscriptionEndDate;
+                    const daysLeft = endDate ? Math.max(0, Math.ceil((new Date(endDate).getTime() - Date.now()) / (24 * 60 * 60 * 1000))) : 0;
+
+                    return (
+                        <View className="mx-4 mb-4 bg-indigo-600 p-4 rounded-2xl">
+                            <View className="flex-row items-center justify-between">
+                                <View className="flex-row items-center">
+                                    <Text className="text-2xl mr-3">⭐</Text>
+                                    <View>
+                                        <Text className="text-white font-bold">Usuario {profile.subscription}</Text>
+                                        <Text className="text-white/80 text-xs">{daysLeft} días restantes</Text>
+                                    </View>
+                                </View>
+                                <View className="bg-white/20 px-3 py-1 rounded-full">
+                                    <Text className="text-white text-sm font-bold">{daysLeft}d</Text>
+                                </View>
+                            </View>
+                        </View>
+                    );
+                })()}
+
+                {/* PDF Credits Card - Show for any user with credits */}
+                {((profile as any)?.pdfUnlocksAvailable || 0) > 0 && (
+                    <View className="mx-4 mb-6 bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                        <View className="flex-row items-center justify-between">
+                            <View className="flex-row items-center">
+                                <View className="bg-blue-100 w-10 h-10 rounded-xl items-center justify-center mr-3">
+                                    <Ionicons name="document-text" size={20} color="#2563EB" />
+                                </View>
+                                <View>
+                                    <Text className="text-blue-800 font-bold">PDFs Premium</Text>
+                                    <Text className="text-blue-600 text-xs">Sin marca de agua</Text>
+                                </View>
+                            </View>
+                            <View className="bg-blue-600 px-4 py-2 rounded-xl">
+                                <Text className="text-white text-xl font-bold">{(profile as any)?.pdfUnlocksAvailable || 0}</Text>
                             </View>
                         </View>
                     </View>
@@ -271,25 +301,20 @@ export default function ProfileScreen() {
                         <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
                     </TouchableOpacity>
 
-                    {/* Branding - only for PRO users */}
-                    {profile?.subscription && profile.subscription !== 'free' && (
-                        <TouchableOpacity
-                            onPress={() => router.push('/(app)/profile/branding')}
-                            className="bg-white p-4 rounded-2xl border border-gray-100 flex-row items-center active:bg-gray-50 mb-3"
-                        >
-                            <View className="bg-indigo-100 w-12 h-12 rounded-xl items-center justify-center mr-4">
-                                <Ionicons name="color-palette" size={24} color="#6366F1" />
-                            </View>
-                            <View className="flex-1">
-                                <Text className="font-bold text-gray-800">Personalizar PDFs</Text>
-                                <Text className="text-gray-500 text-sm">Logo, colores y marca para reportes</Text>
-                            </View>
-                            <View className="bg-indigo-600 px-2 py-0.5 rounded-full mr-2">
-                                <Text className="text-white text-xs font-bold">PRO</Text>
-                            </View>
-                            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-                        </TouchableOpacity>
-                    )}
+                    {/* Branding - available for all users */}
+                    <TouchableOpacity
+                        onPress={() => router.push('/(app)/profile/branding')}
+                        className="bg-white p-4 rounded-2xl border border-gray-100 flex-row items-center active:bg-gray-50 mb-3"
+                    >
+                        <View className="bg-indigo-100 w-12 h-12 rounded-xl items-center justify-center mr-4">
+                            <Ionicons name="color-palette" size={24} color="#6366F1" />
+                        </View>
+                        <View className="flex-1">
+                            <Text className="font-bold text-gray-800">Personalizar PDFs</Text>
+                            <Text className="text-gray-500 text-sm">Logo, colores y marca para reportes</Text>
+                        </View>
+                        <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+                    </TouchableOpacity>
 
                     <TouchableOpacity
                         onPress={() => router.push('/(app)/profile/settings')}
@@ -332,17 +357,18 @@ export default function ProfileScreen() {
                         <Text className="text-gray-300 text-[10px] text-center mt-1">QRclima © 2025</Text>
                     </TouchableOpacity>
                 </View>
-            </ScrollView>
+            </ScrollView >
 
             {/* Bottom Navigation */}
-            <BottomNav />
+            < BottomNav />
 
             {/* Profile Completion Guide Modal */}
-            <ProfileCompletionGuide
+            < ProfileCompletionGuide
                 profile={profile}
                 isVisible={showGuide}
-                onClose={() => setShowGuide(false)}
+                onClose={() => setShowGuide(false)
+                }
             />
-        </View>
+        </View >
     );
 }

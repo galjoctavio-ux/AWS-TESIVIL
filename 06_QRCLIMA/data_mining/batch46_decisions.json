@@ -1,0 +1,635 @@
+{
+    "new_products": [
+        {
+            "sku": "HE-INS-AVA-010",
+            "name": "Termómetro Digital Avaly Tipo Pluma -40 a 232°C",
+            "category": "Herramientas",
+            "brand": "Avaly",
+            "specs": "-40 a 232°C"
+        },
+        {
+            "sku": "RE-TAR-MIR-002",
+            "name": "Tarjeta Electrónica Mirage Principal 6870A90001R",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "6870A90001R"
+        },
+        {
+            "sku": "RE-TAR-AVA-002",
+            "name": "Tarjeta Universal Avaly A/C 3 Velocidades",
+            "category": "Refacciones",
+            "brand": "Avaly",
+            "specs": "3 Velocidades"
+        },
+        {
+            "sku": "HE-HER-AVA-016",
+            "name": "Aspersora Manual Avaly 2 Litros",
+            "category": "Herramientas",
+            "brand": "Avaly",
+            "specs": "2 Litros"
+        },
+        {
+            "sku": "TU-AIS-KFL-063",
+            "name": "Caja Armaflex K-Flex 1/2 x 1/2 1.8m",
+            "category": "Tuberías/Aislamientos",
+            "brand": "K-Flex",
+            "specs": "1/2 x 1/2 1.8m"
+        },
+        {
+            "sku": "RE-VAL-MIR-001",
+            "name": "Válvula de Servicio Líquido Mirage 2 Vías",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "2 Vías"
+        },
+        {
+            "sku": "RF-LAT-MO9-001",
+            "name": "Gas Refrigerante MO99 (R-438A) Lata 650g Chemours",
+            "category": "Refrigerantes",
+            "brand": "Chemours",
+            "specs": "650g"
+        },
+        {
+            "sku": "HE-CHE-BAR-003",
+            "name": "Espuma Poliuretano Barreto 500ml",
+            "category": "Herramientas",
+            "brand": "Barreto",
+            "specs": "500ml"
+        },
+        {
+            "sku": "RE-CER-ERO-001",
+            "name": "Cerrojo Cámara Frigorífica Ero 11 Pulgadas con Llave",
+            "category": "Refacciones",
+            "brand": "Ero International",
+            "specs": "11 Pulgadas"
+        },
+        {
+            "sku": "RE-VAL-SPO-001",
+            "name": "Válvula Expansión Sporlan 1/2 Ton R404 3/8x1/2",
+            "category": "Refacciones",
+            "brand": "Sporlan",
+            "specs": "1/2 Ton R404"
+        },
+        {
+            "sku": "RE-VAL-SPO-002",
+            "name": "Válvula Expansión Sporlan 1 Ton R404 3/8x1/2",
+            "category": "Refacciones",
+            "brand": "Sporlan",
+            "specs": "1 Ton R404"
+        },
+        {
+            "sku": "HE-CIN-FAS-001",
+            "name": "Cinta Aluminio Fasson 48mm x 46m",
+            "category": "Herramientas",
+            "brand": "Fasson",
+            "specs": "48mm x 46m"
+        },
+        {
+            "sku": "HE-CIN-ERO-001",
+            "name": "Cinta Momia Ero 6cm x 30m",
+            "category": "Herramientas",
+            "brand": "Ero International",
+            "specs": "6cm x 30m"
+        },
+        {
+            "sku": "EQ-MSI-YOR-033",
+            "name": "Minisplit Inverter York 4.58 Ton Solo Frío 220V",
+            "category": "Equipos",
+            "brand": "York",
+            "specs": "4.58 Ton Solo Frío Inverter 220V"
+        },
+        {
+            "sku": "RE-TER-BAR-001",
+            "name": "Termostato Barreto Refrigerador Doméstico G1125",
+            "category": "Refacciones",
+            "brand": "Barreto",
+            "specs": "G1125"
+        },
+        {
+            "sku": "HE-INS-AVA-011",
+            "name": "Termómetro Avaly -30 a 30°C Refrigerador/Congelador",
+            "category": "Herramientas",
+            "brand": "Avaly",
+            "specs": "-30 a 30°C"
+        },
+        {
+            "sku": "EQ-MSI-HIS-022",
+            "name": "Minisplit Inverter Hisense WiFi 1 Ton Solo Frío 220V",
+            "category": "Equipos",
+            "brand": "Hisense",
+            "specs": "1 Ton Solo Frío Inverter WiFi 220V"
+        },
+        {
+            "sku": "RE-TAR-BAR-001",
+            "name": "Tarjeta Universal Minisplit Barreto 220V",
+            "category": "Refacciones",
+            "brand": "Barreto",
+            "specs": "220V"
+        },
+        {
+            "sku": "RE-COM-DAN-010",
+            "name": "Compresor Fraccionario Danfoss Huayi 1/8HP R134a 115V",
+            "category": "Refacciones",
+            "brand": "Danfoss",
+            "specs": "1/8HP R134a 115V"
+        },
+        {
+            "sku": "EQ-CAL-RHE-002",
+            "name": "Calentador de Paso Rheem 8L Gas LP",
+            "category": "Equipos",
+            "brand": "Rheem",
+            "specs": "8L Gas LP"
+        },
+        {
+            "sku": "EQ-CAL-RHE-003",
+            "name": "Calentador Depósito Rheem 76L Gas LP",
+            "category": "Equipos",
+            "brand": "Rheem",
+            "specs": "76L Gas LP"
+        },
+        {
+            "sku": "RE-MOT-ERO-003",
+            "name": "Motor Ero 1/40HP 127V 1550RPM CCW con Base",
+            "category": "Refacciones",
+            "brand": "Ero International",
+            "specs": "1/40HP 127V 1550RPM CCW"
+        },
+        {
+            "sku": "RE-MOT-ERO-004",
+            "name": "Motor Ero Refrigerador Mabe 3000RPM",
+            "category": "Refacciones",
+            "brand": "Ero International",
+            "specs": "Mabe 3000RPM"
+        },
+        {
+            "sku": "RE-MOT-ERO-005",
+            "name": "Motor Ero 1/20HP 220V 1550RPM CCW",
+            "category": "Refacciones",
+            "brand": "Ero International",
+            "specs": "1/20HP 220V 1550RPM CCW"
+        },
+        {
+            "sku": "RE-MOT-ERO-006",
+            "name": "Motor Ero 1/15HP 220V 1550RPM CCW",
+            "category": "Refacciones",
+            "brand": "Ero International",
+            "specs": "1/15HP 220V 1550RPM CCW"
+        },
+        {
+            "sku": "RE-MOT-EME-006",
+            "name": "Micromotor Emerson Polo Sombreado 1/40HP 220V",
+            "category": "Refacciones",
+            "brand": "Emerson",
+            "specs": "1/40HP 220V"
+        },
+        {
+            "sku": "RE-MOT-AVA-002",
+            "name": "Motor Ventilador Avaly 110V 3000RPM",
+            "category": "Refacciones",
+            "brand": "Avaly",
+            "specs": "110V 3000RPM"
+        },
+        {
+            "sku": "RE-MOT-HEA-001",
+            "name": "Motor Heater 1/40HP Cople Abierto CCW",
+            "category": "Refacciones",
+            "brand": "Heater",
+            "specs": "1/40HP CCW"
+        },
+        {
+            "sku": "RE-MOT-FAS-003",
+            "name": "Motor Fasco 1/20HP 220V CCW",
+            "category": "Refacciones",
+            "brand": "Fasco",
+            "specs": "1/20HP 220V CCW"
+        },
+        {
+            "sku": "RE-MOT-FAS-004",
+            "name": "Motor Fasco 1/12HP 208-230V 1550RPM",
+            "category": "Refacciones",
+            "brand": "Fasco",
+            "specs": "1/12HP 208-230V 1550RPM"
+        },
+        {
+            "sku": "EQ-REF-IMB-004",
+            "name": "Refrigerador Imbera 4 Puertas VR-35-B-4 Blanc",
+            "category": "Equipos",
+            "brand": "Imbera",
+            "specs": "4 Puertas VR-35-B-4"
+        },
+        {
+            "sku": "EQ-REF-IMB-005",
+            "name": "Refrigerador Imbera 2 Puertas VR-19-B 18.6ft3",
+            "category": "Equipos",
+            "brand": "Imbera",
+            "specs": "2 Puertas VR-19-B"
+        },
+        {
+            "sku": "EQ-REF-IMB-006",
+            "name": "Enfriador Vertical Imbera 1 Puerta VR-17-B",
+            "category": "Equipos",
+            "brand": "Imbera",
+            "specs": "1 Puerta VR-17-B"
+        },
+        {
+            "sku": "EQ-ENF-POR-003",
+            "name": "Enfriador Evaporativo Portátil Portacool Jetstream 230",
+            "category": "Equipos",
+            "brand": "Portacool",
+            "specs": "Jetstream 230"
+        },
+        {
+            "sku": "RE-MOT-BOH-002",
+            "name": "Motor Bohn 1/15HP 208-230V 1550RPM",
+            "category": "Refacciones",
+            "brand": "Bohn",
+            "specs": "1/15HP 208-230V 1550RPM"
+        },
+        {
+            "sku": "RE-MOT-AVA-003",
+            "name": "Motor Ventilador Avaly 110/120V 2700/3100RPM",
+            "category": "Refacciones",
+            "brand": "Avaly",
+            "specs": "110/120V 2700/3100RPM"
+        },
+        {
+            "sku": "RE-MOT-ERO-007",
+            "name": "Motor Difusor Aruki Ero 1/22HP 110V 1300/1550RPM",
+            "category": "Refacciones",
+            "brand": "Ero International",
+            "specs": "1/22HP 110V"
+        },
+        {
+            "sku": "RE-MOT-ERO-008",
+            "name": "Motor Difusor Aruki Ero 1/70HP 115V Multiples",
+            "category": "Refacciones",
+            "brand": "Ero International",
+            "specs": "1/70HP 115V"
+        },
+        {
+            "sku": "RE-MOT-AVA-004",
+            "name": "Motor Micromotor Avaly 6W 115V 1550RPM",
+            "category": "Refacciones",
+            "brand": "Avaly",
+            "specs": "6W 115V 1550RPM"
+        },
+        {
+            "sku": "RE-MOT-AVA-005",
+            "name": "Motor Micromotor Avaly 9W 115V 1550RPM",
+            "category": "Refacciones",
+            "brand": "Avaly",
+            "specs": "9W 115V 1550RPM"
+        },
+        {
+            "sku": "RE-MOT-ERO-009",
+            "name": "Motor Ero 1/70HP Accesorios LM670",
+            "category": "Refacciones",
+            "brand": "Ero International",
+            "specs": "LM670"
+        },
+        {
+            "sku": "RE-MOT-ERO-010",
+            "name": "Motor Difusor Aruki Ero 1/40HP 220V 18W",
+            "category": "Refacciones",
+            "brand": "Ero International",
+            "specs": "1/40HP 220V 18W"
+        },
+        {
+            "sku": "RE-MOT-EME-007",
+            "name": "Micromotor Emerson Polo Sombreado 1/70HP 127V",
+            "category": "Refacciones",
+            "brand": "Emerson",
+            "specs": "1/70HP 127V"
+        },
+        {
+            "sku": "EL-CON-WHI-001",
+            "name": "Contactor White Rodgers 2 Polos 30A 208-240V",
+            "category": "Eléctricos",
+            "brand": "White Rodgers",
+            "specs": "2 Polos 30A 208-240V"
+        },
+        {
+            "sku": "RE-BOM-ERO-001",
+            "name": "Bomba Condensados Ero Universal 110/220V",
+            "category": "Refacciones",
+            "brand": "Ero International",
+            "specs": "110/220V"
+        },
+        {
+            "sku": "RE-BOM-DIV-005",
+            "name": "Bomba Condensados Diversitech Mini-Split 115V",
+            "category": "Refacciones",
+            "brand": "Diversitech",
+            "specs": "Mini-Split 115V"
+        },
+        {
+            "sku": "RE-BOM-DIV-006",
+            "name": "Bomba Condensados Diversitech Ultra CP-22 230V",
+            "category": "Refacciones",
+            "brand": "Diversitech",
+            "specs": "Ultra CP-22 230V"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "HE-INS-AVA-007",
+            "price": 408.11,
+            "url": "https://reacsa.mx/products/termometro-electronico-digital-dual-int-ext-50-70-c-avaly",
+            "raw_id": "84f45bb5-e3fd-4918-8ccf-0440467c33eb"
+        },
+        {
+            "sku": "HE-INS-AVA-010",
+            "price": 364.25,
+            "url": "https://reacsa.mx/products/termometro-digital-avaly-tipo-pluma-40-a-232-c",
+            "raw_id": "a1fe166b-d034-4818-8f03-fdbf94016dc7"
+        },
+        {
+            "sku": "RE-TAR-AVA-001",
+            "price": 775.44,
+            "url": "https://reacsa.mx/products/tarjeta-avaly-control-universal-con-display",
+            "raw_id": "3d6eec57-60cb-4116-809c-c57b24aa40c5"
+        },
+        {
+            "sku": "RE-TAR-MIR-002",
+            "price": 801.79,
+            "url": "https://www.tiendamirage.mx/refacciones/549-tarjeta-principal-6870a90001r.html",
+            "raw_id": "d6918d31-0257-4b6c-a2c7-57c8f6155c72"
+        },
+        {
+            "sku": "RE-TAR-AVA-002",
+            "price": 421.72,
+            "url": "https://reacsa.mx/products/tarjeta-universal-para-aires-acondicionados-3-velocidades-avaly",
+            "raw_id": "56c3d617-8455-44ee-b9c1-75a9752accc6"
+        },
+        {
+            "sku": "HE-HER-AVA-016",
+            "price": 171.61,
+            "url": "https://reacsa.mx/products/aspersora-manual-capacidad-2-litros-avaly",
+            "raw_id": "92fc12a5-343f-4cb0-8be8-24002956e867"
+        },
+        {
+            "sku": "TU-AIS-KFL-063",
+            "price": 2121.54,
+            "url": "https://reacsa.mx/products/caja-armaflex-k-flex-1-2-x-1-2-w-x-1-8-m-60-pz",
+            "raw_id": "6e1488b9-9f87-4cfc-ae85-0fa5f66a3c0f"
+        },
+        {
+            "sku": "RE-VAL-MIR-001",
+            "price": 205.41,
+            "url": "https://www.tiendamirage.mx/refacciones/240-valvula-de-servicio-liquido-2-vias.html",
+            "raw_id": "8094e34f-b63d-4a0b-bd25-ead01847de9f"
+        },
+        {
+            "sku": "RF-LAT-MO9-001",
+            "price": 245.12,
+            "url": "https://reacsa.mx/products/gas-lata-mo99-isceon-chemours-650-grs",
+            "raw_id": "937d205c-7349-4f37-a194-e5300ee65f4d"
+        },
+        {
+            "sku": "RF-LAT-134-002",
+            "price": 95.54,
+            "url": "https://reacsa.mx/products/gas-suva-134a-lata-de-0-340-econovalvula",
+            "raw_id": "70d6be00-2525-43b5-9d25-ec3739f59b60"
+        },
+        {
+            "sku": "HE-CHE-BAR-003",
+            "price": 145.8,
+            "url": "https://reacsa.mx/products/aerosol-espuma-poliuretano-barreto-500-ml",
+            "raw_id": "497ecdd2-4028-4b72-acf6-abbdd704f3b0"
+        },
+        {
+            "sku": "RE-CER-ERO-001",
+            "price": 1191.13,
+            "url": "https://reacsa.mx/products/cerrojo-camara-frigorifica-con-llave-y-botador-contra-corta-11",
+            "raw_id": "813ce1ee-9dc6-4011-b298-6a78c7739220"
+        },
+        {
+            "sku": "RE-VAL-SPO-001",
+            "price": 2578.26,
+            "url": "https://reacsa.mx/products/valvula-de-expansion-1-2-tonelada-r404-3-8-x-1-2",
+            "raw_id": "f7ea8f0d-7062-48e9-8843-c9aa2198c705"
+        },
+        {
+            "sku": "RE-VAL-SPO-002",
+            "price": 2283.61,
+            "url": "https://reacsa.mx/products/valvula-de-expansion-1-tonelada-r404-3-8-x-1-2",
+            "raw_id": "7bd68e3f-cc12-47c4-9453-44794c6e77b5"
+        },
+        {
+            "sku": "HE-CIN-FAS-001",
+            "price": 167.38,
+            "url": "https://reacsa.mx/products/cinta-fasson-aluminio-48mm-x-46m",
+            "raw_id": "c263e311-1ebc-49b7-afaa-bb1f1ac280e5"
+        },
+        {
+            "sku": "HE-CIN-ERO-001",
+            "price": 131.83,
+            "url": "https://reacsa.mx/products/cinta-momia-ero-6cm-ancho-30m-largo",
+            "raw_id": "4709f139-ed1a-4f17-b91a-ab39ea11ac14"
+        },
+        {
+            "sku": "EQ-MSI-YOR-033",
+            "price": 47125.94,
+            "url": "https://reacsa.mx/products/minisplit-york-f-c-inverter-4-58t-solo-frio-220-1-v",
+            "raw_id": "5920c3ee-023f-4010-9bce-ad302c38190d"
+        },
+        {
+            "sku": "RE-TER-BAR-001",
+            "price": 80.34,
+            "url": "https://reacsa.mx/products/termostato-para-refrigerador-domestico",
+            "raw_id": "989db023-97ef-4c91-81b1-8fb31b643cac"
+        },
+        {
+            "sku": "HE-INS-AVA-011",
+            "price": 119.46,
+            "url": "https://reacsa.mx/products/termometro-avaly-30-a-30\u00bac-para-refrigerador-y-congelador",
+            "raw_id": "fe940a8e-6f85-41b8-9b7f-b6af0c542df7"
+        },
+        {
+            "sku": "EQ-MSI-HIS-022",
+            "price": 13627.44,
+            "url": "https://reacsa.mx/products/minisplit-hisense-wifi-inverter-1-tonelada-solo-frio-220v",
+            "raw_id": "58d0a341-18fb-4dd0-9b5a-65d0b0197184"
+        },
+        {
+            "sku": "RE-TAR-BAR-001",
+            "price": 395.61,
+            "url": "https://reacsa.mx/products/tarjeta-universal-para-minisplit-con-control-220-v",
+            "raw_id": "bc26c76e-7694-4d22-a12f-705e29504186"
+        },
+        {
+            "sku": "RE-COM-DAN-010",
+            "price": 1730.02,
+            "url": "https://reacsa.mx/products/compresor-fraccionario-danfoss-huayi-1-8hp-r-134-115-v",
+            "raw_id": "fadb8ed1-4044-4ba5-b52d-091bd1b8555c"
+        },
+        {
+            "sku": "EQ-CAL-RHE-002",
+            "price": 4697.42,
+            "url": "https://reacsa.mx/products/chl08p-boiler-calentador-de-paso-gas-lp-8-lts",
+            "raw_id": "daa106e6-c652-41fc-b588-c0aeb0df13e6"
+        },
+        {
+            "sku": "EQ-CAL-RHE-003",
+            "price": 8848.34,
+            "url": "https://reacsa.mx/products/393391-calentador-de-agua-rheem-de-deposito-76-lts-a-gas-lp",
+            "raw_id": "7c8fb891-5ffd-488b-bc86-c65c72030a06"
+        },
+        {
+            "sku": "RE-MOT-ERO-003",
+            "price": 724.92,
+            "url": "https://reacsa.mx/products/motor-ero-internacionl-140-ccw-con-base",
+            "raw_id": "23047d18-ab43-44ad-a4e3-ba8ce1141ecc"
+        },
+        {
+            "sku": "RE-MOT-ERO-004",
+            "price": 322.31,
+            "url": "https://reacsa.mx/products/motor-ero-internacional-refrigerador-mabe-3000-rpm",
+            "raw_id": "fcab5853-650c-471b-bed1-1465ff3095d5"
+        },
+        {
+            "sku": "RE-MOT-ERO-005",
+            "price": 823.69,
+            "url": "https://reacsa.mx/products/motor-ero-intrenacional-1-20-hp-1550-rpm-220v-ccw",
+            "raw_id": "3f7b4429-4d5f-4d4c-9dc6-a3919715ed62"
+        },
+        {
+            "sku": "RE-MOT-ERO-006",
+            "price": 1008.63,
+            "url": "https://reacsa.mx/products/motor-ero-internacional-1-15-hp-220v-1-0a-1550-rpm-ccw",
+            "raw_id": "3fcba824-049a-467d-994c-4ccc55e02bd1"
+        },
+        {
+            "sku": "RE-MOT-EME-006",
+            "price": 458.13,
+            "url": "https://reacsa.mx/products/micromotor-emerson-polo-somb-1-4-0hp-220-v",
+            "raw_id": "93137f48-b21a-4ee6-b425-a9b0b45fd220"
+        },
+        {
+            "sku": "RE-MOT-AVA-002",
+            "price": 388.09,
+            "url": "https://reacsa.mx/products/motor-avaly-ventilador-110v-60h-3000-rpm",
+            "raw_id": "39703f54-27fb-4f97-ac4e-d20e72db59a6"
+        },
+        {
+            "sku": "RE-MOT-HEA-001",
+            "price": 474.46,
+            "url": "https://reacsa.mx/products/motor-1-40-hp-heater-cople-abi-ccw",
+            "raw_id": "dbc65366-529b-432d-96e2-c05a72493211"
+        },
+        {
+            "sku": "RE-MOT-FAS-003",
+            "price": 1697.92,
+            "url": "https://reacsa.mx/products/motor-fasco-1-20-hp-220w-ccw",
+            "raw_id": "666336d6-4822-4e70-8a44-ebf0f9a65f34"
+        },
+        {
+            "sku": "RE-MOT-FAS-004",
+            "price": 2665.77,
+            "url": "https://reacsa.mx/products/motor-fasco-1-12-hp-208-230v-1550-rpm",
+            "raw_id": "3639a5d8-eb45-4c8f-8901-ac7742dc6235"
+        },
+        {
+            "sku": "EQ-REF-IMB-004",
+            "price": 53869.01,
+            "url": "https://reacsa.mx/products/vr-35-b-4-refrigerador-imbera-4-puertas-3-8-hp-bco-c-cif-1010785",
+            "raw_id": "b5a2d861-f357-45d7-89cd-814a3d9a1a04"
+        },
+        {
+            "sku": "EQ-REF-IMB-005",
+            "price": 34849.79,
+            "url": "https://reacsa.mx/products/vr-19-b-refrigerador-imbera-2-piuertas-1-4hp-18-6ft3",
+            "raw_id": "0a9bee60-2d6e-421b-9da8-6eddbdbc8462"
+        },
+        {
+            "sku": "EQ-REF-IMB-006",
+            "price": 28591.67,
+            "url": "https://reacsa.mx/products/vr-17-b-enf-imbera-1p-1-4-hp-bco-c-cif-1010156",
+            "raw_id": "c9cb3b9b-6409-4217-abe7-c15dd8928359"
+        },
+        {
+            "sku": "EQ-ENF-POR-003",
+            "price": 41262.68,
+            "url": "https://reacsa.mx/products/enfriador-evaporativo-portatil-portacool-jetstream-230",
+            "raw_id": "7911ce70-dcc0-43de-a2af-2bbe86395e7d"
+        },
+        {
+            "sku": "RE-MOT-BOH-002",
+            "price": 5555.88,
+            "url": "https://reacsa.mx/products/25309101-motor-bohn-1-15hp-208-230v",
+            "raw_id": "867db418-a80c-4e26-af3e-733d9ef9b076"
+        },
+        {
+            "sku": "RE-MOT-AVA-003",
+            "price": 414.32,
+            "url": "https://reacsa.mx/products/motor-ventilador-avaly-110-120v-2700-3100-rpm",
+            "raw_id": "af4bb9e1-979c-43cd-bfe0-db01961f32ee"
+        },
+        {
+            "sku": "RE-MOT-ERO-007",
+            "price": 806.44,
+            "url": "https://reacsa.mx/products/motor-ero-internacional-difusor-aruki-1-22hp-110v-34w",
+            "raw_id": "98f2e049-1de7-4d6d-948c-3a36fe8bd410"
+        },
+        {
+            "sku": "RE-MOT-ERO-008",
+            "price": 441.19,
+            "url": "https://reacsa.mx/products/motor-ero-internacional-difusor-aruki-1-70-hp-115v-60-hz-multiples",
+            "raw_id": "bbd584e6-d446-485c-b2d3-0fa90b23b3cd"
+        },
+        {
+            "sku": "RE-MOT-AVA-004",
+            "price": 722.46,
+            "url": "https://reacsa.mx/products/motor-avaly-6-watts-115v-50-60-hz-1550-rpm",
+            "raw_id": "1c198b8e-ebd4-4ea9-b562-1a7a49d13f1e"
+        },
+        {
+            "sku": "RE-MOT-AVA-005",
+            "price": 485.76,
+            "url": "https://reacsa.mx/products/motor-avaly-9-watts-50-60-hz-1550-rpm",
+            "raw_id": "4bcd0e15-3b8c-4204-b209-9925acbf8d8f"
+        },
+        {
+            "sku": "RE-MOT-ERO-009",
+            "price": 253.6,
+            "url": "https://reacsa.mx/products/motor-ero-internacional-con-accesorios-lm670",
+            "raw_id": "039a9fd4-26cc-4bf8-bbc2-b8e87fdfe12e"
+        },
+        {
+            "sku": "RE-MOT-ERO-010",
+            "price": 557.82,
+            "url": "https://reacsa.mx/products/motor-difusor-aruki-18w-1-40-hp-220v",
+            "raw_id": "eceec853-e5e6-4e37-9c51-54005e3d3349"
+        },
+        {
+            "sku": "RE-MOT-EME-007",
+            "price": 366.55,
+            "url": "https://reacsa.mx/products/micromotor-emerson-polo-somb-1-70-hp-127v",
+            "raw_id": "b372cee9-a401-4ff3-84a0-24e78de6a670"
+        },
+        {
+            "sku": "EL-CON-WHI-001",
+            "price": 306.84,
+            "url": "https://reacsa.mx/products/contactores-de-emerson-30-amp-208-240v",
+            "raw_id": "b1ee12ea-cb18-42b3-9ab2-82f811dd9000"
+        },
+        {
+            "sku": "RE-BOM-ERO-001",
+            "price": 1476.84,
+            "url": "https://reacsa.mx/products/bomba-condensadora-ero-p-mnsplt-110v-220v",
+            "raw_id": "372f4742-72ff-4db1-90c1-3dbacb06f5ff"
+        },
+        {
+            "sku": "RE-BOM-DIV-005",
+            "price": 2558.35,
+            "url": "https://reacsa.mx/products/bomba-de-condensado-p-minisplit-115v-diversitech",
+            "raw_id": "fb6413b6-cce3-4f4d-ba56-65412545151d"
+        },
+        {
+            "sku": "RE-BOM-DIV-006",
+            "price": 1874.02,
+            "url": "https://reacsa.mx/products/bomba-de-condensado-22-diversitech",
+            "raw_id": "eaad06d3-f34e-47ef-bf16-1e080c148266"
+        }
+    ]
+}

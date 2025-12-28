@@ -701,20 +701,16 @@ export const sendPasswordResetEmail = functions
         }
 
         try {
-            // Buscar usuario por email
-            const usersSnapshot = await db.collection('users')
-                .where('email', '==', email)
-                .limit(1)
-                .get();
-
-            // No revelar si el usuario existe o no (seguridad)
-            if (usersSnapshot.empty) {
+            // Usar Firebase Auth para buscar usuario (más confiable, normaliza emails)
+            let userId: string;
+            try {
+                const userRecord = await admin.auth().getUserByEmail(email);
+                userId = userRecord.uid;
+            } catch (authError: any) {
+                // Usuario no existe - no revelar esto por seguridad
                 console.log(`Password reset requested for non-existent email: ${email}`);
                 return { success: true, message: 'Si el email existe, recibirás un código' };
             }
-
-            const userDoc = usersSnapshot.docs[0];
-            const userId = userDoc.id;
 
             // Generar código de 6 dígitos
             const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
@@ -725,7 +721,7 @@ export const sendPasswordResetEmail = functions
 
             await db.collection('password_resets').doc(userId).set({
                 code: resetCode,
-                email: email,
+                email: email.toLowerCase().trim(),
                 createdAt: admin.firestore.Timestamp.now(),
                 expiresAt: admin.firestore.Timestamp.fromDate(expiresAt),
                 attempts: 0,
@@ -758,6 +754,118 @@ export const sendPasswordResetEmail = functions
                 throw error;
             }
             console.error('Error in sendPasswordResetEmail:', error);
+            throw new functions.https.HttpsError('internal', error.message);
+        }
+    });
+
+// ============================================
+// EMAIL: Verificar código y cambiar contraseña
+// ============================================
+export const verifyPasswordResetCode = functions
+    .runWith({ timeoutSeconds: 60 })
+    .https
+    .onCall(async (data, context) => {
+        const { email, code, newPassword } = data;
+
+        if (!email || typeof email !== 'string') {
+            throw new functions.https.HttpsError(
+                'invalid-argument',
+                'Email es requerido'
+            );
+        }
+
+        if (!code || typeof code !== 'string' || code.length !== 6) {
+            throw new functions.https.HttpsError(
+                'invalid-argument',
+                'El código debe ser de 6 dígitos'
+            );
+        }
+
+        if (!newPassword || typeof newPassword !== 'string' || newPassword.length < 6) {
+            throw new functions.https.HttpsError(
+                'invalid-argument',
+                'La contraseña debe tener al menos 6 caracteres'
+            );
+        }
+
+        try {
+            // Normalizar email para búsqueda case-insensitive
+            const normalizedEmail = email.toLowerCase().trim();
+
+            // Buscar el documento de password_resets por email directamente
+            const resetSnapshot = await db.collection('password_resets')
+                .where('email', '==', normalizedEmail)
+                .limit(1)
+                .get();
+
+            // También buscar sin normalizar por si el email original no estaba normalizado
+            let resetDoc = resetSnapshot.empty ? null : resetSnapshot.docs[0];
+
+            if (!resetDoc) {
+                const resetSnapshotOriginal = await db.collection('password_resets')
+                    .where('email', '==', email)
+                    .limit(1)
+                    .get();
+                resetDoc = resetSnapshotOriginal.empty ? null : resetSnapshotOriginal.docs[0];
+            }
+
+            if (!resetDoc) {
+                throw new functions.https.HttpsError(
+                    'not-found',
+                    'No se encontró solicitud de recuperación. Solicita un nuevo código.'
+                );
+            }
+
+            const resetData = resetDoc.data()!;
+            const userId = resetDoc.id; // El documento ID es el userId
+
+            // Verificar intentos (máximo 5)
+            if (resetData.attempts >= 5) {
+                throw new functions.https.HttpsError(
+                    'resource-exhausted',
+                    'Demasiados intentos. Solicita un nuevo código.'
+                );
+            }
+
+            // Incrementar intentos
+            await db.collection('password_resets').doc(userId).update({
+                attempts: admin.firestore.FieldValue.increment(1)
+            });
+
+            // Verificar expiración
+            const expiresAt = resetData.expiresAt.toDate();
+            if (new Date() > expiresAt) {
+                throw new functions.https.HttpsError(
+                    'deadline-exceeded',
+                    'El código ha expirado. Solicita uno nuevo.'
+                );
+            }
+
+            // Verificar código
+            if (resetData.code !== code) {
+                throw new functions.https.HttpsError(
+                    'invalid-argument',
+                    'Código incorrecto'
+                );
+            }
+
+            // ¡Código correcto! Actualizar contraseña en Firebase Auth
+            await admin.auth().updateUser(userId, {
+                password: newPassword
+            });
+
+            // Limpiar documento de reset
+            await db.collection('password_resets').doc(userId).delete();
+
+            console.log(`✅ Password reset successful for user ${userId}`);
+
+            return { success: true, message: 'Contraseña actualizada correctamente' };
+
+        } catch (error: any) {
+            if (error instanceof functions.https.HttpsError) {
+                throw error;
+            }
+            console.error('Error in verifyPasswordResetCode:', error);
             throw new functions.https.HttpsError('internal', error.message);
         }
     });

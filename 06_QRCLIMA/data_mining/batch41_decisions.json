@@ -1,0 +1,502 @@
+{
+    "new_products": [
+        {
+            "sku": "RE-VAL-AVA-002",
+            "name": "Válvula Check Avaly para Lata 1/4",
+            "category": "Refacciones",
+            "brand": "Avaly",
+            "specs": "1/4 Lata"
+        },
+        {
+            "sku": "HE-HER-AVA-017",
+            "name": "Aspersora Manual Avaly 2 Litros",
+            "category": "Herramientas",
+            "brand": "Avaly",
+            "specs": "2L"
+        },
+        {
+            "sku": "TU-AIS-KFL-063",
+            "name": "Caja Aislamiento K-Flex 1/2 x 1/2 (60 Piezas)",
+            "category": "Tuberías",
+            "brand": "K-Flex",
+            "specs": "1/2 x 1/2 Caja"
+        },
+        {
+            "sku": "RE-VAL-GEN-002",
+            "name": "Válvula Expansión Genérica 1/2 Ton R404",
+            "category": "Refacciones",
+            "brand": "Genérico",
+            "specs": "1/2 Ton R404"
+        },
+        {
+            "sku": "RE-VAL-GEN-003",
+            "name": "Válvula Expansión Genérica 1 Ton R404",
+            "category": "Refacciones",
+            "brand": "Genérico",
+            "specs": "1 Ton R404"
+        },
+        {
+            "sku": "RF-BOY-MO4-001",
+            "name": "Gas Refrigerante Isceon MO49 Boya 13.4kg",
+            "category": "Refrigerantes",
+            "brand": "Chemours",
+            "specs": "MO49 13.4kg"
+        },
+        {
+            "sku": "TU-AIS-KFL-064",
+            "name": "Aislamiento Térmico K-Flex 1/2 x 1",
+            "category": "Tuberías",
+            "brand": "K-Flex",
+            "specs": "1/2 x 1"
+        },
+        {
+            "sku": "TU-AIS-KFL-065",
+            "name": "Aislamiento Térmico K-Flex 3/4 x 1",
+            "category": "Tuberías",
+            "brand": "K-Flex",
+            "specs": "3/4 x 1"
+        },
+        {
+            "sku": "TU-AIS-KFL-066",
+            "name": "Aislamiento Térmico K-Flex 3/8 x 1",
+            "category": "Tuberías",
+            "brand": "K-Flex",
+            "specs": "3/8 x 1"
+        },
+        {
+            "sku": "TU-AIS-KFL-067",
+            "name": "Aislamiento Térmico K-Flex 3/4 x 1/2",
+            "category": "Tuberías",
+            "brand": "K-Flex",
+            "specs": "3/4 x 1/2"
+        },
+        {
+            "sku": "TU-AIS-KFL-068",
+            "name": "Aislamiento Térmico K-Flex 1/4 x 1/2",
+            "category": "Tuberías",
+            "brand": "K-Flex",
+            "specs": "1/4 x 1/2"
+        },
+        {
+            "sku": "RE-FIL-EME-004",
+            "name": "Filtro Deshidratador Piedra Emerson 3/8 Soldable",
+            "category": "Refacciones",
+            "brand": "Emerson",
+            "specs": "3/8 Soldable"
+        },
+        {
+            "sku": "RE-FIL-ERO-001",
+            "name": "Filtro Deshidratador Ero 1/4 Soldable Conexiones Largas",
+            "category": "Refacciones",
+            "brand": "Ero",
+            "specs": "1/4 Soldable"
+        },
+        {
+            "sku": "HE-SOL-TUR-004",
+            "name": "Boquilla Turner HT-802B Encendido Automático",
+            "category": "Herramientas",
+            "brand": "Turner",
+            "specs": "HT-802B"
+        },
+        {
+            "sku": "HE-CHE-ACE-014",
+            "name": "Aceite Acemire AB 150 3.78L",
+            "category": "Herramientas",
+            "brand": "Acemire",
+            "specs": "AB 150 3.78L"
+        },
+        {
+            "sku": "HE-CHE-ACE-015",
+            "name": "Aceite Acemire AB 150 19L",
+            "category": "Herramientas",
+            "brand": "Acemire",
+            "specs": "AB 150 19L"
+        },
+        {
+            "sku": "RE-COM-EMB-016",
+            "name": "Compresor Embraco Hermético 1 HP R134A 220V",
+            "category": "Refacciones",
+            "brand": "Embraco",
+            "specs": "1HP R134A 220V"
+        },
+        {
+            "sku": "RE-COM-EMB-017",
+            "name": "Compresor Embraco Hermético 1/3 HP R134A 115V",
+            "category": "Refacciones",
+            "brand": "Embraco",
+            "specs": "1/3HP R134A 115V"
+        },
+        {
+            "sku": "RE-COM-EMB-018",
+            "name": "Compresor Embraco Hermético 1/3+ HP R134A 115V",
+            "category": "Refacciones",
+            "brand": "Embraco",
+            "specs": "1/3+HP R134A 115V"
+        },
+        {
+            "sku": "RE-COM-DAN-010",
+            "name": "Compresor Danfoss Fraccionario 1/4 HP R134A 115V",
+            "category": "Refacciones",
+            "brand": "Danfoss",
+            "specs": "1/4HP R134A 115V"
+        },
+        {
+            "sku": "RE-COM-DAN-011",
+            "name": "Compresor Danfoss Fraccionario 1/3 HP R134A 115V",
+            "category": "Refacciones",
+            "brand": "Danfoss",
+            "specs": "1/3HP R134A 115V"
+        },
+        {
+            "sku": "RE-COM-DAN-012",
+            "name": "Compresor Danfoss Huayi 1/3 HP R134A",
+            "category": "Refacciones",
+            "brand": "Danfoss",
+            "specs": "1/3HP R134A"
+        },
+        {
+            "sku": "HE-INS-SPE-005",
+            "name": "Kit Detección Fugas Fluorescencia Spectroline",
+            "category": "Herramientas",
+            "brand": "Spectroline",
+            "specs": "Kit Detección"
+        },
+        {
+            "sku": "HE-INS-SPE-006",
+            "name": "Kit Inyección Colorante Fluorescente Spectroline",
+            "category": "Herramientas",
+            "brand": "Spectroline",
+            "specs": "Kit Inyección"
+        },
+        {
+            "sku": "HE-CHE-SPE-005",
+            "name": "Cartucho Tinta Fluorescente Spectroline",
+            "category": "Herramientas",
+            "brand": "Spectroline",
+            "specs": "Cartucho"
+        },
+        {
+            "sku": "AC-VEN-SOL-028",
+            "name": "Extractor Pared Ventana Soler&Palau 900m3/hr",
+            "category": "Accesorios",
+            "brand": "Soler&Palau",
+            "specs": "900m3/hr"
+        },
+        {
+            "sku": "AC-VEN-SOL-029",
+            "name": "Extractor Pared Ventana Soler&Palau 400m3/hr",
+            "category": "Accesorios",
+            "brand": "Soler&Palau",
+            "specs": "400m3/hr"
+        },
+        {
+            "sku": "AC-VEN-SOL-030",
+            "name": "Extractor Baño Future 120 Soler&Palau",
+            "category": "Accesorios",
+            "brand": "Soler&Palau",
+            "specs": "Future 120"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "RE-VAL-AVA-002",
+            "price": 450.0,
+            "url": "https://reacsa.mx/products/valvula-avaly-check-para-lata-1-4-10-piezas",
+            "raw_id": "3450"
+        },
+        {
+            "sku": "HE-HER-AVA-017",
+            "price": 171.61,
+            "url": "https://reacsa.mx/products/aspersora-manual-capacidad-2-litros-avaly",
+            "raw_id": "3475"
+        },
+        {
+            "sku": "TU-AIS-KFL-063",
+            "price": 2121.54,
+            "url": "https://reacsa.mx/products/caja-armaflex-k-flex-1-2-x-1-2-w-x-1-8-m-60-pz",
+            "raw_id": "3499"
+        },
+        {
+            "sku": "RE-VAL-GEN-002",
+            "price": 2577.05,
+            "url": "https://reacsa.mx/products/valvula-de-expansion-1-2-tonelada-r404-3-8-x-1-2",
+            "raw_id": "3515"
+        },
+        {
+            "sku": "RE-VAL-GEN-003",
+            "price": 2282.54,
+            "url": "https://reacsa.mx/products/valvula-de-expansion-1-tonelada-r404-3-8-x-1-2",
+            "raw_id": "3516"
+        },
+        {
+            "sku": "RF-BOY-MO4-001",
+            "price": 6454.66,
+            "url": "https://reacsa.mx/products/gas-isceon-mo49-boya-de-13-4-kgs",
+            "raw_id": "3580"
+        },
+        {
+            "sku": "TU-AIS-KFL-050",
+            "price": 78.15,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-7-8-x-3-4-w-x-72",
+            "raw_id": "3587"
+        },
+        {
+            "sku": "TU-AIS-KFL-031",
+            "price": 46.96,
+            "url": "https://reacsa.mx/products/armaflex-5-8-x-3-8-w-x-72",
+            "raw_id": "3589"
+        },
+        {
+            "sku": "TU-AIS-KFL-024",
+            "price": 65.25,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-5-8-x-3-4-w-x-72",
+            "raw_id": "3590"
+        },
+        {
+            "sku": "TU-AIS-KFL-004",
+            "price": 243.42,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-1-5-8-x-1-w-x-72",
+            "raw_id": "3591"
+        },
+        {
+            "sku": "TU-AIS-KFL-032",
+            "price": 215.46,
+            "url": "https://reacsa.mx/products/armaflex-1-3-8-x-1-w-x-72",
+            "raw_id": "3592"
+        },
+        {
+            "sku": "TU-AIS-KFL-008",
+            "price": 67.76,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-1-5-8-x-1-2-w-x-72",
+            "raw_id": "3593"
+        },
+        {
+            "sku": "TU-AIS-KFL-064",
+            "price": 113.82,
+            "url": "https://reacsa.mx/products/armaflex-1-2-x-1-w-x-72",
+            "raw_id": "3594"
+        },
+        {
+            "sku": "TU-AIS-KFL-028",
+            "price": 97.87,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-1-4-x-1-w-x-72",
+            "raw_id": "3595"
+        },
+        {
+            "sku": "TU-AIS-KFL-065",
+            "price": 136.41,
+            "url": "https://reacsa.mx/products/armaflex-3-4-x-1-w-x-72",
+            "raw_id": "3596"
+        },
+        {
+            "sku": "TU-AIS-KFL-038",
+            "price": 152.54,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-7-8-x-1-w-x-72-90",
+            "raw_id": "3597"
+        },
+        {
+            "sku": "TU-AIS-KFL-012",
+            "price": 122.96,
+            "url": "https://reacsa.mx/products/armaflex-5-8-x-1-w-x-72",
+            "raw_id": "3598"
+        },
+        {
+            "sku": "TU-AIS-KFL-066",
+            "price": 103.07,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-3-8-x-1-w-x72",
+            "raw_id": "3599"
+        },
+        {
+            "sku": "TU-AIS-KFL-007",
+            "price": 184.98,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-1-1-8-x-1-w-x72-66",
+            "raw_id": "3600"
+        },
+        {
+            "sku": "TU-AIS-KFL-039",
+            "price": 58.43,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-1-3-8-x-1-2-w-x72-120",
+            "raw_id": "3601"
+        },
+        {
+            "sku": "TU-AIS-KFL-049",
+            "price": 38.54,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-1-2-x-1-2-w-x-72-360",
+            "raw_id": "3602"
+        },
+        {
+            "sku": "TU-AIS-KFL-051",
+            "price": 109.34,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-1-3-8-x-3-4-w-x-72",
+            "raw_id": "3603"
+        },
+        {
+            "sku": "TU-AIS-KFL-067",
+            "price": 43.92,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-3-4-x-1-2-w-x-72",
+            "raw_id": "3604"
+        },
+        {
+            "sku": "TU-AIS-KFL-002",
+            "price": 21.69,
+            "url": "https://reacsa.mx/products/aislante-armaflex-k-flex-1-2-x-3-8-w-x-72",
+            "raw_id": "3605"
+        },
+        {
+            "sku": "TU-AIS-KFL-025",
+            "price": 36.57,
+            "url": "https://reacsa.mx/products/aislante-armaflex-k-flex-1-1-8-x-3-8-w-x-72-216",
+            "raw_id": "3696"
+        },
+        {
+            "sku": "TU-AIS-KFL-013",
+            "price": 53.24,
+            "url": "https://reacsa.mx/products/aislante-armaflex-k-flex-1-1-8x1-2-w-x72",
+            "raw_id": "3697"
+        },
+        {
+            "sku": "TU-AIS-KFL-030",
+            "price": 36.03,
+            "url": "https://reacsa.mx/products/aislante-armaflex-k-flex-3-8-x-1-2-w-x72-456",
+            "raw_id": "3698"
+        },
+        {
+            "sku": "TU-AIS-KFL-068",
+            "price": 33.52,
+            "url": "https://reacsa.mx/products/aislante-armaflex-k-flex-1-4-x-1-2-w-x72-510",
+            "raw_id": "3699"
+        },
+        {
+            "sku": "TU-AIS-KFL-018",
+            "price": 42.66,
+            "url": "https://reacsa.mx/products/aislante-armaflex-k-flex-5-8-x-1-2-w-x-72",
+            "raw_id": "3700"
+        },
+        {
+            "sku": "TU-AIS-KFL-031",
+            "price": 29.04,
+            "url": "https://reacsa.mx/products/aislante-armaflex-k-flex-5-8-x-3-8-w-x-72",
+            "raw_id": "3701"
+        },
+        {
+            "sku": "TU-AIS-KFL-003",
+            "price": 32.26,
+            "url": "https://reacsa.mx/products/aislante-armaflex-k-flex-7-8-x-3-8-w-x-72",
+            "raw_id": "3702"
+        },
+        {
+            "sku": "TU-AIS-KFL-045",
+            "price": 37.46,
+            "url": "https://reacsa.mx/products/aislante-armaflex-k-flex-7-8-x-1-2-w-x-72",
+            "raw_id": "3703"
+        },
+        {
+            "sku": "RE-FIL-EME-004",
+            "price": 353.3,
+            "url": "https://reacsa.mx/products/filtro-deshidratador-de-piedra-3-8-s-emerson",
+            "raw_id": "3727"
+        },
+        {
+            "sku": "RE-FIL-ERO-001",
+            "price": 47.62,
+            "url": "https://reacsa.mx/products/filtro-deshidratador-1-4-s-conexiones-largas-refrigeracion-ero",
+            "raw_id": "3728"
+        },
+        {
+            "sku": "HE-HER-AVA-012",
+            "price": 577.42,
+            "url": "https://reacsa.mx/products/cortador-de-tubo-avaly-1-8-a-1-1-8",
+            "raw_id": "3729"
+        },
+        {
+            "sku": "HE-SOL-TUR-004",
+            "price": 644.58,
+            "url": "https://reacsa.mx/products/ht-802b-boquilla-perilla-bronce-autoenc-turner",
+            "raw_id": "3730"
+        },
+        {
+            "sku": "HE-CHE-ACE-014",
+            "price": 1695.51,
+            "url": "https://reacsa.mx/products/150-4-aceite-ab-acemire-150-3-7-litros",
+            "raw_id": "3731"
+        },
+        {
+            "sku": "HE-CHE-ACE-015",
+            "price": 7850.52,
+            "url": "https://reacsa.mx/products/150-19-aceite-ab-acemire-150-19-litros",
+            "raw_id": "3732"
+        },
+        {
+            "sku": "RE-COM-EMB-016",
+            "price": 8204.54,
+            "url": "https://reacsa.mx/products/nj6220z-b-compresor-hermetico-embraco-1hp-r-134a-208-230-1",
+            "raw_id": "3733"
+        },
+        {
+            "sku": "RE-COM-EMB-017",
+            "price": 3456.26,
+            "url": "https://reacsa.mx/products/ffi10hbx-compresor-hermetico-embraco-1-3hp-115-1-60-r134a",
+            "raw_id": "3734"
+        },
+        {
+            "sku": "RE-COM-EMB-018",
+            "price": 3362.15,
+            "url": "https://reacsa.mx/products/ffi12hbx-compresor-hermetico-embraco-1-2hp-134a-115v",
+            "raw_id": "3735"
+        },
+        {
+            "sku": "RE-COM-DAN-010",
+            "price": 2598.74,
+            "url": "https://reacsa.mx/products/compresor-fraccionario-danfoss-1-4-hp-115v-r-134a-nf9fx",
+            "raw_id": "3736"
+        },
+        {
+            "sku": "RE-COM-DAN-011",
+            "price": 2770.46,
+            "url": "https://reacsa.mx/products/compresor-fraccionario-danfoss-1-3p-hp-r134a-115-1-60",
+            "raw_id": "3737"
+        },
+        {
+            "sku": "RE-COM-DAN-012",
+            "price": 2770.46,
+            "url": "https://reacsa.mx/products/compresor-fraccionado-danfoss-huayi-1-3-hp-r134a",
+            "raw_id": "3738"
+        },
+        {
+            "sku": "HE-INS-SPE-005",
+            "price": 4535.87,
+            "url": "https://reacsa.mx/products/kit-de-deteccion-de-fugas-por-fluorescencia-spectroline",
+            "raw_id": "3739"
+        },
+        {
+            "sku": "HE-INS-SPE-006",
+            "price": 4095.82,
+            "url": "https://reacsa.mx/products/kit-de-inyeccion-de-colorante-fluorescente-spectroline",
+            "raw_id": "3740"
+        },
+        {
+            "sku": "HE-CHE-SPE-005",
+            "price": 420.87,
+            "url": "https://reacsa.mx/products/cartucho-de-tinta-fluorescente-spectroline-para-deteccion-de-fugas",
+            "raw_id": "3741"
+        },
+        {
+            "sku": "AC-VEN-SOL-028",
+            "price": 3051.7,
+            "url": "https://reacsa.mx/products/extractor-para-pared-y-ventana-s-p-900m3-hr",
+            "raw_id": "3742"
+        },
+        {
+            "sku": "AC-VEN-SOL-029",
+            "price": 1697.3,
+            "url": "https://reacsa.mx/products/extractor-pra-pared-y-ventana-s-p-500m3-hr-1",
+            "raw_id": "3743"
+        },
+        {
+            "sku": "AC-VEN-SOL-030",
+            "price": 1104.88,
+            "url": "https://reacsa.mx/products/extractor-p-bano-2500rpm-127v",
+            "raw_id": "3744"
+        }
+    ]
+}

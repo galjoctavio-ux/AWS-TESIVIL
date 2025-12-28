@@ -1,7 +1,7 @@
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, Dimensions, ActivityIndicator } from 'react-native';
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import Svg, { Path, Circle, G, Text as SvgText } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { auth } from '../../../firebaseConfig';
@@ -249,6 +249,11 @@ export default function BTUCalculatorPRO() {
     const [hasAccess, setHasAccess] = useState(false);
     const [userBranding, setUserBranding] = useState<BrandingConfig | undefined>(undefined);
 
+    // String states for inputs to preserve decimal input
+    const [lengthInput, setLengthInput] = useState('');
+    const [widthInput, setWidthInput] = useState('');
+    const [heightInput, setHeightInput] = useState('2.5');
+
     // ========================================================================
     // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
     // (React Rules of Hooks)
@@ -436,13 +441,11 @@ export default function BTUCalculatorPRO() {
                             className="bg-white p-4 rounded-xl border border-gray-200 text-lg"
                             placeholder="Ej: 5.5"
                             keyboardType="decimal-pad"
-                            value={state.length > 0 ? state.length.toString() : ''}
+                            value={lengthInput}
                             onChangeText={(text) => {
                                 const cleaned = text.replace(',', '.');
-                                // Allow empty string, or valid decimal patterns including trailing dot
-                                if (cleaned === '' || cleaned === '.') {
-                                    updateState({ length: 0 });
-                                } else if (/^\d*\.?\d*$/.test(cleaned)) {
+                                if (/^$|^\d*\.?\d*$/.test(cleaned)) {
+                                    setLengthInput(cleaned);
                                     const num = parseFloat(cleaned);
                                     updateState({ length: isNaN(num) ? 0 : num });
                                 }
@@ -455,12 +458,11 @@ export default function BTUCalculatorPRO() {
                             className="bg-white p-4 rounded-xl border border-gray-200 text-lg"
                             placeholder="Ej: 4.5"
                             keyboardType="decimal-pad"
-                            value={state.width > 0 ? state.width.toString() : ''}
+                            value={widthInput}
                             onChangeText={(text) => {
                                 const cleaned = text.replace(',', '.');
-                                if (cleaned === '' || cleaned === '.') {
-                                    updateState({ width: 0 });
-                                } else if (/^\d*\.?\d*$/.test(cleaned)) {
+                                if (/^$|^\d*\.?\d*$/.test(cleaned)) {
+                                    setWidthInput(cleaned);
                                     const num = parseFloat(cleaned);
                                     updateState({ width: isNaN(num) ? 0 : num });
                                 }
@@ -473,12 +475,11 @@ export default function BTUCalculatorPRO() {
                             className="bg-white p-4 rounded-xl border border-gray-200 text-lg"
                             placeholder="2.5"
                             keyboardType="decimal-pad"
-                            value={state.height > 0 ? state.height.toString() : ''}
+                            value={heightInput}
                             onChangeText={(text) => {
                                 const cleaned = text.replace(',', '.');
-                                if (cleaned === '' || cleaned === '.') {
-                                    updateState({ height: 2.5 });
-                                } else if (/^\d*\.?\d*$/.test(cleaned)) {
+                                if (/^$|^\d*\.?\d*$/.test(cleaned)) {
+                                    setHeightInput(cleaned);
                                     const num = parseFloat(cleaned);
                                     updateState({ height: isNaN(num) ? 2.5 : num });
                                 }
@@ -1048,15 +1049,27 @@ export default function BTUCalculatorPRO() {
 
     return (
         <View className="flex-1 bg-slate-50">
+            <Stack.Screen options={{ headerShown: false }} />
+
             {/* Header */}
-            <View className="bg-blue-600 pb-4 px-5" style={{ paddingTop: insets.top + 8 }}>
-                <View className="flex-row justify-between items-center">
-                    <View>
-                        <Text className="text-blue-200 text-sm">Herramienta PRO</Text>
-                        <Text className="text-white text-2xl font-bold">Calculadora BTU</Text>
+            <View style={{
+                backgroundColor: '#2563EB',
+                paddingTop: insets.top + 10,
+                paddingBottom: 20,
+                paddingHorizontal: 20,
+                borderBottomLeftRadius: 24,
+                borderBottomRightRadius: 24,
+            }}>
+                <View className="flex-row items-center">
+                    <TouchableOpacity onPress={() => router.back()} className="mr-4 bg-white/20 p-2 rounded-full">
+                        <Ionicons name="arrow-back" size={24} color="white" />
+                    </TouchableOpacity>
+                    <View className="flex-1">
+                        <Text className="text-white text-xl font-bold">Calculadora BTU PRO</Text>
+                        <Text className="text-blue-200 text-xs">Cálculo profesional de carga térmica</Text>
                     </View>
-                    <View className="bg-white/20 w-12 h-12 rounded-full items-center justify-center">
-                        <Ionicons name="calculator" size={24} color="white" />
+                    <View className="bg-yellow-400 px-2 py-1 rounded-full">
+                        <Text className="text-yellow-900 font-bold text-xs">PRO</Text>
                     </View>
                 </View>
             </View>

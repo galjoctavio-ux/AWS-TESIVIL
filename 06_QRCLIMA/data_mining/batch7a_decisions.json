@@ -1,0 +1,768 @@
+{
+    "new_products": [
+        {
+            "sku": "LI-FCL-FRI-004",
+            "nombre_estandarizado": "Frigo Safe 1 Litro",
+            "grupo_general": "LI",
+            "grupo_especializado": "Limpieza",
+            "marca": "Frigo Safe",
+            "modelo": "CL-FGS-01",
+            "descripcion_tecnica": "Botella 1 Litro",
+            "capacidad": "1 Litro",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Botella"
+        },
+        {
+            "sku": "LI-FCL-FRI-005",
+            "nombre_estandarizado": "Frigo Safe Galón 3.78L",
+            "grupo_general": "LI",
+            "grupo_especializado": "Limpieza",
+            "marca": "Frigo Safe",
+            "modelo": "CL-FGS-02",
+            "descripcion_tecnica": "Galón 3.78 Litros",
+            "capacidad": "3.78 Litros",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Galón"
+        },
+        {
+            "sku": "LI-FCL-FRI-006",
+            "nombre_estandarizado": "Frigo Safe 20 Litros",
+            "grupo_general": "LI",
+            "grupo_especializado": "Limpieza",
+            "marca": "Frigo Safe",
+            "modelo": "CL-FGS-03",
+            "descripcion_tecnica": "Porrón 20 Litros",
+            "capacidad": "20 Litros",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Porrón"
+        },
+        {
+            "sku": "LI-FCL-ALK-001",
+            "nombre_estandarizado": "Frigo Alki 1 Litro",
+            "grupo_general": "LI",
+            "grupo_especializado": "Limpieza",
+            "marca": "Frigo Alki",
+            "modelo": "CL-FGK-01",
+            "descripcion_tecnica": "Botella 1 Litro Alcalino",
+            "capacidad": "1 Litro",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Botella"
+        },
+        {
+            "sku": "LI-FCL-ALK-002",
+            "nombre_estandarizado": "Frigo Alki Aerosol 600ml",
+            "grupo_general": "LI",
+            "grupo_especializado": "Limpieza",
+            "marca": "Frigo Alki",
+            "modelo": "CL-FGK-A600",
+            "descripcion_tecnica": "Aerosol 600ml",
+            "capacidad": "600 ml",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Aerosol"
+        },
+        {
+            "sku": "LI-FCL-CLU-001",
+            "nombre_estandarizado": "Foam Cleaner Cluxer Desincrustante 20 Litros",
+            "grupo_general": "LI",
+            "grupo_especializado": "Limpieza",
+            "marca": "Cluxer",
+            "modelo": "CXFOAM-20",
+            "descripcion_tecnica": "Porrón 20 Litros Desincrustante",
+            "capacidad": "20 Litros",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Porrón"
+        },
+        {
+            "sku": "RF-LAT-410-001",
+            "nombre_estandarizado": "Gas Refrigerante R-410A Lata 650g Chemours",
+            "grupo_general": "RF",
+            "grupo_especializado": "Gases Refrigerantes",
+            "marca": "Chemours",
+            "modelo": "R-410A",
+            "descripcion_tecnica": "Lata 650Gr",
+            "capacidad": "650 Gr",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Lata"
+        },
+        {
+            "sku": "RF-BOY-438-001",
+            "nombre_estandarizado": "Gas Refrigerante MO99 (R-438A) Boya 11.35kg Chemours",
+            "grupo_general": "RF",
+            "grupo_especializado": "Gases Refrigerantes",
+            "marca": "Chemours",
+            "modelo": "MO99",
+            "descripcion_tecnica": "Boya 11.35Kg R-438A",
+            "capacidad": "11.35 Kg",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Boya"
+        },
+        {
+            "sku": "RF-CIL-MED-001",
+            "nombre_estandarizado": "Cilindro Mediano Gas Refrigerante",
+            "grupo_general": "RF",
+            "grupo_especializado": "Envases",
+            "marca": "Genérico",
+            "modelo": "Mediano",
+            "descripcion_tecnica": "Cilindro Vacío Mediano",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "RF-BOY-507-001",
+            "nombre_estandarizado": "Gas Refrigerante R-507 Boya 11.35kg Chemours",
+            "grupo_general": "RF",
+            "grupo_especializado": "Gases Refrigerantes",
+            "marca": "Chemours",
+            "modelo": "R-507",
+            "descripcion_tecnica": "Boya 11.35Kg",
+            "capacidad": "11.35 Kg",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Boya"
+        },
+        {
+            "sku": "RF-CIL-RET-001",
+            "nombre_estandarizado": "Cilindro Retornable 9kg",
+            "grupo_general": "RF",
+            "grupo_especializado": "Envases",
+            "marca": "Genérico",
+            "modelo": "Retornable",
+            "descripcion_tecnica": "Cilindro Vacío 9Kg",
+            "capacidad": "9 Kg",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "RF-BOY-401-001",
+            "nombre_estandarizado": "Gas Refrigerante MP66 (R-401B) Boya 13.61kg Chemours",
+            "grupo_general": "RF",
+            "grupo_especializado": "Gases Refrigerantes",
+            "marca": "Chemours",
+            "modelo": "MP66",
+            "descripcion_tecnica": "Boya 13.61Kg R-401B",
+            "capacidad": "13.61 Kg",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Boya"
+        },
+        {
+            "sku": "RF-LAT-134-001",
+            "nombre_estandarizado": "Gas Refrigerante R-134A Lata 1kg Chemours",
+            "grupo_general": "RF",
+            "grupo_especializado": "Gases Refrigerantes",
+            "marca": "Chemours",
+            "modelo": "R-134A",
+            "descripcion_tecnica": "Lata 1Kg",
+            "capacidad": "1 Kg",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Lata"
+        },
+        {
+            "sku": "RF-BOY-404-001",
+            "nombre_estandarizado": "Gas Refrigerante R-404A Boya 10.89kg Chemours",
+            "grupo_general": "RF",
+            "grupo_especializado": "Gases Refrigerantes",
+            "marca": "Chemours",
+            "modelo": "R-404A",
+            "descripcion_tecnica": "Boya 10.89Kg",
+            "capacidad": "10.89 Kg",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Boya"
+        },
+        {
+            "sku": "RF-BOY-449-001",
+            "nombre_estandarizado": "Gas Refrigerante Opteon XP40 (R-449A) Boya 11.35kg Chemours",
+            "grupo_general": "RF",
+            "grupo_especializado": "Gases Refrigerantes",
+            "marca": "Chemours",
+            "modelo": "Opteon XP40",
+            "descripcion_tecnica": "Boya 11.35Kg R-449A",
+            "capacidad": "11.35 Kg",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Boya"
+        },
+        {
+            "sku": "RF-BOY-134-001",
+            "nombre_estandarizado": "Gas Refrigerante R-134A Boya 13.6kg Chemours",
+            "grupo_general": "RF",
+            "grupo_especializado": "Gases Refrigerantes",
+            "marca": "Chemours",
+            "modelo": "R-134A",
+            "descripcion_tecnica": "Boya 13.6Kg Automotriz",
+            "capacidad": "13.6 Kg",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Boya"
+        },
+        {
+            "sku": "RF-LAT-404-001",
+            "nombre_estandarizado": "Gas Refrigerante R-404A Lata 425g Chemours",
+            "grupo_general": "RF",
+            "grupo_especializado": "Gases Refrigerantes",
+            "marca": "Chemours",
+            "modelo": "R-404A",
+            "descripcion_tecnica": "Lata 425Gr",
+            "capacidad": "425 Gr",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Lata"
+        },
+        {
+            "sku": "RE-VAL-LAT-001",
+            "nombre_estandarizado": "Válvula para Lata R-134A",
+            "grupo_general": "RE",
+            "grupo_especializado": "Valvulas",
+            "marca": "Genérico",
+            "modelo": "R-134A",
+            "descripcion_tecnica": "Válvula conexión automotriz",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "RF-CIL-404-001",
+            "nombre_estandarizado": "Gas Refrigerante R-404A Cilindro 45.4kg Chemours",
+            "grupo_general": "RF",
+            "grupo_especializado": "Gases Refrigerantes",
+            "marca": "Chemours",
+            "modelo": "R-404A",
+            "descripcion_tecnica": "Cilindro 45.4Kg",
+            "capacidad": "45.4 Kg",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Cilindro"
+        },
+        {
+            "sku": "RF-LAT-R22-001",
+            "nombre_estandarizado": "Gas Refrigerante R-22 Lata 1kg Chemours",
+            "grupo_general": "RF",
+            "grupo_especializado": "Gases Refrigerantes",
+            "marca": "Chemours",
+            "modelo": "R-22",
+            "descripcion_tecnica": "Lata 1Kg",
+            "capacidad": "1 Kg",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Lata"
+        },
+        {
+            "sku": "RF-LAT-134-002",
+            "nombre_estandarizado": "Gas Refrigerante R-134A Lata 340g Chemours",
+            "grupo_general": "RF",
+            "grupo_especializado": "Gases Refrigerantes",
+            "marca": "Chemours",
+            "modelo": "R-134A",
+            "descripcion_tecnica": "Lata 340Gr",
+            "capacidad": "340 Gr",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Lata"
+        },
+        {
+            "sku": "RF-BOY-407-001",
+            "nombre_estandarizado": "Gas Refrigerante R-407C Boya 11.35kg Chemours",
+            "grupo_general": "RF",
+            "grupo_especializado": "Gases Refrigerantes",
+            "marca": "Chemours",
+            "modelo": "R-407C",
+            "descripcion_tecnica": "Boya 11.35Kg",
+            "capacidad": "11.35 Kg",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Boya"
+        },
+        {
+            "sku": "RF-BOY-R22-001",
+            "nombre_estandarizado": "Gas Refrigerante R-22 Boya 13.6kg Chemours",
+            "grupo_general": "RF",
+            "grupo_especializado": "Gases Refrigerantes",
+            "marca": "Chemours",
+            "modelo": "R-22",
+            "descripcion_tecnica": "Boya 13.6Kg",
+            "capacidad": "13.6 Kg",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Boya"
+        },
+        {
+            "sku": "RF-BOY-409-001",
+            "nombre_estandarizado": "Gas Refrigerante R-409A Boya 13.6kg Chemours",
+            "grupo_general": "RF",
+            "grupo_especializado": "Gases Refrigerantes",
+            "marca": "Chemours",
+            "modelo": "R-409A",
+            "descripcion_tecnica": "Boya 13.6Kg",
+            "capacidad": "13.6 Kg",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Boya"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "LI-FCL-FRI-004",
+            "precio": 39.74,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200326-00079611",
+            "url": "https://www.grupocoresa.com/frigo-safe-1l-11697",
+            "scraped_at": "2025-12-26 19:26:12.609396+00",
+            "raw_id": 1556
+        },
+        {
+            "sku": "LI-FCL-FRI-004",
+            "precio": 39.74,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200326-00079611",
+            "url": "https://www.grupocoresa.com/frigo-safe-1l-11697",
+            "scraped_at": "2025-12-26 19:26:12.609396+00",
+            "raw_id": 1557
+        },
+        {
+            "sku": "LI-FCL-FRI-005",
+            "precio": 124.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200326-00089611",
+            "url": "https://www.grupocoresa.com/frigo-safe-galon-11698",
+            "scraped_at": "2025-12-26 19:26:12.609396+00",
+            "raw_id": 1558
+        },
+        {
+            "sku": "LI-FCL-FRI-005",
+            "precio": 124.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200326-00089611",
+            "url": "https://www.grupocoresa.com/frigo-safe-galon-11698",
+            "scraped_at": "2025-12-26 19:26:12.609396+00",
+            "raw_id": 1559
+        },
+        {
+            "sku": "LI-FCL-FRI-006",
+            "precio": 866.52,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200326-00099611",
+            "url": "https://www.grupocoresa.com/frigo-safe-porron-20l-11699",
+            "scraped_at": "2025-12-26 19:26:12.609396+00",
+            "raw_id": 1560
+        },
+        {
+            "sku": "LI-FCL-FRI-006",
+            "precio": 866.52,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200326-00099611",
+            "url": "https://www.grupocoresa.com/frigo-safe-porron-20l-11699",
+            "scraped_at": "2025-12-26 19:26:12.609396+00",
+            "raw_id": 1561
+        },
+        {
+            "sku": "LI-FCL-ALK-001",
+            "precio": 80.12,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200911-00005221",
+            "url": "https://www.grupocoresa.com/agente-de-limpieza-frigo-alki-cl-fgk-01-1-litro",
+            "scraped_at": "2025-12-26 19:26:12.609396+00",
+            "raw_id": 1562
+        },
+        {
+            "sku": "LI-FCL-ALK-001",
+            "precio": 80.12,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200911-00005221",
+            "url": "https://www.grupocoresa.com/agente-de-limpieza-frigo-alki-cl-fgk-01-1-litro",
+            "scraped_at": "2025-12-26 19:26:12.609396+00",
+            "raw_id": 1563
+        },
+        {
+            "sku": "LI-FCL-ALK-002",
+            "precio": 72.99,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-230120-00089141",
+            "url": "https://www.grupocoresa.com/frigo-alki-cl-fgk-a600-aerosol",
+            "scraped_at": "2025-12-26 19:26:12.609396+00",
+            "raw_id": 1564
+        },
+        {
+            "sku": "LI-FCL-ALK-002",
+            "precio": 72.99,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-230120-00089141",
+            "url": "https://www.grupocoresa.com/frigo-alki-cl-fgk-a600-aerosol",
+            "scraped_at": "2025-12-26 19:26:12.609396+00",
+            "raw_id": 1565
+        },
+        {
+            "sku": "LI-FCL-CLU-001",
+            "precio": 812.6,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-240710-00015951",
+            "url": "https://www.grupocoresa.com/foam-cleaner-porron-desincrustante-para-serpentines-cluxer-modelo-cxfoam-20-20l",
+            "scraped_at": "2025-12-26 19:26:12.609396+00",
+            "raw_id": 1566
+        },
+        {
+            "sku": "LI-FCL-CLU-001",
+            "precio": 812.6,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-240710-00015951",
+            "url": "https://www.grupocoresa.com/foam-cleaner-porron-desincrustante-para-serpentines-cluxer-modelo-cxfoam-20-20l",
+            "scraped_at": "2025-12-26 19:26:12.609396+00",
+            "raw_id": 1567
+        },
+        {
+            "sku": "RF-LAT-410-001",
+            "precio": 263.31,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001267",
+            "url": "https://www.grupocoresa.com/refrigerante-r-410a-lata-de-650gr-7621",
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1568
+        },
+        {
+            "sku": "RF-LAT-410-001",
+            "precio": 263.31,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001267",
+            "url": "https://www.grupocoresa.com/refrigerante-r-410a-lata-de-650gr-7621",
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1569
+        },
+        {
+            "sku": "RF-BOY-438-001",
+            "precio": 4009.46,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001367",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1570
+        },
+        {
+            "sku": "RF-BOY-438-001",
+            "precio": 4009.46,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001367",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1571
+        },
+        {
+            "sku": "RF-CIL-MED-001",
+            "precio": 5074.23,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001467",
+            "url": "https://www.grupocoresa.com/cilindro-mediano-7641",
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1572
+        },
+        {
+            "sku": "RF-CIL-MED-001",
+            "precio": 5074.23,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00001467",
+            "url": "https://www.grupocoresa.com/cilindro-mediano-7641",
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1573
+        },
+        {
+            "sku": "RF-BOY-507-001",
+            "precio": 2791.81,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002267",
+            "url": "https://www.grupocoresa.com/refrigerante-freon-507-r-507-boya-de-11-35kg-7622",
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1574
+        },
+        {
+            "sku": "RF-BOY-507-001",
+            "precio": 2791.81,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002267",
+            "url": "https://www.grupocoresa.com/refrigerante-freon-507-r-507-boya-de-11-35kg-7622",
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1575
+        },
+        {
+            "sku": "RF-CIL-RET-001",
+            "precio": 5074.23,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002467",
+            "url": "https://www.grupocoresa.com/cilindro-retornable-9kg-7642",
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1576
+        },
+        {
+            "sku": "RF-CIL-RET-001",
+            "precio": 5074.23,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00002467",
+            "url": "https://www.grupocoresa.com/cilindro-retornable-9kg-7642",
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1577
+        },
+        {
+            "sku": "RF-BOY-401-001",
+            "precio": 2212.1,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00003367",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1578
+        },
+        {
+            "sku": "RF-BOY-401-001",
+            "precio": 2212.1,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00003367",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1579
+        },
+        {
+            "sku": "RF-LAT-134-001",
+            "precio": 222.96,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00004067",
+            "url": "https://www.grupocoresa.com/refrigerante-freon-134a-r-134a-lata-de-1kg-7604",
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1580
+        },
+        {
+            "sku": "RF-LAT-134-001",
+            "precio": 222.96,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00004067",
+            "url": "https://www.grupocoresa.com/refrigerante-freon-134a-r-134a-lata-de-1kg-7604",
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1581
+        },
+        {
+            "sku": "RF-BOY-404-001",
+            "precio": 2647.76,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00004167",
+            "url": "https://www.grupocoresa.com/refrigerante-freon-404a-r-404a-boya-de-10-89kg-7614",
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1582
+        },
+        {
+            "sku": "RF-BOY-404-001",
+            "precio": 2647.76,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00004167",
+            "url": "https://www.grupocoresa.com/refrigerante-freon-404a-r-404a-boya-de-10-89kg-7614",
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1583
+        },
+        {
+            "sku": "RF-BOY-449-001",
+            "precio": 7713.97,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00004367",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1584
+        },
+        {
+            "sku": "RF-BOY-449-001",
+            "precio": 7713.97,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00004367",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1585
+        },
+        {
+            "sku": "RF-BOY-134-001",
+            "precio": 3436.37,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005067",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1586
+        },
+        {
+            "sku": "RF-BOY-134-001",
+            "precio": 3436.37,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005067",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1587
+        },
+        {
+            "sku": "RF-LAT-404-001",
+            "precio": 167.06,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005167",
+            "url": "https://www.grupocoresa.com/refrigerante-freon-404a-r-404a-lata-de-425gr-7615",
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1588
+        },
+        {
+            "sku": "RF-LAT-404-001",
+            "precio": 167.06,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005167",
+            "url": "https://www.grupocoresa.com/refrigerante-freon-404a-r-404a-lata-de-425gr-7615",
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1589
+        },
+        {
+            "sku": "RE-VAL-LAT-001",
+            "precio": 33.11,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005267",
+            "url": "https://www.grupocoresa.com/valvula-p-lata-refrigeracion-conexion-automotriz-r-134a-7625",
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1590
+        },
+        {
+            "sku": "RE-VAL-LAT-001",
+            "precio": 33.11,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00005267",
+            "url": "https://www.grupocoresa.com/valvula-p-lata-refrigeracion-conexion-automotriz-r-134a-7625",
+            "scraped_at": "2025-12-26 19:26:12.930072+00",
+            "raw_id": 1591
+        },
+        {
+            "sku": "RF-BOY-134-001",
+            "precio": 3436.37,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006067",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:16.748262+00",
+            "raw_id": 1592
+        },
+        {
+            "sku": "RF-BOY-134-001",
+            "precio": 3436.37,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006067",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:16.748262+00",
+            "raw_id": 1593
+        },
+        {
+            "sku": "RF-CIL-404-001",
+            "precio": 13964.44,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006167",
+            "url": "https://www.grupocoresa.com/refrigerante-freon-404a-r-404a-cilindro-de-45-4kg-7616",
+            "scraped_at": "2025-12-26 19:26:16.748262+00",
+            "raw_id": 1594
+        },
+        {
+            "sku": "RF-CIL-404-001",
+            "precio": 13964.44,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006167",
+            "url": "https://www.grupocoresa.com/refrigerante-freon-404a-r-404a-cilindro-de-45-4kg-7616",
+            "scraped_at": "2025-12-26 19:26:16.748262+00",
+            "raw_id": 1595
+        },
+        {
+            "sku": "RF-LAT-R22-001",
+            "precio": 273.59,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006367",
+            "url": "https://www.grupocoresa.com/refrigerante-freon-22-r-22-lata-de-1kg-7636",
+            "scraped_at": "2025-12-26 19:26:16.748262+00",
+            "raw_id": 1596
+        },
+        {
+            "sku": "RF-LAT-R22-001",
+            "precio": 273.59,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006367",
+            "url": "https://www.grupocoresa.com/refrigerante-freon-22-r-22-lata-de-1kg-7636",
+            "scraped_at": "2025-12-26 19:26:16.748262+00",
+            "raw_id": 1597
+        },
+        {
+            "sku": "RF-LAT-134-002",
+            "precio": 101.29,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007067",
+            "url": "https://www.grupocoresa.com/refrigerante-freon-134a-r-134a-lata-de-340gr-7607",
+            "scraped_at": "2025-12-26 19:26:16.748262+00",
+            "raw_id": 1598
+        },
+        {
+            "sku": "RF-LAT-134-002",
+            "precio": 101.29,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007067",
+            "url": "https://www.grupocoresa.com/refrigerante-freon-134a-r-134a-lata-de-340gr-7607",
+            "scraped_at": "2025-12-26 19:26:16.748262+00",
+            "raw_id": 1599
+        },
+        {
+            "sku": "RF-BOY-407-001",
+            "precio": 3710.42,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007167",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:16.748262+00",
+            "raw_id": 1600
+        },
+        {
+            "sku": "RF-BOY-407-001",
+            "precio": 3710.42,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007167",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:16.748262+00",
+            "raw_id": 1601
+        },
+        {
+            "sku": "RF-BOY-R22-001",
+            "precio": 3274.36,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007367",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:16.748262+00",
+            "raw_id": 1602
+        },
+        {
+            "sku": "RF-BOY-R22-001",
+            "precio": 3274.36,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007367",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:16.748262+00",
+            "raw_id": 1603
+        },
+        {
+            "sku": "RF-BOY-409-001",
+            "precio": 30408.7,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00008167",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:16.748262+00",
+            "raw_id": 1604
+        },
+        {
+            "sku": "RF-BOY-409-001",
+            "precio": 30408.7,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00008167",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:16.748262+00",
+            "raw_id": 1605
+        }
+    ]
+}

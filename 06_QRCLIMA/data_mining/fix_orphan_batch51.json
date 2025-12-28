@@ -1,0 +1,12 @@
+{
+    "new_products": [
+        {
+            "sku": "EQ-MSO-YOR-001",
+            "name": "Minisplit York 1 Ton Solo Frío 220V R410A Estándar",
+            "category": "Equipos",
+            "brand": "York",
+            "specs": "1TR 220V"
+        }
+    ],
+    "price_observations": []
+}

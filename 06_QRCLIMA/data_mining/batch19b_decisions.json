@@ -1,0 +1,679 @@
+{
+    "new_products": [
+        {
+            "sku": "HE-ACC-YEL-003",
+            "nombre_estandarizado": "Cople Rápido 90° Yellow Jacket 1/4\" x 1/4\"",
+            "grupo_general": "HE",
+            "grupo_especializado": "Accesorios",
+            "marca": "Yellow Jacket",
+            "modelo": "19191",
+            "descripcion_tecnica": "Cople Rápido 90° 1/4\" Hembra x 1/4\" Macho",
+            "capacidad": "1/4-1/4\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Conexión",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-ADE-011",
+            "nombre_estandarizado": "Lanza Mixta Completa Adesa",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Adesa",
+            "modelo": "AD-R-LAN",
+            "descripcion_tecnica": "Lanza Mixta Completa",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Limpieza",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-CHE-REC-002",
+            "nombre_estandarizado": "Sellador de Fuga Leak Freeze Rectorseal",
+            "grupo_general": "HE",
+            "grupo_especializado": "Químicos",
+            "marca": "Rectorseal",
+            "modelo": "45321",
+            "descripcion_tecnica": "Sellador de Fuga Leak Freeze 1.5 Oz",
+            "capacidad": "1.5 Oz",
+            "voltaje": "N/A",
+            "tipo_operacion": "Sellado",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-MGU-YEL-010",
+            "nombre_estandarizado": "Manguera Yellow Jacket 72\" Roja 1/4\"",
+            "grupo_general": "HE",
+            "grupo_especializado": "Mangueras",
+            "marca": "Yellow Jacket",
+            "modelo": "21672",
+            "descripcion_tecnica": "Manguera 72\" Roja Conexión 1/4\"",
+            "capacidad": "72 pulg",
+            "voltaje": "N/A",
+            "tipo_operacion": "Carga",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-SOL-UNI-011",
+            "nombre_estandarizado": "Protector de Calor Uniweld HG4",
+            "grupo_general": "HE",
+            "grupo_especializado": "Soldadura",
+            "marca": "Uniweld",
+            "modelo": "HG4",
+            "descripcion_tecnica": "Protector de Calor para Puntas Unitorch",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Soldadura",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-MAN-YEL-016",
+            "nombre_estandarizado": "Manifold Heat Pump Yellow Jacket R22/410A/407C",
+            "grupo_general": "HE",
+            "grupo_especializado": "Manómetros",
+            "marca": "Yellow Jacket",
+            "modelo": "42044",
+            "descripcion_tecnica": "Manifold Heat Pump R22/410A/407C con Manguera Negra",
+            "capacidad": "Heat Pump",
+            "voltaje": "N/A",
+            "tipo_operacion": "Medición",
+            "unidad": "Juego"
+        },
+        {
+            "sku": "HE-MGU-MAS-002",
+            "nombre_estandarizado": "Juego Mangueras Master Cool 72\"",
+            "grupo_general": "HE",
+            "grupo_especializado": "Mangueras",
+            "marca": "Master Cool",
+            "modelo": "40372",
+            "descripcion_tecnica": "Juego Mangueras 72\" (40372)",
+            "capacidad": "72 pulg",
+            "voltaje": "N/A",
+            "tipo_operacion": "Carga",
+            "unidad": "Juego"
+        },
+        {
+            "sku": "HE-SOL-UNI-012",
+            "nombre_estandarizado": "Kit Llama de Lápiz Uniweld K80",
+            "grupo_general": "HE",
+            "grupo_especializado": "Soldadura",
+            "marca": "Uniweld",
+            "modelo": "K80",
+            "descripcion_tecnica": "Kit Llama de Lápiz con Manguera 3Ft",
+            "capacidad": "Lápiz",
+            "voltaje": "N/A",
+            "tipo_operacion": "Soldadura",
+            "unidad": "Kit"
+        },
+        {
+            "sku": "RE-CON-HON-001",
+            "nombre_estandarizado": "Base para Modutrol Honeywell",
+            "grupo_general": "RE",
+            "grupo_especializado": "Controles",
+            "marca": "Honeywell",
+            "modelo": "M9184A1019",
+            "descripcion_tecnica": "Base Para Modutrol M9184A1019",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Control",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-VAL-GEN-001",
+            "nombre_estandarizado": "Llave Vertical para Tanque 1/4 NPT",
+            "grupo_general": "HE",
+            "grupo_especializado": "Válvulas",
+            "marca": "Genérico",
+            "modelo": "LL-102-1",
+            "descripcion_tecnica": "Llave He Vertical para Tanque 1/4NPT x 3/8 Flare",
+            "capacidad": "1/4-3/8\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Servicio",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-SOL-AVA-005",
+            "nombre_estandarizado": "Boquilla Tubo Giratorio Avaly",
+            "grupo_general": "HE",
+            "grupo_especializado": "Soldadura",
+            "marca": "Avaly",
+            "modelo": "VA-8069",
+            "descripcion_tecnica": "Boquilla con Tubo Giratorio",
+            "capacidad": "Giratoria",
+            "voltaje": "N/A",
+            "tipo_operacion": "Soldadura",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "AC-VIB-GEN-005",
+            "nombre_estandarizado": "Eliminador de Vibración con Malla de Cobre 1/2\"",
+            "grupo_general": "AC",
+            "grupo_especializado": "Antivibración",
+            "marca": "Genérico",
+            "modelo": "VF-4",
+            "descripcion_tecnica": "Eliminador de Vibración con Malla de Cobre 1/2\" Largo 9\"",
+            "capacidad": "1/2\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Instalación",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-SOL-UNI-013",
+            "nombre_estandarizado": "Kit Soldar Aluminio Uniweld Uni-4300",
+            "grupo_general": "HE",
+            "grupo_especializado": "Soldadura",
+            "marca": "Uniweld",
+            "modelo": "P4KD9",
+            "descripcion_tecnica": "Kit Soldar Aluminio con Fundente Uni 4300",
+            "capacidad": "Aluminio",
+            "voltaje": "N/A",
+            "tipo_operacion": "Soldadura",
+            "unidad": "Kit"
+        },
+        {
+            "sku": "HE-HER-GEN-009",
+            "nombre_estandarizado": "Plegador de Tubos C5T",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Genérico",
+            "modelo": "C5T",
+            "descripcion_tecnica": "Plegador de Tubos Manual",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Tubería",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-REF-YEL-003",
+            "nombre_estandarizado": "Navaja para Cortar Tubo Yellow Jacket",
+            "grupo_general": "HE",
+            "grupo_especializado": "Refacciones",
+            "marca": "Yellow Jacket",
+            "modelo": "60107",
+            "descripcion_tecnica": "Navaja de Repuesto para Cortar Tubo",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Corte",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-REG-UNI-003",
+            "nombre_estandarizado": "Regulador de Acetileno Uniweld RMC2",
+            "grupo_general": "HE",
+            "grupo_especializado": "Reguladores",
+            "marca": "Uniweld",
+            "modelo": "RMC2",
+            "descripcion_tecnica": "Regulador de Acetileno",
+            "capacidad": "Acetileno",
+            "voltaje": "N/A",
+            "tipo_operacion": "Soldadura",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-GEN-010",
+            "nombre_estandarizado": "Herramienta Tensora de Nylon TY4",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Genérico",
+            "modelo": "TY4",
+            "descripcion_tecnica": "Herramienta Tensora de Nylon sin Agarre",
+            "capacidad": "Nylon",
+            "voltaje": "N/A",
+            "tipo_operacion": "Fijación",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-INS-BAR-003",
+            "nombre_estandarizado": "Multímetro Digital Barreto con Temperatura",
+            "grupo_general": "HE",
+            "grupo_especializado": "Instrumentos",
+            "marca": "Barreto",
+            "modelo": "266C",
+            "descripcion_tecnica": "Multímetro Digital con Medidor de Temperatura",
+            "capacidad": "Temp",
+            "voltaje": "N/A",
+            "tipo_operacion": "Medición Eléctrica",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-HER-YEL-010",
+            "nombre_estandarizado": "Llave Ratch Yellow Jacket (4 Medidas)",
+            "grupo_general": "HE",
+            "grupo_especializado": "Herramientas",
+            "marca": "Yellow Jacket",
+            "modelo": "60613",
+            "descripcion_tecnica": "Llave Ratch 1/4\", 3/16\", 3/8\", 5/16\"",
+            "capacidad": "Multipunto",
+            "voltaje": "N/A",
+            "tipo_operacion": "Servicio",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-SOL-BAR-003",
+            "nombre_estandarizado": "Boquilla Encendido Automático Barreto HT-802B",
+            "grupo_general": "HE",
+            "grupo_especializado": "Soldadura",
+            "marca": "Barreto",
+            "modelo": "HT-802B",
+            "descripcion_tecnica": "Boquilla Encendido Automático",
+            "capacidad": "Auto-Ignición",
+            "voltaje": "N/A",
+            "tipo_operacion": "Soldadura",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-INS-YEL-003",
+            "nombre_estandarizado": "Medidor de Vacío de Mano Yellow Jacket",
+            "grupo_general": "HE",
+            "grupo_especializado": "Instrumentos",
+            "marca": "Yellow Jacket",
+            "modelo": "69086",
+            "descripcion_tecnica": "Medidor de Vacío de Mano Digital",
+            "capacidad": "Vacío",
+            "voltaje": "N/A",
+            "tipo_operacion": "Vacío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-MGU-YEL-011",
+            "nombre_estandarizado": "Juego 3 Mangueras Yellow Jacket 36\"",
+            "grupo_general": "HE",
+            "grupo_especializado": "Mangueras",
+            "marca": "Yellow Jacket",
+            "modelo": "21983",
+            "descripcion_tecnica": "Juego de 3 Mangueras 36\" Rojo/Azul/Amarillo",
+            "capacidad": "36 pulg",
+            "voltaje": "N/A",
+            "tipo_operacion": "Carga",
+            "unidad": "Juego"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "HE-ACC-YEL-003",
+            "precio": 302.18,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007045",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:29:02.151882+00",
+            "raw_id": 2814
+        },
+        {
+            "sku": "HE-ACC-YEL-003",
+            "precio": 302.18,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007045",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:29:02.151882+00",
+            "raw_id": 2815
+        },
+        {
+            "sku": "HE-HER-ADE-011",
+            "precio": 235.89,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007054",
+            "url": "https://www.grupocoresa.com/lanza-mixta-completa-4507",
+            "scraped_at": "2025-12-26 19:29:02.151882+00",
+            "raw_id": 2816
+        },
+        {
+            "sku": "HE-HER-ADE-011",
+            "precio": 235.89,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007054",
+            "url": "https://www.grupocoresa.com/lanza-mixta-completa-4507",
+            "scraped_at": "2025-12-26 19:29:02.151882+00",
+            "raw_id": 2817
+        },
+        {
+            "sku": "HE-CHE-REC-002",
+            "precio": 920.19,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007134",
+            "url": "https://www.grupocoresa.com/sellador-de-fuga-leak-freeze-1-5oz-4317",
+            "scraped_at": "2025-12-26 19:29:02.151882+00",
+            "raw_id": 2820
+        },
+        {
+            "sku": "HE-CHE-REC-002",
+            "precio": 920.19,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007134",
+            "url": "https://www.grupocoresa.com/sellador-de-fuga-leak-freeze-1-5oz-4317",
+            "scraped_at": "2025-12-26 19:29:02.151882+00",
+            "raw_id": 2821
+        },
+        {
+            "sku": "HE-MGU-YEL-010",
+            "precio": 609.88,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007145",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:29:02.151882+00",
+            "raw_id": 2822
+        },
+        {
+            "sku": "HE-MGU-YEL-010",
+            "precio": 609.88,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007145",
+            "url": "N/A",
+            "scraped_at": "2025-12-26 19:29:02.151882+00",
+            "raw_id": 2823
+        },
+        {
+            "sku": "HE-SOL-UNI-011",
+            "precio": 136.49,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007205",
+            "url": "https://www.grupocoresa.com/protector-de-calor-hg4-para-puntas-unitorch-5027",
+            "scraped_at": "2025-12-26 19:29:02.151882+00",
+            "raw_id": 2824
+        },
+        {
+            "sku": "HE-SOL-UNI-011",
+            "precio": 136.49,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007205",
+            "url": "https://www.grupocoresa.com/protector-de-calor-hg4-para-puntas-unitorch-5027",
+            "scraped_at": "2025-12-26 19:29:02.151882+00",
+            "raw_id": 2825
+        },
+        {
+            "sku": "HE-MAN-YEL-016",
+            "precio": 4113.38,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007245",
+            "url": "https://www.grupocoresa.com/manifold-heat-pump-r22-407-410a-con-manguera-negra-60-yellow-jacket-5427",
+            "scraped_at": "2025-12-26 19:29:02.151882+00",
+            "raw_id": 2826
+        },
+        {
+            "sku": "HE-MAN-YEL-016",
+            "precio": 4113.38,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007245",
+            "url": "https://www.grupocoresa.com/manifold-heat-pump-r22-407-410a-con-manguera-negra-60-yellow-jacket-5427",
+            "scraped_at": "2025-12-26 19:29:02.151882+00",
+            "raw_id": 2827
+        },
+        {
+            "sku": "HE-MGU-MAS-002",
+            "precio": 1147.51,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007257",
+            "url": "https://www.grupocoresa.com/juego-mangueras-72-mastercol-40372-7527",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2828
+        },
+        {
+            "sku": "HE-MGU-MAS-002",
+            "precio": 1147.51,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007257",
+            "url": "https://www.grupocoresa.com/juego-mangueras-72-mastercol-40372-7527",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2829
+        },
+        {
+            "sku": "HE-SOL-UNI-012",
+            "precio": 1496.54,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007305",
+            "url": "https://www.grupocoresa.com/kit-llama-de-lapiz-con-manguera-3ft-5037",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2830
+        },
+        {
+            "sku": "HE-SOL-UNI-012",
+            "precio": 1496.54,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007305",
+            "url": "https://www.grupocoresa.com/kit-llama-de-lapiz-con-manguera-3ft-5037",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2831
+        },
+        {
+            "sku": "RE-CON-HON-001",
+            "precio": 43.74,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007317",
+            "url": "https://www.grupocoresa.com/base-para-modutrol-m9184a1019-7137",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2832
+        },
+        {
+            "sku": "RE-CON-HON-001",
+            "precio": 43.74,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007317",
+            "url": "https://www.grupocoresa.com/base-para-modutrol-m9184a1019-7137",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2833
+        },
+        {
+            "sku": "HE-VAL-GEN-001",
+            "precio": 25.93,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007333",
+            "url": "https://www.grupocoresa.com/llave-he-vertical-para-tanque-1-4nptf-3-8f-3337",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2834
+        },
+        {
+            "sku": "HE-VAL-GEN-001",
+            "precio": 25.93,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007333",
+            "url": "https://www.grupocoresa.com/llave-he-vertical-para-tanque-1-4nptf-3-8f-3337",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2835
+        },
+        {
+            "sku": "HE-SOL-AVA-005",
+            "precio": 435.67,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007346",
+            "url": "https://www.grupocoresa.com/boquilla-con-tubo-giratorio-6437",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2836
+        },
+        {
+            "sku": "HE-SOL-AVA-005",
+            "precio": 435.67,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007346",
+            "url": "https://www.grupocoresa.com/boquilla-con-tubo-giratorio-6437",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2837
+        },
+        {
+            "sku": "AC-VIB-GEN-005",
+            "precio": 691.21,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007377",
+            "url": "https://www.grupocoresa.com/eliminador-de-vibracion-con-malla-de-cobre-1-2-largo-9-7737",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2838
+        },
+        {
+            "sku": "AC-VIB-GEN-005",
+            "precio": 691.21,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007377",
+            "url": "https://www.grupocoresa.com/eliminador-de-vibracion-con-malla-de-cobre-1-2-largo-9-7737",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2839
+        },
+        {
+            "sku": "HE-SOL-UNI-013",
+            "precio": 310.1,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007405",
+            "url": "https://www.grupocoresa.com/kit-soldar-aluminio-con-fundente-uni-4300-5047",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2840
+        },
+        {
+            "sku": "HE-SOL-UNI-013",
+            "precio": 310.1,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007405",
+            "url": "https://www.grupocoresa.com/kit-soldar-aluminio-con-fundente-uni-4300-5047",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2841
+        },
+        {
+            "sku": "HE-HER-GEN-009",
+            "precio": 125.71,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007414",
+            "url": "https://www.grupocoresa.com/plegador-de-tubos-4147",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2842
+        },
+        {
+            "sku": "HE-HER-GEN-009",
+            "precio": 125.71,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007414",
+            "url": "https://www.grupocoresa.com/plegador-de-tubos-4147",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2843
+        },
+        {
+            "sku": "HE-REF-YEL-003",
+            "precio": 137.66,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007445",
+            "url": "https://www.grupocoresa.com/navaja-para-cortar-tubo-yellow-jacket-5447",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2844
+        },
+        {
+            "sku": "HE-REF-YEL-003",
+            "precio": 137.66,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007445",
+            "url": "https://www.grupocoresa.com/navaja-para-cortar-tubo-yellow-jacket-5447",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2845
+        },
+        {
+            "sku": "HE-REG-UNI-003",
+            "precio": 1805.23,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007505",
+            "url": "https://www.grupocoresa.com/regulador-de-acetileno-5057",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2846
+        },
+        {
+            "sku": "HE-REG-UNI-003",
+            "precio": 1805.23,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007505",
+            "url": "https://www.grupocoresa.com/regulador-de-acetileno-5057",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2847
+        },
+        {
+            "sku": "HE-HER-GEN-010",
+            "precio": 165.83,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007514",
+            "url": "https://www.grupocoresa.com/herramienta-tensora-de-nilon-sin-agarre-4157",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2848
+        },
+        {
+            "sku": "HE-HER-GEN-010",
+            "precio": 165.83,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007514",
+            "url": "https://www.grupocoresa.com/herramienta-tensora-de-nilon-sin-agarre-4157",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2849
+        },
+        {
+            "sku": "HE-INS-BAR-003",
+            "precio": 367.01,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007536",
+            "url": "https://www.grupocoresa.com/multimetro-digital-con-medidor-de-temperatura-6357",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2850
+        },
+        {
+            "sku": "HE-INS-BAR-003",
+            "precio": 367.01,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007536",
+            "url": "https://www.grupocoresa.com/multimetro-digital-con-medidor-de-temperatura-6357",
+            "scraped_at": "2025-12-26 19:29:05.144782+00",
+            "raw_id": 2851
+        },
+        {
+            "sku": "HE-HER-YEL-010",
+            "precio": 439.58,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007545",
+            "url": "https://www.grupocoresa.com/llave-ratch-1-4-3-16-3-8-5-16-yellow-jacket-5457",
+            "scraped_at": "2025-12-26 19:29:08.414135+00",
+            "raw_id": 2852
+        },
+        {
+            "sku": "HE-HER-YEL-010",
+            "precio": 439.58,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007545",
+            "url": "https://www.grupocoresa.com/llave-ratch-1-4-3-16-3-8-5-16-yellow-jacket-5457",
+            "scraped_at": "2025-12-26 19:29:08.414135+00",
+            "raw_id": 2853
+        },
+        {
+            "sku": "HE-SOL-BAR-003",
+            "precio": 549.85,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007636",
+            "url": "https://www.grupocoresa.com/boquilla-encendido-automatico-6367",
+            "scraped_at": "2025-12-26 19:29:08.414135+00",
+            "raw_id": 2854
+        },
+        {
+            "sku": "HE-SOL-BAR-003",
+            "precio": 549.85,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007636",
+            "url": "https://www.grupocoresa.com/boquilla-encendido-automatico-6367",
+            "scraped_at": "2025-12-26 19:29:08.414135+00",
+            "raw_id": 2855
+        },
+        {
+            "sku": "HE-INS-YEL-003",
+            "precio": 8720.49,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007645",
+            "url": "https://www.grupocoresa.com/medidor-de-vacio-de-mano-yellow-jacket-5467",
+            "scraped_at": "2025-12-26 19:29:08.414135+00",
+            "raw_id": 2856
+        },
+        {
+            "sku": "HE-INS-YEL-003",
+            "precio": 8720.49,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007645",
+            "url": "https://www.grupocoresa.com/medidor-de-vacio-de-mano-yellow-jacket-5467",
+            "scraped_at": "2025-12-26 19:29:08.414135+00",
+            "raw_id": 2857
+        },
+        {
+            "sku": "HE-MGU-YEL-011",
+            "precio": 1792.29,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007647",
+            "url": "https://www.grupocoresa.com/juego-3-mangueras-36-amarillo-rojo-azul-yellow-jacket-7467",
+            "scraped_at": "2025-12-26 19:29:08.414135+00",
+            "raw_id": 2858
+        }
+    ]
+}

@@ -1,0 +1,628 @@
+{
+    "new_products": [
+        {
+            "sku": "RE-COM-EMB-016",
+            "name": "Compresor Hermético Embraco 1 1/4HP R134a 208-230V",
+            "category": "Refacciones",
+            "brand": "Embraco",
+            "specs": "1 1/4HP R134a 208-230V"
+        },
+        {
+            "sku": "EQ-MSO-15T220-012",
+            "name": "Minisplit High Wall York 1.5 Ton Frío-Calor 220V R410A",
+            "category": "Equipos",
+            "brand": "York",
+            "specs": "1.5 Ton Frío-Calor 220V R410A"
+        },
+        {
+            "sku": "HE-BOM-AVA-004",
+            "name": "Bomba de Vacío Avaly 3 CFM 2 Etapas 110V",
+            "category": "Herramientas",
+            "brand": "Avaly",
+            "specs": "3 CFM 2 Etapas 110V"
+        },
+        {
+            "sku": "HE-BOM-BAR-001",
+            "name": "Bomba de Vacío Barreto 1.8 CFM 1/4HP 110V",
+            "category": "Herramientas",
+            "brand": "Barreto",
+            "specs": "1.8 CFM 1/4HP 110V"
+        },
+        {
+            "sku": "EQ-MSO-2T220-012",
+            "name": "Minisplit High Wall York 2 Ton Frío-Calor 220V R410A",
+            "category": "Equipos",
+            "brand": "York",
+            "specs": "2 Ton Frío-Calor 220V R410A"
+        },
+        {
+            "sku": "RE-TAR-YOR-004",
+            "name": "Tarjeta York Control Evaporador 00H11800323K",
+            "category": "Refacciones",
+            "brand": "York",
+            "specs": "00H11800323K"
+        },
+        {
+            "sku": "RE-FIL-DIV-001",
+            "name": "Filtro Drier Universal Spun CPR DXA-5",
+            "category": "Refacciones",
+            "brand": "Diversitech",
+            "specs": "Universal Spun CPR DXA-5"
+        },
+        {
+            "sku": "RE-VAL-DIV-001",
+            "name": "Válvula Diversitech Pivote 1/8 ODF",
+            "category": "Refacciones",
+            "brand": "Diversitech",
+            "specs": "1/8 ODF"
+        },
+        {
+            "sku": "RE-VAL-DAN-008",
+            "name": "Válvula Danfoss Solenoide 5/8 Soldable",
+            "category": "Refacciones",
+            "brand": "Danfoss",
+            "specs": "5/8 Soldable"
+        },
+        {
+            "sku": "RE-FIL-DAN-001",
+            "name": "Filtro Danfoss Tipo Piedra DCR 48-DA",
+            "category": "Refacciones",
+            "brand": "Danfoss",
+            "specs": "DCR 48-DA"
+        },
+        {
+            "sku": "RE-FIL-LG-001",
+            "name": "Filtro Evaporador LG Artcool C122HR",
+            "category": "Refacciones",
+            "brand": "LG",
+            "specs": "C122HR"
+        },
+        {
+            "sku": "EL-ACC-TER-001",
+            "name": "Línea Toma Corriente 3x16",
+            "category": "Eléctricos",
+            "brand": "Termicel",
+            "specs": "3x16"
+        },
+        {
+            "sku": "AC-FIL-TER-001",
+            "name": "Filtro Bolsa Superficie Extendida 12x24x2",
+            "category": "Accesorios",
+            "brand": "Termochisa",
+            "specs": "12x24x2"
+        },
+        {
+            "sku": "RE-VAL-RIM-001",
+            "name": "Válvula Termostática Expansión Rimsa 7 Ton R22",
+            "category": "Refacciones",
+            "brand": "Rimsa",
+            "specs": "7 Ton R22"
+        },
+        {
+            "sku": "RE-CAR-DAN-001",
+            "name": "Carcaza Danfoss Filtro Recargador DCR0487S",
+            "category": "Refacciones",
+            "brand": "Danfoss",
+            "specs": "DCR0487S"
+        },
+        {
+            "sku": "EQ-MSI-PRI-026",
+            "name": "Minisplit Inverter Prime 1 Ton Frío-Calor 110V",
+            "category": "Equipos",
+            "brand": "Prime",
+            "specs": "1 Ton Frío-Calor Inverter 110V"
+        },
+        {
+            "sku": "EQ-MSI-PRI-027",
+            "name": "Minisplit Inverter Prime 1.5 Ton Frío-Calor 220V",
+            "category": "Equipos",
+            "brand": "Prime",
+            "specs": "1.5 Ton Frío-Calor Inverter 220V"
+        },
+        {
+            "sku": "EQ-MSI-PRI-028",
+            "name": "Minisplit Inverter Prime 1 Ton Frío-Calor 110V R32",
+            "category": "Equipos",
+            "brand": "Prime",
+            "specs": "1 Ton Frío-Calor Inverter 110V R32"
+        },
+        {
+            "sku": "EQ-MSO-1T220-018",
+            "name": "Minisplit On/Off Hisense 1 Ton Frío-Calor 220V",
+            "category": "Equipos",
+            "brand": "Hisense",
+            "specs": "1 Ton Frío-Calor 220V"
+        },
+        {
+            "sku": "EQ-MSI-MID-008",
+            "name": "Minisplit Inverter Midea FRST 1 Ton Frío-Calor 220V",
+            "category": "Equipos",
+            "brand": "Midea",
+            "specs": "1 Ton Frío-Calor Inverter 220V"
+        },
+        {
+            "sku": "EQ-MSO-15T220-013",
+            "name": "Minisplit Prime Elite 1.5 Ton Frío-Calor 220V",
+            "category": "Equipos",
+            "brand": "Prime",
+            "specs": "1.5 Ton Frío-Calor 220V"
+        },
+        {
+            "sku": "EQ-MSI-PRI-029",
+            "name": "Minisplit Inverter Prime 2 Ton Solo Frío 220V R32",
+            "category": "Equipos",
+            "brand": "Prime",
+            "specs": "2 Ton Solo Frío Inverter 220V R32"
+        },
+        {
+            "sku": "EQ-MSO-2T220-013",
+            "name": "Minisplit Prime Trendy 2 Ton Solo Frío 220V",
+            "category": "Equipos",
+            "brand": "Prime",
+            "specs": "2 Ton Solo Frío 220V"
+        },
+        {
+            "sku": "EQ-MSO-15T220-014",
+            "name": "Minisplit Prime Trendy3 1.5 Ton Solo Frío 220V",
+            "category": "Equipos",
+            "brand": "Prime",
+            "specs": "1.5 Ton Solo Frío 220V"
+        },
+        {
+            "sku": "EQ-MSI-HIS-021",
+            "name": "Minisplit Inverter Hisense 1 Ton Frío-Calor 110V R410A",
+            "category": "Equipos",
+            "brand": "Hisense",
+            "specs": "1 Ton Frío-Calor Inverter 110V R410A"
+        },
+        {
+            "sku": "AC-VEN-SOL-040",
+            "name": "Cortina de Aire Soler & Palau 36 Pulgadas .35KW",
+            "category": "Accesorios",
+            "brand": "Soler & Palau",
+            "specs": "36 Pulgadas .35KW"
+        },
+        {
+            "sku": "EQ-MSO-1T220-019",
+            "name": "Minisplit On/Off Hisense 1 Ton Solo Frío 220V Estándar",
+            "category": "Equipos",
+            "brand": "Hisense",
+            "specs": "1 Ton Solo Frío 220V"
+        },
+        {
+            "sku": "EQ-MSO-1T220-020",
+            "name": "Minisplit On/Off TCL 1 Ton Frío-Calor 220V",
+            "category": "Equipos",
+            "brand": "TCL",
+            "specs": "1 Ton Frío-Calor 220V"
+        },
+        {
+            "sku": "EQ-MSO-1T220-021",
+            "name": "Minisplit Prime Elite 1 Ton Frío-Calor 220V",
+            "category": "Equipos",
+            "brand": "Prime",
+            "specs": "1 Ton Frío-Calor 220V"
+        },
+        {
+            "sku": "EQ-DIS-IMB-001",
+            "name": "Dispensador de Agua Imbera Garrafón 20Lts",
+            "category": "Equipos",
+            "brand": "Imbera",
+            "specs": "20Lts"
+        },
+        {
+            "sku": "EQ-MSO-1T220-022",
+            "name": "Minisplit Prime Elite 1 Ton Solo Frío 220V",
+            "category": "Equipos",
+            "brand": "Prime",
+            "specs": "1 Ton Solo Frío 220V"
+        },
+        {
+            "sku": "HE-HER-AVA-015",
+            "name": "Cortatubo Avaly Mini 1/8 a 5/8",
+            "category": "Herramientas",
+            "brand": "Avaly",
+            "specs": "1/8 a 5/8"
+        },
+        {
+            "sku": "HE-PRO-AVA-002",
+            "name": "Protector Mantenimiento Minisplit Avaly",
+            "category": "Herramientas",
+            "brand": "Avaly",
+            "specs": "Minisplit"
+        },
+        {
+            "sku": "AC-CIN-AVA-002",
+            "name": "Cinta Elastomérica Aislante Avaly 9.14m",
+            "category": "Accesorios",
+            "brand": "Avaly",
+            "specs": "9.14m"
+        },
+        {
+            "sku": "RE-MOT-AVA-001",
+            "name": "Micromotor Avaly 1/70HP 27V 1550RPM",
+            "category": "Refacciones",
+            "brand": "Avaly",
+            "specs": "1/70HP 27V 1550RPM"
+        },
+        {
+            "sku": "RE-CON-AVA-006",
+            "name": "Control Remoto Universal Avaly 1000 Códigos",
+            "category": "Refacciones",
+            "brand": "Avaly",
+            "specs": "1000 Códigos"
+        },
+        {
+            "sku": "AC-SOP-AVA-003",
+            "name": "Soporte Pared Avaly 420x365mm 120kg",
+            "category": "Accesorios",
+            "brand": "Avaly",
+            "specs": "420x365mm 120kg"
+        },
+        {
+            "sku": "HE-CIN-AVA-005",
+            "name": "Cinta Aislante Avaly Flex PVC 30m",
+            "category": "Herramientas",
+            "brand": "Avaly",
+            "specs": "PVC 30m"
+        },
+        {
+            "sku": "EQ-MSO-1T110-011",
+            "name": "Minisplit Prime Elite 1 Ton Solo Frío 110V",
+            "category": "Equipos",
+            "brand": "Prime",
+            "specs": "1 Ton Solo Frío 110V"
+        },
+        {
+            "sku": "EQ-MSO-1T220-023",
+            "name": "Minisplit Prime Trendy 1 Ton Solo Frío 220V",
+            "category": "Equipos",
+            "brand": "Prime",
+            "specs": "1 Ton Solo Frío 220V"
+        },
+        {
+            "sku": "EQ-MSO-1T110-012",
+            "name": "Minisplit Prime Elite 1 Ton Frío-Calor 110V",
+            "category": "Equipos",
+            "brand": "Prime",
+            "specs": "1 Ton Frío-Calor 110V"
+        },
+        {
+            "sku": "HE-INS-AVA-006",
+            "name": "Vacuómetro Digital Avaly",
+            "category": "Herramientas",
+            "brand": "Avaly",
+            "specs": "Digital"
+        },
+        {
+            "sku": "RE-VAL-AVA-002",
+            "name": "Válvula Avaly Check para Lata 1/4",
+            "category": "Refacciones",
+            "brand": "Avaly",
+            "specs": "1/4"
+        },
+        {
+            "sku": "HE-INS-AVA-007",
+            "name": "Termómetro Digital Avaly Int/Ext",
+            "category": "Herramientas",
+            "brand": "Avaly",
+            "specs": "Int/Ext"
+        },
+        {
+            "sku": "HE-INS-AVA-008",
+            "name": "Termómetro Digital Avaly con Humedad",
+            "category": "Herramientas",
+            "brand": "Avaly",
+            "specs": "Humedad"
+        },
+        {
+            "sku": "HE-INS-AVA-009",
+            "name": "Termohigrómetro Digital Avaly Int/Ext",
+            "category": "Herramientas",
+            "brand": "Avaly",
+            "specs": "Int/Ext"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "AC-BOM-ASP-003",
+            "price": 2623.45,
+            "url": "https://reacsa.mx/products/bomba-aspen-mini-orange-maxi-230v",
+            "raw_id": "b1867cb3-e66e-4241-8235-692c7756da52"
+        },
+        {
+            "sku": "RE-COM-EMB-016",
+            "price": 8109.93,
+            "url": "https://reacsa.mx/products/nj6226z-b-compresor-hermetico-embraco-1-1-4hp-r-134a-208-230v",
+            "raw_id": "b563fa49-db3a-4d40-977e-f0ec259e3da6"
+        },
+        {
+            "sku": "EQ-MSO-15T220-012",
+            "price": 8906.17,
+            "url": "https://reacsa.mx/products/minisplit-york-compresor-on-off-frio-calor-1-5-ton-220v-r-410a",
+            "raw_id": "71e9521c-9e3a-4946-8341-7479db0a63b0"
+        },
+        {
+            "sku": "HE-BOM-UNI-002",
+            "price": 7537.86,
+            "url": "https://reacsa.mx/products/hvp6-bomba-de-vacio-6-cfm-hvp6",
+            "raw_id": "5223de6b-23ec-4481-a396-2026f672d200"
+        },
+        {
+            "sku": "HE-BOM-AVA-004",
+            "price": 7294.92,
+            "url": "https://reacsa.mx/products/bomba-avaly-vacio-3cfm-1725-rpm-2-etapas-110v",
+            "raw_id": "4af37fc1-fe64-4382-a87c-8072f3829f5d"
+        },
+        {
+            "sku": "HE-BOM-BAR-001",
+            "price": 3393.32,
+            "url": "https://reacsa.mx/products/ait-2b-bomba-de-vacio-barreto-1-8-cfm-1-4-hp-110v",
+            "raw_id": "3cc31fe1-5c4d-4f41-9848-55efc107d315"
+        },
+        {
+            "sku": "EQ-MSO-2T220-012",
+            "price": 13565.93,
+            "url": "https://reacsa.mx/products/minisplit-york-compresor-on-off-frio-calor-2-ton-220v-r-410a",
+            "raw_id": "c6d98bb7-8c58-4fc7-8fb4-c465f23ce7d8"
+        },
+        {
+            "sku": "RE-TAR-YOR-004",
+            "price": 838.56,
+            "url": "https://reacsa.mx/products/tarjeta-york-control-para-evaporador-00h11800323k",
+            "raw_id": "ad32c3a2-0d1b-445e-94f1-a792dc378a7c"
+        },
+        {
+            "sku": "RE-FIL-DIV-001",
+            "price": 200.49,
+            "url": "https://reacsa.mx/products/filtro-drier-universal-spun-cpr-dxa-5",
+            "raw_id": "7e7dab21-506f-4d7e-a575-5b3b8b97764b"
+        },
+        {
+            "sku": "RE-VAL-DIV-001",
+            "price": 314.73,
+            "url": "https://reacsa.mx/products/valvulas-diversitech-pivote-1-8-odf-6-pzas",
+            "raw_id": "1c2208bd-b20a-404e-85c8-ff2d3c02bc2c"
+        },
+        {
+            "sku": "RE-VAL-DAN-008",
+            "price": 1355.75,
+            "url": "https://reacsa.mx/products/valvula-danfoss-solenoide-5-8-soldable",
+            "raw_id": "bdf6d526-9737-417f-aa56-c3622dc0d9e2"
+        },
+        {
+            "sku": "RE-FIL-DAN-001",
+            "price": 618.34,
+            "url": "https://reacsa.mx/products/filtro-danfoss-tipo-piedra-dcr-48-da",
+            "raw_id": "308932b8-6389-4f2c-bbc2-96f7abfbc77d"
+        },
+        {
+            "sku": "RE-FIL-LG-001",
+            "price": 93.0,
+            "url": "https://reacsa.mx/products/filtro-para-evaporador-lg-artcool-mod-c122hr",
+            "raw_id": "bebbaaea-e708-4159-8778-f80056fbe94d"
+        },
+        {
+            "sku": "EL-ACC-TER-001",
+            "price": 47.03,
+            "url": "https://reacsa.mx/products/linea-toma-corriente-de-3x16",
+            "raw_id": "a824e98d-7886-4350-bcd9-492a1490bbd5"
+        },
+        {
+            "sku": "AC-FIL-TER-001",
+            "price": 406.0,
+            "url": "https://reacsa.mx/products/filtros-bolsa-de-superficie-ext-12x24x2-c-6",
+            "raw_id": "86552534-2d60-42b8-ac3c-29e43951e75d"
+        },
+        {
+            "sku": "RE-VAL-RIM-001",
+            "price": 1283.52,
+            "url": "https://reacsa.mx/products/valvula-termostatica-de-expansion-7-ton-r22-a-a",
+            "raw_id": "0bba4d1d-c828-455c-9367-90475b7ffced"
+        },
+        {
+            "sku": "RE-CAR-DAN-001",
+            "price": 1764.09,
+            "url": "https://reacsa.mx/products/carcaza-danfoss-para-filtro-recargador-dcr0487s",
+            "raw_id": "4767686f-07fc-45b2-851c-951d3911a9e2"
+        },
+        {
+            "sku": "EQ-MSI-PRI-026",
+            "price": 6672.03,
+            "url": "https://reacsa.mx/products/copia-de-minisplit-prime-1-5-ton-solo-frio-inverter-220v",
+            "raw_id": "5f5fc761-afe2-4854-ae39-a48fd7c9e46f"
+        },
+        {
+            "sku": "EQ-MSI-PRI-027",
+            "price": 9967.79,
+            "url": "https://reacsa.mx/products/minisplit-prime-1-5-ton-frio-calor-inverter-220v",
+            "raw_id": "b3f9663b-722e-42e4-9623-8b6996d77dd9"
+        },
+        {
+            "sku": "EQ-MSI-PRI-028",
+            "price": 6672.03,
+            "url": "https://reacsa.mx/products/minisplit-prime-1-ton-frio-y-calor-inverter-r32-110v",
+            "raw_id": "65c30a02-6df2-4f89-b8c4-06adeaedffda"
+        },
+        {
+            "sku": "EQ-MSO-1T220-018",
+            "price": 6163.66,
+            "url": "https://reacsa.mx/products/copia-de-minisplit-hisense-estandar-1-5-ton-frio-calor-220-v",
+            "raw_id": "ed240205-8d6e-4d8f-8a94-2f533483e073"
+        },
+        {
+            "sku": "EQ-MSI-HIS-019",
+            "price": 11962.76,
+            "url": "https://reacsa.mx/products/minisplit-hisense-1-5-ton-solo-frio-wfi-inverter",
+            "raw_id": "c4b6c398-f08a-4a8a-a8e3-e3d240316ce1"
+        },
+        {
+            "sku": "EQ-MSI-MID-008",
+            "price": 7713.97,
+            "url": "https://reacsa.mx/products/minisplit-midea-frst-1-ton-frio-y-calor-inverter-220v",
+            "raw_id": "f5c8d331-4eb0-49d1-b40a-811b8cb6ce8a"
+        },
+        {
+            "sku": "EQ-MSO-15T220-013",
+            "price": 8854.71,
+            "url": "https://reacsa.mx/products/minisplit-prime-elite-1-5-ton-frio-y-calor-estandar-220v",
+            "raw_id": "5b81832c-e48a-4541-962f-4d500a5d3880"
+        },
+        {
+            "sku": "EQ-MSI-PRI-029",
+            "price": 11949.67,
+            "url": "https://reacsa.mx/products/minisplit-prime-2-tone-solo-frio-inverter-220v",
+            "raw_id": "3391e456-03a1-4a49-abf5-6d61dcef0968"
+        },
+        {
+            "sku": "EQ-MSO-2T220-013",
+            "price": 10522.35,
+            "url": "https://reacsa.mx/products/minisplit-prime-trendy-2-ton-solo-frio-estandar-220v",
+            "raw_id": "bb3d15a4-f0d2-423e-bc92-329d374d1926"
+        },
+        {
+            "sku": "EQ-MSO-15T220-014",
+            "price": 8301.3,
+            "url": "https://reacsa.mx/products/minisplit-prime-trendy-3-1-5-ton-solo-frio-estandar-220v",
+            "raw_id": "fdf52e5e-b91b-4459-a346-be4cb6baed77"
+        },
+        {
+            "sku": "EQ-MSI-HIS-021",
+            "price": 9942.01,
+            "url": "https://reacsa.mx/products/minisplit-hisense-inverter-frio-calor-1-ton-110-v-r410a",
+            "raw_id": "ab5ad32c-6daa-4394-b992-37517a77caa4"
+        },
+        {
+            "sku": "AC-VEN-SOL-040",
+            "price": 8401.52,
+            "url": "https://reacsa.mx/products/cortina-de-aire-s-p-35kw-762cfm-1296-m3-hr",
+            "raw_id": "6a611049-f47f-491d-8cee-0bb91cef80d2"
+        },
+        {
+            "sku": "EQ-MSO-1T220-019",
+            "price": 4946.03,
+            "url": "https://reacsa.mx/products/minisplit-hisense-1-tonelada-estandar-solo-frio-220v",
+            "raw_id": "763bb353-a6ac-41cc-853d-472764540f92"
+        },
+        {
+            "sku": "EQ-MSO-1T220-020",
+            "price": 5420.02,
+            "url": "https://reacsa.mx/products/minisplit-tcl-1-tonelada-frio-y-calor-estandar-r410a-220v",
+            "raw_id": "2b98e0ed-47b9-4f7d-ab65-a77356ce4f0b"
+        },
+        {
+            "sku": "EQ-MSO-1T220-021",
+            "price": 5181.73,
+            "url": "https://reacsa.mx/products/minisplit-prime-elite-1-tonelada-frio-y-calor-estandar-220v",
+            "raw_id": "44d4cddf-40f7-4172-a716-25128ee8e3e4"
+        },
+        {
+            "sku": "EQ-DIS-IMB-001",
+            "price": 4993.97,
+            "url": "https://reacsa.mx/products/dispensador-de-agua-imbera-para-garrafon-20-lts",
+            "raw_id": "14634595-9e16-4d05-8999-c33bc6b8d61c"
+        },
+        {
+            "sku": "EQ-MSO-1T220-022",
+            "price": 4918.31,
+            "url": "https://reacsa.mx/products/minisplit-prime-1-tonelada-elite-solo-frio-estandar-220v",
+            "raw_id": "72cf014f-97b9-4b26-83e7-6d53436c7a82"
+        },
+        {
+            "sku": "HE-HER-AVA-015",
+            "price": 177.58,
+            "url": "https://reacsa.mx/products/cortatubo-avaly-mini-de-1-8-a-5-8",
+            "raw_id": "7c18ae61-7ea1-4750-813d-69c947de1550"
+        },
+        {
+            "sku": "HE-PRO-AVA-002",
+            "price": 419.0,
+            "url": "https://reacsa.mx/products/protector-avaly-para-mantenimiento-de-minisplit",
+            "raw_id": "e77eb8f7-93de-46c1-8a49-82803db19ddb"
+        },
+        {
+            "sku": "AC-CIN-AVA-002",
+            "price": 123.28,
+            "url": "https://reacsa.mx/products/cinta-autoadhesiva-elastomerica-aislante-avaly-de-9-14mt",
+            "raw_id": "ef3f834f-c101-4fca-b3d8-fdb7bf75fbda"
+        },
+        {
+            "sku": "RE-MOT-AVA-001",
+            "price": 500.18,
+            "url": "https://reacsa.mx/products/va-170-10w-micromotor-avaly-polo-sombreado-1-70hp-27v-10w-1550-rpm",
+            "raw_id": "e13d50ca-5053-4055-b284-a8e2af952df9"
+        },
+        {
+            "sku": "RE-CON-AVA-006",
+            "price": 125.15,
+            "url": "https://reacsa.mx/products/va-cr1000u-control-remoto-universal-de-1000-codigos",
+            "raw_id": "dae50b9b-ddee-419b-8806-3d2e3aea69da"
+        },
+        {
+            "sku": "AC-SOP-AVA-003",
+            "price": 333.31,
+            "url": "https://reacsa.mx/products/soporte-para-aire-acondicionado-420x365x1-5-mm-9-000-12-000-btu-para-120-kg",
+            "raw_id": "f4da2cd9-ba11-4661-9b86-137420a77a3a"
+        },
+        {
+            "sku": "HE-CIN-AVA-005",
+            "price": 49.68,
+            "url": "https://reacsa.mx/products/cinta-aislante-avaly-flex-de-pvc-30m",
+            "raw_id": "7718c41d-d8f3-43b2-807d-a4ca10eddadb"
+        },
+        {
+            "sku": "EQ-MSO-1T110-011",
+            "price": 6183.72,
+            "url": "https://reacsa.mx/products/minisplit-prime-elite-1-ton-solo-frio-estandar-110v",
+            "raw_id": "a811ac73-36da-4cbd-8b95-64e17781c3fb"
+        },
+        {
+            "sku": "EQ-MSO-1T220-023",
+            "price": 4918.31,
+            "url": "https://reacsa.mx/products/minisplit-prime-trendy-1-ton-solo-frio-estandar-220v",
+            "raw_id": "f813432e-d02d-4125-ae88-cf7f7e9f79c5"
+        },
+        {
+            "sku": "EQ-MSO-1T110-012",
+            "price": 5707.41,
+            "url": "https://reacsa.mx/products/minisplit-prime-1-tonelada-elite-solo-frio-estandar-220v-copia",
+            "raw_id": "c70081ca-087f-41c5-ac10-c9bf00afd4f5"
+        },
+        {
+            "sku": "HE-INS-AVA-006",
+            "price": 4892.53,
+            "url": "https://reacsa.mx/products/vacuometro-digital-avaly-178-c-60-c",
+            "raw_id": "5f02abf3-8117-4a89-8380-e8de7e69f0c7"
+        },
+        {
+            "sku": "RE-VAL-AVA-002",
+            "price": 450.0,
+            "url": "https://reacsa.mx/products/valvula-avaly-check-para-lata-1-4-10-pz",
+            "raw_id": "33030fcd-419e-4104-8256-a700d8e36e90"
+        },
+        {
+            "sku": "HE-INS-AVA-007",
+            "price": 440.0,
+            "url": "https://reacsa.mx/products/termometro-electronico-digital-avaly-int-ext-50-70\u00bac",
+            "raw_id": "97115499-f629-449b-9e88-0f788733d730"
+        },
+        {
+            "sku": "HE-INS-AVA-008",
+            "price": 737.54,
+            "url": "https://reacsa.mx/products/termometro-avaly-digital-rang0-humedad-50-a-70\u00ba",
+            "raw_id": "fe545806-e9fa-407b-a1c9-7a436fc2a82a"
+        },
+        {
+            "sku": "HE-INS-AVA-007",
+            "price": 489.75,
+            "url": "https://reacsa.mx/products/termometro-digital-comercial-int-ext-50-a-70\u00bac-avaly",
+            "raw_id": "40f6b617-e5b0-42ef-af7b-613445be0c3d"
+        },
+        {
+            "sku": "HE-INS-AVA-009",
+            "price": 492.42,
+            "url": "https://reacsa.mx/products/termo-higrometros-electronico-digital-int-ext-50-70-c-avaly",
+            "raw_id": "e5174a80-9586-4fd6-af58-28b8639b5aaf"
+        }
+    ]
+}

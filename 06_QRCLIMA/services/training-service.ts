@@ -232,6 +232,14 @@ export const submitQuiz = async (
         if (result.success) {
             tokensEarned = module.token_reward;
         }
+
+        // Increment training count for profile guide (using Firestore increment)
+        const { doc, updateDoc, increment } = await import('firebase/firestore');
+        const { db } = await import('../firebaseConfig');
+        const userRef = doc(db, 'users', userId);
+        await updateDoc(userRef, {
+            'stats.trainingCompleted': increment(1)
+        });
     } else {
         // Marcar como fallido con cooldown
         await updateTrainingProgress(userId, moduleId, {

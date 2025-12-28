@@ -1,0 +1,649 @@
+{
+    "new_products": [
+        {
+            "sku": "HE-HER-USA-003",
+            "name": "Cortador de Tubo USA Parts CT-138 1/8 a 1-1/8",
+            "category": "Herramientas",
+            "brand": "USA Parts",
+            "specs": "CT-138"
+        },
+        {
+            "sku": "HE-INS-DSZ-002",
+            "name": "Vacuómetro Digital DSZH WKVG89",
+            "category": "Herramientas",
+            "brand": "DSZH",
+            "specs": "WKVG89"
+        },
+        {
+            "sku": "RE-MOT-USA-001",
+            "name": "Motor Axial USA Parts 300mm 110V",
+            "category": "Refacciones",
+            "brand": "USA Parts",
+            "specs": "300mm 110V"
+        },
+        {
+            "sku": "HE-INS-YEL-008",
+            "name": "Detector de Fugas Yellow Jacket AccuProbe II",
+            "category": "Herramientas",
+            "brand": "Yellow Jacket",
+            "specs": "AccuProbe II"
+        },
+        {
+            "sku": "HE-ACC-FUL-001",
+            "name": "Gabinete de Montaje para Controlador Full Gauge GB-01S",
+            "category": "Accesorios",
+            "brand": "Full Gauge",
+            "specs": "GB-01S"
+        },
+        {
+            "sku": "RE-MOT-USA-002",
+            "name": "Motor Evaporador Universal USA Parts 1/12-1/20HP 115/220V",
+            "category": "Refacciones",
+            "brand": "USA Parts",
+            "specs": "1/12-1/20HP 115/220V"
+        },
+        {
+            "sku": "HE-REC-YEL-002",
+            "name": "Recuperadora de Refrigerante Yellow Jacket TurboRecover 95780",
+            "category": "Herramientas",
+            "brand": "Yellow Jacket",
+            "specs": "95780"
+        },
+        {
+            "sku": "HE-HER-USA-004",
+            "name": "Kit Doblador de Tubos USA Parts CT-999",
+            "category": "Herramientas",
+            "brand": "USA Parts",
+            "specs": "CT-999"
+        },
+        {
+            "sku": "HE-HER-USA-005",
+            "name": "Cortador de Tubo Roller USA Parts",
+            "category": "Herramientas",
+            "brand": "USA Parts",
+            "specs": "Roller"
+        },
+        {
+            "sku": "HE-HER-USA-006",
+            "name": "Cortador de Tubo Rodamiento USA Parts",
+            "category": "Herramientas",
+            "brand": "USA Parts",
+            "specs": "Rodamiento"
+        },
+        {
+            "sku": "RF-BOY-QUI-001",
+            "name": "Gas Refrigerante R-22 Quimobásicos Boya 13.6kg",
+            "category": "Refrigerantes",
+            "brand": "Quimobásicos",
+            "specs": "R-22 13.6kg"
+        },
+        {
+            "sku": "HE-HER-USA-007",
+            "name": "Hidrolavadora Portátil USA Parts",
+            "category": "Herramientas",
+            "brand": "USA Parts",
+            "specs": "Portátil"
+        },
+        {
+            "sku": "LI-FCL-ADE-001",
+            "name": "Foam Cleaner Canela Adesa 1 Litro",
+            "category": "Limpieza",
+            "brand": "Adesa",
+            "specs": "Canela 1L"
+        },
+        {
+            "sku": "LI-FCL-ADE-002",
+            "name": "Foam Cleaner Canela Adesa Galón 3.78L",
+            "category": "Limpieza",
+            "brand": "Adesa",
+            "specs": "Canela Galón"
+        },
+        {
+            "sku": "LI-FCL-ADE-003",
+            "name": "Foam Cleaner Limpiador Adesa 1 Litro",
+            "category": "Limpieza",
+            "brand": "Adesa",
+            "specs": "Limpiador 1L"
+        },
+        {
+            "sku": "RF-BOY-IGA-001",
+            "name": "Gas Refrigerante R-134A iGas Boya 13.6kg",
+            "category": "Refrigerantes",
+            "brand": "iGas",
+            "specs": "13.6kg"
+        },
+        {
+            "sku": "RF-LAT-IGA-001",
+            "name": "Gas Refrigerante R-32 iGas Lata 650g",
+            "category": "Refrigerantes",
+            "brand": "iGas",
+            "specs": "R32 650g"
+        },
+        {
+            "sku": "LI-SOL-ERK-001",
+            "name": "Agente de Limpieza Erka Flush Lata 800g",
+            "category": "Limpieza",
+            "brand": "Erka",
+            "specs": "800g"
+        },
+        {
+            "sku": "RF-LAT-UNI-001",
+            "name": "Gas Refrigerante R-410A UNI Lata 650g",
+            "category": "Refrigerantes",
+            "brand": "UNI",
+            "specs": "R410A 650g"
+        },
+        {
+            "sku": "RF-LAT-IGA-002",
+            "name": "Gas Refrigerante R-134A iGas Lata 1kg",
+            "category": "Refrigerantes",
+            "brand": "iGas",
+            "specs": "R134A 1kg"
+        },
+        {
+            "sku": "RF-LAT-QUI-001",
+            "name": "Gas Refrigerante R-22 Quimobásicos Lata 1kg",
+            "category": "Refrigerantes",
+            "brand": "Quimobásicos",
+            "specs": "R22 1kg"
+        },
+        {
+            "sku": "AC-BOM-USA-001",
+            "name": "Bomba Condensado USA Tools Aspa-Pump",
+            "category": "Accesorios",
+            "brand": "USA Tools",
+            "specs": "Aspa-Pump"
+        },
+        {
+            "sku": "RE-TAR-KOB-001",
+            "name": "Tarjeta Control Universal A/C Kobra AC Tools",
+            "category": "Refacciones",
+            "brand": "Kobra",
+            "specs": "Universal"
+        },
+        {
+            "sku": "HE-MAN-ERA-001",
+            "name": "Manifold Erasa Multigas R22/R404/R407/R134A",
+            "category": "Herramientas",
+            "brand": "Erasa",
+            "specs": "Multigas"
+        },
+        {
+            "sku": "LI-FCL-USA-001",
+            "name": "Espuma Desengrasante USA Foam 500g",
+            "category": "Limpieza",
+            "brand": "USA Parts",
+            "specs": "500g"
+        },
+        {
+            "sku": "HE-HER-YEL-029",
+            "name": "Cortador de Tubo Premium Yellow Jacket 60102 1/8 a 1-1/8",
+            "category": "Herramientas",
+            "brand": "Yellow Jacket",
+            "specs": "Premium 60102"
+        },
+        {
+            "sku": "HE-HER-USA-008",
+            "name": "Sacabocados Broca Diamante 2.5\" USA Parts",
+            "category": "Herramientas",
+            "brand": "USA Parts",
+            "specs": "2.5\" Diamante"
+        },
+        {
+            "sku": "AC-INS-USA-005",
+            "name": "Kit Instalación Minisplit 1/4 y 3/8 USA Tools",
+            "category": "Accesorios",
+            "brand": "USA Tools",
+            "specs": "1/4 3/8"
+        },
+        {
+            "sku": "HE-BOM-USA-001",
+            "name": "Bomba de Vacío USA Parts UPVP225N 2.5 CFM",
+            "category": "Herramientas",
+            "brand": "USA Parts",
+            "specs": "2.5 CFM"
+        },
+        {
+            "sku": "HE-BOM-USA-002",
+            "name": "Bomba de Vacío USA Parts UPVP290N 9 CFM",
+            "category": "Herramientas",
+            "brand": "USA Parts",
+            "specs": "9 CFM"
+        },
+        {
+            "sku": "HE-BOM-USA-003",
+            "name": "Bomba de Vacío USA Parts UPVP245N 4.5 CFM",
+            "category": "Herramientas",
+            "brand": "USA Parts",
+            "specs": "4.5 CFM"
+        },
+        {
+            "sku": "HE-MAN-YEL-029",
+            "name": "Manifold Yellow Jacket 42034 R22/R410A/R404A",
+            "category": "Herramientas",
+            "brand": "Yellow Jacket",
+            "specs": "42034"
+        },
+        {
+            "sku": "HE-MAN-USA-001",
+            "name": "Manifold USA Parts 4 Vías R22/R134a/R410A",
+            "category": "Herramientas",
+            "brand": "USA Parts",
+            "specs": "4 Vías"
+        },
+        {
+            "sku": "HE-SOL-USA-001",
+            "name": "Boquilla Soldadura Gas Doble USA Parts",
+            "category": "Herramientas",
+            "brand": "USA Parts",
+            "specs": "Gas Doble"
+        },
+        {
+            "sku": "HE-INS-USA-002",
+            "name": "Termómetro Infrarrojo USA Parts UT-300A",
+            "category": "Herramientas",
+            "brand": "USA Parts",
+            "specs": "UT-300A"
+        },
+        {
+            "sku": "RE-CON-USA-003",
+            "name": "Control Remoto Universal 4000 Códigos USA Parts",
+            "category": "Refacciones",
+            "brand": "USA Parts",
+            "specs": "4000 Códigos"
+        },
+        {
+            "sku": "HE-HER-FRI-001",
+            "name": "Sacabocados Broca Diamante 2.5\"",
+            "category": "Herramientas",
+            "brand": "Genérico",
+            "specs": "2.5\" Diamante"
+        },
+        {
+            "sku": "RF-BOY-UNI-001",
+            "name": "Gas Refrigerante R-410A UNI Boya 11.3kg",
+            "category": "Refrigerantes",
+            "brand": "UNI",
+            "specs": "R410A 11.3kg"
+        },
+        {
+            "sku": "RF-BOY-410-003",
+            "name": "Gas Refrigerante R-410A iGas Boya 11.3kg",
+            "category": "Refrigerantes",
+            "brand": "iGas",
+            "specs": "R410A 11.3kg"
+        },
+        {
+            "sku": "TU-COB-GEN-001",
+            "name": "Tubo Cobre Flexible 1/4 Uso General (Por Metro)",
+            "category": "Tuberías",
+            "brand": "Genérico",
+            "specs": "1/4 Flexible Metro"
+        },
+        {
+            "sku": "TU-COB-GEN-002",
+            "name": "Tubo Cobre Flexible 1/4 Uso General Rollo 15.24m",
+            "category": "Tuberías",
+            "brand": "Genérico",
+            "specs": "1/4 Flexible 15m"
+        },
+        {
+            "sku": "TU-COB-GEN-003",
+            "name": "Tubo Cobre Flexible 1/4 Tipo L (Por Metro)",
+            "category": "Tuberías",
+            "brand": "Genérico",
+            "specs": "1/4 Tipo L Metro"
+        },
+        {
+            "sku": "TU-COB-GEN-004",
+            "name": "Tubo Cobre Flexible 1/4 Tipo L Rollo 18.30m",
+            "category": "Tuberías",
+            "brand": "Genérico",
+            "specs": "1/4 Tipo L 18m"
+        },
+        {
+            "sku": "TU-COB-GEN-005",
+            "name": "Tubo Cobre Flexible 5/16 Uso General (Por Metro)",
+            "category": "Tuberías",
+            "brand": "Genérico",
+            "specs": "5/16 Flexible Metro"
+        },
+        {
+            "sku": "TU-COB-GEN-006",
+            "name": "Tubo Cobre Flexible 5/16 Uso General Rollo 15.24m",
+            "category": "Tuberías",
+            "brand": "Genérico",
+            "specs": "5/16 Flexible 15m"
+        },
+        {
+            "sku": "TU-COB-GEN-007",
+            "name": "Tubo Cobre Flexible 1/2 Tipo L (Por Metro)",
+            "category": "Tuberías",
+            "brand": "Genérico",
+            "specs": "1/2 Tipo L Metro"
+        },
+        {
+            "sku": "TU-COB-GEN-008",
+            "name": "Tubo Cobre Flexible 1/2 Tipo L Rollo 18.30m",
+            "category": "Tuberías",
+            "brand": "Genérico",
+            "specs": "1/2 Tipo L 18m"
+        },
+        {
+            "sku": "TU-COB-GEN-009",
+            "name": "Tubo Cobre Flexible 3/4 Tipo L (Por Metro)",
+            "category": "Tuberías",
+            "brand": "Genérico",
+            "specs": "3/4 Tipo L Metro"
+        },
+        {
+            "sku": "TU-COB-GEN-010",
+            "name": "Tubo Cobre Flexible 3/4 Tipo L Rollo 18.30m",
+            "category": "Tuberías",
+            "brand": "Genérico",
+            "specs": "3/4 Tipo L 18m"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "HE-HER-USA-003",
+            "price": 359.0,
+            "url": "https://friorefacciones.com/products/cortador-de-tubos-ct138-usa-parts",
+            "raw_id": "05e27476-17c9-423f-b169-488a7f0e2025"
+        },
+        {
+            "sku": "HE-INS-DSZ-002",
+            "price": 3995.0,
+            "url": "https://friorefacciones.com/products/vacuometro-digital-dszh-wkvg89",
+            "raw_id": "3bba9e9f-10f2-403a-ab04-dbbfa2812721"
+        },
+        {
+            "sku": "RE-MOT-USA-001",
+            "price": 1099.0,
+            "url": "https://friorefacciones.com/products/motor-axial-300mm-110v",
+            "raw_id": "5f26d504-8152-4dc5-9fac-0a875670de28"
+        },
+        {
+            "sku": "HE-INS-YEL-008",
+            "price": 9890.0,
+            "url": "https://friorefacciones.com/products/detector-de-fugas-accuprobe\u2122-ii-yellow-jacket-69354",
+            "raw_id": "b9fb3a1d-97d1-4255-a28a-cfbe792356ac"
+        },
+        {
+            "sku": "HE-ACC-FUL-001",
+            "price": 420.0,
+            "url": "https://friorefacciones.com/products/gabinete-montaje-para-controlador-gb-01s",
+            "raw_id": "de1dc030-6600-4799-b4fb-3b60f62299b0"
+        },
+        {
+            "sku": "RE-MOT-USA-002",
+            "price": 1190.0,
+            "url": "https://friorefacciones.com/products/motor-usa-parts-1-12-1-15-1-20-hp-115-220v",
+            "raw_id": "22fe348e-7435-46e6-be33-ce7f13cbc5ac"
+        },
+        {
+            "sku": "HE-REC-YEL-002",
+            "price": 22650.0,
+            "url": "https://friorefacciones.com/products/recuperadora-turborecover-95780-yellow-jacket",
+            "raw_id": "4d3cf8d6-47ee-49da-8c6a-62af18800b48"
+        },
+        {
+            "sku": "HE-HER-USA-004",
+            "price": 2399.0,
+            "url": "https://friorefacciones.com/products/kit-doblador-de-tubos-usa-parts-ct-999",
+            "raw_id": "efc4c991-0943-4114-ba49-895f17c1086c"
+        },
+        {
+            "sku": "HE-HER-USA-005",
+            "price": 379.0,
+            "url": "https://friorefacciones.com/products/cortador-de-tubos-roller-usa-parts",
+            "raw_id": "9c9ccc68-8924-42f8-a839-978c2cf58dd7"
+        },
+        {
+            "sku": "HE-HER-USA-006",
+            "price": 249.0,
+            "url": "https://friorefacciones.com/products/cortador-de-tubos-rodamiento-usa-parts",
+            "raw_id": "66c9c0f5-0772-40be-b5db-c5cbd97ef8ee"
+        },
+        {
+            "sku": "RF-BOY-QUI-001",
+            "price": 3290.0,
+            "url": "https://friorefacciones.com/products/gas-refrigerante-quimobasicos-r-22-boya-13-3-kg",
+            "raw_id": "0e21889a-0287-4981-b0fc-0237bdf85132"
+        },
+        {
+            "sku": "HE-HER-USA-007",
+            "price": 1990.0,
+            "url": "https://friorefacciones.com/products/hidrolavadora-presion-minisplit-usa-parts",
+            "raw_id": "d06fdc08-b732-474a-8673-c10a88343ffc"
+        },
+        {
+            "sku": "LI-FCL-ADE-001",
+            "price": 70.0,
+            "url": "https://friorefacciones.com/products/foam-cleaner-evaporador-canela1-l",
+            "raw_id": "4f7cfe5c-d0ed-4e97-a9e5-de271143807f"
+        },
+        {
+            "sku": "LI-FCL-ADE-002",
+            "price": 270.0,
+            "url": "https://friorefacciones.com/products/foam-cleaner-limpiador-3-75-l-galon",
+            "raw_id": "ec9c7b7c-fb5e-46d6-9bf0-8562a6877a1a"
+        },
+        {
+            "sku": "LI-FCL-ADE-003",
+            "price": 90.0,
+            "url": "https://friorefacciones.com/products/foam-cleaner-limpiador-1l",
+            "raw_id": "388aabfe-7b2e-4911-b8f3-dc0a8db467d7"
+        },
+        {
+            "sku": "RF-BOY-IGA-001",
+            "price": 2499.0,
+            "url": "https://friorefacciones.com/products/gas-refrigerante-igas-r-134a-boya-13-6-kg",
+            "raw_id": "8a34b502-ea36-4675-a7c3-8190fc2adf3f"
+        },
+        {
+            "sku": "RF-BOY-R32-002",
+            "price": 1090.0,
+            "url": "https://friorefacciones.com/products/gas-refrigerante-igas-r-32-boya-3-kg",
+            "raw_id": "9eeb2de0-7e36-4de1-bc9f-6517aa2eee65"
+        },
+        {
+            "sku": "RF-LAT-IGA-001",
+            "price": 260.0,
+            "url": "https://friorefacciones.com/products/gas-refrigenrante-igas-r-32-650-g",
+            "raw_id": "26cf2d6f-123a-437b-942a-438affd8c772"
+        },
+        {
+            "sku": "LI-SOL-ERK-001",
+            "price": 390.0,
+            "url": "https://friorefacciones.com/products/agenrte-de-limpieza-erka-flush-800-g",
+            "raw_id": "a185b60d-9aed-481e-91ca-d1ba412731fa"
+        },
+        {
+            "sku": "RF-LAT-UNI-001",
+            "price": 260.0,
+            "url": "https://friorefacciones.com/products/gas-refrigerante-uni-r-410a-650-g",
+            "raw_id": "9d0fea4d-e31f-416d-847d-da8b4bd1a264"
+        },
+        {
+            "sku": "RF-LAT-IGA-002",
+            "price": 269.0,
+            "url": "https://friorefacciones.com/products/gas-refrigerante-igas-r-134a-1kg",
+            "raw_id": "dd107d30-4494-482d-ac62-9994edc35d17"
+        },
+        {
+            "sku": "RF-LAT-QUI-001",
+            "price": 370.0,
+            "url": "https://friorefacciones.com/products/gas-refrigerante-quimobasicos-r-22-1kg",
+            "raw_id": "02ae3d1a-3399-42d2-8119-814a8947bbab"
+        },
+        {
+            "sku": "AC-BOM-USA-001",
+            "price": 1349.0,
+            "url": "https://friorefacciones.com/products/bomba-de-condensado-aspa-pump-usa-tools",
+            "raw_id": "64522ba7-1cd0-4185-b9d4-95e22eaedf66"
+        },
+        {
+            "sku": "RE-TAR-KOB-001",
+            "price": 355.0,
+            "url": "https://friorefacciones.com/products/tarjeta-de-control-universal-para-a-a-kobra-ac-tools",
+            "raw_id": "f2024cbb-4c58-4766-979c-62e24ba299de"
+        },
+        {
+            "sku": "HE-MAN-ERA-001",
+            "price": 549.0,
+            "url": "https://friorefacciones.com/products/manifold-erasa-r-410-r-407-r-507-r-134a",
+            "raw_id": "44a251cd-b977-441c-81a4-53a1063df890"
+        },
+        {
+            "sku": "LI-FCL-USA-001",
+            "price": 150.0,
+            "url": "https://friorefacciones.com/products/espuma-desengrasante-usa-foam-500-g",
+            "raw_id": "bbd76545-91ca-4678-8ebd-b5c523c0b357"
+        },
+        {
+            "sku": "HE-HER-YEL-029",
+            "price": 1590.0,
+            "url": "https://friorefacciones.com/products/cortador-de-tuberia-premium-yellow-jacket",
+            "raw_id": "daaee2a5-6512-4577-a6c3-38ce33500576"
+        },
+        {
+            "sku": "HE-HER-USA-008",
+            "price": 499.0,
+            "url": "https://friorefacciones.com/products/sacabrocas",
+            "raw_id": "d360a346-1f2f-4f67-bf85-828b5d7c0514"
+        },
+        {
+            "sku": "AC-INS-USA-005",
+            "price": 399.0,
+            "url": "https://friorefacciones.com/products/kit-de-instalaci-n-para-minisplit-1-4-gas-3-8-usa-tools",
+            "raw_id": "3c0b0441-c968-4efc-9750-3eeb52c6f56c"
+        },
+        {
+            "sku": "HE-BOM-USA-001",
+            "price": 3450.0,
+            "url": "https://friorefacciones.com/products/bomba-de-vacio-upvp225n-usa-parts",
+            "raw_id": "0a903b94-9800-476f-b2e4-13e5813bf1d0"
+        },
+        {
+            "sku": "HE-BOM-USA-002",
+            "price": 4360.0,
+            "url": "https://friorefacciones.com/products/bomba-de-vacio-upvp290n-usa-parts",
+            "raw_id": "eeadda8c-bdaa-41bc-9785-4647059df877"
+        },
+        {
+            "sku": "HE-BOM-USA-003",
+            "price": 3740.0,
+            "url": "https://friorefacciones.com/products/bomba-de-vacio-upvp245n-usa-parts",
+            "raw_id": "fecd383f-9257-4aa7-bd4a-128d6c4d0d77"
+        },
+        {
+            "sku": "HE-MAN-YEL-029",
+            "price": 3890.0,
+            "url": "https://friorefacciones.com/products/manifold-yellow-jacket-42034-r-22-r-410a-r-404a",
+            "raw_id": "9e339314-d2b2-4575-a01d-c0fe1856b31e"
+        },
+        {
+            "sku": "HE-MAN-USA-001",
+            "price": 649.0,
+            "url": "https://friorefacciones.com/products/manifold-usa-parts",
+            "raw_id": "a0a15f69-411e-4804-abe9-fc0e22bba14c"
+        },
+        {
+            "sku": "HE-SOL-USA-001",
+            "price": 790.0,
+            "url": "https://friorefacciones.com/products/antorcha-de-soldadura-de-gas-doble-cabeza-usa-parts",
+            "raw_id": "db9c93d9-2421-462b-97b3-add4363dbb6d"
+        },
+        {
+            "sku": "HE-INS-USA-002",
+            "price": 450.0,
+            "url": "https://friorefacciones.com/products/termometro-infrarojo-usa-parts",
+            "raw_id": "0d6e966a-5533-4407-8078-418ecbdc3926"
+        },
+        {
+            "sku": "RE-CON-USA-003",
+            "price": 290.0,
+            "url": "https://friorefacciones.com/products/control-universal-4000-codigos",
+            "raw_id": "c171c30d-bc11-4ba8-ab00-f192627dddc8"
+        },
+        {
+            "sku": "HE-HER-FRI-001",
+            "price": 2490.0,
+            "url": "https://friorefacciones.com/products/sacabocados-broca-de-diamante-2-5",
+            "raw_id": "a8aa4b0d-ac7b-4833-9f2d-644d40b07f0a"
+        },
+        {
+            "sku": "RF-BOY-UNI-001",
+            "price": 2549.0,
+            "url": "https://friorefacciones.com/products/gas-refrigerante-r-410a-boya-uni-11-3-kg",
+            "raw_id": "357bba1e-0f10-4145-bfa2-6a697bb9692f"
+        },
+        {
+            "sku": "RF-BOY-410-003",
+            "price": 2549.0,
+            "url": "https://friorefacciones.com/products/gas-refrigerante-igas-r-410a-11-3-kg",
+            "raw_id": "8da05969-1f6d-4366-be8c-1a65a6cb68be"
+        },
+        {
+            "sku": "TU-COB-GEN-001",
+            "price": 83.52,
+            "url": "https://plomeriauniversal.mx/products/tubo-cobre-flexible?variant=39637645852824",
+            "raw_id": "3d695fe8-84b8-4756-9969-3e7780e6e6ef"
+        },
+        {
+            "sku": "TU-COB-GEN-002",
+            "price": 1125.0,
+            "url": "https://plomeriauniversal.mx/products/tubo-cobre-flexible?variant=39637645787288",
+            "raw_id": "4a2e34d4-64b2-4d91-8e28-4c553d4e65e8"
+        },
+        {
+            "sku": "TU-COB-GEN-003",
+            "price": 104.4,
+            "url": "https://plomeriauniversal.mx/products/tubo-cobre-flexible?variant=39637645951128",
+            "raw_id": "62b08722-308f-4d7c-b2d1-fbd0c3842650"
+        },
+        {
+            "sku": "TU-COB-GEN-004",
+            "price": 1675.5,
+            "url": "https://plomeriauniversal.mx/products/tubo-cobre-flexible?variant=39637645885592",
+            "raw_id": "e7f849ba-dee1-4e70-b76a-fa49a8646403"
+        },
+        {
+            "sku": "TU-COB-GEN-005",
+            "price": 95.7,
+            "url": "https://plomeriauniversal.mx/products/tubo-cobre-flexible?variant=40204746883224",
+            "raw_id": "dfb572a7-f7d8-4faf-a5cd-b3f0238c973e"
+        },
+        {
+            "sku": "TU-COB-GEN-006",
+            "price": 1278.75,
+            "url": "https://plomeriauniversal.mx/products/tubo-cobre-flexible?variant=40204748030104",
+            "raw_id": "aa96823a-f7be-4e5f-a0ed-108fc5ce7d92"
+        },
+        {
+            "sku": "TU-COB-GEN-007",
+            "price": 182.7,
+            "url": "https://plomeriauniversal.mx/products/tubo-cobre-flexible?variant=39637646147736",
+            "raw_id": "aa1b2895-c3eb-4bdf-b67c-092b25434af1"
+        },
+        {
+            "sku": "TU-COB-GEN-008",
+            "price": 2998.5,
+            "url": "https://plomeriauniversal.mx/products/tubo-cobre-flexible?variant=39637646082200",
+            "raw_id": "24cb734d-29b5-4645-8798-d79858a6770b"
+        },
+        {
+            "sku": "TU-COB-GEN-009",
+            "price": 304.5,
+            "url": "https://plomeriauniversal.mx/products/tubo-cobre-flexible?variant=39637646213272",
+            "raw_id": "2bf1463b-6eef-4968-803b-f864058cbdf8"
+        },
+        {
+            "sku": "TU-COB-GEN-010",
+            "price": 4852.5,
+            "url": "https://plomeriauniversal.mx/products/tubo-cobre-flexible?variant=40204747440280",
+            "raw_id": "8a939523-695e-4ca4-a2d1-7fa854c57258"
+        }
+    ]
+}

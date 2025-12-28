@@ -1,0 +1,628 @@
+{
+    "new_products": [
+        {
+            "sku": "RE-TAR-MIR-027",
+            "name": "Tarjeta Evaporador Mirage CE-KF35G",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "CE-KF35G"
+        },
+        {
+            "sku": "RE-TAR-MIR-028",
+            "name": "Módulo Tarjeta Condensador Mirage US1-KF67W",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "US1-KF67W"
+        },
+        {
+            "sku": "RE-TAR-MIR-029",
+            "name": "Módulo Tarjeta Condensador Mirage US1-KF35W",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "US1-KF35W"
+        },
+        {
+            "sku": "RE-TAR-MIR-030",
+            "name": "Módulo Tarjeta Condensador Mirage PH-KF53W",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "PH-KF53W"
+        },
+        {
+            "sku": "RE-TAR-MIR-031",
+            "name": "Módulo Tarjeta Condensador Mirage US-KFR35W",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "US-KFR35W"
+        },
+        {
+            "sku": "RE-TAR-MIR-032",
+            "name": "Tarjeta Evaporador Mirage CE-KFR53G",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "CE-KFR53G"
+        },
+        {
+            "sku": "RE-VAL-MIR-001",
+            "name": "Válvula Reversible Mirage SHF-7H-34U-P",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "SHF-7H-34U-P"
+        },
+        {
+            "sku": "RE-TAR-MIR-033",
+            "name": "Tarjeta Condensador Mirage",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "Condensador"
+        },
+        {
+            "sku": "RE-TAR-MIR-034",
+            "name": "Tarjeta Evaporador Mirage SA-KFR35G",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "SA-KFR35G"
+        },
+        {
+            "sku": "RE-TAR-MIR-035",
+            "name": "Tarjeta Evaporador Mirage",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "Evaporador"
+        },
+        {
+            "sku": "RE-VAL-MIR-002",
+            "name": "Válvula Reversible Mirage 2 Vías",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "2 Vías"
+        },
+        {
+            "sku": "RE-VAL-MIR-003",
+            "name": "Válvula Servicio Succión Mirage 3 Vías",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "Succión 3 Vías"
+        },
+        {
+            "sku": "RE-VAL-MIR-004",
+            "name": "Válvula Servicio Líquido Mirage 2 Vías",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "Líquido 2 Vías"
+        },
+        {
+            "sku": "RE-VAL-MIR-005",
+            "name": "Válvula Reversible Mirage SHF-7H-34U",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "SHF-7H-34U"
+        },
+        {
+            "sku": "RE-VAL-MIR-006",
+            "name": "Válvula Reversible Mirage SHF-9H-34U-P",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "SHF-9H-34U-P"
+        },
+        {
+            "sku": "RE-COM-MIR-002",
+            "name": "Compresor Mirage 3/4 Ton 110V R410A",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "3/4 Ton 110V R410A"
+        },
+        {
+            "sku": "RE-COM-MIR-003",
+            "name": "Compresor Mirage 0.5 Ton Ventana Blu Plus",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "0.5 Ton Blu Plus"
+        },
+        {
+            "sku": "RE-COM-MIR-004",
+            "name": "Compresor Mirage 1.5 Ton Inverter Magnum 17",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "1.5 Ton Magnum 17"
+        },
+        {
+            "sku": "RE-COM-MIR-005",
+            "name": "Compresor Mirage 1 Ton Inverter Magnum 17",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "1 Ton Magnum 17"
+        },
+        {
+            "sku": "RE-TAR-MIR-036",
+            "name": "Tarjeta Evaporador Mirage 17122000044542",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "17122000044542"
+        },
+        {
+            "sku": "RE-TAR-MIR-037",
+            "name": "Tarjeta Evaporador Mirage 3 Ton Calor 220V",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "3 Ton Calor 220V"
+        },
+        {
+            "sku": "RE-TAR-MIR-038",
+            "name": "Tarjeta Evaporador Mirage 3 Ton Frío 220V XR",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "3 Ton Frío 220V XR"
+        },
+        {
+            "sku": "RE-TAR-MIR-039",
+            "name": "Tarjeta Evaporador Mirage 2 Ton Calor 220V",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "2 Ton Calor 220V"
+        },
+        {
+            "sku": "RE-TAR-MIR-040",
+            "name": "Tarjeta Evaporador Mirage 2 Ton Frío 220V",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "2 Ton Frío 220V"
+        },
+        {
+            "sku": "RE-TAR-MIR-041",
+            "name": "Tarjeta Evaporador Mirage 1.5 Ton Calor 220V",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "1.5 Ton Calor 220V"
+        },
+        {
+            "sku": "RE-TAR-MIR-042",
+            "name": "Tarjeta Evaporador Mirage 1.5 Ton Frío 220V",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "1.5 Ton Frío 220V"
+        },
+        {
+            "sku": "RE-TAR-MIR-043",
+            "name": "Tarjeta Evaporador Mirage 1 Ton Calor 220V XR",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "1 Ton INR 220V XR"
+        },
+        {
+            "sku": "RE-TAR-MIR-044",
+            "name": "Tarjeta Evaporador Mirage 1 Ton Frío 220V XR",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "1 Ton Frío 220V XR"
+        },
+        {
+            "sku": "RE-TAR-MIR-045",
+            "name": "Tarjeta Evaporador Mirage 1 Ton Calor 110V XR",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "1 Ton Calor 110V XR"
+        },
+        {
+            "sku": "RE-TAR-MIR-046",
+            "name": "Tarjeta Display Mirage XR",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "XR"
+        },
+        {
+            "sku": "RE-TAR-MIR-047",
+            "name": "Tarjeta Evaporador Mirage 1.5 Ton Frío 220V V2",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "1.5 Ton Frío 220V V2"
+        },
+        {
+            "sku": "RE-REF-MIR-001",
+            "name": "Cuerpo del Embrague Mirage 12938000001941",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "12938000001941"
+        },
+        {
+            "sku": "RE-TAR-MIR-048",
+            "name": "Módulo Tarjeta Condensador 1 Ton Frío 110V Mirage",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "1 Ton Frío 110V"
+        },
+        {
+            "sku": "RE-TAR-MIR-049",
+            "name": "Tarjeta Condensador Mirage 2 Ton Frío 220V Life 12",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "2 Ton Frío 220V"
+        },
+        {
+            "sku": "RE-TAR-MIR-050",
+            "name": "Kit Tarjeta Evaporador + Caja Control Mirage",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "Kit"
+        },
+        {
+            "sku": "RE-TAR-MIR-051",
+            "name": "Tarjeta Evaporador Mirage 17122000047700",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "17122000047700"
+        },
+        {
+            "sku": "RE-TAR-MIR-052",
+            "name": "Tarjeta Evaporador Mirage 17122000048740",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "17122000048740"
+        },
+        {
+            "sku": "RE-TAR-MIR-053",
+            "name": "Tarjeta Condensador Mirage 2 Ton Calor 220V Life 12+XPlus",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "2 Ton Calor 220V"
+        },
+        {
+            "sku": "RE-TAR-MIR-054",
+            "name": "Tarjeta Evaporador Mirage 17122000047483",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "17122000047483"
+        },
+        {
+            "sku": "RE-TAR-MIR-055",
+            "name": "Tarjeta Evaporador Mirage 17122000047072",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "17122000047072"
+        },
+        {
+            "sku": "RE-TAR-MIR-056",
+            "name": "Tarjeta Fuente Mirage ELSA-KFR70G",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "ELSA-KFR70G"
+        },
+        {
+            "sku": "RE-TAR-MIR-057",
+            "name": "Tarjeta Evaporador Mirage 17122000047478",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "17122000047478"
+        },
+        {
+            "sku": "RE-TAR-MIR-058",
+            "name": "Módulo Tarjeta Condensador Mirage 11222004000519",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "11222004000519"
+        },
+        {
+            "sku": "RE-TAR-MIR-059",
+            "name": "Kit Tarjeta Evaporador Mirage 11222003002956",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "11222003002956"
+        },
+        {
+            "sku": "RE-TAR-MIR-060",
+            "name": "Tarjeta Evaporador Mirage 11222009003201",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "11222009003201"
+        },
+        {
+            "sku": "RE-TAR-MIR-061",
+            "name": "Módulo Tarjeta Condensador Mirage 17222000026694",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "17222000026694"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "RE-TAR-MIR-027",
+            "price": 485.08,
+            "url": "https://www.tiendamirage.mx/refacciones/324-tarjeta-de-evaporador-ce-kf35g-abjdgnwxn.html",
+            "raw_id": "9bfed11b-0d83-49cc-9ddd-6f803d6dc3af"
+        },
+        {
+            "sku": "RE-TAR-MIR-028",
+            "price": 3293.02,
+            "url": "https://www.tiendamirage.mx/refacciones/360-modulo-de-tarjetas-de-condensador-us1-kf67w-bp3n1-ca01.html",
+            "raw_id": "e18792e7-3f4b-4873-afa3-6782d9e7e69f"
+        },
+        {
+            "sku": "RE-TAR-MIR-029",
+            "price": 2790.14,
+            "url": "https://www.tiendamirage.mx/refacciones/359-modulo-de-tarjetas-de-condensador-us1-kf35w-bp3n1-ba30.html",
+            "raw_id": "123c0ed7-f0e4-4eda-8a66-3b10bbc39884"
+        },
+        {
+            "sku": "RE-TAR-MIR-030",
+            "price": 3295.05,
+            "url": "https://www.tiendamirage.mx/refacciones/358-modulo-de-tarjetas-de-condensador-ph-kf53w-bp2n1-b01c3.html",
+            "raw_id": "8f1bc1dd-8cd8-4456-8180-44d5996af3ab"
+        },
+        {
+            "sku": "RE-TAR-MIR-031",
+            "price": 2509.81,
+            "url": "https://www.tiendamirage.mx/refacciones/357-modulo-de-tarjetas-de-condensador-us-kfr35w-bp2n1-ba3011.html",
+            "raw_id": "21b2e132-eccd-419d-b93b-7b4222823604"
+        },
+        {
+            "sku": "RE-TAR-MIR-030",
+            "price": 339.74,
+            "url": "https://www.tiendamirage.mx/refacciones/300-tarjeta-display-ce-kc53-fyd04xs.html",
+            "raw_id": "6a605181-4478-4606-8976-fc186852b066"
+        },
+        {
+            "sku": "RE-TAR-MIR-032",
+            "price": 468.62,
+            "url": "https://www.tiendamirage.mx/refacciones/339-tarjeta-de-evaporador-ce-kfr53g-afcjdgnwxn.html",
+            "raw_id": "8aea6041-785e-4cc2-b483-549214bd0ee6"
+        },
+        {
+            "sku": "RE-VAL-MIR-001",
+            "price": 1171.32,
+            "url": "https://www.tiendamirage.mx/refacciones/253-valvula-reversible-con-arana-shf-7h-34u-p.html",
+            "raw_id": "9bd4bfe8-8fb0-4ae2-8156-db1652893784"
+        },
+        {
+            "sku": "RE-TAR-MIR-033",
+            "price": 990.49,
+            "url": "https://www.tiendamirage.mx/refacciones/335-tarjeta-de-condensador.html",
+            "raw_id": "5bb7cab8-b23c-4f8b-8850-6057ac90d567"
+        },
+        {
+            "sku": "RE-TAR-MIR-034",
+            "price": 593.82,
+            "url": "https://www.tiendamirage.mx/refacciones/329-tarjeta-de-evaporador-sa-kfr35g-abjdgnwxn.html",
+            "raw_id": "b82051c6-ecc4-481b-9936-0cf35204a17c"
+        },
+        {
+            "sku": "RE-TAR-MIR-035",
+            "price": 735.22,
+            "url": "https://www.tiendamirage.mx/refacciones/326-tarjeta-de-evaporador.html",
+            "raw_id": "af3002d5-49ab-4a0e-ab0c-94d42be47f88"
+        },
+        {
+            "sku": "RE-VAL-MIR-002",
+            "price": 1465.29,
+            "url": "https://www.tiendamirage.mx/refacciones/252-valvula-reversible-con-arana-2-vias.html",
+            "raw_id": "80b10488-1132-4793-bd74-a61d8468c06e"
+        },
+        {
+            "sku": "RE-VAL-MIR-003",
+            "price": 221.49,
+            "url": "https://www.tiendamirage.mx/refacciones/250-valvula-de-servicio-succion-3-vias.html",
+            "raw_id": "da84efdc-a684-43b3-beba-2cf5cf90c276"
+        },
+        {
+            "sku": "RE-VAL-MIR-004",
+            "price": 214.17,
+            "url": "https://www.tiendamirage.mx/refacciones/241-valvula-de-servicio-liquido-2-vias.html",
+            "raw_id": "0a190a32-8ce4-45d0-86a0-d14fff41c001"
+        },
+        {
+            "sku": "RE-VAL-MIR-003",
+            "price": 146.37,
+            "url": "https://www.tiendamirage.mx/refacciones/234-valvula-de-servicio-succion-3-vias.html",
+            "raw_id": "8e38f377-01b4-4845-8b75-c743f11f2793"
+        },
+        {
+            "sku": "RE-VAL-MIR-003",
+            "price": 158.57,
+            "url": "https://www.tiendamirage.mx/refacciones/212-valvula-de-servicio-succion-3-vias.html",
+            "raw_id": "f943be9f-249f-439e-8b1e-168fdeed5acb"
+        },
+        {
+            "sku": "RE-VAL-MIR-005",
+            "price": 1010.51,
+            "url": "https://www.tiendamirage.mx/refacciones/193-valvula-reversible-sin-arana-shf-7h-34u.html",
+            "raw_id": "698277b4-a817-4c4e-a2d7-5a02276abfbf"
+        },
+        {
+            "sku": "RE-VAL-MIR-006",
+            "price": 1121.42,
+            "url": "https://www.tiendamirage.mx/refacciones/191-valvula-reversible-sin-arana-shf-9h-34u-p.html",
+            "raw_id": "cc89dd13-1038-41a6-984d-c5ac796d3288"
+        },
+        {
+            "sku": "RE-COM-MIR-002",
+            "price": 3297.51,
+            "url": "https://www.tiendamirage.mx/refacciones/143-compresor-3-4-ton-ventana-blu-plus.html",
+            "raw_id": "4e6239ec-fa17-4f91-9ca3-9c90e574cfcd"
+        },
+        {
+            "sku": "RE-COM-MIR-003",
+            "price": 2738.18,
+            "url": "https://www.tiendamirage.mx/refacciones/142-compresor-05-ton-ventana-blu-plus.html",
+            "raw_id": "299b7456-6deb-4a6d-b41e-0398155d0091"
+        },
+        {
+            "sku": "RE-COM-MIR-004",
+            "price": 3835.22,
+            "url": "https://www.tiendamirage.mx/refacciones/134-compresor-15-ton-inverter-magnum-17.html",
+            "raw_id": "86f61219-5cc0-44ff-b308-010ba604267f"
+        },
+        {
+            "sku": "RE-COM-MIR-005",
+            "price": 2681.28,
+            "url": "https://www.tiendamirage.mx/refacciones/131-compresor-1-ton-inverter-magnum-17.html",
+            "raw_id": "36ed0b8a-c500-4da9-a9bd-9ae6d3d6a199"
+        },
+        {
+            "sku": "RE-TAR-MIR-036",
+            "price": 468.87,
+            "url": "https://www.tiendamirage.mx/refacciones/1620-tarjeta-de-evaporador-17122000044542.html",
+            "raw_id": "81002131-3bed-494f-b917-0b7c59f377bc"
+        },
+        {
+            "sku": "RE-TAR-MIR-037",
+            "price": 1873.08,
+            "url": "https://www.tiendamirage.mx/refacciones/1665-tarjeta-evaporador-3-ton-calor-220v.html",
+            "raw_id": "9df52bae-4057-4ddc-a628-234bf4bc0bce"
+        },
+        {
+            "sku": "RE-TAR-MIR-038",
+            "price": 1269.67,
+            "url": "https://www.tiendamirage.mx/refacciones/1664-tarjeta-evaporador--300002061394.html",
+            "raw_id": "a9a69af0-bb7e-4ac3-ab0c-9b5326b6b812"
+        },
+        {
+            "sku": "RE-TAR-MIR-039",
+            "price": 917.68,
+            "url": "https://www.tiendamirage.mx/refacciones/1663-tarjeta-evaporador-2-ton-calor-220v.html",
+            "raw_id": "0537ac43-a651-408c-ae03-9d8de94a4c9f"
+        },
+        {
+            "sku": "RE-TAR-MIR-040",
+            "price": 804.54,
+            "url": "https://www.tiendamirage.mx/refacciones/1662-tarjeta-evaporador-2-ton-frio-220v.html",
+            "raw_id": "120c48b1-36b0-4e5f-a89c-3fdbe7968a76"
+        },
+        {
+            "sku": "RE-TAR-MIR-041",
+            "price": 955.4,
+            "url": "https://www.tiendamirage.mx/refacciones/1661-tarjeta-evaporador-15-ton-calor-220v.html",
+            "raw_id": "43d3bdaa-0f75-4311-a7e7-4849bf9ed94c"
+        },
+        {
+            "sku": "RE-TAR-MIR-042",
+            "price": 842.26,
+            "url": "https://www.tiendamirage.mx/refacciones/1660-tarjeta-evaporador--300002061289.html",
+            "raw_id": "a226307f-7a7d-417b-93a7-4b89decbb298"
+        },
+        {
+            "sku": "RE-TAR-MIR-043",
+            "price": 1081.11,
+            "url": "https://www.tiendamirage.mx/refacciones/1659-tarjeta-evaporador-1-ton-calor-220v-xr.html",
+            "raw_id": "92d15d6b-25d1-426e-baf5-93d1526eee48"
+        },
+        {
+            "sku": "RE-TAR-MIR-044",
+            "price": 993.11,
+            "url": "https://www.tiendamirage.mx/refacciones/1658-tarjeta-evaporador-1-ton-frio-220v-xr.html",
+            "raw_id": "86fdf050-a885-4661-b5e1-d19ca1df2509"
+        },
+        {
+            "sku": "RE-TAR-MIR-045",
+            "price": 1143.96,
+            "url": "https://www.tiendamirage.mx/refacciones/1657-tarjeta-evaporador-1-ton-calor-110v-xr.html",
+            "raw_id": "b96a4597-44d9-4511-8d34-97b7970d8ff2"
+        },
+        {
+            "sku": "RE-TAR-MIR-045",
+            "price": 1055.96,
+            "url": "https://www.tiendamirage.mx/refacciones/1656-tarjeta-evaporador--300002061291.html",
+            "raw_id": "d5a57ff4-9eab-4ec8-bdeb-20a98324cb47"
+        },
+        {
+            "sku": "RE-TAR-MIR-046",
+            "price": 354.28,
+            "url": "https://www.tiendamirage.mx/refacciones/1655-tarjeta-display-xr.html",
+            "raw_id": "ba05800f-b87d-44b1-8d93-866922e7ea44"
+        },
+        {
+            "sku": "RE-TAR-MIR-047",
+            "price": 795.05,
+            "url": "https://www.tiendamirage.mx/refacciones/1654-tarjeta-evaporador-15-ton-frio-220v.html",
+            "raw_id": "ce35a614-af39-4949-9a1e-ad94f991c906"
+        },
+        {
+            "sku": "RE-REF-MIR-001",
+            "price": 1693.63,
+            "url": "https://www.tiendamirage.mx/refacciones/1520-cuerpo-del-embrague--12938000001941-.html",
+            "raw_id": "b6611d37-0064-43d4-9684-fa18d03325ae"
+        },
+        {
+            "sku": "RE-TAR-MIR-048",
+            "price": 3036.33,
+            "url": "https://www.tiendamirage.mx/refacciones/1653-modulo-de-tarjetas-de-condensador--17122000019192.html",
+            "raw_id": "12f7f25f-5777-45bf-8240-0069a954214b"
+        },
+        {
+            "sku": "RE-TAR-MIR-049",
+            "price": 1032.62,
+            "url": "https://www.tiendamirage.mx/refacciones/1650-tarjeta-de-condensador-2-ton-frio-220v-life-12.html",
+            "raw_id": "2e0b69f0-6b64-4814-917e-3daab6c9fb18"
+        },
+        {
+            "sku": "RE-TAR-MIR-050",
+            "price": 1460.02,
+            "url": "https://www.tiendamirage.mx/refacciones/1585-kit-tarjeta-de-evaporador-mas-caja-de-control--11222003002962.html",
+            "raw_id": "0421b32f-e594-4d7a-acfd-f795fe3a5ad6"
+        },
+        {
+            "sku": "RE-TAR-MIR-051",
+            "price": 546.99,
+            "url": "https://www.tiendamirage.mx/refacciones/1648-tarjeta-de-evaporador-17122000047700.html",
+            "raw_id": "a1a13919-c84d-4b21-bc72-92b37c29e94e"
+        },
+        {
+            "sku": "RE-TAR-MIR-052",
+            "price": 496.12,
+            "url": "https://www.tiendamirage.mx/refacciones/1647-tarjeta-de-evaporador-17122000048740.html",
+            "raw_id": "5df4a7f4-b01f-4c86-8b48-129a877bae09"
+        },
+        {
+            "sku": "RE-TAR-MIR-053",
+            "price": 2113.52,
+            "url": "https://www.tiendamirage.mx/refacciones/1646-tarjeta-electronica.html",
+            "raw_id": "9e68a92b-cc9e-47d8-b8f3-662d1939bca6"
+        },
+        {
+            "sku": "RE-TAR-MIR-054",
+            "price": 496.12,
+            "url": "https://www.tiendamirage.mx/refacciones/1645-tarjeta-de-evaporador-17122000047483.html",
+            "raw_id": "95e21689-95b2-4020-bdd7-1ff54fbc101c"
+        },
+        {
+            "sku": "RE-TAR-MIR-055",
+            "price": 457.96,
+            "url": "https://www.tiendamirage.mx/refacciones/1644-tarjeta-de-evaporador-17122000047072.html",
+            "raw_id": "e628f7cd-5f3d-47ec-9975-50f3355923b7"
+        },
+        {
+            "sku": "RE-TAR-MIR-056",
+            "price": 668.47,
+            "url": "https://www.tiendamirage.mx/refacciones/1320-tarjeta-fuente-elsa-kfr70g-gwyn-db8.html",
+            "raw_id": "d3d139c4-9edb-4b8e-8dfb-3e438691b4e8"
+        },
+        {
+            "sku": "RE-TAR-MIR-057",
+            "price": 527.92,
+            "url": "https://www.tiendamirage.mx/refacciones/1643-tarjeta-de-evaporador-17122000047478.html",
+            "raw_id": "a693cfb7-70de-4eea-a93c-d42afcaa8c93"
+        },
+        {
+            "sku": "RE-TAR-MIR-058",
+            "price": 3306.92,
+            "url": "https://www.tiendamirage.mx/refacciones/1590-modulo-de-tarjetas-de-condensador--11222004000519.html",
+            "raw_id": "e34ba895-0b67-46e3-8e8e-6a341ff5f42d"
+        },
+        {
+            "sku": "RE-TAR-MIR-059",
+            "price": 1459.99,
+            "url": "https://www.tiendamirage.mx/refacciones/1583-kit-tarjeta-de-evaporador-mas-caja-de-control--11222003002956.html",
+            "raw_id": "3e18cb2b-16f5-4362-9e5c-c5419d925533"
+        },
+        {
+            "sku": "RE-TAR-MIR-060",
+            "price": 396.67,
+            "url": "https://www.tiendamirage.mx/refacciones/1580-tarjeta-de-evaporador-11222009003201.html",
+            "raw_id": "d24bbcaa-af84-4b9b-a7f0-99790cee97d2"
+        },
+        {
+            "sku": "RE-TAR-MIR-061",
+            "price": 3619.18,
+            "url": "https://www.tiendamirage.mx/refacciones/1561-modulo-de-tarjeta-de-condensador--17222000026694.html",
+            "raw_id": "d70a93d7-34bd-44ab-896e-675d1a72dbdf"
+        }
+    ]
+}

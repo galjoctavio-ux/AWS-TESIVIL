@@ -1,0 +1,530 @@
+{
+    "new_products": [
+        {
+            "sku": "RE-BOM-ASP-005",
+            "name": "Bomba Condensados Aspen Mini Aqua Univolt 100-250V",
+            "category": "Refacciones",
+            "brand": "Aspen Pumps",
+            "specs": "Mini Aqua Univolt"
+        },
+        {
+            "sku": "RE-COM-ERO-007",
+            "name": "Compresor Ero 1/3HP R134a 110-120V",
+            "category": "Refacciones",
+            "brand": "Ero International",
+            "specs": "1/3HP R134a 110-120V"
+        },
+        {
+            "sku": "RE-COM-COP-011",
+            "name": "Compresor Hermético Copeland 1.5HP 230V 1F",
+            "category": "Refacciones",
+            "brand": "Copeland",
+            "specs": "1.5HP 230V 1F"
+        },
+        {
+            "sku": "RE-COM-COP-012",
+            "name": "Compresor Hermético Copeland 2HP 230V 1F",
+            "category": "Refacciones",
+            "brand": "Copeland",
+            "specs": "2HP 230V 1F"
+        },
+        {
+            "sku": "RE-COM-COP-013",
+            "name": "Compresor Hermético Copeland 2HP 230V 3F",
+            "category": "Refacciones",
+            "brand": "Copeland",
+            "specs": "2HP 230V 3F"
+        },
+        {
+            "sku": "RF-BOY-MO4-001",
+            "name": "Gas Refrigerante Isceon MO49 Boya 13.4kg",
+            "category": "Refrigerantes",
+            "brand": "Chemours",
+            "specs": "Boya 13.4kg"
+        },
+        {
+            "sku": "TU-AIS-KFL-064",
+            "name": "Aislamiento Térmico K-Flex 1 5/8 x 1",
+            "category": "Tuberías/Aislamientos",
+            "brand": "K-Flex",
+            "specs": "1 5/8 x 1"
+        },
+        {
+            "sku": "TU-AIS-KFL-065",
+            "name": "Aislamiento Térmico K-Flex 1/2 x 1",
+            "category": "Tuberías/Aislamientos",
+            "brand": "K-Flex",
+            "specs": "1/2 x 1"
+        },
+        {
+            "sku": "TU-AIS-KFL-066",
+            "name": "Aislamiento Térmico K-Flex 1/4 x 1",
+            "category": "Tuberías/Aislamientos",
+            "brand": "K-Flex",
+            "specs": "1/4 x 1"
+        },
+        {
+            "sku": "TU-AIS-KFL-067",
+            "name": "Aislamiento Térmico K-Flex 3/4 x 1",
+            "category": "Tuberías/Aislamientos",
+            "brand": "K-Flex",
+            "specs": "3/4 x 1"
+        },
+        {
+            "sku": "TU-AIS-KFL-068",
+            "name": "Aislamiento Térmico K-Flex 3/8 x 1",
+            "category": "Tuberías/Aislamientos",
+            "brand": "K-Flex",
+            "specs": "3/8 x 1"
+        },
+        {
+            "sku": "TU-AIS-KFL-069",
+            "name": "Aislamiento Térmico K-Flex 3/4 x 1/2",
+            "category": "Tuberías/Aislamientos",
+            "brand": "K-Flex",
+            "specs": "3/4 x 1/2"
+        },
+        {
+            "sku": "EQ-MSO-SAM-001",
+            "name": "Minisplit On/Off Samsung 1.5 Ton Solo Frío 220V",
+            "category": "Equipos",
+            "brand": "Samsung",
+            "specs": "1.5 Ton Solo Frío On/Off 220V"
+        },
+        {
+            "sku": "RE-CON-PEN-002",
+            "name": "Control Presión Penn P70CA-2C SPST",
+            "category": "Refacciones",
+            "brand": "Penn",
+            "specs": "P70CA-2C 50/450"
+        },
+        {
+            "sku": "EQ-UCD-BOH-002",
+            "name": "Unidad Condensadora Bohn Scroll 3HP R22/404A 220V 3F",
+            "category": "Equipos",
+            "brand": "Bohn",
+            "specs": "3HP Scroll 220V 3F"
+        },
+        {
+            "sku": "EQ-REF-CRI-011",
+            "name": "Congelador Horizontal Criotec Cofre 15 Pulgadas",
+            "category": "Equipos",
+            "brand": "Criotec",
+            "specs": "15 Pulgadas Cofre"
+        },
+        {
+            "sku": "EQ-REF-CRI-012",
+            "name": "Refrigerador Vertical Criotec 42 Pulgadas 2 Puertas",
+            "category": "Equipos",
+            "brand": "Criotec",
+            "specs": "42 Pulgadas 2 Puertas"
+        },
+        {
+            "sku": "LI-FCL-ADE-004",
+            "name": "Foam Cleaner Adesa Desengrasante 20L",
+            "category": "Limpieza",
+            "brand": "Adesa",
+            "specs": "20 Litros"
+        },
+        {
+            "sku": "RE-TAR-MIR-003",
+            "name": "Tarjeta Electrónica Mirage 17122000018538",
+            "category": "Refacciones",
+            "brand": "Mirage",
+            "specs": "17122000018538"
+        },
+        {
+            "sku": "EQ-MSO-YOR-002",
+            "name": "Minisplit On/Off York High Wall 1.5 Ton Frío/Calor 220V",
+            "category": "Equipos",
+            "brand": "York",
+            "specs": "1.5 Ton Frío/Calor On/Off 220V"
+        },
+        {
+            "sku": "EQ-MSO-YOR-003",
+            "name": "Minisplit On/Off York High Wall 1.5 Ton Solo Frío 220V",
+            "category": "Equipos",
+            "brand": "York",
+            "specs": "1.5 Ton Solo Frío On/Off 220V"
+        },
+        {
+            "sku": "RE-CON-GRU-006",
+            "name": "Conexión Holtec Hembra 1/2 SAE 5/8-18 UNF",
+            "category": "Refacciones",
+            "brand": "Grupotec",
+            "specs": "1/2 SAE 5/8-18 UNF"
+        },
+        {
+            "sku": "EQ-MSO-MID-002",
+            "name": "Minisplit On/Off Midea 1.5 Ton Frío/Calor 220V",
+            "category": "Equipos",
+            "brand": "Midea",
+            "specs": "1.5 Ton Frío/Calor On/Off 220V"
+        },
+        {
+            "sku": "RE-MOT-BOH-003",
+            "name": "Motor Bohn 1/3HP 208-230V 1075RPM",
+            "category": "Refacciones",
+            "brand": "Bohn",
+            "specs": "1/3HP 208-230V 1075RPM"
+        },
+        {
+            "sku": "RE-COM-COP-014",
+            "name": "Compresor Hermético Copeland 1.2HP R404A 230V 3F",
+            "category": "Refacciones",
+            "brand": "Copeland",
+            "specs": "1.2HP R404A 230V 3F"
+        },
+        {
+            "sku": "HE-CHE-ACE-011",
+            "name": "Aceite Acemire MO Frío 300 1L",
+            "category": "Herramientas",
+            "brand": "Acemire",
+            "specs": "MO Frío 300 1L"
+        },
+        {
+            "sku": "LI-FCL-ADE-006",
+            "name": "Foam Cleaner Canela Adesa 20L",
+            "category": "Limpieza",
+            "brand": "Adesa",
+            "specs": "20 Litros"
+        },
+        {
+            "sku": "HE-CHE-ACE-012",
+            "name": "Aceite Acemire AB HFC 150 1L",
+            "category": "Herramientas",
+            "brand": "Acemire",
+            "specs": "AB HFC 150 1L"
+        },
+        {
+            "sku": "HE-CHE-ACE-013",
+            "name": "Aceite Acemire AB 300 1L",
+            "category": "Herramientas",
+            "brand": "Acemire",
+            "specs": "AB 300 1L"
+        },
+        {
+            "sku": "EL-CAB-GEN-001",
+            "name": "Cable Eléctrico Calibre 4 (Metro)",
+            "category": "Eléctricos",
+            "brand": "Genérico",
+            "specs": "Calibre 4"
+        },
+        {
+            "sku": "HE-ACC-GEN-001",
+            "name": "Rondana Plana Galvanizada 3/8",
+            "category": "Herramientas",
+            "brand": "Genérico",
+            "specs": "3/8"
+        },
+        {
+            "sku": "HE-LIM-SON-001",
+            "name": "Toalla Limpieza Sontara",
+            "category": "Herramientas",
+            "brand": "Sontara",
+            "specs": "Unidad"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "RE-BOM-ASP-005",
+            "price": 2286.66,
+            "url": "https://reacsa.mx/products/bomba-aspen-mini-aqua-univolt-100v-250v",
+            "raw_id": "2a0d2127-6e6f-4317-94d9-cfeb8ca9442d"
+        },
+        {
+            "sku": "RE-COM-ERO-007",
+            "price": 2157.4,
+            "url": "https://reacsa.mx/products/compresor-scroll-copeland-1-3-a-c-r134a-110-120v-3-trifasico",
+            "raw_id": "37b2aab7-c651-4ef7-9a7a-890c98f23ebc"
+        },
+        {
+            "sku": "RE-COM-EMB-013",
+            "price": 5180.18,
+            "url": "https://reacsa.mx/products/compresor-hermetico-embraco-3-4-hp-r-404a-115v",
+            "raw_id": "d99d9d26-432d-497e-8ae0-f6fa9f2534d0"
+        },
+        {
+            "sku": "RE-COM-COP-011",
+            "price": 22140.87,
+            "url": "https://reacsa.mx/products/compresor-copeland-hermetico-1-5-hp-230-v-monofasico",
+            "raw_id": "b5c5be20-0808-4d89-8dd6-b2ef1b70524c"
+        },
+        {
+            "sku": "RE-COM-COP-012",
+            "price": 13212.46,
+            "url": "https://reacsa.mx/products/compresor-copeland-hermetico-2-hp-230-monofasico",
+            "raw_id": "f21c02dd-bc8d-4c1e-86b4-f09ca9972f4d"
+        },
+        {
+            "sku": "RE-COM-COP-013",
+            "price": 16126.79,
+            "url": "https://reacsa.mx/products/compresor-copeland-hermetico-trifasico-2-hp-230",
+            "raw_id": "615a0527-86eb-4a69-95fb-1dbb3c4270ab"
+        },
+        {
+            "sku": "RF-BOY-MO4-001",
+            "price": 6454.66,
+            "url": "https://reacsa.mx/products/gas-isceon-mo49-boya-de-13-4-kgs",
+            "raw_id": "ff67fee5-cfe5-4f57-9901-40e3e6824b26"
+        },
+        {
+            "sku": "TU-AIS-KFL-050",
+            "price": 78.19,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-7-8-x-3-4-w-x-72",
+            "raw_id": "77f2b47c-eb30-4d43-9c73-8fcb5a893fc0"
+        },
+        {
+            "sku": "TU-AIS-KFL-031",
+            "price": 46.98,
+            "url": "https://reacsa.mx/products/armaflex-5-8-x-3-8-w-x-72",
+            "raw_id": "433db253-7b2f-4dfa-b519-7d7e2542f670"
+        },
+        {
+            "sku": "TU-AIS-KFL-024",
+            "price": 65.28,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-5-8-x-3-4-w-x-72",
+            "raw_id": "1c8f1e95-6721-403a-90f7-50a7b18f1e6b"
+        },
+        {
+            "sku": "TU-AIS-KFL-064",
+            "price": 243.53,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-1-5-8-x-1-w-x-72",
+            "raw_id": "31029f45-d784-4dc9-ad15-fa1893dc03cb"
+        },
+        {
+            "sku": "TU-AIS-KFL-032",
+            "price": 215.56,
+            "url": "https://reacsa.mx/products/armaflex-1-3-8-x-1-w-x-72",
+            "raw_id": "0289f908-6b43-43f6-9814-87224966f5d0"
+        },
+        {
+            "sku": "TU-AIS-KFL-008",
+            "price": 67.79,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-1-5-8-x-1-2-w-x-72",
+            "raw_id": "eeb0d59c-3465-464e-a7b4-92d8de98939a"
+        },
+        {
+            "sku": "TU-AIS-KFL-065",
+            "price": 113.88,
+            "url": "https://reacsa.mx/products/armaflex-1-2-x-1-w-x-72",
+            "raw_id": "96ab42bf-7ecc-43d6-9e61-983a453a779e"
+        },
+        {
+            "sku": "TU-AIS-KFL-066",
+            "price": 97.92,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-1-4-x-1-w-x-72",
+            "raw_id": "339b949c-85a1-4722-b80c-00c318097f0b"
+        },
+        {
+            "sku": "TU-AIS-KFL-067",
+            "price": 136.47,
+            "url": "https://reacsa.mx/products/armaflex-3-4-x-1-w-x-72",
+            "raw_id": "eb39cce3-aef1-4a5f-93aa-1239eac24784"
+        },
+        {
+            "sku": "TU-AIS-KFL-038",
+            "price": 152.61,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-7-8-x-1-w-x-72-90",
+            "raw_id": "5f71ffc2-ba00-4ee5-8819-4d795267823d"
+        },
+        {
+            "sku": "TU-AIS-KFL-012",
+            "price": 123.02,
+            "url": "https://reacsa.mx/products/armaflex-5-8-x-1-w-x-72",
+            "raw_id": "ede9062f-6103-4f04-94b3-2ba086e53442"
+        },
+        {
+            "sku": "TU-AIS-KFL-068",
+            "price": 103.12,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-3-8-x-1-w-x72",
+            "raw_id": "d74ab625-3095-486f-af36-ccfdf24da959"
+        },
+        {
+            "sku": "TU-AIS-KFL-007",
+            "price": 185.07,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-1-1-8-x-1-w-x72-66",
+            "raw_id": "af9e5887-2568-4bd6-9c37-04f6f050a28f"
+        },
+        {
+            "sku": "TU-AIS-KFL-039",
+            "price": 58.46,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-1-3-8-x-1-2-w-x72-120",
+            "raw_id": "e689f58f-ced2-4fd9-be3e-876f84c57adb"
+        },
+        {
+            "sku": "TU-AIS-KFL-049",
+            "price": 38.56,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-1-2-x-1-2-w-x-72-360",
+            "raw_id": "d0cd0cbd-30db-4424-bf51-4cd6cc279a7b"
+        },
+        {
+            "sku": "TU-AIS-KFL-051",
+            "price": 109.39,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-13-8-x-3-4-w-x-72",
+            "raw_id": "a6ef3867-2ff0-4d67-be73-ba7f93a703b4"
+        },
+        {
+            "sku": "TU-AIS-KFL-069",
+            "price": 43.94,
+            "url": "https://reacsa.mx/products/armaflex-k-flex-3-4-x-1-2-w-x-72",
+            "raw_id": "a372aa35-0e0d-49c8-8e8b-d699cd6bae82"
+        },
+        {
+            "sku": "TU-AIS-KFL-002",
+            "price": 21.7,
+            "url": "https://reacsa.mx/products/aislante-armaflex-k-flex-1-2-x-3-8-w-x-72",
+            "raw_id": "dc2da322-2c72-4ae4-a7ff-fe5f60ce2c54"
+        },
+        {
+            "sku": "EQ-MSO-YOR-001",
+            "price": 6346.1,
+            "url": "https://reacsa.mx/products/minisplit-york-1-ton-solo-frio-220v-r410a-estandar",
+            "raw_id": "cc7de5ab-353f-4cbe-9bd8-b19d1fd153db"
+        },
+        {
+            "sku": "EQ-MSO-SAM-001",
+            "price": 9469.98,
+            "url": "https://reacsa.mx/products/samsung-minisplit-essential-solo-frio-1-5-ton-220-1-on-off",
+            "raw_id": "50e5b397-ef05-44fd-a6b1-21689df7ca9f"
+        },
+        {
+            "sku": "RE-CON-PEN-002",
+            "price": 2263.35,
+            "url": "https://reacsa.mx/products/p70ca-2c-control-spst-pressure-50-450-1-4male",
+            "raw_id": "dfbb43a7-ca33-4fad-ab63-16a421207113"
+        },
+        {
+            "sku": "EQ-UCD-BOH-002",
+            "price": 107245.2,
+            "url": "https://reacsa.mx/products/mbzx0300m6c-unidad-condensadora-bohn-scroll-3hp-r22-404a-507-220v-3trifasico",
+            "raw_id": "7c757eca-0870-4d3c-8a9f-31bdc5e26e0e"
+        },
+        {
+            "sku": "EQ-REF-CRI-011",
+            "price": 19941.54,
+            "url": "https://reacsa.mx/products/ctcc-15-congelador-criotec-tipo-cofre-15",
+            "raw_id": "82c1d1b6-0a44-4c0d-b4d5-0db54bc8810e"
+        },
+        {
+            "sku": "EQ-REF-CRI-012",
+            "price": 46783.06,
+            "url": "https://reacsa.mx/products/cfx-42-2p-refrigerador-vertical-42-2-puetas-abatibles",
+            "raw_id": "db1580c5-4826-4ff9-aadc-3da8d74573d5"
+        },
+        {
+            "sku": "EQ-MSI-YOR-032",
+            "price": 5950.06,
+            "url": "https://reacsa.mx/products/minisplit-york-12mbh-solo-frio-115-1v-r-410",
+            "raw_id": "4756dab6-605e-49e3-9d2e-962755b83173"
+        },
+        {
+            "sku": "LI-FCL-ADE-002",
+            "price": 171.66,
+            "url": "https://reacsa.mx/products/foam-cleaner-adesa-desengrasante-4-l",
+            "raw_id": "f4ddef40-84d8-4168-938e-df9fd5b1ad46"
+        },
+        {
+            "sku": "LI-FCL-ADE-004",
+            "price": 831.73,
+            "url": "https://reacsa.mx/products/foam-cleaner-adesa-desengrasante-20-litros",
+            "raw_id": "9551f928-887d-436d-bba2-495aee0e0f7b"
+        },
+        {
+            "sku": "RE-TAR-MIR-003",
+            "price": 303.2,
+            "url": "https://www.tiendamirage.mx/refacciones/1632-tarjeta-led-17122000018538.html",
+            "raw_id": "1feb632b-c8d6-4afa-8667-1ca828ddaac4"
+        },
+        {
+            "sku": "LI-FCL-ADE-003",
+            "price": 56.17,
+            "url": "https://reacsa.mx/products/foam-cleaner-adesa-desengrasante-alta-espuma-1-litro",
+            "raw_id": "a1c3759b-c7e6-4b6d-9a5b-11fa17fe06a6"
+        },
+        {
+            "sku": "EQ-MSO-YOR-002",
+            "price": 7935.26,
+            "url": "https://reacsa.mx/products/minisplit-york-1-5-ton-frio-calor-220v-estandar",
+            "raw_id": "9713221d-0567-4d0d-8d9e-8aed889f6f17"
+        },
+        {
+            "sku": "EQ-MSO-YOR-003",
+            "price": 6946.43,
+            "url": "https://reacsa.mx/products/minisplit-york-1-5-ton-solo-frio-220v-r410a-estandar",
+            "raw_id": "b8191fda-0391-49f2-96f0-dc6a1aa1b9f1"
+        },
+        {
+            "sku": "RE-CON-GRU-006",
+            "price": 65.1,
+            "url": "https://reacsa.mx/products/conexion-holtec-hembra-16-unf-1-2-inc",
+            "raw_id": "6687399e-7d0f-4f50-8871-ce00a098d8b3"
+        },
+        {
+            "sku": "LI-FCL-ADE-001",
+            "price": 44.1,
+            "url": "https://reacsa.mx/products/foam-cleaner-canela-para-evaporadores-1l",
+            "raw_id": "d8903806-f8ec-43b3-9e20-99f1a4ac9f25"
+        },
+        {
+            "sku": "EQ-MSO-MID-002",
+            "price": 9965.62,
+            "url": "https://reacsa.mx/products/minisplit-midea-1-5-ton-frio-calor-220v-estandar",
+            "raw_id": "68058e62-6360-46af-8545-9620ab8f53ea"
+        },
+        {
+            "sku": "RE-MOT-BOH-003",
+            "price": 8356.15,
+            "url": "https://reacsa.mx/products/motor-1-3hp-208-230v-1075rpm",
+            "raw_id": "2329a38c-6012-423b-8e50-a0b25dd7c024"
+        },
+        {
+            "sku": "RE-COM-COP-014",
+            "price": 15430.08,
+            "url": "https://reacsa.mx/products/compresor-hermetico-copeland-2hp-r-404a-230-3-60",
+            "raw_id": "a572b43b-8d35-4a88-96e7-f377310694e9"
+        },
+        {
+            "sku": "HE-CHE-ACE-011",
+            "price": 232.81,
+            "url": "https://reacsa.mx/products/aceite-acemire-mo-frio-300-sus-1l",
+            "raw_id": "aad3dc45-afcd-4ddb-829a-acb184bc9598"
+        },
+        {
+            "sku": "LI-FCL-ADE-006",
+            "price": 815.8,
+            "url": "https://reacsa.mx/products/foam-cleaner-canela-evaporadores-20l",
+            "raw_id": "87e54c35-9998-470f-ad8b-b766678f9bbe"
+        },
+        {
+            "sku": "HE-CHE-ACE-012",
+            "price": 633.58,
+            "url": "https://reacsa.mx/products/aceite-acemire-ab-hfc-150-sus-1l",
+            "raw_id": "8b663152-1941-48ae-8321-cb5098b2bf4d"
+        },
+        {
+            "sku": "HE-CHE-ACE-013",
+            "price": 520.6,
+            "url": "https://reacsa.mx/products/aceite-ab-acemire-300-sus-o-32-cst-1-litro",
+            "raw_id": "30bb5437-969e-4eab-992a-c017f11f36ed"
+        },
+        {
+            "sku": "EL-CAB-GEN-001",
+            "price": 100.1,
+            "url": "https://reacsa.mx/products/cable-calibre-4-en-metro",
+            "raw_id": "630619ec-e630-4525-88ad-c6a86da65717"
+        },
+        {
+            "sku": "HE-ACC-GEN-001",
+            "price": 1.22,
+            "url": "https://reacsa.mx/products/rondana-plana-de-galvaanizada-de-3-8",
+            "raw_id": "1264e8c3-d1b4-4643-98b0-bbac87ca8d87"
+        },
+        {
+            "sku": "HE-LIM-SON-001",
+            "price": 6.36,
+            "url": "https://reacsa.mx/products/toalla-de-limpieza-sontara-1-pza",
+            "raw_id": "cda7d5ad-c13f-4933-ad32-c69634067e14"
+        }
+    ]
+}

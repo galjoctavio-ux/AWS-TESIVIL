@@ -1,0 +1,435 @@
+{
+    "new_products": [
+        {
+            "sku": "EQ-CAL-RHE-003",
+            "name": "Calentador de Agua Rheem Depósito 76L Gas LP",
+            "category": "Equipos",
+            "brand": "Rheem",
+            "specs": "76L Gas LP"
+        },
+        {
+            "sku": "RE-MOT-ERO-003",
+            "name": "Motor Ero 1/40 HP 127V 1550 RPM",
+            "category": "Refacciones",
+            "brand": "Ero",
+            "specs": "1/40HP 127V"
+        },
+        {
+            "sku": "RE-MOT-ERO-004",
+            "name": "Motor Ero Refrigerador Mabe 3000 RPM",
+            "category": "Refacciones",
+            "brand": "Ero",
+            "specs": "Mabe 3000RPM"
+        },
+        {
+            "sku": "RE-MOT-ERO-005",
+            "name": "Motor Ero 1/20 HP 220V 1550 RPM",
+            "category": "Refacciones",
+            "brand": "Ero",
+            "specs": "1/20HP 220V"
+        },
+        {
+            "sku": "RE-MOT-ERO-006",
+            "name": "Motor Ero 1/15 HP 220V 1550 RPM",
+            "category": "Refacciones",
+            "brand": "Ero",
+            "specs": "1/15HP 220V"
+        },
+        {
+            "sku": "RE-MOT-EME-006",
+            "name": "Micromotor Emerson 1/40 HP 220V",
+            "category": "Refacciones",
+            "brand": "Emerson",
+            "specs": "1/40HP 220V"
+        },
+        {
+            "sku": "RE-MOT-AVA-002",
+            "name": "Motor Ventilador Avaly 110V 3000 RPM",
+            "category": "Refacciones",
+            "brand": "Avaly",
+            "specs": "110V 3000RPM"
+        },
+        {
+            "sku": "RE-MOT-HEA-001",
+            "name": "Motor Heater 1/40 HP Cople Abierto",
+            "category": "Refacciones",
+            "brand": "Heater",
+            "specs": "1/40HP"
+        },
+        {
+            "sku": "RE-MOT-FAS-003",
+            "name": "Motor Fasco 1/20 HP 220V",
+            "category": "Refacciones",
+            "brand": "Fasco",
+            "specs": "1/20HP 220V"
+        },
+        {
+            "sku": "RE-MOT-FAS-004",
+            "name": "Motor Fasco 1/12 HP 230V 1550 RPM",
+            "category": "Refacciones",
+            "brand": "Fasco",
+            "specs": "1/12HP 230V"
+        },
+        {
+            "sku": "EQ-REF-IMB-004",
+            "name": "Refrigerador Imbera 4 Puertas 3/8 HP Blanco",
+            "category": "Equipos",
+            "brand": "Imbera",
+            "specs": "4 Puertas 3/8HP"
+        },
+        {
+            "sku": "EQ-REF-IMB-005",
+            "name": "Refrigerador Imbera 2 Puertas 1/4 HP 18ft3",
+            "category": "Equipos",
+            "brand": "Imbera",
+            "specs": "2 Puertas 1/4HP"
+        },
+        {
+            "sku": "EQ-REF-IMB-006",
+            "name": "Enfriador Vertical Imbera 1 Puerta",
+            "category": "Equipos",
+            "brand": "Imbera",
+            "specs": "1 Puerta"
+        },
+        {
+            "sku": "EQ-EVA-POR-001",
+            "name": "Enfriador Evaporativo Portátil Portacool Jetstream 230",
+            "category": "Equipos",
+            "brand": "Portacool",
+            "specs": "Jetstream 230"
+        },
+        {
+            "sku": "RE-MOT-BOH-002",
+            "name": "Motor Bohn 1/15 HP 230V",
+            "category": "Refacciones",
+            "brand": "Bohn",
+            "specs": "1/15HP 230V"
+        },
+        {
+            "sku": "RE-MOT-AVA-003",
+            "name": "Motor Ventilador Avaly 115V 2700/3100 RPM",
+            "category": "Refacciones",
+            "brand": "Avaly",
+            "specs": "115V 2700/3100RPM"
+        },
+        {
+            "sku": "RE-MOT-ERO-007",
+            "name": "Motor Ero Aruki 1/22 HP 110V",
+            "category": "Refacciones",
+            "brand": "Ero",
+            "specs": "1/22HP 110V"
+        },
+        {
+            "sku": "RE-MOT-ERO-008",
+            "name": "Motor Ero 1/70 HP 115V",
+            "category": "Refacciones",
+            "brand": "Ero",
+            "specs": "1/70HP 115V"
+        },
+        {
+            "sku": "RE-MOT-AVA-004",
+            "name": "Motor Avaly 6W 115V 1550 RPM",
+            "category": "Refacciones",
+            "brand": "Avaly",
+            "specs": "6W 115V"
+        },
+        {
+            "sku": "RE-MOT-AVA-005",
+            "name": "Motor Avaly 9W 115V 1550 RPM",
+            "category": "Refacciones",
+            "brand": "Avaly",
+            "specs": "9W 115V"
+        },
+        {
+            "sku": "RE-MOT-ERO-009",
+            "name": "Motor Ero LM670 con Accesorios",
+            "category": "Refacciones",
+            "brand": "Ero",
+            "specs": "LM670"
+        },
+        {
+            "sku": "RE-MOT-ERO-010",
+            "name": "Motor Difusor Aruki 18W 1/40 HP 220V",
+            "category": "Refacciones",
+            "brand": "Ero",
+            "specs": "18W 220V"
+        },
+        {
+            "sku": "RE-MOT-EME-007",
+            "name": "Micromotor Emerson 1/70 HP 127V",
+            "category": "Refacciones",
+            "brand": "Emerson",
+            "specs": "1/70HP 127V"
+        },
+        {
+            "sku": "EL-CON-WHI-001",
+            "name": "Contactor White Rodgers 2 Polos 30A 240V",
+            "category": "Eléctricos",
+            "brand": "White Rodgers",
+            "specs": "2P 30A 240V"
+        },
+        {
+            "sku": "RE-BOM-ERO-001",
+            "name": "Bomba Condensado Ero 110/220V",
+            "category": "Refacciones",
+            "brand": "Ero",
+            "specs": "110/220V"
+        },
+        {
+            "sku": "RE-BOM-DIV-005",
+            "name": "Bomba Condensado Diversitech 115V",
+            "category": "Refacciones",
+            "brand": "Diversitech",
+            "specs": "115V"
+        },
+        {
+            "sku": "RE-BOM-DIV-006",
+            "name": "Bomba Condensado Diversitech 22 Pulgadas",
+            "category": "Refacciones",
+            "brand": "Diversitech",
+            "specs": "22\""
+        },
+        {
+            "sku": "RE-BOM-ASP-005",
+            "name": "Bomba Aspen Mini Aqua Univolt 100-250V",
+            "category": "Refacciones",
+            "brand": "Aspen",
+            "specs": "Univolt"
+        },
+        {
+            "sku": "RE-COM-ERO-007",
+            "name": "Compresor Ero 1/3 HP R134A 115V",
+            "category": "Refacciones",
+            "brand": "Ero",
+            "specs": "1/3HP 115V R134A"
+        },
+        {
+            "sku": "RE-COM-EMB-016",
+            "name": "Compresor Embraco Hermético 3/4 HP R404A 115V",
+            "category": "Refacciones",
+            "brand": "Embraco",
+            "specs": "3/4HP 115V R404A"
+        },
+        {
+            "sku": "RE-COM-COP-011",
+            "name": "Compresor Copeland Hermético 1.5 HP 230V 1F",
+            "category": "Refacciones",
+            "brand": "Copeland",
+            "specs": "1.5HP 230V 1F"
+        },
+        {
+            "sku": "RE-COM-COP-012",
+            "name": "Compresor Copeland Hermético 2 HP 230V 1F",
+            "category": "Refacciones",
+            "brand": "Copeland",
+            "specs": "2HP 230V 1F"
+        },
+        {
+            "sku": "RE-COM-COP-013",
+            "name": "Compresor Copeland Hermético 2 HP 230V 3F",
+            "category": "Refacciones",
+            "brand": "Copeland",
+            "specs": "2HP 230V 3F"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "EQ-CAL-RHE-003",
+            "price": 8848.34,
+            "url": "https://reacsa.mx/products/393391-calentador-de-agua-rheem-de-deposito-76-lts-a-gas-lp",
+            "raw_id": "3526"
+        },
+        {
+            "sku": "RE-MOT-ERO-003",
+            "price": 724.92,
+            "url": "https://reacsa.mx/products/motor-ero-internacionl-140-ccw-con-base",
+            "raw_id": "3527"
+        },
+        {
+            "sku": "RE-MOT-ERO-004",
+            "price": 322.31,
+            "url": "https://reacsa.mx/products/motor-ero-internacional-refrigerador-mabe-3000-rpm",
+            "raw_id": "3528"
+        },
+        {
+            "sku": "RE-MOT-ERO-005",
+            "price": 823.69,
+            "url": "https://reacsa.mx/products/motor-ero-intrenacional-1-20-hp-1550-rpm-220v-ccw",
+            "raw_id": "3529"
+        },
+        {
+            "sku": "RE-MOT-ERO-006",
+            "price": 1008.63,
+            "url": "https://reacsa.mx/products/motor-ero-internacional-1-15-hp-220v-1-0a-1550-rpm-ccw",
+            "raw_id": "3530"
+        },
+        {
+            "sku": "RE-MOT-EME-006",
+            "price": 458.13,
+            "url": "https://reacsa.mx/products/micromotor-emerson-polo-somb-1-4-0hp-220-v",
+            "raw_id": "3531"
+        },
+        {
+            "sku": "RE-MOT-AVA-002",
+            "price": 388.09,
+            "url": "https://reacsa.mx/products/motor-avaly-ventilador-110v-60h-3000-rpm",
+            "raw_id": "3532"
+        },
+        {
+            "sku": "RE-MOT-HEA-001",
+            "price": 474.46,
+            "url": "https://reacsa.mx/products/motor-1-40-hp-heater-cople-abi-ccw",
+            "raw_id": "3533"
+        },
+        {
+            "sku": "RE-MOT-FAS-003",
+            "price": 1697.12,
+            "url": "https://reacsa.mx/products/motor-fasco-1-20-hp-220w-ccw",
+            "raw_id": "3534"
+        },
+        {
+            "sku": "RE-MOT-FAS-004",
+            "price": 2664.52,
+            "url": "https://reacsa.mx/products/motor-fasco-1-12-hp-208-230v-1550-rpm",
+            "raw_id": "3535"
+        },
+        {
+            "sku": "EQ-REF-IMB-004",
+            "price": 53869.01,
+            "url": "https://reacsa.mx/products/vr-35-b-4-refrigerador-imbera-4-puertas-3-8-hp-bco-c-cif-1010785",
+            "raw_id": "3536"
+        },
+        {
+            "sku": "EQ-REF-IMB-005",
+            "price": 34849.79,
+            "url": "https://reacsa.mx/products/vr-19-b-refrigerador-imbera-2-piuertas-1-4hp-18-6ft3",
+            "raw_id": "3537"
+        },
+        {
+            "sku": "EQ-REF-IMB-006",
+            "price": 28591.67,
+            "url": "https://reacsa.mx/products/vr-17-b-enf-imbera-1p-1-4-hp-bco-c-cif-1010156",
+            "raw_id": "3538"
+        },
+        {
+            "sku": "EQ-EVA-POR-001",
+            "price": 41243.35,
+            "url": "https://reacsa.mx/products/enfriador-evaporativo-portatil-portacool-jetstream-230",
+            "raw_id": "3539"
+        },
+        {
+            "sku": "RE-MOT-BOH-002",
+            "price": 5553.28,
+            "url": "https://reacsa.mx/products/25309101-motor-bohn-1-15hp-208-230v",
+            "raw_id": "3540"
+        },
+        {
+            "sku": "RE-MOT-AVA-003",
+            "price": 414.32,
+            "url": "https://reacsa.mx/products/motor-ventilador-avaly-110-120v-2700-3100-rpm",
+            "raw_id": "3541"
+        },
+        {
+            "sku": "RE-MOT-ERO-007",
+            "price": 806.44,
+            "url": "https://reacsa.mx/products/motor-ero-internacional-difusor-aruki-1-22hp-110v-34w",
+            "raw_id": "3542"
+        },
+        {
+            "sku": "RE-MOT-ERO-008",
+            "price": 441.19,
+            "url": "https://reacsa.mx/products/motor-ero-internacional-difusor-aruki-1-70-hp-115v-60-hz-multiples",
+            "raw_id": "3543"
+        },
+        {
+            "sku": "RE-MOT-AVA-004",
+            "price": 722.46,
+            "url": "https://reacsa.mx/products/motor-avaly-6-watts-115v-50-60-hz-1550-rpm",
+            "raw_id": "3544"
+        },
+        {
+            "sku": "RE-MOT-AVA-005",
+            "price": 485.76,
+            "url": "https://reacsa.mx/products/motor-avaly-9-watts-50-60-hz-1550-rpm",
+            "raw_id": "3545"
+        },
+        {
+            "sku": "RE-MOT-ERO-009",
+            "price": 253.6,
+            "url": "https://reacsa.mx/products/motor-ero-internacional-con-accesorios-lm670",
+            "raw_id": "3546"
+        },
+        {
+            "sku": "RE-MOT-ERO-010",
+            "price": 557.82,
+            "url": "https://reacsa.mx/products/motor-difusor-aruki-18w-1-40-hp-220v",
+            "raw_id": "3547"
+        },
+        {
+            "sku": "RE-MOT-EME-007",
+            "price": 366.38,
+            "url": "https://reacsa.mx/products/micromotor-emerson-polo-somb-1-70-hp-127v",
+            "raw_id": "3548"
+        },
+        {
+            "sku": "EL-CON-WHI-001",
+            "price": 306.69,
+            "url": "https://reacsa.mx/products/contactores-de-emerson-30-amp-208-240v",
+            "raw_id": "3549"
+        },
+        {
+            "sku": "RE-BOM-ERO-001",
+            "price": 1476.84,
+            "url": "https://reacsa.mx/products/bomba-condensadora-ero-p-mnsplt-110v-220v",
+            "raw_id": "3550"
+        },
+        {
+            "sku": "RE-BOM-DIV-005",
+            "price": 2557.15,
+            "url": "https://reacsa.mx/products/bomba-de-condensado-p-minisplit-115v-diversitech",
+            "raw_id": "3551"
+        },
+        {
+            "sku": "RE-BOM-DIV-006",
+            "price": 1873.14,
+            "url": "https://reacsa.mx/products/bomba-de-condensado-22-diversitech",
+            "raw_id": "3552"
+        },
+        {
+            "sku": "RE-BOM-ASP-005",
+            "price": 2285.59,
+            "url": "https://reacsa.mx/products/bomba-aspen-mini-aqua-univolt-100v-250v",
+            "raw_id": "3553"
+        },
+        {
+            "sku": "RE-COM-ERO-007",
+            "price": 2157.4,
+            "url": "https://reacsa.mx/products/compresor-scroll-copeland-1-3-a-c-r134a-110-120v-3-trifasico",
+            "raw_id": "3554"
+        },
+        {
+            "sku": "RE-COM-EMB-016",
+            "price": 5177.76,
+            "url": "https://reacsa.mx/products/compresor-hermetico-embraco-3-4-hp-r-404a-115v",
+            "raw_id": "3555"
+        },
+        {
+            "sku": "RE-COM-COP-011",
+            "price": 22130.5,
+            "url": "https://reacsa.mx/products/compresor-copeland-hermetico-1-5-hp-230-v-monofasico",
+            "raw_id": "3556"
+        },
+        {
+            "sku": "RE-COM-COP-012",
+            "price": 13206.28,
+            "url": "https://reacsa.mx/products/compresor-copeland-hermetico-2-hp-230-monofasico",
+            "raw_id": "3557"
+        },
+        {
+            "sku": "RE-COM-COP-013",
+            "price": 16119.23,
+            "url": "https://reacsa.mx/products/compresor-copeland-hermetico-trifasico-2-hp-230",
+            "raw_id": "3558"
+        }
+    ]
+}

@@ -1,0 +1,20 @@
+{
+    "new_products": [
+        {
+            "sku": "AC-ACC-ADE-001",
+            "nombre_estandarizado": "Tapa Superior Tubo de Bombeo Adesa",
+            "grupo_general": "AC",
+            "grupo_especializado": "Accesorios",
+            "marca": "Adesa",
+            "modelo": "4516",
+            "descripcion_tecnica": "Tapa Superior para Tubo de Bombeo",
+            "capacidad": "NA",
+            "voltaje": "NA",
+            "refrigerante": "NA",
+            "tipo_operacion": "NA",
+            "unidad": "Pieza",
+            "observaciones_equivalencia": "Accesorio"
+        }
+    ],
+    "price_observations": []
+}

@@ -48,6 +48,12 @@ export default function ToolsLayout() {
                     headerShown: false,
                 }}
             />
+            <Stack.Screen
+                name="price-intel"
+                options={{
+                    headerShown: false,
+                }}
+            />
         </Stack>
     );
 }

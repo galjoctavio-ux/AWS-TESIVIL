@@ -189,24 +189,13 @@ exports.sendMaintenanceReminders = functions.pubsub
             // Skip if we already checked this user in this batch (optimization?)
             // Actually, we might want to notify about multiple equipments, but maybe group them?
             // For simplicity, let's process each.
-            // GET USER to check if PRO
+            // GET USER to check preferences (no longer checking PRO - all reminders work)
             const userDoc = await db.collection('users').doc(userId).get();
             const userData = userDoc.data();
             if (!userData)
                 continue;
-            // Check Subscription (PRO Only)
-            const isPro = userData.subscription === 'Pro' || userData.subscription === 'Pro+';
-            // Also check expiration
-            let isExpired = false;
-            if (userData.subscriptionEndDate) {
-                const endDate = userData.subscriptionEndDate.toDate();
-                if (endDate < new Date())
-                    isExpired = true;
-            }
-            if (!isPro || isExpired) {
-                console.log(`Skipping reminder for user ${userId} (Not PRO or Expired)`);
-                continue;
-            }
+            // NOTE: PRO restriction removed - all scheduled reminders now send notifications
+            // PRO is only required to CREATE the reminder, not to receive it
             // Check Preferences
             if (((_a = userData.notificationPreferences) === null || _a === void 0 ? void 0 : _a.maintenanceReminders) === false) {
                 continue;
@@ -221,8 +210,8 @@ exports.sendMaintenanceReminders = functions.pubsub
             }
             // Get Equipment Info if needed
             // service.equipment_id has the equipment details
-            // Send Notification
-            await sendPushNotification(userId, '🔧 Mantenimiento Sugerido (7 días)', `El equipo de ${clientName} requiere servicio pronto.`, { type: 'maintenance_reminder', serviceId: doc.id, clientId: service.client_id });
+            // Send Notification - message suggests contacting the client
+            await sendPushNotification(userId, '📅 Recordatorio de Mantenimiento', `Contacta a ${clientName} para programar su próximo servicio.`, { type: 'maintenance_reminder', serviceId: doc.id, clientId: service.client_id });
         }
     }
     catch (error) {

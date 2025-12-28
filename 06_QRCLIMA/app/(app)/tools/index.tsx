@@ -7,6 +7,17 @@ import BottomNav from '../../../components/BottomNav';
 // Tool definitions with proper categorization
 const DIAGNOSTIC_TOOLS = [
     {
+        id: 'price-intel',
+        icon: 'analytics',
+        title: 'Radar de Precios',
+        description: 'Tendencias de mercado HVAC en tiempo real',
+        route: '/(app)/tools/price-intel',
+        color: 'bg-teal-500',
+        iconBg: 'bg-teal-100',
+        iconColor: '#14B8A6',
+        premium: true,
+    },
+    {
         id: 'mirage-diagnostic',
         icon: 'pulse',
         title: 'Modo Diagnóstico',
@@ -75,6 +86,17 @@ const CALCULATION_TOOLS = [
 
 const BUSINESS_TOOLS = [
     {
+        id: 'cotizador-pro',
+        icon: 'document-text',
+        title: 'Cotizador PRO',
+        description: 'PDFs con tu marca + sugerencias de mercado',
+        route: '/(app)/cotizador-pro',
+        color: 'bg-blue-600',
+        iconBg: 'bg-blue-100',
+        iconColor: '#2563EB',
+        premium: true,
+    },
+    {
         id: 'cotizador-free',
         icon: 'create',
         title: 'Cotizador Free',
@@ -93,17 +115,6 @@ const BUSINESS_TOOLS = [
         color: 'bg-indigo-500',
         iconBg: 'bg-indigo-100',
         iconColor: '#6366F1',
-    },
-    {
-        id: 'quote',
-        icon: 'document-text',
-        title: 'Cotizador Pro',
-        description: 'Crea presupuestos profesionales',
-        route: '/(app)/quotes/wizard',
-        color: 'bg-green-500',
-        iconBg: 'bg-green-100',
-        iconColor: '#22C55E',
-        premium: true,
     },
     {
         id: 'scanner',

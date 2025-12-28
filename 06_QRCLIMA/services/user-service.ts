@@ -106,6 +106,9 @@ export interface UserProfile {
     // Perfil Completado v2.0 - Nuevos campos
     preferredNavigationApp?: 'google' | 'waze' | 'apple';  // App preferida para navegación
     achievements?: ProfileAchievements;                     // Logros de primera vez
+
+    // Store purchases - PDF unlocks
+    pdfUnlocksAvailable?: number;  // Number of PDF unlock credits purchased
 }
 
 // Perfil por defecto para usuarios nuevos

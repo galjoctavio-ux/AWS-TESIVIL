@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter, Stack } from 'expo-router';
 
 // Datos de presión según master_plan.md - Sección 3.5.2
 type GasType = 'R410A' | 'R32' | 'R22';
@@ -152,6 +153,7 @@ const PressureGauge = ({ min, max, unit, color }: { min: number; max: number; un
 
 export default function PTTable() {
     const insets = useSafeAreaInsets();
+    const router = useRouter();
     const [selectedGas, setSelectedGas] = useState<GasType>('R410A');
     const [temperature, setTemperature] = useState(30);
     const [showBar, setShowBar] = useState(false);
@@ -161,18 +163,22 @@ export default function PTTable() {
 
     return (
         <View className="flex-1 bg-slate-50">
+            <Stack.Screen options={{ headerShown: false }} />
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* ========================================== */}
                 {/* HEADER - Uniform with rest of app */}
                 {/* ========================================== */}
                 <View className="bg-blue-600 pb-6 px-5" style={{ paddingTop: insets.top + 8 }}>
-                    <View className="flex-row justify-between items-center">
-                        <View>
-                            <Text className="text-blue-200 text-sm">Herramienta</Text>
+                    <View className="flex-row items-center">
+                        <TouchableOpacity onPress={() => router.back()} className="mr-3">
+                            <Ionicons name="arrow-back" size={24} color="white" />
+                        </TouchableOpacity>
+                        <View className="flex-1">
                             <Text className="text-white text-2xl font-bold">Tabla P-T</Text>
+                            <Text className="text-blue-200 text-sm">Presión-Temperatura por refrigerante</Text>
                         </View>
-                        <View className="bg-white/20 w-12 h-12 rounded-full items-center justify-center">
-                            <Ionicons name="thermometer" size={24} color="white" />
+                        <View className="bg-white/20 w-10 h-10 rounded-full items-center justify-center">
+                            <Ionicons name="thermometer" size={20} color="white" />
                         </View>
                     </View>
                 </View>

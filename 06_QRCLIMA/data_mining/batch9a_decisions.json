@@ -1,0 +1,874 @@
+{
+    "new_products": [
+        {
+            "sku": "TU-AIS-KFL-038",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 7/8 x 1",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RX100078",
+            "descripcion_tecnica": "Tubo 7/8 ID x 1 Espesor",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-039",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 1 3/8 x 1/2",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RX048138",
+            "descripcion_tecnica": "Tubo 1 3/8 ID x 1/2 Espesor",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-040",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 2 1/8 x 3/4",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RX068218",
+            "descripcion_tecnica": "Tubo 2 1/8 ID x 3/4 Espesor",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-041",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 4 1/8 x 1/2",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RX048418",
+            "descripcion_tecnica": "Tubo 4 1/8 ID x 1/2 Espesor",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-042",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 7/8 x 3/8 Abierto",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RXL038078",
+            "descripcion_tecnica": "Tubo 7/8 ID x 3/8 Espesor Abierto",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-043",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 2 1/8 x 3/4 Abierto",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RXLO068218",
+            "descripcion_tecnica": "Tubo 2 1/8 ID x 3/4 Espesor Abierto",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-044",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 3/8 x 3/8",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RX038038",
+            "descripcion_tecnica": "Tubo 3/8 ID x 3/8 Espesor",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-045",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 7/8 x 1/2",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RX048078",
+            "descripcion_tecnica": "Tubo 7/8 ID x 1/2 Espesor",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-046",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 2 1/8 x 3/8",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RX038218",
+            "descripcion_tecnica": "Tubo 2 1/8 ID x 3/8 Espesor",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-047",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 1 1/8 x 1 Abierto",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RXLO100118",
+            "descripcion_tecnica": "Tubo 1 1/8 ID x 1 Espesor Abierto",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-048",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 2 1/8 x 3/8 Abierto",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RXL038218",
+            "descripcion_tecnica": "Tubo 2 1/8 ID x 3/8 Espesor Abierto",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-049",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 1/2 x 1/2",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RX048048",
+            "descripcion_tecnica": "Tubo 1/2 ID x 1/2 Espesor",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-050",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 7/8 x 3/4",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RX068078",
+            "descripcion_tecnica": "Tubo 7/8 ID x 3/4 Espesor",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-051",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 1 3/8 x 3/4",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RX068138",
+            "descripcion_tecnica": "Tubo 1 3/8 ID x 3/4 Espesor",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-052",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 2 5/8 x 1",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RX100258",
+            "descripcion_tecnica": "Tubo 2 5/8 ID x 1 Espesor",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-053",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 1 1/8 x 1/2 Abierto",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RXLO048118",
+            "descripcion_tecnica": "Tubo 1 1/8 ID x 1/2 Espesor Abierto",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-054",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 2 3/8 x 1/2 Abierto",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RXLO048238",
+            "descripcion_tecnica": "Tubo 2 3/8 ID x 1/2 Espesor Abierto",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-055",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 1/2 x 3/4",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RX068048",
+            "descripcion_tecnica": "Tubo 1/2 ID x 3/4 Espesor",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-056",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 1 3/8 x 3/8",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RX038138",
+            "descripcion_tecnica": "Tubo 1 3/8 ID x 3/8 Espesor",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-057",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 2 5/8 x 1/2",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RX048258",
+            "descripcion_tecnica": "Tubo 2 5/8 ID x 1/2 Espesor",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-058",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 1 1/8 x 3/4 Abierto",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RXLO068118",
+            "descripcion_tecnica": "Tubo 1 1/8 ID x 3/4 Espesor Abierto",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-059",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 2 5/8 x 1/2 Abierto",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RXLO048258",
+            "descripcion_tecnica": "Tubo 2 5/8 ID x 1/2 Espesor Abierto",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-OWE-001",
+            "nombre_estandarizado": "Aislamiento Thermasmart Owens Corning 3 1/8 x 1",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "Owens Corning",
+            "modelo": "Thermasmart",
+            "descripcion_tecnica": "Tubo 3 1/8 ID x 1 Espesor",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-060",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 4 1/8 x 3/4 Abierto",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "6RXLO068418",
+            "descripcion_tecnica": "Tubo 4 1/8 ID x 3/4 Espesor Abierto",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-061",
+            "nombre_estandarizado": "Aislamiento Térmico Aeroflex 1 7/8 x 1",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "Aeroflex",
+            "modelo": "48-1781",
+            "descripcion_tecnica": "Tubo 1 7/8 ID x 1 Espesor",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-AIS-KFL-062",
+            "nombre_estandarizado": "Aislamiento Térmico K-Flex 3 1/2 x 3/4",
+            "grupo_general": "TU",
+            "grupo_especializado": "Aislamiento",
+            "marca": "K-Flex",
+            "modelo": "7PXL068348",
+            "descripcion_tecnica": "Tubo 3 1/2 ID x 3/4 Espesor",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Tramo"
+        },
+        {
+            "sku": "TU-SOP-KFL-001",
+            "nombre_estandarizado": "Soporte para Tubería K-Flex 2 1/8 x 1",
+            "grupo_general": "TU",
+            "grupo_especializado": "Soportes",
+            "marca": "K-Flex",
+            "modelo": "800-PH-100218",
+            "descripcion_tecnica": "Soporte 2 1/8 ID x 1 Espesor",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "TU-SOP-KFL-002",
+            "nombre_estandarizado": "Soporte para Tubería K-Flex 7/8 x 1",
+            "grupo_general": "TU",
+            "grupo_especializado": "Soportes",
+            "marca": "K-Flex",
+            "modelo": "800-PH-100078",
+            "descripcion_tecnica": "Soporte 7/8 ID x 1 Espesor",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "N/A",
+            "unidad": "Pieza"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "TU-AIS-KFL-038",
+            "precio": 196.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006464",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:38.120452+00",
+            "raw_id": 1758
+        },
+        {
+            "sku": "TU-AIS-KFL-038",
+            "precio": 196.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006464",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:38.120452+00",
+            "raw_id": 1759
+        },
+        {
+            "sku": "TU-AIS-KFL-039",
+            "precio": 77.4,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006564",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:38.120452+00",
+            "raw_id": 1760
+        },
+        {
+            "sku": "TU-AIS-KFL-039",
+            "precio": 77.4,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006564",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:38.120452+00",
+            "raw_id": 1761
+        },
+        {
+            "sku": "TU-AIS-KFL-040",
+            "precio": 242.27,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006664",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:38.120452+00",
+            "raw_id": 1762
+        },
+        {
+            "sku": "TU-AIS-KFL-040",
+            "precio": 242.27,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006664",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:38.120452+00",
+            "raw_id": 1763
+        },
+        {
+            "sku": "TU-AIS-KFL-041",
+            "precio": 236.11,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006764",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:38.120452+00",
+            "raw_id": 1764
+        },
+        {
+            "sku": "TU-AIS-KFL-041",
+            "precio": 236.11,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006764",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:38.120452+00",
+            "raw_id": 1765
+        },
+        {
+            "sku": "TU-AIS-KFL-042",
+            "precio": 82.43,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006864",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:38.120452+00",
+            "raw_id": 1766
+        },
+        {
+            "sku": "TU-AIS-KFL-042",
+            "precio": 82.43,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006864",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:38.120452+00",
+            "raw_id": 1767
+        },
+        {
+            "sku": "TU-AIS-KFL-043",
+            "precio": 207.34,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006964",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:38.120452+00",
+            "raw_id": 1768
+        },
+        {
+            "sku": "TU-AIS-KFL-043",
+            "precio": 207.34,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00006964",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:38.120452+00",
+            "raw_id": 1769
+        },
+        {
+            "sku": "TU-AIS-KFL-044",
+            "precio": 30.47,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007364",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1770
+        },
+        {
+            "sku": "TU-AIS-KFL-044",
+            "precio": 30.47,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007364",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1771
+        },
+        {
+            "sku": "TU-AIS-KFL-045",
+            "precio": 61.17,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007464",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1772
+        },
+        {
+            "sku": "TU-AIS-KFL-045",
+            "precio": 61.17,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007464",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1773
+        },
+        {
+            "sku": "TU-AIS-KFL-046",
+            "precio": 90.99,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007664",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1774
+        },
+        {
+            "sku": "TU-AIS-KFL-046",
+            "precio": 90.99,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007664",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1775
+        },
+        {
+            "sku": "TU-AIS-KFL-047",
+            "precio": 236.19,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007864",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1776
+        },
+        {
+            "sku": "TU-AIS-KFL-047",
+            "precio": 236.19,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007864",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1777
+        },
+        {
+            "sku": "TU-AIS-KFL-048",
+            "precio": 159.6,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007964",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1778
+        },
+        {
+            "sku": "TU-AIS-KFL-048",
+            "precio": 159.6,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00007964",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1779
+        },
+        {
+            "sku": "TU-AIS-KFL-049",
+            "precio": 49.76,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00008364",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1780
+        },
+        {
+            "sku": "TU-AIS-KFL-049",
+            "precio": 49.76,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00008364",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1781
+        },
+        {
+            "sku": "TU-AIS-KFL-050",
+            "precio": 101.07,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00008464",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1782
+        },
+        {
+            "sku": "TU-AIS-KFL-050",
+            "precio": 101.07,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00008464",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1783
+        },
+        {
+            "sku": "TU-AIS-KFL-051",
+            "precio": 145.36,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00008564",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1784
+        },
+        {
+            "sku": "TU-AIS-KFL-051",
+            "precio": 145.36,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00008564",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1785
+        },
+        {
+            "sku": "TU-AIS-KFL-052",
+            "precio": 594.36,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00008664",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1786
+        },
+        {
+            "sku": "TU-AIS-KFL-052",
+            "precio": 594.36,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00008664",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1787
+        },
+        {
+            "sku": "TU-AIS-KFL-053",
+            "precio": 115.72,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00008864",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1788
+        },
+        {
+            "sku": "TU-AIS-KFL-053",
+            "precio": 115.72,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00008864",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1789
+        },
+        {
+            "sku": "TU-AIS-KFL-054",
+            "precio": 200.29,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00008964",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1790
+        },
+        {
+            "sku": "TU-AIS-KFL-054",
+            "precio": 200.29,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00008964",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1791
+        },
+        {
+            "sku": "TU-AIS-KFL-055",
+            "precio": 83.31,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009364",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1792
+        },
+        {
+            "sku": "TU-AIS-KFL-055",
+            "precio": 83.31,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009364",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:41.325295+00",
+            "raw_id": 1793
+        },
+        {
+            "sku": "TU-AIS-KFL-056",
+            "precio": 55.47,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009564",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:44.495931+00",
+            "raw_id": 1794
+        },
+        {
+            "sku": "TU-AIS-KFL-056",
+            "precio": 55.47,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009564",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:44.495931+00",
+            "raw_id": 1795
+        },
+        {
+            "sku": "TU-AIS-KFL-057",
+            "precio": 171.01,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009664",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:44.495931+00",
+            "raw_id": 1796
+        },
+        {
+            "sku": "TU-AIS-KFL-057",
+            "precio": 171.01,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009664",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:44.495931+00",
+            "raw_id": 1797
+        },
+        {
+            "sku": "TU-AIS-KFL-058",
+            "precio": 226.26,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009864",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:44.495931+00",
+            "raw_id": 1798
+        },
+        {
+            "sku": "TU-AIS-KFL-058",
+            "precio": 226.26,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009864",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:44.495931+00",
+            "raw_id": 1799
+        },
+        {
+            "sku": "TU-AIS-KFL-059",
+            "precio": 324.92,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009964",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:44.495931+00",
+            "raw_id": 1800
+        },
+        {
+            "sku": "TU-AIS-KFL-059",
+            "precio": 324.92,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-181201-00009964",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:44.495931+00",
+            "raw_id": 1801
+        },
+        {
+            "sku": "TU-AIS-OWE-001",
+            "precio": 217.37,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190114-00004789",
+            "url": "https://www.grupocoresa.com/thermasmart-pro-3-1-8-x-1-largo-2-mts-9874",
+            "scraped_at": "2025-12-26 19:26:44.495931+00",
+            "raw_id": 1802
+        },
+        {
+            "sku": "TU-AIS-OWE-001",
+            "precio": 217.37,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190114-00004789",
+            "url": "https://www.grupocoresa.com/thermasmart-pro-3-1-8-x-1-largo-2-mts-9874",
+            "scraped_at": "2025-12-26 19:26:44.495931+00",
+            "raw_id": 1803
+        },
+        {
+            "sku": "TU-AIS-KFL-060",
+            "precio": 483.04,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190403-00041301",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:44.495931+00",
+            "raw_id": 1804
+        },
+        {
+            "sku": "TU-AIS-KFL-060",
+            "precio": 483.04,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-190403-00041301",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:44.495931+00",
+            "raw_id": 1805
+        },
+        {
+            "sku": "TU-AIS-KFL-061",
+            "precio": 361.57,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200902-00051221",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:44.495931+00",
+            "raw_id": 1806
+        },
+        {
+            "sku": "TU-AIS-KFL-061",
+            "precio": 361.57,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-200902-00051221",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:44.495931+00",
+            "raw_id": 1807
+        },
+        {
+            "sku": "TU-AIS-KFL-062",
+            "precio": 224.22,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-20220805-00089631",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:44.495931+00",
+            "raw_id": 1808
+        },
+        {
+            "sku": "TU-AIS-KFL-062",
+            "precio": 224.22,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-20220805-00089631",
+            "url": null,
+            "scraped_at": "2025-12-26 19:26:44.495931+00",
+            "raw_id": 1809
+        },
+        {
+            "sku": "TU-SOP-KFL-001",
+            "precio": 234.96,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-211127-00080231",
+            "url": "https://www.grupocoresa.com/soporte-para-tuberia-2-1-8-x-1-13208",
+            "scraped_at": "2025-12-26 19:26:44.495931+00",
+            "raw_id": 1810
+        },
+        {
+            "sku": "TU-SOP-KFL-001",
+            "precio": 234.96,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-211127-00080231",
+            "url": "https://www.grupocoresa.com/soporte-para-tuberia-2-1-8-x-1-13208",
+            "scraped_at": "2025-12-26 19:26:44.495931+00",
+            "raw_id": 1811
+        },
+        {
+            "sku": "TU-SOP-KFL-002",
+            "precio": 149.01,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-211127-00090231",
+            "url": "https://www.grupocoresa.com/soporte-para-tuberia-7-8-x-1-13209",
+            "scraped_at": "2025-12-26 19:26:44.495931+00",
+            "raw_id": 1812
+        },
+        {
+            "sku": "TU-SOP-KFL-002",
+            "precio": 149.01,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-211127-00090231",
+            "url": "https://www.grupocoresa.com/soporte-para-tuberia-7-8-x-1-13209",
+            "scraped_at": "2025-12-26 19:26:44.495931+00",
+            "raw_id": 1813
+        }
+    ]
+}

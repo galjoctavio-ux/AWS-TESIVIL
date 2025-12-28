@@ -63,6 +63,7 @@ export default function NewService() {
     const [notes, setNotes] = useState('');
     const [reminderEnabled, setReminderEnabled] = useState(false); // Default to false, will be set based on isPro
     const [isPro, setIsPro] = useState(false); // Track if user is PRO
+    const [customReminderMonths, setCustomReminderMonths] = useState(settings.reminderMonths || 6); // Custom reminder time per service
     const [capacityBTU, setCapacityBTU] = useState(''); // BTU capacity
 
     // Diagnosis (Only for Repair)
@@ -310,13 +311,9 @@ export default function NewService() {
                 }
             }
 
-            // Calculate next service date using configurable reminder time
+            // Calculate next service date using custom reminder time selected by user
             const nextDate = new Date();
-            if (serviceType === 'Instalación') {
-                nextDate.setFullYear(nextDate.getFullYear() + 1);
-            } else {
-                nextDate.setMonth(nextDate.getMonth() + settings.reminderMonths);
-            }
+            nextDate.setMonth(nextDate.getMonth() + customReminderMonths);
 
             // Prepare payload to avoid undefined values which Firebase rejects
             const servicePayload: any = {
@@ -338,7 +335,8 @@ export default function NewService() {
                 nextServiceDate: reminderEnabled ? nextDate : null,
                 reminderEnabled: reminderEnabled,
                 cost: 0, // Placeholder
-                clientSignature: signature || null
+                clientSignature: signature || null,
+                warrantyMonths: warrantyMonths, // Save warranty duration
             };
 
             // Only add diagnosis if it exists (repair only)
@@ -1439,42 +1437,77 @@ export default function NewService() {
 
                 {/* PRO Feature: Automatic Reminder */}
                 {(serviceType === 'Instalación' || serviceType === 'Mantenimiento') && (
-                    <View className={`p-4 rounded-xl mb-6 border flex-row items-center justify-between ${isPro ? 'bg-indigo-50 border-indigo-100' : 'bg-gray-100 border-gray-200'}`}>
-                        <View className="flex-1 mr-4">
-                            <View className="flex-row items-center mb-1 flex-wrap">
-                                <Ionicons name="notifications" size={18} color={isPro ? '#4F46E5' : '#9CA3AF'} />
-                                <Text className={`font-bold ml-2 ${isPro ? 'text-indigo-900' : 'text-gray-500'}`}>Recordatorio automático de próximo mantenimiento</Text>
-                                <View className="bg-indigo-600 px-2 py-0.5 rounded ml-2">
-                                    <Text className="text-white text-[10px] font-bold">PRO</Text>
+                    <View className="mb-6">
+                        <View className={`p-4 rounded-xl border flex-row items-center justify-between ${isPro ? 'bg-indigo-50 border-indigo-100' : 'bg-gray-100 border-gray-200'}`}>
+                            <View className="flex-1 mr-4">
+                                <View className="flex-row items-center mb-1 flex-wrap">
+                                    <Ionicons name="notifications" size={18} color={isPro ? '#4F46E5' : '#9CA3AF'} />
+                                    <Text className={`font-bold ml-2 ${isPro ? 'text-indigo-900' : 'text-gray-500'}`}>Recordatorio automático</Text>
+                                    <View className="bg-indigo-600 px-2 py-0.5 rounded ml-2">
+                                        <Text className="text-white text-[10px] font-bold">PRO</Text>
+                                    </View>
+                                </View>
+                                <Text className={`text-xs ${isPro ? 'text-indigo-700' : 'text-gray-400'}`}>
+                                    {isPro
+                                        ? `Recordatorio en ${customReminderMonths} ${customReminderMonths === 1 ? 'mes' : 'meses'}`
+                                        : 'Función exclusiva para usuarios PRO'
+                                    }
+                                </Text>
+                            </View>
+                            <Switch
+                                value={reminderEnabled}
+                                onValueChange={(value) => {
+                                    if (!isPro && value) {
+                                        Alert.alert(
+                                            '🚀 Función PRO',
+                                            'Los recordatorios automáticos son una función exclusiva de QRclima Pro',
+                                            [
+                                                { text: 'Ver Planes', onPress: () => router.push('/(app)/profile/subscription' as any) },
+                                                { text: 'Cancelar', style: 'cancel' }
+                                            ]
+                                        );
+                                        return;
+                                    }
+                                    setReminderEnabled(value);
+                                }}
+                                trackColor={{ false: '#D1D5DB', true: '#818CF8' }}
+                                thumbColor={reminderEnabled && isPro ? '#4F46E5' : '#9CA3AF'}
+                                disabled={!isPro}
+                            />
+                        </View>
+
+                        {/* Time Selector - For when reminder enabled */}
+                        {reminderEnabled && isPro && (
+                            <View className="mt-3 p-3 bg-white rounded-xl border border-gray-100">
+                                <Text className="text-gray-600 text-sm font-medium mb-2">⏰ Recordar en:</Text>
+                                <View className="flex-row justify-between">
+                                    {[3, 6, 12].map((months) => (
+                                        <TouchableOpacity
+                                            key={months}
+                                            onPress={() => setCustomReminderMonths(months)}
+                                            className={`flex-1 py-3 mx-1 rounded-xl items-center ${customReminderMonths === months
+                                                ? 'bg-indigo-600'
+                                                : 'bg-gray-100'
+                                                }`}
+                                        >
+                                            <Text className={`font-bold ${customReminderMonths === months
+                                                ? 'text-white'
+                                                : 'text-gray-600'
+                                                }`}>
+                                                {months} {months === 1 ? 'mes' : 'meses'}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    ))}
                                 </View>
                             </View>
-                            <Text className={`text-xs ${isPro ? 'text-indigo-700' : 'text-gray-400'}`}>
-                                {isPro
-                                    ? `Notificar al cliente para su próximo servicio (${serviceType === 'Instalación' ? '1 año' : `${settings.reminderMonths} ${settings.reminderMonths === 1 ? 'mes' : 'meses'}`}).`
-                                    : 'Función exclusiva para usuarios PRO'
-                                }
+                        )}
+
+                        {/* Helper text */}
+                        {reminderEnabled && isPro && (
+                            <Text className="text-indigo-600 text-xs mt-2 text-center">
+                                💡 Puedes modificar esta fecha después desde Agenda → Recordatorios PRO
                             </Text>
-                        </View>
-                        <Switch
-                            value={reminderEnabled}
-                            onValueChange={(value) => {
-                                if (!isPro && value) {
-                                    Alert.alert(
-                                        '🚀 Función PRO',
-                                        'Los recordatorios automáticos son una función exclusiva de QRclima Pro',
-                                        [
-                                            { text: 'Ver Planes', onPress: () => router.push('/(app)/profile/subscription' as any) },
-                                            { text: 'Cancelar', style: 'cancel' }
-                                        ]
-                                    );
-                                    return;
-                                }
-                                setReminderEnabled(value);
-                            }}
-                            trackColor={{ false: '#D1D5DB', true: '#818CF8' }}
-                            thumbColor={reminderEnabled && isPro ? '#4F46E5' : '#9CA3AF'}
-                            disabled={!isPro}
-                        />
+                        )}
                     </View>
                 )}
 

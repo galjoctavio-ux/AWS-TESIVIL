@@ -1,0 +1,918 @@
+{
+    "new_products": [
+        {
+            "sku": "AC-SOP-COL-009",
+            "nombre_estandarizado": "Base Condensadora Pared Coldtek 100Kg",
+            "grupo_general": "AC",
+            "grupo_especializado": "Soportes",
+            "marca": "Coldtek",
+            "modelo": "BSCDAA006",
+            "descripcion_tecnica": "Base para Condensadora de Minisplit Acero Galvanizado 100Kgs",
+            "capacidad": "100 Kg",
+            "voltaje": "N/A",
+            "tipo_operacion": "Soporte",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "AC-AIS-COL-006",
+            "nombre_estandarizado": "Cinta Espuma Coldtek 3mm x 50mm",
+            "grupo_general": "AC",
+            "grupo_especializado": "Aislamiento",
+            "marca": "Coldtek",
+            "modelo": "CNFMRF001",
+            "descripcion_tecnica": "Cinta Espuma Espesor 3.175X50.8X9.20",
+            "capacidad": "3mm x 50mm",
+            "voltaje": "N/A",
+            "tipo_operacion": "Aislamiento",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "AC-SOP-COL-010",
+            "nombre_estandarizado": "Base Condensadora Pared Coldtek 230Kg",
+            "grupo_general": "AC",
+            "grupo_especializado": "Soportes",
+            "marca": "Coldtek",
+            "modelo": "BSCDAA001",
+            "descripcion_tecnica": "Base de Pared para Condensadora de Minisplit Acero Galvanizado 230Kgs",
+            "capacidad": "230 Kg",
+            "voltaje": "N/A",
+            "tipo_operacion": "Soporte",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "AC-SOP-COL-011",
+            "nombre_estandarizado": "Base Condensadora Pared Coldtek 200Kg",
+            "grupo_general": "AC",
+            "grupo_especializado": "Soportes",
+            "marca": "Coldtek",
+            "modelo": "BSCDAA002",
+            "descripcion_tecnica": "Base de Pared para Condensadora de Minisplit Acero Galvanizado 200Kgs",
+            "capacidad": "200 Kg",
+            "voltaje": "N/A",
+            "tipo_operacion": "Soporte",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "AC-SOP-COL-012",
+            "nombre_estandarizado": "Base Condensadora Piso Coldtek 200Kg",
+            "grupo_general": "AC",
+            "grupo_especializado": "Soportes",
+            "marca": "Coldtek",
+            "modelo": "BSCDAA003",
+            "descripcion_tecnica": "Base de Suelo para Condensadora de Minisplit 200Kgs",
+            "capacidad": "200 Kg",
+            "voltaje": "N/A",
+            "tipo_operacion": "Soporte",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "AC-VIB-COL-001",
+            "nombre_estandarizado": "Eliminador Vibración Inox Coldtek 1/2\"",
+            "grupo_general": "AC",
+            "grupo_especializado": "Antivibración",
+            "marca": "Coldtek",
+            "modelo": "ELVBRF012",
+            "descripcion_tecnica": "Eliminador de Vibración con Malla de Acero Inoxidable 1/2\"",
+            "capacidad": "1/2\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Instalación",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "AC-VIB-COL-002",
+            "nombre_estandarizado": "Eliminador Vibración Inox Coldtek 5/8\"",
+            "grupo_general": "AC",
+            "grupo_especializado": "Antivibración",
+            "marca": "Coldtek",
+            "modelo": "ELVBRF058",
+            "descripcion_tecnica": "Eliminador de Vibración con Malla de Acero Inoxidable 5/8\"",
+            "capacidad": "5/8\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Instalación",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "AC-VIB-COL-003",
+            "nombre_estandarizado": "Eliminador Vibración Inox Coldtek 7/8\"",
+            "grupo_general": "AC",
+            "grupo_especializado": "Antivibración",
+            "marca": "Coldtek",
+            "modelo": "ELVBRF078",
+            "descripcion_tecnica": "Eliminador de Vibración con Malla de Acero Inoxidable 7/8\"",
+            "capacidad": "7/8\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Instalación",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "AC-VIB-COL-004",
+            "nombre_estandarizado": "Eliminador Vibración Inox Coldtek 1-1/8\"",
+            "grupo_general": "AC",
+            "grupo_especializado": "Antivibración",
+            "marca": "Coldtek",
+            "modelo": "ELVBRF118",
+            "descripcion_tecnica": "Eliminador de Vibración con Malla de Acero Inoxidable 1-1/8\"",
+            "capacidad": "1-1/8\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Instalación",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "AC-VIB-COL-005",
+            "nombre_estandarizado": "Eliminador Vibración Inox Coldtek 1-3/8\"",
+            "grupo_general": "AC",
+            "grupo_especializado": "Antivibración",
+            "marca": "Coldtek",
+            "modelo": "ELVBRF138",
+            "descripcion_tecnica": "Eliminador de Vibración con Malla de Acero Inoxidable 1-3/8\"",
+            "capacidad": "1-3/8\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Instalación",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "AC-VIB-COL-006",
+            "nombre_estandarizado": "Eliminador Vibración Inox Coldtek 1-5/8\"",
+            "grupo_general": "AC",
+            "grupo_especializado": "Antivibración",
+            "marca": "Coldtek",
+            "modelo": "ELVBRF158",
+            "descripcion_tecnica": "Eliminador de Vibración con Malla de Acero Inoxidable 1-5/8\"",
+            "capacidad": "1-5/8\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Instalación",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "AC-VIB-COL-007",
+            "nombre_estandarizado": "Eliminador Vibración Inox Coldtek 2-1/8\"",
+            "grupo_general": "AC",
+            "grupo_especializado": "Antivibración",
+            "marca": "Coldtek",
+            "modelo": "ELVBRF218",
+            "descripcion_tecnica": "Eliminador de Vibración con Malla de Acero Inoxidable 2-1/8\"",
+            "capacidad": "2-1/8\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Instalación",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-SOL-AVA-005",
+            "nombre_estandarizado": "Boquilla Fina Turbo Avaly WA-802",
+            "grupo_general": "HE",
+            "grupo_especializado": "Soldadura",
+            "marca": "Avaly",
+            "modelo": "WA-802",
+            "descripcion_tecnica": "Boquilla Fina Turbo con Autoencendido",
+            "capacidad": "Auto-Ignición",
+            "voltaje": "N/A",
+            "tipo_operacion": "Soldadura",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-CIN-TAP-004",
+            "nombre_estandarizado": "Cinta Aluminio Tapes & Foam 2\" x 50m",
+            "grupo_general": "HE",
+            "grupo_especializado": "Materiales",
+            "marca": "Tapes & Foam",
+            "modelo": "ALU002",
+            "descripcion_tecnica": "Cinta Aluminio 2\"x 50Mts",
+            "capacidad": "2\" x 50m",
+            "voltaje": "N/A",
+            "tipo_operacion": "Aislamiento",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-BOM-YEL-002",
+            "nombre_estandarizado": "Bomba Vacío Yellow Jacket 8CFM 2 Etapas",
+            "grupo_general": "HE",
+            "grupo_especializado": "Bombas",
+            "marca": "Yellow Jacket",
+            "modelo": "93780",
+            "descripcion_tecnica": "Bomba de Vacío 8Cfm 1/2Hp 2 Etapas Superevac Plus ll",
+            "capacidad": "8 CFM",
+            "voltaje": "115V",
+            "tipo_operacion": "Vacío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-INS-INF-001",
+            "nombre_estandarizado": "Detector Fugas Inficon TEK-MATE 3",
+            "grupo_general": "HE",
+            "grupo_especializado": "Instrumentos",
+            "marca": "Inficon",
+            "modelo": "705-202-G1",
+            "descripcion_tecnica": "Detector de Fugas Electrónico TEK-MATE 3",
+            "capacidad": "Electrónico",
+            "voltaje": "N/A",
+            "tipo_operacion": "Detección",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-INS-YEL-006",
+            "nombre_estandarizado": "Báscula Precisión Yellow Jacket 61003",
+            "grupo_general": "HE",
+            "grupo_especializado": "Instrumentos",
+            "marca": "Yellow Jacket",
+            "modelo": "61003",
+            "descripcion_tecnica": "Báscula de Precisión HVAC",
+            "capacidad": "Precisión",
+            "voltaje": "N/A",
+            "tipo_operacion": "Medición",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-PRO-FUL-009",
+            "nombre_estandarizado": "Gabinete Montaje Controlador Full Gauge",
+            "grupo_general": "HE",
+            "grupo_especializado": "Protectores",
+            "marca": "Full Gauge",
+            "modelo": "GB-01S",
+            "descripcion_tecnica": "Caja Gabinete para Facilitar Instalación De Controladores",
+            "capacidad": "Gabinete",
+            "voltaje": "N/A",
+            "tipo_operacion": "Montaje",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-SOL-RED-001",
+            "nombre_estandarizado": "Tanque Soldar Negro Red Burn",
+            "grupo_general": "HE",
+            "grupo_especializado": "Soldadura",
+            "marca": "Red Burn",
+            "modelo": "Negro",
+            "descripcion_tecnica": "Tanque para Soldar Negro 3650°F",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Soldadura",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-BOM-YEL-003",
+            "nombre_estandarizado": "Bomba Vacío Yellow Jacket 6CFM 2 Etapas",
+            "grupo_general": "HE",
+            "grupo_especializado": "Bombas",
+            "marca": "Yellow Jacket",
+            "modelo": "93760",
+            "descripcion_tecnica": "Bomba de Vacío Dos Etapas Superevac Plus II 6Cfm",
+            "capacidad": "6 CFM",
+            "voltaje": "115V",
+            "tipo_operacion": "Vacío",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-CHE-AVA-003",
+            "nombre_estandarizado": "Espuma Poliuretano Avaly 12oz",
+            "grupo_general": "HE",
+            "grupo_especializado": "Químicos",
+            "marca": "Avaly",
+            "modelo": "7565000043",
+            "descripcion_tecnica": "Espuma de Poliuretano 12oz (340gr)",
+            "capacidad": "12 Oz",
+            "voltaje": "N/A",
+            "tipo_operacion": "Aislamiento",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "AC-SOP-AVA-006",
+            "nombre_estandarizado": "Base Piso Condensadora Avaly 9-24K",
+            "grupo_general": "AC",
+            "grupo_especializado": "Soportes",
+            "marca": "Avaly",
+            "modelo": "VA-SUP9-24",
+            "descripcion_tecnica": "Base de Piso para Condensadora 9000- 24000Btus",
+            "capacidad": "9-24K BTUs",
+            "voltaje": "N/A",
+            "tipo_operacion": "Soporte",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "RE-REF-YEL-009",
+            "nombre_estandarizado": "Empaque O'Ring Yellow Jacket 19037",
+            "grupo_general": "RE",
+            "grupo_especializado": "Refacciones",
+            "marca": "Yellow Jacket",
+            "modelo": "19037",
+            "descripcion_tecnica": "Empaque O'Ring",
+            "capacidad": "N/A",
+            "voltaje": "N/A",
+            "tipo_operacion": "Mantenimiento",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "RE-REF-YEL-010",
+            "nombre_estandarizado": "Empaque Cobre Yellow Jacket 3/8\"",
+            "grupo_general": "RE",
+            "grupo_especializado": "Refacciones",
+            "marca": "Yellow Jacket",
+            "modelo": "59652",
+            "descripcion_tecnica": "Empaque de Cobre 3/8\"",
+            "capacidad": "3/8\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Mantenimiento",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "RE-REF-YEL-011",
+            "nombre_estandarizado": "Empaque Cobre Yellow Jacket 1/2\"",
+            "grupo_general": "RE",
+            "grupo_especializado": "Refacciones",
+            "marca": "Yellow Jacket",
+            "modelo": "59653",
+            "descripcion_tecnica": "Empaque de Cobre 1/2\"",
+            "capacidad": "1/2\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Mantenimiento",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "RE-REF-YEL-012",
+            "nombre_estandarizado": "Empaque Cobre Yellow Jacket 5/8\"",
+            "grupo_general": "RE",
+            "grupo_especializado": "Refacciones",
+            "marca": "Yellow Jacket",
+            "modelo": "59654",
+            "descripcion_tecnica": "Empaque de Cobre 5/8\"",
+            "capacidad": "5/8\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Mantenimiento",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "RE-REF-YEL-013",
+            "nombre_estandarizado": "Empaque Cobre Yellow Jacket 3/4\"",
+            "grupo_general": "RE",
+            "grupo_especializado": "Refacciones",
+            "marca": "Yellow Jacket",
+            "modelo": "59655",
+            "descripcion_tecnica": "Empaque de Cobre 3/4\"",
+            "capacidad": "3/4\"",
+            "voltaje": "N/A",
+            "tipo_operacion": "Mantenimiento",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-CHE-AVA-004",
+            "nombre_estandarizado": "Espuma Poliuretano Avaly 70082",
+            "grupo_general": "HE",
+            "grupo_especializado": "Químicos",
+            "marca": "Avaly",
+            "modelo": "70082",
+            "descripcion_tecnica": "Espuma de Poliuretano 12oz (340gr)",
+            "capacidad": "12 Oz",
+            "voltaje": "N/A",
+            "tipo_operacion": "Aislamiento",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-CIN-GEN-006",
+            "nombre_estandarizado": "Cinta Duct Tape Negra 2\"x 50m",
+            "grupo_general": "HE",
+            "grupo_especializado": "Materiales",
+            "marca": "Genérico",
+            "modelo": "Duct Tape",
+            "descripcion_tecnica": "Cinta Duct Tape Negra 2\"x 50m",
+            "capacidad": "2\" x 50m",
+            "voltaje": "N/A",
+            "tipo_operacion": "Aislamiento",
+            "unidad": "Pieza"
+        },
+        {
+            "sku": "HE-BOM-UNI-004",
+            "nombre_estandarizado": "Bomba Vacío Uniweld 14CFM 1.5HP",
+            "grupo_general": "HE",
+            "grupo_especializado": "Bombas",
+            "marca": "Uniweld",
+            "modelo": "MEVP14S",
+            "descripcion_tecnica": "Bomba de Vacío 14Cfm 1.5Hp Negra",
+            "capacidad": "14 CFM",
+            "voltaje": "N/A",
+            "tipo_operacion": "Vacío",
+            "unidad": "Pieza"
+        }
+    ],
+    "price_observations": [
+        {
+            "sku": "HE-PRO-FUL-009",
+            "precio": 282.82,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-210728-00044921",
+            "url": "https://www.grupocoresa.com/caja-gabinete-para-facilitar-instalacion-de-controladores-full-gauge-12944",
+            "scraped_at": "2025-12-26 19:29:34.177006+00",
+            "raw_id": 3059
+        },
+        {
+            "sku": "HE-SOL-RED-001",
+            "precio": 162.25,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-211025-00035131",
+            "url": "https://www.grupocoresa.com/tanque-para-soldar-negro-red-burn-3650-f-13153",
+            "scraped_at": "2025-12-26 19:29:34.177006+00",
+            "raw_id": 3060
+        },
+        {
+            "sku": "HE-SOL-RED-001",
+            "precio": 162.25,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-211025-00035131",
+            "url": "https://www.grupocoresa.com/tanque-para-soldar-negro-red-burn-3650-f-13153",
+            "scraped_at": "2025-12-26 19:29:34.177006+00",
+            "raw_id": 3061
+        },
+        {
+            "sku": "HE-BOM-YEL-003",
+            "precio": 20889.63,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-211209-00091231",
+            "url": "https://www.grupocoresa.com/bomba-de-vacio-dos-etapas-superevac-plus-ii-1-2hp-6cfm-115v-50-60hz-yellow-jacket-13219",
+            "scraped_at": "2025-12-26 19:29:34.177006+00",
+            "raw_id": 3062
+        },
+        {
+            "sku": "HE-BOM-YEL-003",
+            "precio": 20889.63,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-211209-00091231",
+            "url": "https://www.grupocoresa.com/bomba-de-vacio-dos-etapas-superevac-plus-ii-1-2hp-6cfm-115v-50-60hz-yellow-jacket-13219",
+            "scraped_at": "2025-12-26 19:29:34.177006+00",
+            "raw_id": 3063
+        },
+        {
+            "sku": "HE-CHE-AVA-003",
+            "precio": 263.97,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-220120-00033331",
+            "url": "https://www.grupocoresa.com/espuma-de-poliuretano-12oz-340gr-13333",
+            "scraped_at": "2025-12-26 19:29:36.844095+00",
+            "raw_id": 3064
+        },
+        {
+            "sku": "HE-CHE-AVA-003",
+            "precio": 263.97,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-220120-00033331",
+            "url": "https://www.grupocoresa.com/espuma-de-poliuretano-12oz-340gr-13333",
+            "scraped_at": "2025-12-26 19:29:36.844095+00",
+            "raw_id": 3065
+        },
+        {
+            "sku": "AC-SOP-AVA-006",
+            "precio": 336.75,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-220202-00089331",
+            "url": "https://www.grupocoresa.com/base-de-piso-para-condensadora-9000-24000btus-incluye-tornilleria-13398",
+            "scraped_at": "2025-12-26 19:29:36.844095+00",
+            "raw_id": 3066
+        },
+        {
+            "sku": "AC-SOP-AVA-006",
+            "precio": 336.75,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-220202-00089331",
+            "url": "https://www.grupocoresa.com/base-de-piso-para-condensadora-9000-24000btus-incluye-tornilleria-13398",
+            "scraped_at": "2025-12-26 19:29:36.844095+00",
+            "raw_id": 3067
+        },
+        {
+            "sku": "RE-REF-YEL-009",
+            "precio": 16.58,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-220205-00040431",
+            "url": "https://www.grupocoresa.com/empaque-o-ring-yellow-jacket-13404",
+            "scraped_at": "2025-12-26 19:29:36.844095+00",
+            "raw_id": 3068
+        },
+        {
+            "sku": "RE-REF-YEL-009",
+            "precio": 16.58,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-220205-00040431",
+            "url": "https://www.grupocoresa.com/empaque-o-ring-yellow-jacket-13404",
+            "scraped_at": "2025-12-26 19:29:36.844095+00",
+            "raw_id": 3069
+        },
+        {
+            "sku": "RE-REF-YEL-010",
+            "precio": 14.43,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-220205-00050431",
+            "url": "https://www.grupocoresa.com/empaque-de-cobre-de-3-8-yellow-jacket-13405",
+            "scraped_at": "2025-12-26 19:29:36.844095+00",
+            "raw_id": 3070
+        },
+        {
+            "sku": "RE-REF-YEL-010",
+            "precio": 14.43,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-220205-00050431",
+            "url": "https://www.grupocoresa.com/empaque-de-cobre-de-3-8-yellow-jacket-13405",
+            "scraped_at": "2025-12-26 19:29:36.844095+00",
+            "raw_id": 3071
+        },
+        {
+            "sku": "RE-REF-YEL-011",
+            "precio": 15.96,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-220205-00060431",
+            "url": "https://www.grupocoresa.com/empaque-de-cobre-de-1-2-yellow-jacket-13406",
+            "scraped_at": "2025-12-26 19:29:36.844095+00",
+            "raw_id": 3072
+        },
+        {
+            "sku": "RE-REF-YEL-011",
+            "precio": 15.96,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-220205-00060431",
+            "url": "https://www.grupocoresa.com/empaque-de-cobre-de-1-2-yellow-jacket-13406",
+            "scraped_at": "2025-12-26 19:29:36.844095+00",
+            "raw_id": 3073
+        },
+        {
+            "sku": "RE-REF-YEL-012",
+            "precio": 17.79,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-220205-00070431",
+            "url": "https://www.grupocoresa.com/empaque-de-cobre-de-5-8-yellow-jacket-13407",
+            "scraped_at": "2025-12-26 19:29:36.844095+00",
+            "raw_id": 3074
+        },
+        {
+            "sku": "RE-REF-YEL-012",
+            "precio": 17.79,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-220205-00070431",
+            "url": "https://www.grupocoresa.com/empaque-de-cobre-de-5-8-yellow-jacket-13407",
+            "scraped_at": "2025-12-26 19:29:36.844095+00",
+            "raw_id": 3075
+        },
+        {
+            "sku": "RE-REF-YEL-013",
+            "precio": 51.88,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-220205-00080431",
+            "url": "https://www.grupocoresa.com/empaque-de-cobre-de-3-4-yellow-jacket-13408",
+            "scraped_at": "2025-12-26 19:29:36.844095+00",
+            "raw_id": 3076
+        },
+        {
+            "sku": "RE-REF-YEL-013",
+            "precio": 51.88,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-220205-00080431",
+            "url": "https://www.grupocoresa.com/empaque-de-cobre-de-3-4-yellow-jacket-13408",
+            "scraped_at": "2025-12-26 19:29:36.844095+00",
+            "raw_id": 3077
+        },
+        {
+            "sku": "HE-CHE-AVA-004",
+            "precio": 224.0,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-230106-00043141",
+            "url": "https://www.grupocoresa.com/espuma-de-poliuretano-70082-avaly-12oz-340gr-de-poliuretano",
+            "scraped_at": "2025-12-26 19:29:36.844095+00",
+            "raw_id": 3082
+        },
+        {
+            "sku": "HE-CHE-AVA-004",
+            "precio": 224.0,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-230106-00043141",
+            "url": "https://www.grupocoresa.com/espuma-de-poliuretano-70082-avaly-12oz-340gr-de-poliuretano",
+            "scraped_at": "2025-12-26 19:29:36.844095+00",
+            "raw_id": 3083
+        },
+        {
+            "sku": "HE-CIN-GEN-006",
+            "precio": 119.58,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250122-00084461",
+            "url": "https://www.grupocoresa.com/cinta-duct-tape-negra-2-x-50m",
+            "scraped_at": "2025-12-26 19:29:36.844095+00",
+            "raw_id": 3084
+        },
+        {
+            "sku": "HE-CIN-GEN-006",
+            "precio": 119.58,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250122-00084461",
+            "url": "https://www.grupocoresa.com/cinta-duct-tape-negra-2-x-50m",
+            "scraped_at": "2025-12-26 19:29:36.844095+00",
+            "raw_id": 3085
+        },
+        {
+            "sku": "HE-BOM-UNI-004",
+            "precio": 13104.86,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250312-00053561",
+            "url": "https://www.grupocoresa.com/bomba-de-vacio-uniweld-mevp14s-14cfm-1-5hp-color-negro",
+            "scraped_at": "2025-12-26 19:29:36.844095+00",
+            "raw_id": 3086
+        },
+        {
+            "sku": "HE-BOM-UNI-004",
+            "precio": 13104.86,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250312-00053561",
+            "url": "https://www.grupocoresa.com/bomba-de-vacio-uniweld-mevp14s-14cfm-1-5hp-color-negro",
+            "scraped_at": "2025-12-26 19:29:36.844095+00",
+            "raw_id": 3087
+        },
+        {
+            "sku": "AC-SOP-COL-009",
+            "precio": 379.16,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250812-00000961",
+            "url": "https://www.grupocoresa.com/base-para-condensadora-de-minisplit-bscdaa006-coldtek-acero-galvanizado-100kgs",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3088
+        },
+        {
+            "sku": "AC-SOP-COL-009",
+            "precio": 379.16,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250812-00000961",
+            "url": "https://www.grupocoresa.com/base-para-condensadora-de-minisplit-bscdaa006-coldtek-acero-galvanizado-100kgs",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3089
+        },
+        {
+            "sku": "AC-AIS-COL-006",
+            "precio": 116.53,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250812-00020961",
+            "url": "https://www.grupocoresa.com/cinta-espuma-cnfmrf001-coldtek-espesor-3-175x50-8x9-20",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3090
+        },
+        {
+            "sku": "AC-AIS-COL-006",
+            "precio": 116.53,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250812-00020961",
+            "url": "https://www.grupocoresa.com/cinta-espuma-cnfmrf001-coldtek-espesor-3-175x50-8x9-20",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3091
+        },
+        {
+            "sku": "AC-SOP-COL-010",
+            "precio": 456.97,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250812-00069861",
+            "url": "https://www.grupocoresa.com/base-de-pared-para-condensadora-de-minisplit-bscdaa001-coldtek-acero-galvanizado-230kgs",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3092
+        },
+        {
+            "sku": "AC-SOP-COL-010",
+            "precio": 456.97,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250812-00069861",
+            "url": "https://www.grupocoresa.com/base-de-pared-para-condensadora-de-minisplit-bscdaa001-coldtek-acero-galvanizado-230kgs",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3093
+        },
+        {
+            "sku": "AC-SOP-COL-011",
+            "precio": 548.77,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250812-00079861",
+            "url": "https://www.grupocoresa.com/base-de-pared-para-condensadora-de-minisplit-bscdaa002-coldtek-acero-galvanizado-200kgs",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3094
+        },
+        {
+            "sku": "AC-SOP-COL-011",
+            "precio": 548.77,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250812-00079861",
+            "url": "https://www.grupocoresa.com/base-de-pared-para-condensadora-de-minisplit-bscdaa002-coldtek-acero-galvanizado-200kgs",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3095
+        },
+        {
+            "sku": "AC-SOP-COL-012",
+            "precio": 280.36,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250812-00089861",
+            "url": "https://www.grupocoresa.com/base-de-suelo-para-condensadora-de-minisplit-bscdaa003-coldtek-200kgs",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3096
+        },
+        {
+            "sku": "AC-SOP-COL-012",
+            "precio": 280.36,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-250812-00089861",
+            "url": "https://www.grupocoresa.com/base-de-suelo-para-condensadora-de-minisplit-bscdaa003-coldtek-200kgs",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3097
+        },
+        {
+            "sku": "AC-VIB-COL-001",
+            "precio": 303.33,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251014-00001171",
+            "url": "https://www.grupocoresa.com/eliminador-de-vibracion-con-malla-de-acero-inoxidable-elvbrf012-coldtek-1-2-largo-228mm",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3098
+        },
+        {
+            "sku": "AC-VIB-COL-001",
+            "precio": 303.33,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251014-00001171",
+            "url": "https://www.grupocoresa.com/eliminador-de-vibracion-con-malla-de-acero-inoxidable-elvbrf012-coldtek-1-2-largo-228mm",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3099
+        },
+        {
+            "sku": "AC-VIB-COL-002",
+            "precio": 357.2,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251014-00011171",
+            "url": "https://www.grupocoresa.com/eliminador-de-vibracion-con-malla-de-acero-inoxidable-elvbrf058-coldtek-5-8-largo-250mm",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3100
+        },
+        {
+            "sku": "AC-VIB-COL-002",
+            "precio": 357.2,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251014-00011171",
+            "url": "https://www.grupocoresa.com/eliminador-de-vibracion-con-malla-de-acero-inoxidable-elvbrf058-coldtek-5-8-largo-250mm",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3101
+        },
+        {
+            "sku": "AC-VIB-COL-003",
+            "precio": 492.9,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251014-00021171",
+            "url": "https://www.grupocoresa.com/eliminador-de-vibracion-con-malla-de-acero-inoxidable-elvbrf078-coldtek-7-8-largo-304mm",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3102
+        },
+        {
+            "sku": "AC-VIB-COL-003",
+            "precio": 492.9,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251014-00021171",
+            "url": "https://www.grupocoresa.com/eliminador-de-vibracion-con-malla-de-acero-inoxidable-elvbrf078-coldtek-7-8-largo-304mm",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3103
+        },
+        {
+            "sku": "AC-VIB-COL-004",
+            "precio": 610.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251014-00031171",
+            "url": "https://www.grupocoresa.com/eliminador-de-vibracion-con-malla-de-acero-inoxidable-elvbrf118-coldtek-1-1-8-largo-331mm",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3104
+        },
+        {
+            "sku": "AC-VIB-COL-004",
+            "precio": 610.65,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251014-00031171",
+            "url": "https://www.grupocoresa.com/eliminador-de-vibracion-con-malla-de-acero-inoxidable-elvbrf118-coldtek-1-1-8-largo-331mm",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3105
+        },
+        {
+            "sku": "AC-VIB-COL-005",
+            "precio": 892.02,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251014-00070171",
+            "url": "https://www.grupocoresa.com/eliminador-de-vibracion-con-malla-de-acero-inoxidable-elvbrf138-coldtek-1-3-8-largo-395mm",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3106
+        },
+        {
+            "sku": "AC-VIB-COL-005",
+            "precio": 892.02,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251014-00070171",
+            "url": "https://www.grupocoresa.com/eliminador-de-vibracion-con-malla-de-acero-inoxidable-elvbrf138-coldtek-1-3-8-largo-395mm",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3107
+        },
+        {
+            "sku": "AC-VIB-COL-006",
+            "precio": 1315.06,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251014-00080171",
+            "url": "https://www.grupocoresa.com/eliminador-de-vibracion-con-malla-de-acero-inoxidable-elvbrf158-coldtek-1-5-8",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3108
+        },
+        {
+            "sku": "AC-VIB-COL-006",
+            "precio": 1315.06,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251014-00080171",
+            "url": "https://www.grupocoresa.com/eliminador-de-vibracion-con-malla-de-acero-inoxidable-elvbrf158-coldtek-1-5-8",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3109
+        },
+        {
+            "sku": "AC-VIB-COL-007",
+            "precio": 1897.67,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251014-00090171",
+            "url": "https://www.grupocoresa.com/eliminador-de-vibracion-con-malla-de-acero-inoxidable-elvbrf218-coldtek-2-1-8",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3110
+        },
+        {
+            "sku": "AC-VIB-COL-007",
+            "precio": 1897.67,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251014-00090171",
+            "url": "https://www.grupocoresa.com/eliminador-de-vibracion-con-malla-de-acero-inoxidable-elvbrf218-coldtek-2-1-8",
+            "scraped_at": "2025-12-26 19:29:40.8773+00",
+            "raw_id": 3111
+        },
+        {
+            "sku": "HE-SOL-AVA-005",
+            "precio": 455.52,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251017-00062171",
+            "url": "https://www.grupocoresa.com/boquilla-fina-turbo-con-autoencendido-wa-802-avaly",
+            "scraped_at": "2025-12-26 19:29:43.515802+00",
+            "raw_id": 3112
+        },
+        {
+            "sku": "HE-SOL-AVA-005",
+            "precio": 455.52,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251017-00062171",
+            "url": "https://www.grupocoresa.com/boquilla-fina-turbo-con-autoencendido-wa-802-avaly",
+            "scraped_at": "2025-12-26 19:29:43.515802+00",
+            "raw_id": 3113
+        },
+        {
+            "sku": "HE-CIN-TAP-004",
+            "precio": 163.72,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251020-00053171",
+            "url": "https://www.grupocoresa.com/cinta-aluminio-alu002-tapes-foam-2-x-50mts",
+            "scraped_at": "2025-12-26 19:29:43.515802+00",
+            "raw_id": 3114
+        },
+        {
+            "sku": "HE-CIN-TAP-004",
+            "precio": 163.72,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-251020-00053171",
+            "url": "https://www.grupocoresa.com/cinta-aluminio-alu002-tapes-foam-2-x-50mts",
+            "scraped_at": "2025-12-26 19:29:43.515802+00",
+            "raw_id": 3115
+        },
+        {
+            "sku": "HE-BOM-YEL-002",
+            "precio": 15854.31,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-230112-00067141",
+            "url": "https://www.grupocoresa.com/bomba-de-vacio-93780-yellow-jacket-8cfm-1-2hp-2-etapas-superevac-plus-ll-115v-50-60hz",
+            "scraped_at": "2025-12-26 19:29:43.515802+00",
+            "raw_id": 3116
+        },
+        {
+            "sku": "HE-BOM-YEL-002",
+            "precio": 15854.31,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-230112-00067141",
+            "url": "https://www.grupocoresa.com/bomba-de-vacio-93780-yellow-jacket-8cfm-1-2hp-2-etapas-superevac-plus-ll-115v-50-60hz",
+            "scraped_at": "2025-12-26 19:29:43.515802+00",
+            "raw_id": 3117
+        },
+        {
+            "sku": "HE-INS-INF-001",
+            "precio": 5836.17,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-230224-00043341",
+            "url": "https://www.grupocoresa.com/detector-de-fugas-electronico-tek-mate-3-705-202-g1-inficon",
+            "scraped_at": "2025-12-26 19:29:43.515802+00",
+            "raw_id": 3118
+        },
+        {
+            "sku": "HE-INS-INF-001",
+            "precio": 5836.17,
+            "proveedor": "Grupo Coresa",
+            "sku_original": "COR-230224-00043341",
+            "url": "https://www.grupocoresa.com/detector-de-fugas-electronico-tek-mate-3-705-202-g1-inficon",
+            "scraped_at": "2025-12-26 19:29:43.515802+00",
+            "raw_id": 3119
+        },
+        {
+            "sku": "HE-INS-YEL-006",
+            "precio": 1749.0,
+            "proveedor": "Frio Refacciones",
+            "sku_original": "FR-47298674196736",
+            "url": "https://friorefacciones.com/products/bascula-de-precision-yellow-jacket-61003-hvac",
+            "scraped_at": "2025-12-26 19:31:55.811483+00",
+            "raw_id": 3124
+        }
+    ]
+}
