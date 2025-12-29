@@ -72,4 +72,25 @@ sudo apt install certbot python3-certbot-nginx -y
 sudo certbot --nginx -d qrclima.tesivil.com
 ```
 
-¡Listo! Tu sitio debería estar en vivo en `https://qrclima.tesivil.com`.
+
+## 6. Solución de Problemas (Troubleshooting)
+
+### ¿Cómo saber si el puerto 3002 está ocupado?
+Si al iniciar PM2 falla o el sitio no carga, verifica si el puerto 3002 ya está en uso por otra aplicación:
+
+```bash
+# Opción 1: Ver qué proceso usa el puerto
+sudo lsof -i :3002
+
+# Opción 2: Listar puertos escuchando
+sudo netstat -tulnp | grep :3002
+```
+
+### Cambiar de Puerto (si el 3002 está ocupado)
+1. Edita `ecosystem.config.js` y cambia `PORT: 3002` por otro.
+2. Edita `deployment/nginx-qrclima.conf` y actualiza `proxy_pass http://localhost:3002;` por el nuevo puerto.
+3. Reinicia los servicios:
+   ```bash
+   pm2 restart qrclima-landing
+   sudo systemctl reload nginx
+   ```
