@@ -5,9 +5,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../../context/AuthContext';
 import { getClients } from '../../../services/clients-service';
-import { addService, checkScheduleConflict } from '../../../services/services-service';
-import { getUserProfile } from '../../../services/user-service';
+import { addService, checkScheduleConflict, getUpcomingServices } from '../../../services/services-service';
+import { getUserProfile, isUserPro } from '../../../services/user-service';
 import { getLinearDistance } from '../../../services/haversine-calculator';
+import { getTrafficDistance, TrafficDistanceResult } from '../../../services/traffic-distance-service';
 import DistanceIndicator, { getRouteEfficiencyColor } from '../../../components/agenda/DistanceIndicator';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -43,6 +44,13 @@ export default function AgendaWizard() {
     const [baseLng, setBaseLng] = useState<number | null>(null);
     const [distanceToClient, setDistanceToClient] = useState<number | null>(null);
 
+    // PRO Traffic Feature State
+    const [isPro, setIsPro] = useState(false);
+    const [trafficData, setTrafficData] = useState<TrafficDistanceResult | null>(null);
+    const [loadingDistance, setLoadingDistance] = useState(false);
+    const [distanceLabel, setDistanceLabel] = useState('desde tu base');
+    const [isFirstAppointment, setIsFirstAppointment] = useState(true);
+
     // Initialize date from presetDate parameter (when tapping empty cell in calendar)
     useEffect(() => {
         if (presetDate) {
@@ -70,6 +78,8 @@ export default function AgendaWizard() {
                 setBaseLat(profile.baseLat);
                 setBaseLng(profile.baseLng);
             }
+            // Check PRO status
+            setIsPro(isUserPro(profile));
         } catch (error) {
             console.error('Error loading base location:', error);
         }
@@ -104,19 +114,86 @@ export default function AgendaWizard() {
     };
 
     // Update address and calculate distance when client selected
-    const handleClientSelect = (client: any) => {
+    const handleClientSelect = async (client: any) => {
         setSelectedClient(client);
         if (client?.address) setAddress(client.address);
 
+        // Reset distance state
+        setDistanceToClient(null);
+        setTrafficData(null);
+
         // Calculate distance if we have base location and client has coordinates
-        if (baseLat && baseLng && client?.lat && client?.lng) {
-            const distance = getLinearDistance(
-                { latitude: baseLat, longitude: baseLng },
+        if (!baseLat || !baseLng || !client?.lat || !client?.lng) {
+            return;
+        }
+
+        setLoadingDistance(true);
+
+        try {
+            // Get existing appointments for the selected date to determine origin point
+            const services = await getUpcomingServices(user!.uid);
+
+            // Filter appointments for the same date as the new one
+            const selectedDateStr = date.toDateString();
+            const sameDayServices = services
+                .filter(s => {
+                    const serviceDate = s.date?.toDate ? s.date.toDate() : new Date(s.date);
+                    return serviceDate.toDateString() === selectedDateStr;
+                })
+                .filter(s => s.lat && s.lng) // Only those with coordinates
+                .sort((a, b) => {
+                    const aTime = (a.date?.toDate ? a.date.toDate() : new Date(a.date)).getTime();
+                    const bTime = (b.date?.toDate ? b.date.toDate() : new Date(b.date)).getTime();
+                    return aTime - bTime;
+                });
+
+            // Find the last appointment before the new one's time
+            const newAppointmentTime = date.getTime();
+            const previousAppointments = sameDayServices.filter(s => {
+                const serviceTime = (s.date?.toDate ? s.date.toDate() : new Date(s.date)).getTime();
+                return serviceTime < newAppointmentTime;
+            });
+
+            let originLat: number;
+            let originLng: number;
+            let isFromBase = true;
+
+            if (previousAppointments.length > 0) {
+                // Use last previous appointment as origin
+                const lastPrev = previousAppointments[previousAppointments.length - 1];
+                originLat = lastPrev.lat;
+                originLng = lastPrev.lng;
+                isFromBase = false;
+                setDistanceLabel('desde cita anterior');
+            } else {
+                // First appointment of the day: use base location
+                originLat = baseLat;
+                originLng = baseLng;
+                setDistanceLabel('desde tu base');
+            }
+
+            setIsFirstAppointment(isFromBase);
+
+            // Calculate linear distance (always available)
+            const linearDistance = getLinearDistance(
+                { latitude: originLat, longitude: originLng },
                 { latitude: client.lat, longitude: client.lng }
             );
-            setDistanceToClient(distance);
-        } else {
-            setDistanceToClient(null);
+            setDistanceToClient(linearDistance);
+
+            // For PRO users: get traffic data (uses cache automatically)
+            if (isPro) {
+                const traffic = await getTrafficDistance(
+                    { latitude: originLat, longitude: originLng },
+                    { latitude: client.lat, longitude: client.lng }
+                );
+                setTrafficData(traffic);
+            }
+
+        } catch (error) {
+            console.error('Error calculating distance:', error);
+        } finally {
+            setLoadingDistance(false);
         }
     };
 
@@ -140,6 +217,13 @@ export default function AgendaWizard() {
             setDate(newDate);
         }
     };
+
+    // Recalculate distance when date/time changes (affects previous appointment logic)
+    useEffect(() => {
+        if (selectedClient && baseLat && baseLng) {
+            handleClientSelect(selectedClient);
+        }
+    }, [date]);
 
     const handleNext = async () => {
         if (step === 0 && !selectedClient) {
@@ -363,6 +447,45 @@ export default function AgendaWizard() {
                         multiline
                     />
                 </View>
+
+                {/* Distance Indicator - Shows below location */}
+                {loadingDistance && (
+                    <View className="mt-4 p-4 bg-gray-50 rounded-xl flex-row items-center justify-center">
+                        <ActivityIndicator size="small" color="#2563EB" />
+                        <Text className="text-gray-500 ml-2">Calculando distancia...</Text>
+                    </View>
+                )}
+
+                {!loadingDistance && distanceToClient !== null && (
+                    <View className="mt-4">
+                        <DistanceIndicator
+                            distanceKm={distanceToClient}
+                            label={distanceLabel}
+                            trafficData={trafficData || undefined}
+                            isPro={isPro}
+                        />
+
+                        {/* PRO Traffic Note */}
+                        {isPro && trafficData?.isTrafficData && (
+                            <View className="mt-2 flex-row items-start bg-amber-50 p-3 rounded-lg border border-amber-100">
+                                <Ionicons name="information-circle" size={18} color="#D97706" />
+                                <Text className="text-amber-700 text-xs ml-2 flex-1">
+                                    El tráfico fue calculado en este preciso momento. Puede variar al momento de la cita.
+                                </Text>
+                            </View>
+                        )}
+
+                        {/* No coordinates warning */}
+                        {!baseLat && !baseLng && selectedClient && (
+                            <View className="mt-2 flex-row items-start bg-blue-50 p-3 rounded-lg border border-blue-100">
+                                <Ionicons name="location-outline" size={18} color="#2563EB" />
+                                <Text className="text-blue-700 text-xs ml-2 flex-1">
+                                    Configura tu ubicación base en Perfil → Configuración para ver las distancias.
+                                </Text>
+                            </View>
+                        )}
+                    </View>
+                )}
             </View>
 
             {/* Date Picker Modal */}

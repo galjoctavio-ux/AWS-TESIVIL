@@ -8,10 +8,12 @@ import {
     initializeTrainingData,
     getModulesByBlock,
     getOverallProgress,
-    TrainingModule
+    TrainingModule,
+    UserTrainingProgress
 } from '../../../services/training-service';
 import { useAuth } from '../../../context/AuthContext';
 import { getModulesByCategory } from '../../../services/training-service';
+import { getUserTrainingProgress } from '../../../services/database-service';
 
 // Categorías disponibles
 const CATEGORIES = [
@@ -60,6 +62,7 @@ export default function TrainingFeed() {
     const [blockStats, setBlockStats] = useState<{ [key: number]: { completed: number; total: number } }>({});
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [filteredModules, setFilteredModules] = useState<TrainingModule[]>([]);
+    const [completedModuleIds, setCompletedModuleIds] = useState<Set<number>>(new Set());
 
     const loadData = async () => {
         setLoading(true);
@@ -85,6 +88,15 @@ export default function TrainingFeed() {
                     stats[s.block] = { completed: s.completed, total: s.total };
                 });
                 setBlockStats(stats);
+
+                // Load completed module IDs
+                const userProgress = await getUserTrainingProgress(user.uid);
+                const completedIds = new Set<number>(
+                    userProgress
+                        .filter(p => p.status === 'completed')
+                        .map(p => p.module_id)
+                );
+                setCompletedModuleIds(completedIds);
             }
         } catch (error) {
             console.error('Error loading training data:', error);
@@ -120,7 +132,7 @@ export default function TrainingFeed() {
 
     const renderModule = ({ item }: { item: TrainingModule }) => {
         const levelStyle = LEVEL_COLORS[item.level] || LEVEL_COLORS['Básico'];
-        const isCompleted = false; // TODO: check from progress
+        const isCompleted = completedModuleIds.has(item.id);
 
         return (
             <TouchableOpacity
