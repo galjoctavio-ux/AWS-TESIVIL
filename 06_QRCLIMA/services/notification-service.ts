@@ -10,6 +10,7 @@
 
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
+import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
@@ -87,8 +88,24 @@ export const registerForPushNotifications = async (userId: string): Promise<stri
         }
 
         // Obtener el token de Expo Push (compatible con FCM)
+        // projectId debe ser el UUID del proyecto EAS o de expo.dev
+        const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+
+        if (!projectId) {
+            console.warn('⚠️ No se encontró projectId de EAS, usando FCM nativo');
+            // Si no hay projectId de EAS, obtener el FCM token nativo como fallback
+            const fcmTokenData = await Notifications.getDevicePushTokenAsync();
+            const token = fcmTokenData.data;
+            console.log('✅ FCM token nativo obtenido:', token);
+            await saveFCMToken(userId, token);
+            if (Platform.OS === 'android') {
+                await setupAndroidNotificationChannel();
+            }
+            return token;
+        }
+
         const tokenData = await Notifications.getExpoPushTokenAsync({
-            projectId: 'qrclima', // Debe coincidir con el proyecto de Expo
+            projectId: projectId,
         });
 
         const token = tokenData.data;
@@ -212,11 +229,11 @@ export const scheduleLocalNotification = async (
         let trigger: Notifications.NotificationTriggerInput;
 
         if (triggerSeconds) {
-            trigger = { seconds: triggerSeconds };
+            trigger = { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: triggerSeconds, repeats: false };
         } else if (isQuietHours()) {
             // Posponer hasta que termine el silencio nocturno
             const delayMs = getTimeUntilQuietHoursEnd();
-            trigger = { seconds: Math.ceil(delayMs / 1000) };
+            trigger = { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: Math.ceil(delayMs / 1000), repeats: false };
             console.log(`🌙 Notificación pospuesta por silencio nocturno (${Math.round(delayMs / 60000)} minutos)`);
         } else {
             trigger = null; // Enviar inmediatamente

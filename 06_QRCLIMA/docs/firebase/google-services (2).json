@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "639964722922",
+    "project_id": "mr-frio",
+    "storage_bucket": "mr-frio.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:639964722922:android:186b054a7ae208940b4993",
+        "android_client_info": {
+          "package_name": "com.bitavo.qrclima"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "639964722922-o2uqfotiiia29u7u0c7ap80h84he7t5i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDyYJPwYOgJ51DwLybATuGxSszG-ZupEOA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "639964722922-o2uqfotiiia29u7u0c7ap80h84he7t5i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

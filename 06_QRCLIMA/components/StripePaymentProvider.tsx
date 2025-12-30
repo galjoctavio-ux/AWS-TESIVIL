@@ -1,20 +1,33 @@
 /**
  * Stripe Payment Provider
  * 
- * TEMPORARILY DISABLED: Stripe SDK requires native modules not available in Expo Go.
- * Re-enable when using a custom dev build.
+ * Provides Stripe context for native payment processing.
+ * Requires a native build (not Expo Go) to function.
  */
 
 import React from 'react';
+import { StripeProvider } from '@stripe/stripe-react-native';
 
 interface StripePaymentProviderProps {
     children: React.ReactNode;
 }
 
+const STRIPE_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY || '';
+
 export const StripePaymentProvider: React.FC<StripePaymentProviderProps> = ({ children }) => {
-    // STRIPE DISABLED - just pass through children
-    console.log('ℹ️ Stripe temporarily disabled (requires native build)');
-    return <>{children}</>;
+    if (!STRIPE_PUBLISHABLE_KEY) {
+        console.warn('⚠️ Stripe publishable key not configured');
+        return <>{children}</>;
+    }
+
+    return (
+        <StripeProvider
+            publishableKey={STRIPE_PUBLISHABLE_KEY}
+            merchantIdentifier="merchant.com.bitavo.qrclima"
+        >
+            <>{children}</>
+        </StripeProvider>
+    );
 };
 
 export default StripePaymentProvider;

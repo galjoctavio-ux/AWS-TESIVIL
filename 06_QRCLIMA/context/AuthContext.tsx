@@ -75,10 +75,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setLoading(false);
 
             if (authUser) {
-                // Initialize profile in background
-                initializeUserProfile(authUser).catch(err =>
-                    console.error("Error initializing user profile:", err)
-                );
+                // IMPORTANT: Wait for profile initialization FIRST
+                // This ensures Google users get emailVerified: true set before we check
+                try {
+                    await initializeUserProfile(authUser);
+                } catch (err) {
+                    console.error("Error initializing user profile:", err);
+                }
 
                 // Check and expire subscription if needed (triple layer protection)
                 checkAndExpireSubscription(authUser.uid).then(expired => {
@@ -86,6 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 }).catch(err => console.error('Error checking subscription:', err));
 
                 // Check profile status (email verification + onboarding)
+                // Now the profile exists with correct emailVerified value
                 await checkUserProfileStatus(authUser.uid);
             } else {
                 // Reset state when user logs out

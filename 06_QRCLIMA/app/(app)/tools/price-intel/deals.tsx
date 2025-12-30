@@ -93,13 +93,13 @@ export default function DealsScreen() {
                         deals.map((deal, index) => (
                             <TouchableOpacity
                                 key={index}
-                                onPress={() => openUrl(deal.url_reference)}
+                                onPress={() => openUrl(deal.url)}
                                 className="bg-white rounded-2xl p-4 mb-3 border border-red-100 shadow-sm"
                             >
                                 {/* Discount Badge */}
                                 <View className="absolute -top-2 -right-2 bg-red-500 px-3 py-1 rounded-full z-10">
                                     <Text className="text-white font-bold text-sm">
-                                        -{deal.porcentaje_ahorro}%
+                                        -{deal.porcentaje_descuento}%
                                     </Text>
                                 </View>
 
@@ -109,11 +109,11 @@ export default function DealsScreen() {
                                     </View>
                                     <View className="flex-1">
                                         <Text className="text-gray-800 font-bold text-base pr-8" numberOfLines={2}>
-                                            {deal.display_name}
+                                            {deal.nombre_estandarizado}
                                         </Text>
-                                        {deal.en_tienda && (
+                                        {deal.proveedor && (
                                             <Text className="text-gray-400 text-sm mt-1">
-                                                📍 {deal.en_tienda}
+                                                📍 {deal.proveedor}
                                             </Text>
                                         )}
                                     </View>
@@ -122,10 +122,10 @@ export default function DealsScreen() {
                                 <View className="flex-row items-center justify-between mt-4 pt-3 border-t border-gray-100">
                                     <View>
                                         <Text className="text-red-600 font-bold text-2xl">
-                                            {formatPrice(deal.precio_ganga)}
+                                            {formatPrice(deal.mejor_precio)}
                                         </Text>
                                         <Text className="text-gray-400 text-sm line-through">
-                                            {formatPrice(deal.precio_promedio)} (promedio)
+                                            {formatPrice(deal.promedio_historico)} (promedio)
                                         </Text>
                                     </View>
                                     <View className="bg-red-500 px-4 py-2 rounded-xl flex-row items-center">

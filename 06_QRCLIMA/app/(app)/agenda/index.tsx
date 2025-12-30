@@ -8,7 +8,7 @@ import { useSettings } from '../../../context/SettingsContext';
 import { getUpcomingServices, ServiceData } from '../../../services/services-service';
 import { getLinearDistance } from '../../../services/haversine-calculator';
 import { getUserProfile, isUserPro, updateUserProfile } from '../../../services/user-service';
-import { getTrafficDistance, TrafficDistanceResult } from '../../../services/traffic-distance-service';
+import { getTrafficDistance, TrafficDistanceResult, getDailyApiUsageInfo } from '../../../services/traffic-distance-service';
 import CalendarView, { CalendarMode } from '../../../components/agenda/CalendarView';
 import ActionSheet from '../../../components/agenda/ActionSheet';
 import BottomNav from '../../../components/BottomNav';
@@ -41,6 +41,9 @@ export default function AgendaScreen() {
     const [trafficDataMap, setTrafficDataMap] = useState<{ [eventId: string]: TrafficDistanceResult }>({});
     const [loadingTraffic, setLoadingTraffic] = useState(false);
 
+    // API Usage for distance mode counter
+    const [apiUsage, setApiUsage] = useState<{ used: number, max: number, remaining: number }>({ used: 0, max: 10, remaining: 10 });
+
     // Data Load
     useFocusEffect(
         useCallback(() => {
@@ -63,7 +66,14 @@ export default function AgendaScreen() {
                 updateSettings({ preferredNavApp: profile.preferredNavigationApp });
             }
             // Check PRO status
-            setIsPro(isUserPro(profile));
+            const userIsPro = isUserPro(profile);
+            setIsPro(userIsPro);
+
+            // Load API usage for PRO users
+            if (userIsPro) {
+                const usage = await getDailyApiUsageInfo();
+                setApiUsage(usage);
+            }
         } catch (error) {
             console.error('Error loading base location:', error);
         }
@@ -198,65 +208,117 @@ export default function AgendaScreen() {
     return (
         <View className="flex-1 bg-slate-50">
             {/* ========================================== */}
-            {/* HEADER - Matching App Style */}
+            {/* HEADER - Simplified & Modern */}
             {/* ========================================== */}
-            <View className="bg-blue-600 pb-4 px-5" style={{ paddingTop: insets.top + 8 }}>
+            <View className="bg-blue-600 pb-3 px-4" style={{ paddingTop: insets.top + 4 }}>
+                {/* Top Row: Navigation + Title + Actions */}
                 <View className="flex-row justify-between items-center">
-                    <View>
-                        <Text className="text-blue-200 text-sm">Tu Agenda</Text>
-                        <Text className="text-white text-2xl font-bold">
-                            {date.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' })}
-                        </Text>
+                    <View className="flex-row items-center">
+                        <TouchableOpacity onPress={goPrev} className="p-1 mr-1">
+                            <Ionicons name="chevron-back" size={20} color="white" />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={goToday} className="flex-row items-center">
+                            <Text className="text-white text-lg font-bold">
+                                {date.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' })}
+                            </Text>
+                            {date.toDateString() !== new Date().toDateString() && (
+                                <View className="ml-2 bg-white/25 px-2 py-0.5 rounded">
+                                    <Text className="text-white text-[10px] font-bold">HOY</Text>
+                                </View>
+                            )}
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={goNext} className="p-1 ml-1">
+                            <Ionicons name="chevron-forward" size={20} color="white" />
+                        </TouchableOpacity>
                     </View>
 
-                    <TouchableOpacity
-                        onPress={() => router.push('/(app)/agenda/reminders')}
-                        className="bg-white/20 px-4 py-2 rounded-full flex-row items-center"
-                    >
-                        <Ionicons name="notifications" size={18} color="white" />
-                        <Text className="text-white font-bold ml-1">Recordatorios</Text>
-                        <View className="bg-indigo-400 px-1.5 py-0.5 rounded ml-1">
-                            <Text className="text-white text-[10px] font-bold">PRO</Text>
-                        </View>
-                    </TouchableOpacity>
+                    <View className="flex-row items-center">
+                        {/* Traffic Mode Toggle (Icon) */}
+                        <TouchableOpacity
+                            onPress={() => {
+                                if (isPro) {
+                                    const newMode = settings.distanceMode === 'linear' ? 'traffic' : 'linear';
+                                    updateSettings({ distanceMode: newMode });
+                                } else {
+                                    router.push('/(app)/wallet');
+                                }
+                            }}
+                            className={`w-9 h-9 rounded-full items-center justify-center mr-2 ${!isPro
+                                ? 'bg-white/15'
+                                : settings.distanceMode === 'traffic'
+                                    ? 'bg-green-500'
+                                    : 'bg-white/20'
+                                }`}
+                        >
+                            <Ionicons
+                                name={isPro && settings.distanceMode === 'traffic' ? 'car' : 'navigate'}
+                                size={18}
+                                color="white"
+                            />
+                            {!isPro && (
+                                <View className="absolute -top-0.5 -right-0.5 bg-amber-500 w-3.5 h-3.5 rounded-full items-center justify-center">
+                                    <Ionicons name="lock-closed" size={8} color="white" />
+                                </View>
+                            )}
+                        </TouchableOpacity>
+
+                        {/* Reminders (icon only) */}
+                        <TouchableOpacity
+                            onPress={() => router.push('/(app)/agenda/reminders')}
+                            className="w-9 h-9 rounded-full bg-white/20 items-center justify-center"
+                        >
+                            <Ionicons name="notifications" size={18} color="white" />
+                            <View className="absolute -top-0.5 -right-0.5 bg-amber-500 w-3.5 h-3.5 rounded-full items-center justify-center">
+                                <Text className="text-white text-[7px] font-bold">★</Text>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
                 </View>
 
-                {/* View Mode Toggle */}
-                <View className="flex-row mt-4 bg-blue-700/50 rounded-xl p-1">
+                {/* Modern Segmented Control - iOS/Material 3 Style */}
+                <View
+                    className="flex-row mt-3 bg-blue-700/30 rounded-xl p-1"
+                    style={{
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 1 },
+                        shadowOpacity: 0.05,
+                        shadowRadius: 2
+                    }}
+                >
                     {viewModes.map(mode => (
                         <TouchableOpacity
                             key={mode.value}
                             onPress={() => setViewMode(mode.value)}
-                            className={`flex-1 py-2 rounded-lg items-center ${viewMode === mode.value ? 'bg-white' : ''}`}
+                            className="flex-1 py-2 rounded-lg items-center"
+                            style={viewMode === mode.value ? {
+                                backgroundColor: 'white',
+                                shadowColor: '#000',
+                                shadowOffset: { width: 0, height: 2 },
+                                shadowOpacity: 0.08,
+                                shadowRadius: 4,
+                                elevation: 2,
+                            } : {}}
                         >
-                            <Text className={`font-medium ${viewMode === mode.value ? 'text-blue-600' : 'text-blue-200'}`}>
+                            <Text
+                                className={`font-semibold text-sm ${viewMode === mode.value ? 'text-blue-600' : 'text-blue-200'}`}
+                            >
                                 {mode.label}
                             </Text>
                         </TouchableOpacity>
                     ))}
                 </View>
-            </View>
 
-            {/* ========================================== */}
-            {/* DATE NAVIGATION */}
-            {/* ========================================== */}
-            <View className="bg-white border-b border-gray-100 px-4 py-2 flex-row items-center justify-between">
-                <TouchableOpacity onPress={goPrev} className="p-2">
-                    <Ionicons name="chevron-back" size={24} color="#374151" />
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={goToday} className="flex-row items-center">
-                    <Text className="text-gray-800 font-bold">
-                        {date.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'short' })}
-                    </Text>
-                    <View className="ml-2 bg-blue-100 px-2 py-0.5 rounded">
-                        <Text className="text-blue-600 text-xs font-medium">Hoy</Text>
+                {/* API Counter (only when traffic mode active) */}
+                {isPro && settings.distanceMode === 'traffic' && (
+                    <View className="flex-row items-center justify-center mt-2">
+                        <View className="flex-row items-center bg-green-500/30 px-3 py-1 rounded-full">
+                            <Ionicons name="speedometer-outline" size={12} color="white" />
+                            <Text className="text-white text-xs ml-1.5 font-medium">
+                                {apiUsage.used}/{apiUsage.max} consultas tráfico
+                            </Text>
+                        </View>
                     </View>
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={goNext} className="p-2">
-                    <Ionicons name="chevron-forward" size={24} color="#374151" />
-                </TouchableOpacity>
+                )}
             </View>
 
             {/* ========================================== */}
@@ -280,6 +342,7 @@ export default function AgendaScreen() {
                     isLoading={loading || refreshing}
                     trafficDataMap={trafficDataMap}
                     isPro={isPro}
+                    distanceMode={settings.distanceMode}
                 />
             </View>
 
@@ -317,7 +380,7 @@ export default function AgendaScreen() {
             <TouchableOpacity
                 onPress={() => router.push('/(app)/agenda/wizard')}
                 className="absolute right-4 bg-blue-600 w-14 h-14 rounded-full items-center justify-center shadow-lg"
-                style={{ bottom: insets.bottom + 70 }}
+                style={{ bottom: insets.bottom + 90 }}
             >
                 <Ionicons name="add" size={28} color="white" />
             </TouchableOpacity>

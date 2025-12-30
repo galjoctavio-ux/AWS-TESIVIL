@@ -4,6 +4,7 @@ import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../../context/AuthContext';
+import { useSettings } from '../../../context/SettingsContext';
 import { getClients } from '../../../services/clients-service';
 import { addService, checkScheduleConflict, getUpcomingServices } from '../../../services/services-service';
 import { getUserProfile, isUserPro } from '../../../services/user-service';
@@ -16,6 +17,7 @@ export default function AgendaWizard() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
     const { user } = useAuth();
+    const { settings } = useSettings();
     const { presetDate } = useLocalSearchParams<{ presetDate?: string }>();
 
     // Steps: 0=Client, 1=Date/Location, 2=Type
@@ -181,8 +183,8 @@ export default function AgendaWizard() {
             );
             setDistanceToClient(linearDistance);
 
-            // For PRO users: get traffic data (uses cache automatically)
-            if (isPro) {
+            // For PRO users with traffic mode enabled: get traffic data (uses cache automatically)
+            if (isPro && settings.distanceMode === 'traffic') {
                 const traffic = await getTrafficDistance(
                     { latitude: originLat, longitude: originLng },
                     { latitude: client.lat, longitude: client.lng }

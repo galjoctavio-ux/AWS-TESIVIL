@@ -1,14 +1,22 @@
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
 import { Link, useRouter } from 'expo-router';
+import { signInWithGoogle, configureGoogleSignIn } from '../../services/google-auth-service';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [googleLoading, setGoogleLoading] = useState(false);
     const router = useRouter();
+
+    // Configure Google Sign-In on mount
+    useEffect(() => {
+        configureGoogleSignIn();
+    }, []);
 
     const handleLogin = async () => {
         if (!email || !password) {
@@ -23,6 +31,22 @@ export default function Login() {
             Alert.alert('Error de Login', error.message);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleGoogleLogin = async () => {
+        setGoogleLoading(true);
+        try {
+            const user = await signInWithGoogle();
+            if (user) {
+                console.log('Google login successful:', user.email);
+                // Auth context will handle redirect
+            }
+        } catch (error: any) {
+            Alert.alert('Error', error.message || 'No se pudo iniciar sesión con Google');
+            console.error('Google login error:', error);
+        } finally {
+            setGoogleLoading(false);
         }
     };
 
@@ -60,6 +84,29 @@ export default function Login() {
                         <ActivityIndicator color="white" />
                     ) : (
                         <Text className="text-white text-center font-bold text-lg">Entrar</Text>
+                    )}
+                </TouchableOpacity>
+
+                {/* Divider */}
+                <View className="flex-row items-center my-6">
+                    <View className="flex-1 h-px bg-gray-300" />
+                    <Text className="mx-4 text-gray-400 text-sm">o continúa con</Text>
+                    <View className="flex-1 h-px bg-gray-300" />
+                </View>
+
+                {/* Google Sign-In Button */}
+                <TouchableOpacity
+                    className={`w-full py-4 rounded-xl border border-gray-300 flex-row justify-center items-center ${googleLoading ? 'bg-gray-100' : 'bg-white'}`}
+                    onPress={handleGoogleLogin}
+                    disabled={googleLoading}
+                >
+                    {googleLoading ? (
+                        <ActivityIndicator color="#4285F4" />
+                    ) : (
+                        <>
+                            <Ionicons name="logo-google" size={20} color="#4285F4" />
+                            <Text className="text-gray-700 font-semibold ml-3">Google</Text>
+                        </>
                     )}
                 </TouchableOpacity>
 

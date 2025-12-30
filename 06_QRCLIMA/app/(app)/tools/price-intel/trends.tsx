@@ -89,8 +89,8 @@ export default function TrendsScreen() {
                         </View>
                     ) : (
                         trends.map((trend, index) => {
-                            const display = getTrendDisplay(trend.tendencia);
-                            const categoryIcon = getCategoryIcon(trend.categoria);
+                            const display = getTrendDisplay(trend.variacion_porcentual);
+                            const categoryIcon = getCategoryIcon(trend.grupo_especializado);
 
                             return (
                                 <View key={index} className="bg-white rounded-2xl p-4 mb-3 border border-gray-100 shadow-sm">
@@ -100,7 +100,7 @@ export default function TrendsScreen() {
                                                 <Ionicons name={categoryIcon as any} size={28} color={display.color} />
                                             </View>
                                             <View className="flex-1">
-                                                <Text className="text-gray-800 font-bold text-lg">{trend.categoria}</Text>
+                                                <Text className="text-gray-800 font-bold text-lg">{trend.grupo_especializado}</Text>
                                                 <Text className="text-gray-500 text-sm">Tendencia del día</Text>
                                             </View>
                                         </View>
@@ -116,17 +116,7 @@ export default function TrendsScreen() {
                         })
                     )}
 
-                    {/* Disclaimer */}
-                    {trends.length > 0 && trends[0]?.disclaimer && (
-                        <View className="bg-amber-50 rounded-xl p-4 mt-2 border border-amber-100">
-                            <View className="flex-row">
-                                <Ionicons name="information-circle" size={20} color="#D97706" />
-                                <Text className="text-amber-700 text-sm ml-3 flex-1">
-                                    {trends[0].disclaimer}
-                                </Text>
-                            </View>
-                        </View>
-                    )}
+
 
                     {/* Info card */}
                     <View className="bg-teal-50 rounded-xl p-4 mt-4 border border-teal-100">

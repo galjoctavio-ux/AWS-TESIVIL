@@ -1,5 +1,5 @@
 import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -12,6 +12,7 @@ const CITIES = [
 
 export default function ProfileSetup() {
     const router = useRouter();
+    const scrollViewRef = useRef<ScrollView>(null);
     const [fullName, setFullName] = useState('');
     const [alias, setAlias] = useState('');
     const [city, setCity] = useState('');
@@ -40,9 +41,16 @@ export default function ProfileSetup() {
     return (
         <KeyboardAvoidingView
             className="flex-1 bg-gray-50"
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            behavior="padding"
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
         >
-            <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1 }}>
+            <ScrollView
+                ref={scrollViewRef}
+                className="flex-1"
+                contentContainerStyle={{ flexGrow: 1, paddingBottom: 50 }}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+            >
                 <View className="flex-1 p-6 pt-16">
                     {/* Header */}
                     <TouchableOpacity onPress={handleBack} className="mb-6">
@@ -156,16 +164,19 @@ export default function ProfileSetup() {
                                 placeholder="Ej: Climatización del Norte S.A."
                                 value={businessName}
                                 onChangeText={setBusinessName}
-                                maxLength={50}
+                                maxLength={100}
+                                onFocus={() => {
+                                    // Scroll down when business name is focused
+                                    setTimeout(() => {
+                                        scrollViewRef.current?.scrollToEnd({ animated: true });
+                                    }, 300);
+                                }}
                             />
                             <Text className="text-gray-400 text-sm mt-1">
                                 Aparecerá en tus cotizaciones y documentos
                             </Text>
                         </View>
                     </View>
-
-                    {/* Spacer */}
-                    <View className="flex-1" />
 
                     {/* Botón Continuar */}
                     <TouchableOpacity

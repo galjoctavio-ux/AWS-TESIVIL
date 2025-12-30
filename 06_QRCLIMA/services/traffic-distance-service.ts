@@ -44,7 +44,7 @@ interface DailyApiUsage {
 // CONSTANTS
 // ==========================================
 
-const MAX_DAILY_API_CALLS = 5; // Maximum API calls per day for PRO users
+const MAX_DAILY_API_CALLS = 10; // Maximum API calls per day for PRO users
 const CACHE_PREFIX = 'traffic_cache_';
 const DAILY_USAGE_KEY = '@traffic_daily_usage';
 const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_DIRECTIONS_API_KEY;
@@ -341,4 +341,16 @@ export const formatDuration = (minutes: number): string => {
 export const getRemainingApiCalls = async (): Promise<number> => {
     const usage = await getDailyUsage();
     return Math.max(0, MAX_DAILY_API_CALLS - usage.count);
+};
+
+/**
+ * Get complete daily API usage info (used, max, remaining)
+ */
+export const getDailyApiUsageInfo = async (): Promise<{ used: number, max: number, remaining: number }> => {
+    const usage = await getDailyUsage();
+    return {
+        used: usage.count,
+        max: MAX_DAILY_API_CALLS,
+        remaining: Math.max(0, MAX_DAILY_API_CALLS - usage.count)
+    };
 };

@@ -27,6 +27,7 @@ interface Props {
     // PRO Traffic Data
     trafficDataMap?: { [eventId: string]: TrafficDistanceResult };
     isPro?: boolean;
+    distanceMode?: 'linear' | 'traffic';
 }
 
 export default function CalendarView({
@@ -41,7 +42,8 @@ export default function CalendarView({
     baseLng,
     isLoading,
     trafficDataMap,
-    isPro
+    isPro,
+    distanceMode = 'linear'
 }: Props) {
 
     // Dynamic height based on screen - adjusted to prevent cut-off
@@ -57,6 +59,16 @@ export default function CalendarView({
             case 'Garantía': return '#9B59B6';
             case 'Cotización': return '#F1C40F';
             default: return '#6B7280';
+        }
+    };
+
+    // Get text color based on background (dark text for light colors like yellow/green)
+    const getTextColor = (type: string) => {
+        switch (type) {
+            case 'Cotización': return '#1F2937'; // Dark gray on yellow
+            case 'Instalación':
+            case 'Reinstalación': return '#065F46'; // Dark green on green
+            default: return '#FFFFFF'; // White on dark colors
         }
     };
 
@@ -106,25 +118,51 @@ export default function CalendarView({
     const renderEvent = (event: any, touchableOpacityProps: any) => {
         const { key, ...restProps } = touchableOpacityProps;
         const bgColor = getEventColor(event.type);
+        const textColor = getTextColor(event.type);
         const distanceInfo = eventDistances[event.id];
         const trafficInfo = trafficDataMap?.[event.id];
+        const isCompleted = event.raw?.status === 'Completado' || event.raw?.status === 'Finalizado';
 
         return (
             <TouchableOpacity
                 key={key}
                 {...restProps}
-                style={[restProps.style, { backgroundColor: bgColor, borderRadius: 6, padding: 3, opacity: 0.95 }]}
+                style={[
+                    restProps.style,
+                    {
+                        backgroundColor: bgColor,
+                        borderRadius: 8,
+                        padding: 4,
+                        marginLeft: 4, // Margin from time column
+                        opacity: isCompleted ? 0.65 : 0.95
+                    }
+                ]}
                 onLongPress={() => onLongPressEvent?.(event)}
                 delayLongPress={400}
             >
-                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 11 }} numberOfLines={1}>{event.title}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {isCompleted && (
+                        <Text style={{ color: textColor, fontSize: 10, marginRight: 3 }}>✓</Text>
+                    )}
+                    <Text
+                        style={{ color: textColor, fontWeight: 'bold', fontSize: 11, flex: 1 }}
+                        numberOfLines={1}
+                    >
+                        {event.title}
+                    </Text>
+                </View>
                 {mode !== 'week' && (
                     <>
-                        <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 9 }} numberOfLines={1}>{event.address}</Text>
+                        <Text
+                            style={{ color: textColor, opacity: 0.85, fontSize: 9 }}
+                            numberOfLines={1}
+                        >
+                            {event.address}
+                        </Text>
                         {distanceInfo && (
-                            <Text style={{ color: 'rgba(255,255,255,0.75)', fontSize: 8, marginTop: 1 }}>
+                            <Text style={{ color: textColor, opacity: 0.7, fontSize: 8, marginTop: 1 }}>
                                 {distanceInfo.fromBase ? '🏠' : '📍'} {distanceInfo.distance} km
-                                {isPro && trafficInfo?.isTrafficData && trafficInfo.durationInTrafficMinutes
+                                {isPro && distanceMode === 'traffic' && trafficInfo?.isTrafficData && trafficInfo.durationInTrafficMinutes
                                     ? ` • 🚗 ${formatDuration(trafficInfo.durationInTrafficMinutes)}`
                                     : ''}
                             </Text>
@@ -157,13 +195,13 @@ export default function CalendarView({
                 onSwipeEnd={(newDate) => onChangeDate(newDate)}
                 renderEvent={renderEvent}
 
-                // Styling - increased header height to prevent day number cutoff
-                headerContainerStyle={{ height: 70, borderBottomWidth: 1, borderColor: '#E5E7EB', paddingTop: 10 }}
-                bodyContainerStyle={{ backgroundColor: '#F9FAFB' }}
-                dayHeaderStyle={{ backgroundColor: '#F3F4F6', paddingBottom: 5 }}
+                // Styling - improved contrast and compact day header
+                headerContainerStyle={{ height: 60, borderBottomWidth: 0.5, borderColor: 'rgba(0,0,0,0.08)', paddingTop: 2 }}
+                bodyContainerStyle={{ backgroundColor: '#FAFBFC' }}
+                dayHeaderStyle={{ backgroundColor: 'transparent', paddingBottom: 0, paddingTop: 0 }}
                 dayHeaderHighlightColor="#2563EB"
                 weekDayHeaderHighlightColor="#2563EB"
-                hourStyle={{ fontSize: 10, color: '#9CA3AF' }}
+                hourStyle={{ fontSize: 11, color: '#6B7280', fontWeight: '500' }}
             />
         </View>
     );

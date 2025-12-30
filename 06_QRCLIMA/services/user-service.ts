@@ -440,6 +440,7 @@ export const activateProSubscription = async (
 /**
  * Inicializa perfil de usuario en Firestore.
  * Crea un perfil básico marcado como no-onboarded.
+ * Google Sign-In users get emailVerified: true automatically.
  */
 export const initializeUserProfile = async (user: User): Promise<boolean> => {
     if (!user) return false;
@@ -447,6 +448,11 @@ export const initializeUserProfile = async (user: User): Promise<boolean> => {
     try {
         const userRef = doc(db, 'users', user.uid);
         const userSnap = await getDoc(userRef);
+
+        // Check if user signed in with Google (email is auto-verified)
+        const isGoogleUser = user.providerData.some(
+            (provider) => provider.providerId === 'google.com'
+        );
 
         if (!userSnap.exists()) {
             const newUserProfile: UserProfile = {
@@ -459,13 +465,22 @@ export const initializeUserProfile = async (user: User): Promise<boolean> => {
                 role: 'technician',
                 subscription: 'free',
                 isOnboarded: false,
+                emailVerified: isGoogleUser, // Auto-verify for Google users
                 eligibleForDirectory: false,
                 stats: DEFAULT_STATS,
                 createdAt: serverTimestamp(),
             };
             await setDoc(userRef, newUserProfile);
-            console.log('User profile created for:', user.email);
+            console.log('User profile created for:', user.email, isGoogleUser ? '(Google - auto-verified)' : '');
         } else {
+            // If existing user signs in with Google, mark email as verified
+            if (isGoogleUser) {
+                const existingProfile = userSnap.data() as UserProfile;
+                if (!existingProfile.emailVerified) {
+                    await updateDoc(userRef, { emailVerified: true });
+                    console.log('Email auto-verified for Google user:', user.email);
+                }
+            }
             console.log('User profile already exists for:', user.email);
         }
         return true;

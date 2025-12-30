@@ -1,16 +1,18 @@
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, Linking } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { Link, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { signInWithGoogle, configureGoogleSignIn } from '../../services/google-auth-service';
 
 export default function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [googleLoading, setGoogleLoading] = useState(false);
     const router = useRouter();
 
     // Aceptación legal (obligatoria según master_plan.md)
@@ -18,6 +20,27 @@ export default function Register() {
     const [acceptPrivacy, setAcceptPrivacy] = useState(false);
 
     const isFormValid = email && password && confirmPassword && acceptTerms && acceptPrivacy;
+
+    // Configure Google Sign-In on mount
+    useEffect(() => {
+        configureGoogleSignIn();
+    }, []);
+
+    const handleGoogleRegister = async () => {
+        setGoogleLoading(true);
+        try {
+            const user = await signInWithGoogle();
+            if (user) {
+                console.log('Google registration successful:', user.email);
+                // Auth context will handle redirect
+            }
+        } catch (error: any) {
+            Alert.alert('Error', error.message || 'No se pudo registrar con Google');
+            console.error('Google registration error:', error);
+        } finally {
+            setGoogleLoading(false);
+        }
+    };
 
     const handleRegister = async () => {
         if (!email || !password || !confirmPassword) {
@@ -151,6 +174,29 @@ export default function Register() {
                             }`}>
                             Registrarse
                         </Text>
+                    )}
+                </TouchableOpacity>
+
+                {/* Divider */}
+                <View className="flex-row items-center my-6">
+                    <View className="flex-1 h-px bg-gray-300" />
+                    <Text className="mx-4 text-gray-400 text-sm">o continúa con</Text>
+                    <View className="flex-1 h-px bg-gray-300" />
+                </View>
+
+                {/* Google Sign-In Button */}
+                <TouchableOpacity
+                    className={`w-full py-4 rounded-xl border border-gray-300 flex-row justify-center items-center ${googleLoading ? 'bg-gray-100' : 'bg-white'}`}
+                    onPress={handleGoogleRegister}
+                    disabled={googleLoading}
+                >
+                    {googleLoading ? (
+                        <ActivityIndicator color="#4285F4" />
+                    ) : (
+                        <>
+                            <Ionicons name="logo-google" size={20} color="#4285F4" />
+                            <Text className="text-gray-700 font-semibold ml-3">Google</Text>
+                        </>
                     )}
                 </TouchableOpacity>
 

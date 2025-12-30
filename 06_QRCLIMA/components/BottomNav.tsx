@@ -75,15 +75,15 @@ export default function BottomNav() {
                         >
                             <Ionicons
                                 name={(active ? tab.iconActive : tab.icon) as any}
-                                size={24}
-                                color={active ? '#2563EB' : '#94A3B8'}
+                                size={22}
+                                color={active ? '#2563EB' : '#64748B'}
                             />
                         </View>
                         <Text
                             style={{
                                 fontSize: 11,
                                 fontWeight: active ? '700' : '500',
-                                color: active ? '#2563EB' : '#94A3B8',
+                                color: active ? '#2563EB' : '#64748B',
                             }}
                         >
                             {tab.name}

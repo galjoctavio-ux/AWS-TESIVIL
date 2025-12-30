@@ -144,6 +144,22 @@ export default function ActionSheet({
         onCall();
     };
 
+    const handleWhatsApp = () => {
+        const phone = clientPhone || selectedEvent.raw?.phone || selectedEvent.phone;
+        if (phone) {
+            // Clean phone number and open WhatsApp
+            const cleanPhone = phone.replace(/[^0-9]/g, '');
+            const message = encodeURIComponent(`Hola, soy tu técnico de ${selectedEvent.type}. Voy en camino 🛠️`);
+            Linking.openURL(`https://wa.me/${cleanPhone}?text=${message}`);
+        } else {
+            Alert.alert(
+                '📱 Sin número',
+                'Este cliente no tiene número de teléfono registrado.',
+                [{ text: 'Entendido' }]
+            );
+        }
+    };
+
     // Navigation URL helpers
     const getNavigationUrls = () => {
         const address = selectedEvent.address;
@@ -314,16 +330,26 @@ export default function ActionSheet({
                     <View className="w-12 h-1 bg-gray-300 rounded-full self-center" />
                 </View>
 
-                {/* Header: Client & Type */}
+                {/* Header: Client & Type + Delete Icon */}
                 <View className="flex-row justify-between items-start mb-3">
                     <View className="flex-1 mr-4">
                         <Text className="text-2xl font-bold text-gray-900 mb-1">{selectedEvent.title}</Text>
                         <Text className="text-gray-500 text-base" numberOfLines={2}>{selectedEvent.address}</Text>
                     </View>
 
-                    {/* Badge - Master Plan Colors */}
-                    <View className={`px-3 py-1 rounded-full ${getBadgeColor(selectedEvent.type)}`}>
-                        <Text className="text-white font-bold text-xs">{selectedEvent.type}</Text>
+                    <View className="flex-row items-center">
+                        {/* Delete Icon - Top right for safety */}
+                        <TouchableOpacity
+                            onPress={handleDelete}
+                            className="w-8 h-8 items-center justify-center mr-2"
+                        >
+                            <Ionicons name="trash-outline" size={20} color="#9CA3AF" />
+                        </TouchableOpacity>
+
+                        {/* Badge - Master Plan Colors */}
+                        <View className={`px-3 py-1 rounded-full ${getBadgeColor(selectedEvent.type)}`}>
+                            <Text className="text-white font-bold text-xs">{selectedEvent.type}</Text>
+                        </View>
                     </View>
                 </View>
 
@@ -373,46 +399,48 @@ export default function ActionSheet({
                     </View>
                 )}
 
-                {/* Primary Actions (Big Buttons) */}
+                {/* Primary Actions (Big Buttons) - 5 actions with WhatsApp */}
                 <View className="flex-row justify-between mb-4">
-                    <TouchableOpacity onPress={handleCall} className="items-center w-[23%]">
-                        <View className="w-14 h-14 bg-green-100 rounded-full items-center justify-center mb-1">
-                            <Ionicons name="call" size={26} color="#16A34A" />
+                    <TouchableOpacity onPress={handleCall} className="items-center w-[18%]">
+                        <View className="w-12 h-12 bg-green-100 rounded-full items-center justify-center mb-1">
+                            <Ionicons name="call-outline" size={22} color="#16A34A" />
                         </View>
-                        <Text className="text-gray-600 text-xs font-medium">Llamar</Text>
+                        <Text className="text-gray-600 text-[10px] font-medium">Llamar</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={handleNavigate} className="items-center w-[23%]">
-                        <View className="w-14 h-14 bg-blue-100 rounded-full items-center justify-center mb-1">
-                            <Ionicons name="map" size={26} color="#2563EB" />
+                    <TouchableOpacity onPress={handleWhatsApp} className="items-center w-[18%]">
+                        <View className="w-12 h-12 bg-green-100 rounded-full items-center justify-center mb-1">
+                            <Ionicons name="logo-whatsapp" size={22} color="#25D366" />
                         </View>
-                        <Text className="text-gray-600 text-xs font-medium">Navegar</Text>
+                        <Text className="text-gray-600 text-[10px] font-medium">WhatsApp</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={onStartJob} className="items-center w-[23%]">
-                        <View className="w-14 h-14 bg-purple-100 rounded-full items-center justify-center mb-1">
-                            <Ionicons name="play" size={26} color="#7C3AED" />
+                    <TouchableOpacity onPress={handleNavigate} className="items-center w-[18%]">
+                        <View className="w-12 h-12 bg-blue-100 rounded-full items-center justify-center mb-1">
+                            <Ionicons name="navigate-outline" size={22} color="#2563EB" />
                         </View>
-                        <Text className="text-gray-600 text-xs font-medium">Iniciar</Text>
+                        <Text className="text-gray-600 text-[10px] font-medium">Navegar</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={handleReschedule} className="items-center w-[23%]">
-                        <View className="w-14 h-14 bg-amber-100 rounded-full items-center justify-center mb-1">
-                            <Ionicons name="calendar" size={26} color="#D97706" />
+                    <TouchableOpacity onPress={onStartJob} className="items-center w-[18%]">
+                        <View className="w-12 h-12 bg-purple-100 rounded-full items-center justify-center mb-1">
+                            <Ionicons name="hammer-outline" size={22} color="#7C3AED" />
                         </View>
-                        <Text className="text-gray-600 text-xs font-medium">Mover</Text>
+                        <Text className="text-gray-600 text-[10px] font-medium">Iniciar</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={handleReschedule} className="items-center w-[18%]">
+                        <View className="w-12 h-12 bg-amber-100 rounded-full items-center justify-center mb-1">
+                            <Ionicons name="calendar-outline" size={22} color="#D97706" />
+                        </View>
+                        <Text className="text-gray-600 text-[10px] font-medium">Mover</Text>
                     </TouchableOpacity>
                 </View>
 
-                {/* Secondary Actions */}
-                <View className="border-t border-gray-100 pt-4 flex-row justify-between">
-                    <TouchableOpacity onPress={handleDelete} className="flex-row items-center">
-                        <Ionicons name="trash-outline" size={18} color="#DC2626" />
-                        <Text className="text-red-600 font-medium ml-2">Eliminar</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={onClose}>
-                        <Text className="text-gray-400 font-medium">Cerrar</Text>
+                {/* Footer - Only Close button */}
+                <View className="border-t border-gray-100 pt-4 flex-row justify-center">
+                    <TouchableOpacity onPress={onClose} className="px-6 py-2">
+                        <Text className="text-gray-500 font-medium">Cerrar</Text>
                     </TouchableOpacity>
                 </View>
             </Animated.View>

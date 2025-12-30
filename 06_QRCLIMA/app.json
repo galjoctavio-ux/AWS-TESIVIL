@@ -18,12 +18,14 @@
     },
     "android": {
       "package": "com.bitavo.qrclima",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "softwareKeyboardLayoutMode": "resize"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -44,8 +46,7 @@
         {
           "cameraPermission": "Permitir a QRclima usar la cámara para escanear códigos QR de equipos."
         }
-      ],
-      "expo-barcode-scanner"
+      ]
     ]
   }
 }
