@@ -47,6 +47,7 @@ interface DailyApiUsage {
 const MAX_DAILY_API_CALLS = 10; // Maximum API calls per day for PRO users
 const CACHE_PREFIX = 'traffic_cache_';
 const DAILY_USAGE_KEY = '@traffic_daily_usage';
+const CACHE_DURATION_DAYS = 30; // Cache distance data for 30 days
 const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_DIRECTIONS_API_KEY;
 
 // In-memory cache for faster access
@@ -105,12 +106,12 @@ const getTodayString = (): string => {
 };
 
 /**
- * Get end of day timestamp for cache expiration
+ * Get cache expiration timestamp (30 days from now)
  */
-const getEndOfDayTimestamp = (): number => {
+const getCacheExpirationTimestamp = (): number => {
     const now = new Date();
-    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-    return endOfDay.getTime();
+    now.setDate(now.getDate() + CACHE_DURATION_DAYS);
+    return now.getTime();
 };
 
 /**
@@ -168,7 +169,7 @@ const setCachedData = async (cacheKey: string, result: TrafficDistanceResult): P
             lastUpdated: result.lastUpdated.toISOString(),
         },
         cacheKey,
-        expiresAt: getEndOfDayTimestamp(), // Cache until end of day
+        expiresAt: getCacheExpirationTimestamp(), // Cache for 30 days
     };
 
     // Save to memory
@@ -304,6 +305,49 @@ export const getTrafficDistance = async (
     // Cache the fallback too (to avoid repeated failed API calls)
     await setCachedData(cacheKey, fallback);
 
+    return fallback;
+};
+
+/**
+ * Force refresh traffic distance (ignores cache, always fetches from API)
+ * Used for manual refresh button
+ */
+export const forceRefreshTrafficDistance = async (
+    origin: Coordinates,
+    destination: Coordinates
+): Promise<TrafficDistanceResult> => {
+    const cacheKey = getCacheKey(origin, destination);
+
+    // Remove from cache first
+    memoryCache.delete(cacheKey);
+    try {
+        await AsyncStorage.removeItem(CACHE_PREFIX + cacheKey);
+    } catch (error) {
+        console.warn('[TrafficService] Cache remove error:', error);
+    }
+
+    // Check daily limit
+    const canCall = await canMakeApiCall();
+    if (!canCall) {
+        console.log('[TrafficService] Daily limit reached, using Haversine for refresh');
+        const fallback = getHaversineFallback(origin, destination);
+        await setCachedData(cacheKey, fallback);
+        return fallback;
+    }
+
+    // Fetch fresh data from API
+    console.log('[TrafficService] Force refreshing from Google Directions API...');
+    const apiResult = await fetchGoogleDirections(origin, destination);
+
+    if (apiResult) {
+        await incrementDailyUsage();
+        await setCachedData(cacheKey, apiResult);
+        return apiResult;
+    }
+
+    // Fallback
+    const fallback = getHaversineFallback(origin, destination);
+    await setCachedData(cacheKey, fallback);
     return fallback;
 };
 

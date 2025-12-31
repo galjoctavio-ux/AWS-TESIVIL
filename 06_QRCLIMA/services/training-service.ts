@@ -9,7 +9,7 @@ import {
     updateTrainingProgress, getBlockCompletionStats, getUserTrainingProgress,
     TrainingModule, QuizQuestion, UserTrainingProgress
 } from './database-service';
-import { earnTokens } from './wallet-service';
+import { earnCustomTokens } from './wallet-service';
 import { ALL_TRAINING_DATA } from './training-data';
 
 // Constantes de configuración
@@ -227,10 +227,16 @@ export const submitQuiz = async (
             tokens_claimed: 1
         });
 
-        // Otorgar tokens usando wallet-service
-        const result = await earnTokens(userId, 'training_completed', `module_${moduleId}`);
+        // Otorgar tokens usando el token_reward específico del módulo
+        const result = await earnCustomTokens(
+            userId,
+            module.token_reward,
+            `Curso: ${module.title}`,
+            'training_completed',
+            `module_${moduleId}`
+        );
         if (result.success) {
-            tokensEarned = module.token_reward;
+            tokensEarned = result.finalAmount; // Usar finalAmount que incluye boost
         }
 
         // Increment training count for profile guide (using Firestore increment)

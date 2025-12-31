@@ -1,4 +1,4 @@
-// File: C:\TESIVIL\AWS-TESIVIL\AWS-TESIVIL\07_MRFRIO_ADMIN\app\layout.tsx
+// File: C:\TESIVIL\AWS-TESIVIL\AWS-TESIVIL\07_QRCLIMA_ADMIN\app\layout.tsx
 import * as entry from '../../../app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

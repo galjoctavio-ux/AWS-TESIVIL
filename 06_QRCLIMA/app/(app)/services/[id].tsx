@@ -98,8 +98,10 @@ export default function ServiceDetail() {
         try {
             setGeneratingPdf(true);
 
-            // If using premium, consume a credit
-            if (usePremium) {
+            // Only consume credits for FREE users who choose premium PDF
+            // PRO users get unlimited premium PDFs
+            const isPro = technicianProfile?.subscription && technicianProfile.subscription !== 'free';
+            if (usePremium && !isPro) {
                 const { consumePdfUnlock } = await import('../../../services/store-service');
                 const consumed = await consumePdfUnlock(user!.uid);
                 if (!consumed) {

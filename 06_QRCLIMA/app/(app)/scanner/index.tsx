@@ -3,7 +3,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useState, useRef } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { getEquipmentByQrCode } from '../../../services/equipment-service';
+import { getEquipmentByQrCode, isValidPlatformQR } from '../../../services/equipment-service';
 import { useAuth } from '../../../context/AuthContext';
 
 export default function ScannerScreen() {
@@ -72,8 +72,33 @@ export default function ScannerScreen() {
                     // Equipment exists - navigate to new service with preloaded data
                     router.replace(`/(app)/services/new?equipmentId=${equipment.id}${otherTechParam}`);
                 } else {
-                    // Equipment not found - navigate to new service with QR code for inline registration
-                    router.replace(`/(app)/services/new?qr_code=${encodeURIComponent(data)}`);
+                    // Equipment not found - VALIDATE QR is from platform before allowing inline registration
+                    const validation = await isValidPlatformQR(data);
+
+                    if (validation.valid) {
+                        // QR is from platform - navigate to new service with QR code for inline registration
+                        router.replace(`/(app)/services/new?qr_code=${encodeURIComponent(data)}`);
+                    } else {
+                        // QR is NOT from platform - show error
+                        Alert.alert(
+                            '❌ Código QR no válido',
+                            validation.reason + '\n\n¿Necesitas etiquetas QR? Puedes generarlas gratis desde la app.',
+                            [
+                                {
+                                    text: 'Escanear otro',
+                                    onPress: () => {
+                                        setScanned(false);
+                                        setProcessing(false);
+                                        processingRef.current = false;
+                                    },
+                                },
+                                {
+                                    text: 'Generar Etiquetas',
+                                    onPress: () => router.replace('/(app)/tools/qr-labels'),
+                                }
+                            ]
+                        );
+                    }
                 }
             } else {
                 // EQUIPMENT MODE (default): Original behavior
@@ -81,28 +106,53 @@ export default function ScannerScreen() {
                     // Equipment exists - navigate to detail
                     router.replace(`/(app)/equipment/${equipment.id}`);
                 } else {
-                    // Equipment not found - ask to register
-                    Alert.alert(
-                        'Equipo no encontrado',
-                        '¿Deseas registrar este equipo?',
-                        [
-                            {
-                                text: 'No',
-                                style: 'cancel',
-                                onPress: () => {
-                                    setScanned(false);
-                                    setProcessing(false);
-                                    processingRef.current = false;
+                    // Equipment not found - VALIDATE before asking to register
+                    const validation = await isValidPlatformQR(data);
+
+                    if (validation.valid) {
+                        // Valid platform QR - ask to register
+                        Alert.alert(
+                            'Equipo no encontrado',
+                            '¿Deseas registrar este equipo?',
+                            [
+                                {
+                                    text: 'No',
+                                    style: 'cancel',
+                                    onPress: () => {
+                                        setScanned(false);
+                                        setProcessing(false);
+                                        processingRef.current = false;
+                                    },
                                 },
-                            },
-                            {
-                                text: 'Sí, Registrar',
-                                onPress: () => {
-                                    router.replace(`/(app)/equipment/new?qr_code=${encodeURIComponent(data)}`);
+                                {
+                                    text: 'Sí, Registrar',
+                                    onPress: () => {
+                                        router.replace(`/(app)/equipment/new?qr_code=${encodeURIComponent(data)}`);
+                                    },
                                 },
-                            },
-                        ]
-                    );
+                            ]
+                        );
+                    } else {
+                        // Invalid QR - show error
+                        Alert.alert(
+                            '❌ Código QR no válido',
+                            validation.reason + '\n\n¿Necesitas etiquetas QR? Puedes generarlas gratis desde la app.',
+                            [
+                                {
+                                    text: 'Escanear otro',
+                                    onPress: () => {
+                                        setScanned(false);
+                                        setProcessing(false);
+                                        processingRef.current = false;
+                                    },
+                                },
+                                {
+                                    text: 'Generar Etiquetas',
+                                    onPress: () => router.replace('/(app)/tools/qr-labels'),
+                                }
+                            ]
+                        );
+                    }
                 }
             }
         } catch (error) {

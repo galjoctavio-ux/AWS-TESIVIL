@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import Sidebar from '@/components/Sidebar';
+import { useAuth } from '@/lib/auth-context';
 
-// Types for API response
 interface DashboardStats {
     totalUsers: number;
     proUsers: number;
@@ -41,6 +41,7 @@ export default function AdminDashboard() {
     });
     const [recentOrders, setRecentOrders] = useState<Order[]>([]);
     const [flaggedContent, setFlaggedContent] = useState<FlaggedItem[]>([]);
+    const { logout } = useAuth();
 
     useEffect(() => {
         const fetchDashboardData = async () => {
@@ -98,67 +99,11 @@ export default function AdminDashboard() {
 
     return (
         <div className="min-h-screen bg-slate-50">
-            {/* Sidebar */}
-            <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-slate-800 text-white transform transition-transform lg:translate-x-0">
-                <div className="p-6 border-b border-slate-700">
-                    <h1 className="text-xl font-bold flex items-center gap-2">
-                        ❄️ <span>QRclima Admin</span>
-                    </h1>
-                    <p className="text-slate-400 text-sm mt-1">Panel de Administración</p>
-                </div>
-
-                <nav className="p-4">
-                    <ul className="space-y-2">
-                        <li>
-                            <Link href="/" className="flex items-center gap-3 px-4 py-2 rounded-lg bg-slate-700 text-white">
-                                <span>📊</span> Dashboard
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/users" className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-slate-700 text-slate-300 transition">
-                                <span>👥</span> Usuarios
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/orders" className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-slate-700 text-slate-300 transition">
-                                <span>📦</span> Pedidos
-                                {stats.pendingOrders > 0 && (
-                                    <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{stats.pendingOrders}</span>
-                                )}
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/moderation" className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-slate-700 text-slate-300 transition">
-                                <span>🛡️</span> Moderación
-                                {flaggedContent.length > 0 && (
-                                    <span className="ml-auto bg-yellow-500 text-white text-xs px-2 py-0.5 rounded-full">{flaggedContent.length}</span>
-                                )}
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/settings" className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-slate-700 text-slate-300 transition">
-                                <span>⚙️</span> Configuración
-                            </Link>
-                        </li>
-                    </ul>
-
-                    <div className="mt-8 pt-8 border-t border-slate-700">
-                        <p className="text-slate-500 text-xs uppercase tracking-wider mb-2">Herramientas</p>
-                        <ul className="space-y-2">
-                            <li>
-                                <Link href="/tokens" className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-slate-700 text-slate-300 transition">
-                                    <span>🪙</span> Economía Tokens
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/logs" className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-slate-700 text-slate-300 transition">
-                                    <span>📋</span> Logs Auditoría
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
-                </nav>
-            </aside>
+            <Sidebar
+                pendingOrders={stats.pendingOrders}
+                flaggedContentCount={flaggedContent.length}
+                onLogout={logout}
+            />
 
             {/* Main Content */}
             <main className="lg:ml-64 p-8">
@@ -217,7 +162,7 @@ export default function AdminDashboard() {
                     <div className="bg-white rounded-xl shadow-sm border border-slate-100">
                         <div className="p-6 border-b border-slate-100 flex justify-between items-center">
                             <h3 className="font-bold text-lg text-slate-800">Pedidos Pendientes</h3>
-                            <Link href="/orders" className="text-blue-600 text-sm hover:underline">Ver todos →</Link>
+                            <a href="/orders" className="text-blue-600 text-sm hover:underline">Ver todos →</a>
                         </div>
                         {recentOrders.length > 0 ? (
                             <div className="divide-y divide-slate-100">
@@ -230,8 +175,8 @@ export default function AdminDashboard() {
                                         <div className="text-right">
                                             <p className="font-bold text-slate-800">${order.amount || 0}</p>
                                             <span className={`text-xs px-2 py-0.5 rounded-full ${order.status === 'paid' ? 'bg-green-100 text-green-700' :
-                                                    order.status === 'processing' ? 'bg-blue-100 text-blue-700' :
-                                                        'bg-purple-100 text-purple-700'
+                                                order.status === 'processing' ? 'bg-blue-100 text-blue-700' :
+                                                    'bg-purple-100 text-purple-700'
                                                 }`}>
                                                 {order.status === 'paid' ? 'Pagado' : order.status === 'processing' ? 'Preparando' : order.status}
                                             </span>
@@ -251,7 +196,7 @@ export default function AdminDashboard() {
                     <div className="bg-white rounded-xl shadow-sm border border-slate-100">
                         <div className="p-6 border-b border-slate-100 flex justify-between items-center">
                             <h3 className="font-bold text-lg text-slate-800">Cola de Moderación</h3>
-                            <Link href="/moderation" className="text-blue-600 text-sm hover:underline">Ver todos →</Link>
+                            <a href="/moderation" className="text-blue-600 text-sm hover:underline">Ver todos →</a>
                         </div>
                         {flaggedContent.length > 0 ? (
                             <div className="divide-y divide-slate-100">
@@ -290,7 +235,7 @@ export default function AdminDashboard() {
                     <span className="text-2xl">🔥</span>
                     <div>
                         <p className="font-bold text-green-800">Firebase Conectado</p>
-                        <p className="text-green-600 text-sm">Proyecto: mr-frio | Datos en tiempo real</p>
+                        <p className="text-green-600 text-sm">Proyecto: QRclima | Datos en tiempo real</p>
                     </div>
                 </div>
             </main>

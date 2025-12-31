@@ -32,8 +32,8 @@ service cloud.firestore {
     // SERVICIOS - solo el técnico dueño
     // ============================================
     match /services/{serviceId} {
-      allow read: if request.auth != null 
-        && (resource == null || request.auth.uid == resource.data.technicianId);
+      // Allow public read for QR web view
+      allow read: if true;
       allow create: if request.auth != null 
         && request.auth.uid == request.resource.data.technicianId;
       allow update, delete: if request.auth != null 
@@ -84,14 +84,15 @@ service cloud.firestore {
     }
     
     // ============================================
-    // PAYMENT INTENTS - solo el usuario dueño puede leer
+    // PAYMENT INTENTS - usuario puede crear/leer/actualizar sus propios intents
     // ============================================
     match /payment_intents/{intentId} {
       allow read: if request.auth != null 
         && request.auth.uid == resource.data.userId;
       allow create: if request.auth != null 
         && request.auth.uid == request.resource.data.userId;
-      // Update solo desde Cloud Functions (webhook Stripe/MP)
+      allow update: if request.auth != null 
+        && request.auth.uid == resource.data.userId;
     }
     
     // ============================================
@@ -186,6 +187,26 @@ service cloud.firestore {
         && request.auth.uid == request.resource.data.technicianId;
       allow update, delete: if request.auth != null 
         && request.auth.uid == resource.data.technicianId;
+    }
+    
+    // ============================================
+    // STORE PRODUCTS - todos pueden leer productos activos
+    // Usuarios pueden decrementar stock al comprar
+    // ============================================
+    match /store_products/{productId} {
+      allow read: if request.auth != null;
+      // Permitir update solo para decrementar stock (compras)
+      allow update: if request.auth != null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stock'])
+        && request.resource.data.stock < resource.data.stock;
+    }
+    
+    // ============================================
+    // REMOTE CONFIG - lectura pública para configuración
+    // ============================================
+    match /remote_config/{configId} {
+      allow read: if request.auth != null;
+      // Solo Admin SDK puede escribir
     }
   }
 }

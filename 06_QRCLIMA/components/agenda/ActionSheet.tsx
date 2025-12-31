@@ -33,6 +33,9 @@ interface Props {
     // Navigation App Preference
     preferredNavApp?: NavAppType | null;
     onRememberNavApp?: (app: NavAppType) => void;
+    // Refresh Distance
+    onRefreshDistance?: () => void;
+    refreshingDistance?: boolean;
 }
 
 export default function ActionSheet({
@@ -51,7 +54,9 @@ export default function ActionSheet({
     hasBaseLocation,
     onGoToSettings,
     preferredNavApp,
-    onRememberNavApp
+    onRememberNavApp,
+    onRefreshDistance,
+    refreshingDistance
 }: Props) {
     // Reschedule State
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -362,6 +367,34 @@ export default function ActionSheet({
                             trafficData={trafficData}
                             isPro={isPro}
                         />
+                        {/* Calculation time + Refresh button */}
+                        {trafficData && (
+                            <View className="flex-row items-center justify-between mt-2 px-1">
+                                <View className="flex-row items-center">
+                                    <Ionicons name="time-outline" size={12} color="#9CA3AF" />
+                                    <Text className="text-gray-400 text-xs ml-1">
+                                        Calculado: {new Date(trafficData.lastUpdated).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}
+                                        {trafficData.isFromCache && ' (cache)'}
+                                    </Text>
+                                </View>
+                                {isPro && onRefreshDistance && (
+                                    <TouchableOpacity
+                                        onPress={onRefreshDistance}
+                                        disabled={refreshingDistance}
+                                        className="flex-row items-center bg-blue-50 px-2 py-1 rounded-md"
+                                    >
+                                        <Ionicons
+                                            name={refreshingDistance ? 'sync' : 'refresh-outline'}
+                                            size={14}
+                                            color="#2563EB"
+                                        />
+                                        <Text className="text-blue-600 text-xs font-medium ml-1">
+                                            {refreshingDistance ? 'Actualizando...' : 'Actualizar'}
+                                        </Text>
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+                        )}
                     </View>
                 )}
 

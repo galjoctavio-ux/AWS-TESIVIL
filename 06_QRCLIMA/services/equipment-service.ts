@@ -163,6 +163,106 @@ export const extractTokenFromUrl = (url: string): string | null => {
     }
 };
 
+// ============================================
+// QR VALIDATION - Solo QRs de la Plataforma
+// ============================================
+
+/**
+ * Valida si un código QR escaneado es de la plataforma TESIVIL.
+ * Un QR válido debe ser:
+ * 1. Una URL de la plataforma (qr.tesivil.com/a/xxx o qrclima.mx/a/xxx), O
+ * 2. Un token de 6 caracteres que exista en qr_pdf_downloads.tokens[]
+ * 
+ * @returns { valid: boolean, token: string | null, reason: string }
+ */
+export const isValidPlatformQR = async (qrValue: string): Promise<{
+    valid: boolean;
+    token: string | null;
+    reason: string;
+}> => {
+    if (!qrValue || qrValue.trim().length === 0) {
+        return { valid: false, token: null, reason: 'Código QR vacío' };
+    }
+
+    const trimmedValue = qrValue.trim();
+
+    // Check 1: Is it a TESIVIL URL? (qr.tesivil.com/a/xxx or qrclima.mx/a/xxx)
+    const tesilUrlPattern = /^https?:\/\/(qr\.tesivil\.com|qrclima\.mx)\/a\/([a-z0-9]{6})$/i;
+    const urlMatch = trimmedValue.match(tesilUrlPattern);
+    if (urlMatch) {
+        return {
+            valid: true,
+            token: urlMatch[2].toLowerCase(),
+            reason: 'URL válida de TESIVIL'
+        };
+    }
+
+    // Check 2: Extract token from URL if partial match
+    const extractedToken = extractTokenFromUrl(trimmedValue);
+    if (extractedToken && extractedToken.length === 6) {
+        // URL format but need to validate the domain
+        const validDomainPattern = /(qr\.tesivil\.com|qrclima\.mx)/i;
+        if (validDomainPattern.test(trimmedValue)) {
+            return {
+                valid: true,
+                token: extractedToken,
+                reason: 'URL válida de TESIVIL'
+            };
+        }
+    }
+
+    // Check 3: Is it a raw 6-character token?
+    if (/^[a-z0-9]{6}$/i.test(trimmedValue)) {
+        // Need to verify this token exists in qr_pdf_downloads
+        try {
+            const q = query(
+                collection(db, 'qr_pdf_downloads'),
+                where('tokens', 'array-contains', trimmedValue.toLowerCase())
+            );
+            const snapshot = await getDocs(q);
+
+            if (!snapshot.empty) {
+                return {
+                    valid: true,
+                    token: trimmedValue.toLowerCase(),
+                    reason: 'Token válido de la plataforma'
+                };
+            }
+
+            // Also check if token is already linked to equipment (already registered)
+            const existingEquipment = await getEquipmentByToken(trimmedValue);
+            if (existingEquipment) {
+                return {
+                    valid: true,
+                    token: trimmedValue.toLowerCase(),
+                    reason: 'Token ya registrado en un equipo'
+                };
+            }
+
+            return {
+                valid: false,
+                token: null,
+                reason: 'Este código no fue generado por QRClima. Usa etiquetas oficiales.'
+            };
+        } catch (e) {
+            console.error('Error validating token in qr_pdf_downloads:', e);
+            // On error, reject for safety
+            return {
+                valid: false,
+                token: null,
+                reason: 'Error al validar el código QR'
+            };
+        }
+    }
+
+    // Invalid format
+    return {
+        valid: false,
+        token: null,
+        reason: 'Código QR no válido. Escanea etiquetas oficiales de QRClima.'
+    };
+};
+
 /**
  * Get equipment by Firestore document ID
  */
@@ -190,7 +290,10 @@ interface AddEquipmentInput {
     brand: string;
     model: string;
     technicianId: string;
-    qrCode?: string;           // Original scanned value (for reference)
+    technicianPhone?: string;    // For QR public view contact
+    technicianAlias?: string;    // For QR public view display
+    qrCode?: string;             // Original scanned value (for reference)
+    scannedToken?: string;       // Token from scanned QR - USE THIS instead of generating new
     btu?: number;
     location?: string;
     geoLocation?: GeoLocation;
@@ -211,17 +314,29 @@ const removeUndefined = <T extends Record<string, any>>(obj: T): Partial<T> => {
 
 export const addEquipment = async (equipmentData: AddEquipmentInput): Promise<{ id: string; token: string }> => {
     try {
-        // Generate unique 6-char token
-        const token = await generateUniqueToken();
+        // Use scanned token if provided, otherwise generate new one
+        const token = equipmentData.scannedToken
+            ? equipmentData.scannedToken.toLowerCase()
+            : await generateUniqueToken();
+
+        console.log(`Using token: ${token} (scanned: ${!!equipmentData.scannedToken})`);
 
         // Clean undefined values - Firestore doesn't accept undefined
         const cleanedData = removeUndefined(equipmentData);
 
-        const docRef = await addDoc(collection(db, 'equipments'), {
+        // Initialize King of the Hill with the creating technician
+        // This ensures the QR public view shows contact info immediately
+        const equipmentDoc = removeUndefined({
             ...cleanedData,
             token: token.toLowerCase(),
+            lastServiceTechId: equipmentData.technicianId,
+            lastServiceTechPhone: equipmentData.technicianPhone,
+            lastServiceTechAlias: equipmentData.technicianAlias,
+            lastServiceDate: serverTimestamp(),
             createdAt: serverTimestamp(),
         });
+
+        const docRef = await addDoc(collection(db, 'equipments'), equipmentDoc);
 
         console.log(`Equipment created - ID: ${docRef.id}, Token: ${token}`);
 
@@ -302,16 +417,23 @@ export const updateLastServiceTechnician = async (
     equipmentId: string,
     technicianId: string,
     technicianPhone: string,
-    technicianAlias: string
+    technicianAlias: string,
+    technicianName?: string
 ): Promise<boolean> => {
     try {
         const equipmentRef = doc(db, 'equipments', equipmentId);
-        await updateDoc(equipmentRef, {
+        const updateData: any = {
             lastServiceTechId: technicianId,
             lastServiceTechPhone: technicianPhone,
             lastServiceTechAlias: technicianAlias,
             lastServiceDate: serverTimestamp(),
-        });
+        };
+
+        if (technicianName) {
+            updateData.lastServiceTechName = technicianName;
+        }
+
+        await updateDoc(equipmentRef, updateData);
         console.log(`King of the Hill updated: ${technicianAlias} is now the contact for equipment ${equipmentId}`);
         return true;
     } catch (e) {

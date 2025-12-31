@@ -2,8 +2,13 @@ import { View, Text, TouchableOpacity, TextInput, ScrollView, Alert, ActivityInd
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../../context/AuthContext';
-import { createPaymentIntent, processPayment, formatPrice, ShippingAddress } from '../../../services/payment-service';
+import { formatPrice, ShippingAddress } from '../../../services/payment-service';
+import { purchaseWithTokens } from '../../../services/store-service';
+import { purchaseProduct } from '../../../services/stripe-service';
+import { getUserProfile } from '../../../services/user-service';
+import AddressAutocomplete, { AddressComponents } from '../../../components/AddressAutocomplete';
 
 // Mexican states for dropdown
 const MEXICAN_STATES = [
@@ -18,12 +23,19 @@ export default function Checkout() {
     const router = useRouter();
     const { user } = useAuth();
     const params = useLocalSearchParams();
+    const insets = useSafeAreaInsets();
 
     // Product info from params
     const productId = params.productId as string;
     const productName = params.productName as string;
     const productPrice = parseFloat(params.productPrice as string) || 0;
     const isPhysical = params.isPhysical === 'true';
+    const isTokenPayment = params.paymentType === 'tokens';
+
+    // Helper to format price based on payment type
+    const displayPrice = (amount: number) => {
+        return isTokenPayment ? `🪙 ${amount} tokens` : formatPrice(amount);
+    };
 
     // Form state
     const [step, setStep] = useState<'shipping' | 'payment' | 'confirmation'>('shipping');
@@ -83,9 +95,34 @@ export default function Checkout() {
         return true;
     };
 
-    const handleContinueToPayment = () => {
+    const handleContinueToPayment = async () => {
         if (isPhysical && !validateShipping()) return;
+
+        // For token payments, process immediately
+        if (isTokenPayment) {
+            await handleTokenPurchase();
+            return;
+        }
+
         setStep('payment');
+    };
+
+    const handleTokenPurchase = async () => {
+        if (!user) return;
+
+        setLoading(true);
+        try {
+            const result = await purchaseWithTokens(user.uid, productId, isPhysical ? address as any : undefined);
+            if (result.success) {
+                setStep('confirmation');
+            } else {
+                Alert.alert('Error', result.message);
+            }
+        } catch (error: any) {
+            Alert.alert('Error', error.message || 'Error al procesar la compra');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleProcessPayment = async () => {
@@ -93,27 +130,33 @@ export default function Checkout() {
 
         setLoading(true);
         try {
-            // 1. Create payment intent
-            const intent = await createPaymentIntent(
-                user.uid,
-                total,
-                paymentMethod === 'mercadopago' ? 'mercadopago' : 'stripe',
-                {
-                    productId,
-                    productName,
-                    shippingAddress: isPhysical ? address : undefined,
-                }
-            );
+            // Get user email for Stripe
+            const userProfile = await getUserProfile(user.uid);
+            const userEmail = userProfile?.email || user.email || '';
 
-            // 2. Process payment (mock for now - in production would open Stripe/MP SDK)
-            if (intent.id) {
-                const result = await processPayment(intent.id, paymentMethod);
+            // Use Stripe Payment Sheet for real payment
+            const result = await purchaseProduct({
+                userId: user.uid,
+                userEmail,
+                productId,
+                productName,
+                amountMxn: total,
+                shippingAddress: isPhysical ? {
+                    fullName: address.fullName,
+                    phone: address.phone || '',
+                    street: address.street,
+                    neighborhood: address.neighborhood,
+                    city: address.city,
+                    state: address.state,
+                    postalCode: address.postalCode,
+                    references: address.references,
+                } : undefined,
+            });
 
-                if (result.success) {
-                    setStep('confirmation');
-                } else {
-                    Alert.alert('Error', result.message || 'No se pudo procesar el pago.');
-                }
+            if (result.success) {
+                setStep('confirmation');
+            } else if (result.error !== 'Compra cancelada') {
+                Alert.alert('Error', result.error || 'No se pudo procesar el pago.');
             }
         } catch (error: any) {
             Alert.alert('Error', error.message || 'Error al procesar el pago');
@@ -147,6 +190,27 @@ export default function Checkout() {
                     value={address.phone}
                     onChangeText={text => setAddress({ ...address, phone: text })}
                 />
+
+                {/* Address Autocomplete */}
+                <Text className="text-sm font-medium text-gray-600 mb-1">🔍 Buscar dirección</Text>
+                <View style={{ zIndex: 1000, marginBottom: 12 }}>
+                    <AddressAutocomplete
+                        value={undefined as any}
+                        onAddressSelect={() => { }}
+                        onAddressComponents={(components: AddressComponents) => {
+                            // Pre-fill address fields from Google Places
+                            setAddress(prev => ({
+                                ...prev,
+                                street: components.street || prev.street,
+                                neighborhood: components.neighborhood || prev.neighborhood,
+                                city: components.city || prev.city,
+                                state: components.state || prev.state,
+                                postalCode: components.postalCode || prev.postalCode,
+                            }));
+                        }}
+                        placeholder="Buscar dirección con Google Maps..."
+                    />
+                </View>
 
                 {/* Street */}
                 <Text className="text-sm font-medium text-gray-600 mb-1">Calle y número *</Text>
@@ -220,24 +284,36 @@ export default function Checkout() {
                 <Text className="font-bold text-gray-800 mb-3">🛒 Resumen del Pedido</Text>
                 <View className="flex-row justify-between mb-2">
                     <Text className="text-gray-600">{productName}</Text>
-                    <Text className="font-medium">{formatPrice(productPrice)}</Text>
+                    <Text className="font-medium">{displayPrice(productPrice)}</Text>
                 </View>
-                <View className="flex-row justify-between mb-2">
-                    <Text className="text-gray-600">Envío</Text>
-                    <Text className="font-medium">{shippingCost > 0 ? formatPrice(shippingCost) : 'Gratis'}</Text>
-                </View>
+                {!isTokenPayment && (
+                    <View className="flex-row justify-between mb-2">
+                        <Text className="text-gray-600">Envío</Text>
+                        <Text className="font-medium">{shippingCost > 0 ? displayPrice(shippingCost) : 'Gratis'}</Text>
+                    </View>
+                )}
                 <View className="h-px bg-gray-200 my-2" />
                 <View className="flex-row justify-between">
                     <Text className="font-bold text-gray-800">Total</Text>
-                    <Text className="font-bold text-green-600 text-lg">{formatPrice(total)}</Text>
+                    <Text className="font-bold text-green-600 text-lg">
+                        {isTokenPayment ? displayPrice(productPrice) : displayPrice(total)}
+                    </Text>
                 </View>
             </View>
 
             <TouchableOpacity
                 onPress={handleContinueToPayment}
-                className="bg-blue-600 p-4 rounded-xl items-center mt-4"
+                disabled={loading}
+                className={`bg-blue-600 p-4 rounded-xl items-center mt-4 ${loading ? 'opacity-70' : ''}`}
+                style={{ marginBottom: insets.bottom + 20 }}
             >
-                <Text className="text-white font-bold text-lg">Continuar al Pago</Text>
+                {loading ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                    <Text className="text-white font-bold text-lg">
+                        {isTokenPayment ? 'Confirmar Canje con Tokens' : 'Continuar al Pago'}
+                    </Text>
+                )}
             </TouchableOpacity>
         </ScrollView>
     );
@@ -259,39 +335,7 @@ export default function Checkout() {
                     <Ionicons name="card" size={24} color={paymentMethod === 'card' ? '#2563EB' : '#9CA3AF'} />
                     <View className="ml-3">
                         <Text className={`font-medium ${paymentMethod === 'card' ? 'text-blue-800' : 'text-gray-800'}`}>Tarjeta de Crédito/Débito</Text>
-                        <Text className="text-gray-500 text-xs">Pago inmediato con Stripe</Text>
-                    </View>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    onPress={() => setPaymentMethod('mercadopago')}
-                    className={`bg-white p-4 rounded-xl border flex-row items-center mt-3 ${paymentMethod === 'mercadopago' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}
-                >
-                    <View className={`w-5 h-5 rounded-full border-2 mr-3 items-center justify-center ${paymentMethod === 'mercadopago' ? 'border-blue-600' : 'border-gray-300'}`}>
-                        {paymentMethod === 'mercadopago' && <View className="w-3 h-3 rounded-full bg-blue-600" />}
-                    </View>
-                    <View className="w-6 h-6 bg-blue-400 rounded items-center justify-center">
-                        <Text className="text-white font-bold text-xs">MP</Text>
-                    </View>
-                    <View className="ml-3">
-                        <Text className={`font-medium ${paymentMethod === 'mercadopago' ? 'text-blue-800' : 'text-gray-800'}`}>MercadoPago</Text>
-                        <Text className="text-gray-500 text-xs">Paga con saldo, tarjeta o efectivo</Text>
-                    </View>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    onPress={() => setPaymentMethod('oxxo')}
-                    className={`bg-white p-4 rounded-xl border flex-row items-center mt-3 ${paymentMethod === 'oxxo' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}
-                >
-                    <View className={`w-5 h-5 rounded-full border-2 mr-3 items-center justify-center ${paymentMethod === 'oxxo' ? 'border-blue-600' : 'border-gray-300'}`}>
-                        {paymentMethod === 'oxxo' && <View className="w-3 h-3 rounded-full bg-blue-600" />}
-                    </View>
-                    <View className="w-6 h-6 bg-yellow-500 rounded items-center justify-center">
-                        <Text className="text-white font-bold text-xs">O</Text>
-                    </View>
-                    <View className="ml-3">
-                        <Text className={`font-medium ${paymentMethod === 'oxxo' ? 'text-blue-800' : 'text-gray-800'}`}>Pago en OXXO</Text>
-                        <Text className="text-gray-500 text-xs">Genera ficha y paga en tienda (1-3 días)</Text>
+                        <Text className="text-gray-500 text-xs">Pago seguro con Stripe</Text>
                     </View>
                 </TouchableOpacity>
             </View>
@@ -300,16 +344,22 @@ export default function Checkout() {
             <View className="bg-gray-900 rounded-2xl p-6">
                 <View className="flex-row justify-between mb-2">
                     <Text className="text-gray-400">Producto</Text>
-                    <Text className="text-white">{formatPrice(productPrice)}</Text>
+                    <Text className="text-white">{displayPrice(productPrice)}</Text>
                 </View>
-                <View className="flex-row justify-between mb-4">
-                    <Text className="text-gray-400">Envío</Text>
-                    <Text className="text-white">{shippingCost > 0 ? formatPrice(shippingCost) : 'Gratis'}</Text>
-                </View>
+                {!isTokenPayment && (
+                    <View className="flex-row justify-between mb-4">
+                        <Text className="text-gray-400">Envío</Text>
+                        <Text className="text-white">{shippingCost > 0 ? displayPrice(shippingCost) : 'Gratis'}</Text>
+                    </View>
+                )}
                 <View className="h-px bg-gray-700 my-2" />
                 <View className="flex-row justify-between mb-6">
-                    <Text className="text-lg font-bold text-white">Total a pagar</Text>
-                    <Text className="text-2xl font-bold text-green-400">{formatPrice(total)}</Text>
+                    <Text className="text-lg font-bold text-white">
+                        {isTokenPayment ? 'Total en Tokens' : 'Total a pagar'}
+                    </Text>
+                    <Text className="text-2xl font-bold text-amber-400">
+                        {isTokenPayment ? displayPrice(productPrice) : displayPrice(total)}
+                    </Text>
                 </View>
 
                 <TouchableOpacity

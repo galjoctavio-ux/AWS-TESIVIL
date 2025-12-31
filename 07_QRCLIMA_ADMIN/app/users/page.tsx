@@ -1,66 +1,132 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import Sidebar from '@/components/Sidebar';
+import { useAuth } from '@/lib/auth-context';
+import Image from 'next/image';
 
-// Mock data for users
-const mockUsers = [
-    { id: '1', alias: 'FrioTec2024', email: 'friotec@email.com', rank: 'Pro', tokens: 1250, services: 89, isPro: true, isBanned: false },
-    { id: '2', alias: 'ACMaster', email: 'acmaster@email.com', rank: 'Técnico', tokens: 450, services: 34, isPro: false, isBanned: false },
-    { id: '3', alias: 'TecnicoJuan', email: 'juan@email.com', rank: 'Novato', tokens: 120, services: 12, isPro: false, isBanned: false },
-    { id: '4', alias: 'ClimaExpert', email: 'clima@email.com', rank: 'Técnico', tokens: 780, services: 56, isPro: true, isBanned: false },
-    { id: '5', alias: 'RefriPro', email: 'refri@email.com', rank: 'Novato', tokens: 50, services: 5, isPro: false, isBanned: true },
-];
+interface User {
+    id: string;
+    alias?: string;
+    displayName?: string;
+    email?: string;
+    rank?: string;
+    tokenBalance?: number;
+    servicesCount?: number;
+    is_premium?: boolean;
+    is_banned?: boolean;
+    eligible_for_directory?: boolean;
+    city?: string;
+    photoURL?: string;
+    createdAt?: string;
+}
 
 export default function UsersPage() {
+    const [loading, setLoading] = useState(true);
+    const [users, setUsers] = useState<User[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedUser, setSelectedUser] = useState<typeof mockUsers[0] | null>(null);
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [tokensToGift, setTokensToGift] = useState('');
+    const [filter, setFilter] = useState<'all' | 'pro' | 'banned'>('all');
+    const [actionLoading, setActionLoading] = useState(false);
+    const { logout } = useAuth();
 
-    const filteredUsers = mockUsers.filter(u =>
-        u.alias.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        u.email.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+
+    const fetchUsers = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch('/api/users');
+            const data = await response.json();
+            setUsers(data.users || []);
+        } catch (error) {
+            console.error('Error fetching users:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleUpdateUser = async (updates: Partial<User>) => {
+        if (!selectedUser) return;
+
+        try {
+            setActionLoading(true);
+            const response = await fetch('/api/users', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: selectedUser.id,
+                    updates,
+                }),
+            });
+
+            if (response.ok) {
+                // Update local state
+                setUsers(users.map(u =>
+                    u.id === selectedUser.id ? { ...u, ...updates } : u
+                ));
+                setSelectedUser({ ...selectedUser, ...updates });
+            }
+        } catch (error) {
+            console.error('Error updating user:', error);
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleGiftTokens = async () => {
+        if (!selectedUser || !tokensToGift) return;
+
+        const amount = parseInt(tokensToGift);
+        if (isNaN(amount) || amount <= 0) return;
+
+        try {
+            setActionLoading(true);
+            const response = await fetch('/api/users/gift-tokens', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: selectedUser.id,
+                    amount,
+                }),
+            });
+
+            if (response.ok) {
+                const newBalance = (selectedUser.tokenBalance || 0) + amount;
+                setUsers(users.map(u =>
+                    u.id === selectedUser.id ? { ...u, tokenBalance: newBalance } : u
+                ));
+                setSelectedUser({ ...selectedUser, tokenBalance: newBalance });
+                setTokensToGift('');
+                alert(`Se han enviado ${amount} tokens a ${selectedUser.alias || 'usuario'}`);
+            }
+        } catch (error) {
+            console.error('Error gifting tokens:', error);
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const filteredUsers = users.filter(u => {
+        // Apply search filter
+        const matchesSearch = !searchQuery ||
+            (u.alias?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (u.email?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (u.displayName?.toLowerCase().includes(searchQuery.toLowerCase()));
+
+        // Apply type filter
+        const matchesFilter = filter === 'all' ||
+            (filter === 'pro' && u.is_premium) ||
+            (filter === 'banned' && u.is_banned);
+
+        return matchesSearch && matchesFilter;
+    });
 
     return (
         <div className="min-h-screen bg-slate-50">
-            {/* Sidebar (same as dashboard) */}
-            <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-slate-800 text-white">
-                <div className="p-6 border-b border-slate-700">
-                    <h1 className="text-xl font-bold flex items-center gap-2">
-                        ❄️ <span>Mr. Frío Admin</span>
-                    </h1>
-                </div>
-                <nav className="p-4">
-                    <ul className="space-y-2">
-                        <li>
-                            <Link href="/" className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-slate-700 text-slate-300 transition">
-                                <span>📊</span> Dashboard
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/users" className="flex items-center gap-3 px-4 py-2 rounded-lg bg-slate-700 text-white">
-                                <span>👥</span> Usuarios
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/orders" className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-slate-700 text-slate-300 transition">
-                                <span>📦</span> Pedidos
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/moderation" className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-slate-700 text-slate-300 transition">
-                                <span>🛡️</span> Moderación
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/settings" className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-slate-700 text-slate-300 transition">
-                                <span>⚙️</span> Configuración
-                            </Link>
-                        </li>
-                    </ul>
-                </nav>
-            </aside>
+            <Sidebar onLogout={logout} />
 
             {/* Main Content */}
             <main className="lg:ml-64 p-8">
@@ -82,10 +148,14 @@ export default function UsersPage() {
                             />
                             <span className="absolute left-3 top-2.5 text-slate-400">🔍</span>
                         </div>
-                        <select className="border border-slate-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                            <option>Todos</option>
-                            <option>PRO</option>
-                            <option>Baneados</option>
+                        <select
+                            className="border border-slate-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            value={filter}
+                            onChange={(e) => setFilter(e.target.value as any)}
+                        >
+                            <option value="all">Todos</option>
+                            <option value="pro">PRO</option>
+                            <option value="banned">Baneados</option>
                         </select>
                     </div>
                 </div>
@@ -93,54 +163,72 @@ export default function UsersPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Users Table */}
                     <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-100">
-                        <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead className="bg-slate-50 border-b border-slate-100">
-                                    <tr>
-                                        <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">Usuario</th>
-                                        <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">Rango</th>
-                                        <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">Tokens</th>
-                                        <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">Servicios</th>
-                                        <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100">
-                                    {filteredUsers.map((user) => (
-                                        <tr
-                                            key={user.id}
-                                            className={`hover:bg-slate-50 cursor-pointer transition ${selectedUser?.id === user.id ? 'bg-blue-50' : ''}`}
-                                            onClick={() => setSelectedUser(user)}
-                                        >
-                                            <td className="px-6 py-4">
-                                                <div>
-                                                    <p className="font-medium text-slate-800">{user.alias}</p>
-                                                    <p className="text-sm text-slate-500">{user.email}</p>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className={`text-xs px-2 py-1 rounded-full ${user.rank === 'Pro' ? 'bg-yellow-100 text-yellow-700' :
-                                                        user.rank === 'Técnico' ? 'bg-blue-100 text-blue-700' :
-                                                            'bg-gray-100 text-gray-600'
-                                                    }`}>
-                                                    {user.rank}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 font-medium text-slate-800">🪙 {user.tokens}</td>
-                                            <td className="px-6 py-4 text-slate-600">{user.services}</td>
-                                            <td className="px-6 py-4">
-                                                {user.isBanned ? (
-                                                    <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-700">Baneado</span>
-                                                ) : user.isPro ? (
-                                                    <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">PRO</span>
-                                                ) : (
-                                                    <span className="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-600">Free</span>
-                                                )}
-                                            </td>
+                        {loading ? (
+                            <div className="p-8 text-center">
+                                <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                                <p className="text-slate-500">Cargando usuarios...</p>
+                            </div>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead className="bg-slate-50 border-b border-slate-100">
+                                        <tr>
+                                            <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">Usuario</th>
+                                            <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">Tokens</th>
+                                            <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">Estado</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100">
+                                        {filteredUsers.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={3} className="px-6 py-8 text-center text-slate-400">
+                                                    No se encontraron usuarios
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            filteredUsers.map((user) => (
+                                                <tr
+                                                    key={user.id}
+                                                    className={`hover:bg-slate-50 cursor-pointer transition ${selectedUser?.id === user.id ? 'bg-blue-50' : ''}`}
+                                                    onClick={() => setSelectedUser(user)}
+                                                >
+                                                    <td className="px-6 py-4">
+                                                        <div className="flex items-center gap-3">
+                                                            {/* Profile Photo */}
+                                                            {user.photoURL ? (
+                                                                <img
+                                                                    src={user.photoURL}
+                                                                    alt={user.alias || 'User'}
+                                                                    className="w-10 h-10 rounded-full object-cover border-2 border-slate-200"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                                                                    {(user.alias || user.displayName || 'U').charAt(0).toUpperCase()}
+                                                                </div>
+                                                            )}
+                                                            <div>
+                                                                <p className="font-medium text-slate-800">{user.alias || user.displayName || 'Sin nombre'}</p>
+                                                                <p className="text-sm text-slate-500">{user.email || 'Sin email'}</p>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 font-medium text-slate-800">🪙 {user.tokenBalance || 0}</td>
+                                                    <td className="px-6 py-4">
+                                                        {user.is_banned ? (
+                                                            <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-700">Baneado</span>
+                                                        ) : user.is_premium ? (
+                                                            <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">PRO</span>
+                                                        ) : (
+                                                            <span className="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-600">Free</span>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
                     </div>
 
                     {/* User Detail Panel */}
@@ -151,20 +239,32 @@ export default function UsersPage() {
 
                                 <div className="space-y-4">
                                     <div className="text-center pb-4 border-b border-slate-100">
-                                        <div className="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl">
-                                            {selectedUser.alias.charAt(0).toUpperCase()}
-                                        </div>
-                                        <p className="font-bold text-lg">{selectedUser.alias}</p>
-                                        <p className="text-sm text-slate-500">{selectedUser.email}</p>
+                                        {/* Large Profile Photo */}
+                                        {selectedUser.photoURL ? (
+                                            <img
+                                                src={selectedUser.photoURL}
+                                                alt={selectedUser.alias || 'User'}
+                                                className="w-20 h-20 rounded-full mx-auto mb-3 object-cover border-4 border-blue-100"
+                                            />
+                                        ) : (
+                                            <div className="w-20 h-20 bg-blue-100 rounded-full mx-auto mb-3 flex items-center justify-center text-3xl text-blue-600 font-bold">
+                                                {(selectedUser.alias || selectedUser.displayName || 'U').charAt(0).toUpperCase()}
+                                            </div>
+                                        )}
+                                        <p className="font-bold text-lg">{selectedUser.alias || selectedUser.displayName || 'Usuario'}</p>
+                                        <p className="text-sm text-slate-500">{selectedUser.email || 'Sin email'}</p>
+                                        {selectedUser.city && (
+                                            <p className="text-xs text-slate-400 mt-1">📍 {selectedUser.city}</p>
+                                        )}
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-4 text-center">
                                         <div className="p-3 bg-slate-50 rounded-lg">
-                                            <p className="text-xl font-bold text-slate-800">🪙 {selectedUser.tokens}</p>
+                                            <p className="text-xl font-bold text-slate-800">🪙 {selectedUser.tokenBalance || 0}</p>
                                             <p className="text-xs text-slate-500">Tokens</p>
                                         </div>
                                         <div className="p-3 bg-slate-50 rounded-lg">
-                                            <p className="text-xl font-bold text-slate-800">{selectedUser.services}</p>
+                                            <p className="text-xl font-bold text-slate-800">{selectedUser.servicesCount || 0}</p>
                                             <p className="text-xs text-slate-500">Servicios</p>
                                         </div>
                                     </div>
@@ -173,15 +273,33 @@ export default function UsersPage() {
                                     <div className="space-y-3">
                                         <label className="flex items-center justify-between">
                                             <span className="text-sm text-slate-600">Usuario PRO</span>
-                                            <input type="checkbox" checked={selectedUser.isPro} className="w-5 h-5 rounded" onChange={() => { }} />
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedUser.is_premium || false}
+                                                className="w-5 h-5 rounded"
+                                                onChange={(e) => handleUpdateUser({ is_premium: e.target.checked })}
+                                                disabled={actionLoading}
+                                            />
                                         </label>
                                         <label className="flex items-center justify-between">
                                             <span className="text-sm text-slate-600">Elegible Directorio</span>
-                                            <input type="checkbox" className="w-5 h-5 rounded" onChange={() => { }} />
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedUser.eligible_for_directory || false}
+                                                className="w-5 h-5 rounded"
+                                                onChange={(e) => handleUpdateUser({ eligible_for_directory: e.target.checked })}
+                                                disabled={actionLoading}
+                                            />
                                         </label>
                                         <label className="flex items-center justify-between">
                                             <span className="text-sm text-red-600">Baneado</span>
-                                            <input type="checkbox" checked={selectedUser.isBanned} className="w-5 h-5 rounded" onChange={() => { }} />
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedUser.is_banned || false}
+                                                className="w-5 h-5 rounded"
+                                                onChange={(e) => handleUpdateUser({ is_banned: e.target.checked })}
+                                                disabled={actionLoading}
+                                            />
                                         </label>
                                     </div>
 
@@ -196,20 +314,19 @@ export default function UsersPage() {
                                                 value={tokensToGift}
                                                 onChange={(e) => setTokensToGift(e.target.value)}
                                             />
-                                            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700">
+                                            <button
+                                                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"
+                                                onClick={handleGiftTokens}
+                                                disabled={actionLoading || !tokensToGift}
+                                            >
                                                 Enviar
                                             </button>
                                         </div>
                                     </div>
 
-                                    {/* Actions */}
-                                    <div className="pt-4 flex gap-2">
-                                        <button className="flex-1 px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm hover:bg-slate-200">
-                                            Enviar Push
-                                        </button>
-                                        <button className="flex-1 px-4 py-2 bg-orange-100 text-orange-600 rounded-lg text-sm hover:bg-orange-200">
-                                            Resetear Pass
-                                        </button>
+                                    {/* User ID for debugging */}
+                                    <div className="pt-4 border-t border-slate-100">
+                                        <p className="text-xs text-slate-400">ID: {selectedUser.id}</p>
                                     </div>
                                 </div>
                             </>

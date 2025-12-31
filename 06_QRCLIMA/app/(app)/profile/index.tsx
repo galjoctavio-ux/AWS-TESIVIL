@@ -6,10 +6,12 @@ import { getEquipmentsByTechnician } from '../../../services/equipment-service';
 import { updateProfilePhotoFlow } from '../../../services/image-service';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import BottomNav from '../../../components/BottomNav';
 import AcademyLeadCapture from '../../../components/AcademyLeadCapture';
 import ProfileCompletionGuide from '../../../components/ProfileCompletionGuide';
+import CelebrationModal from '../../../components/CelebrationModal';
 
 const getRankInfo = (rank: UserRank | undefined) => {
     switch (rank) {
@@ -28,6 +30,29 @@ export default function ProfileScreen() {
     const [uploadingPhoto, setUploadingPhoto] = useState(false);
     const [qrCount, setQrCount] = useState(0);
     const [showGuide, setShowGuide] = useState(false);
+    const [showCelebration, setShowCelebration] = useState(false);
+    const previousScoreRef = useRef<number | null>(null);
+
+    // Check if user just reached 100% and show celebration
+    useEffect(() => {
+        const checkCelebration = async () => {
+            if (!profile || !user) return;
+
+            const currentScore = profile.profileCompletenessScore || 0;
+            const celebrationKey = `celebration_shown_${user.uid}`;
+
+            // Check if celebration was already shown
+            const wasShown = await AsyncStorage.getItem(celebrationKey);
+
+            if (currentScore === 100 && !wasShown) {
+                // User just reached 100% and hasn't seen celebration yet
+                setShowCelebration(true);
+                await AsyncStorage.setItem(celebrationKey, 'true');
+            }
+        };
+
+        checkCelebration();
+    }, [profile, user]);
 
     const loadProfile = async () => {
         if (!user) return;
@@ -36,7 +61,25 @@ export default function ProfileScreen() {
                 getUserProfile(user.uid),
                 getEquipmentsByTechnician(user.uid)
             ]);
-            setProfile(data);
+
+            if (data) {
+                // Recalcular score y actualizar si es diferente
+                const { calculateProfileCompleteness, updateUserProfile } = await import('../../../services/user-service');
+                const calculatedScore = calculateProfileCompleteness(data);
+                const savedScore = data.profileCompletenessScore || 0;
+
+                if (calculatedScore !== savedScore) {
+                    console.log(`Score desincronizado: guardado=${savedScore}, calculado=${calculatedScore}. Actualizando...`);
+                    // Actualizar perfil (esto también activa PRO si llega a 100%)
+                    await updateUserProfile(user.uid, {});
+                    // Recargar con el nuevo valor
+                    const updatedProfile = await getUserProfile(user.uid);
+                    setProfile(updatedProfile);
+                } else {
+                    setProfile(data);
+                }
+            }
+
             setQrCount(equipments.length);
         } catch (err) {
             console.error('Error loading profile:', err);
@@ -363,12 +406,20 @@ export default function ProfileScreen() {
             < BottomNav />
 
             {/* Profile Completion Guide Modal */}
-            < ProfileCompletionGuide
+            <ProfileCompletionGuide
                 profile={profile}
                 isVisible={showGuide}
-                onClose={() => setShowGuide(false)
-                }
+                onClose={() => setShowGuide(false)}
             />
-        </View >
+
+            {/* Celebration Modal - PRO Reward */}
+            <CelebrationModal
+                isVisible={showCelebration}
+                onClose={() => setShowCelebration(false)}
+                title="¡Felicidades! 🎉"
+                message="Has completado tu perfil al 100%"
+                subMessage="Disfruta de todas las funciones PRO durante 3 días completamente gratis"
+            />
+        </View>
     );
 }

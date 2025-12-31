@@ -26,7 +26,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyPasswordResetCode = exports.sendPasswordResetEmail = exports.verifyEmailToken = exports.sendVerificationEmail = exports.onUserRead = exports.forceExpireSubscription = exports.expireSubscriptions = exports.stripeWebhook = exports.createTokenPurchaseIntent = exports.createPaymentSheetParams = exports.createStripeCheckout = void 0;
+exports.verifyPasswordResetCode = exports.sendPasswordResetEmail = exports.verifyEmailToken = exports.sendVerificationEmail = exports.onUserRead = exports.forceExpireSubscription = exports.expireSubscriptions = exports.sendOrderShippedEmail = exports.stripeWebhook = exports.createProductPurchaseIntent = exports.createTokenPurchaseIntent = exports.createPaymentSheetParams = exports.createStripeCheckout = void 0;
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 // Inicializar Firebase Admin
@@ -225,13 +225,80 @@ exports.createTokenPurchaseIntent = functions
     }
 });
 // ============================================
+// STRIPE: Crear PaymentIntent para compra de productos (tienda MXN)
+// ============================================
+exports.createProductPurchaseIntent = functions
+    .runWith({ timeoutSeconds: 60 })
+    .https
+    .onCall(async (data, context) => {
+    var _a;
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'Debes estar autenticado para comprar');
+    }
+    const { amount, userId, productId, productName, shippingAddress } = data;
+    if (!amount || !userId || !productId || !productName) {
+        throw new functions.https.HttpsError('invalid-argument', 'Se requieren amount, userId, productId y productName');
+    }
+    try {
+        const Stripe = require('stripe');
+        const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' });
+        const userEmail = ((_a = context.auth.token) === null || _a === void 0 ? void 0 : _a.email) || '';
+        // Crear o buscar customer
+        const customers = await stripe.customers.list({ email: userEmail, limit: 1 });
+        let customer = customers.data.length > 0
+            ? customers.data[0]
+            : await stripe.customers.create({
+                email: userEmail,
+                metadata: { firebaseUserId: userId }
+            });
+        // Crear ephemeral key
+        const ephemeralKey = await stripe.ephemeralKeys.create({ customer: customer.id }, { apiVersion: '2023-10-16' });
+        // Crear PaymentIntent para el producto
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: amount, // Ya viene en centavos desde el cliente
+            currency: 'mxn',
+            customer: customer.id,
+            automatic_payment_methods: { enabled: true },
+            metadata: {
+                userId,
+                type: 'product_purchase',
+                productId,
+                productName,
+                hasShipping: shippingAddress ? 'true' : 'false',
+            }
+        });
+        // Guardar orden pendiente en Firestore
+        const orderRef = await db.collection('orders').add({
+            userId,
+            productId,
+            productName,
+            amountCents: amount,
+            status: 'pending',
+            paymentIntentId: paymentIntent.id,
+            shippingAddress: shippingAddress || null,
+            createdAt: admin.firestore.Timestamp.now(),
+        });
+        console.log(`✅ Product purchase PaymentIntent created: ${paymentIntent.id} for ${productName}`);
+        return {
+            paymentIntent: paymentIntent.client_secret,
+            ephemeralKey: ephemeralKey.secret,
+            customer: customer.id,
+            orderId: orderRef.id,
+        };
+    }
+    catch (error) {
+        console.error('Error creating product purchase intent:', error);
+        throw new functions.https.HttpsError('internal', error.message);
+    }
+});
+// ============================================
 // STRIPE: Webhook para confirmar pagos
 // ============================================
 exports.stripeWebhook = functions
     .runWith({ timeoutSeconds: 60 })
     .https
     .onRequest(async (req, res) => {
-    var _a, _b, _c, _d, _e, _f;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
     if (req.method !== 'POST') {
         res.status(405).send('Method not allowed');
         return;
@@ -296,9 +363,88 @@ exports.stripeWebhook = functions
                     console.log(`🪙 [TokenPurchase] Added ${tokensAmount} tokens to user ${userId}`);
                 }
             }
+            // COMPRA DE PRODUCTOS (tienda MXN)
+            else if (paymentType === 'product_purchase') {
+                const productId = (_f = paymentIntent.metadata) === null || _f === void 0 ? void 0 : _f.productId;
+                const productName = ((_g = paymentIntent.metadata) === null || _g === void 0 ? void 0 : _g.productName) || 'Producto';
+                // Buscar y actualizar la orden pendiente
+                const ordersSnapshot = await db.collection('orders')
+                    .where('paymentIntentId', '==', paymentIntent.id)
+                    .limit(1)
+                    .get();
+                if (!ordersSnapshot.empty) {
+                    const orderDoc = ordersSnapshot.docs[0];
+                    const orderData = orderDoc.data();
+                    await orderDoc.ref.update({
+                        status: 'paid',
+                        paidAt: admin.firestore.Timestamp.now(),
+                    });
+                    console.log(`🛍️ [ProductPurchase] Order ${orderDoc.id} marked as paid for ${productName}`);
+                    // Send order confirmation email
+                    try {
+                        // Get user email
+                        const userDoc = await db.collection('users').doc(userId).get();
+                        const userEmail = (_h = userDoc.data()) === null || _h === void 0 ? void 0 : _h.email;
+                        const userName = ((_j = userDoc.data()) === null || _j === void 0 ? void 0 : _j.alias) || ((_k = userDoc.data()) === null || _k === void 0 ? void 0 : _k.displayName);
+                        if (userEmail) {
+                            const { Resend } = require('resend');
+                            const resend = new Resend(RESEND_API_KEY);
+                            // Format shipping address if exists
+                            let shippingAddressStr = '';
+                            const addr = orderData.shippingAddress;
+                            if (addr) {
+                                if (typeof addr === 'string') {
+                                    shippingAddressStr = addr;
+                                }
+                                else {
+                                    shippingAddressStr = [
+                                        addr.fullName,
+                                        addr.street,
+                                        addr.neighborhood,
+                                        addr.city,
+                                        addr.state,
+                                        addr.postalCode ? `C.P. ${addr.postalCode}` : '',
+                                    ].filter(Boolean).join(', ');
+                                }
+                            }
+                            const emailData = {
+                                orderId: orderDoc.id,
+                                productName: productName,
+                                amount: Math.round((orderData.amountCents || paymentIntent.amount) / 100),
+                                paymentMethod: 'stripe',
+                                shippingAddress: shippingAddressStr || undefined,
+                                userName,
+                            };
+                            const htmlContent = (0, email_templates_1.getOrderConfirmationEmailTemplate)(emailData);
+                            await resend.emails.send({
+                                from: 'QRClima Store <noreply@tesivil.com>',
+                                to: [userEmail],
+                                subject: '🛍️ ¡Pedido Confirmado! - QRClima',
+                                html: htmlContent,
+                            });
+                            console.log(`📧 Order confirmation email sent to ${userEmail}`);
+                        }
+                    }
+                    catch (emailError) {
+                        console.error('Error sending order confirmation email:', emailError);
+                        // Don't fail the webhook if email fails
+                    }
+                }
+                // Descontar stock si aplica
+                if (productId) {
+                    const productRef = db.collection('store_products').doc(productId);
+                    const productDoc = await productRef.get();
+                    if (productDoc.exists && (((_l = productDoc.data()) === null || _l === void 0 ? void 0 : _l.stock) || 0) > 0) {
+                        await productRef.update({
+                            stock: admin.firestore.FieldValue.increment(-1)
+                        });
+                        console.log(`📦 Stock decremented for product ${productId}`);
+                    }
+                }
+            }
             // SUSCRIPCIÓN PRO
             else {
-                const durationDays = parseInt(((_f = paymentIntent.metadata) === null || _f === void 0 ? void 0 : _f.durationDays) || '30');
+                const durationDays = parseInt(((_m = paymentIntent.metadata) === null || _m === void 0 ? void 0 : _m.durationDays) || '30');
                 const endDate = new Date();
                 endDate.setDate(endDate.getDate() + durationDays);
                 await db.collection('users').doc(userId).update({
@@ -315,6 +461,68 @@ exports.stripeWebhook = functions
     catch (error) {
         console.error('Webhook error:', error);
         res.status(500).send('Webhook handler failed');
+    }
+});
+// ============================================
+// EMAIL: Enviar notificación de envío (desde admin)
+// ============================================
+exports.sendOrderShippedEmail = functions
+    .runWith({ timeoutSeconds: 60 })
+    .https
+    .onCall(async (data, context) => {
+    const { orderId, trackingNumber, trackingCarrier } = data;
+    if (!orderId || !trackingNumber || !trackingCarrier) {
+        throw new functions.https.HttpsError('invalid-argument', 'orderId, trackingNumber y trackingCarrier son requeridos');
+    }
+    try {
+        // Get order data
+        const orderDoc = await db.collection('orders').doc(orderId).get();
+        if (!orderDoc.exists) {
+            throw new functions.https.HttpsError('not-found', 'Orden no encontrada');
+        }
+        const orderData = orderDoc.data();
+        const userId = orderData.userId;
+        // Get user email
+        const userDoc = await db.collection('users').doc(userId).get();
+        if (!userDoc.exists) {
+            throw new functions.https.HttpsError('not-found', 'Usuario no encontrado');
+        }
+        const userData = userDoc.data();
+        const userEmail = userData.email;
+        const userName = userData.alias || userData.displayName;
+        if (!userEmail) {
+            throw new functions.https.HttpsError('failed-precondition', 'Usuario sin email');
+        }
+        // Send email
+        const { Resend } = require('resend');
+        const resend = new Resend(RESEND_API_KEY);
+        const emailData = {
+            orderId,
+            productName: orderData.productName || orderData.product || 'Producto',
+            trackingNumber,
+            trackingCarrier,
+            userName,
+        };
+        const htmlContent = (0, email_templates_1.getOrderShippedEmailTemplate)(emailData);
+        const { error } = await resend.emails.send({
+            from: 'QRClima Store <noreply@tesivil.com>',
+            to: [userEmail],
+            subject: '📦 ¡Tu pedido va en camino! - QRClima',
+            html: htmlContent,
+        });
+        if (error) {
+            console.error('Error sending shipped email:', error);
+            throw new functions.https.HttpsError('internal', 'Error al enviar email');
+        }
+        console.log(`📧 Shipped email sent to ${userEmail} for order ${orderId}`);
+        return { success: true, message: 'Email de envío enviado correctamente' };
+    }
+    catch (error) {
+        if (error instanceof functions.https.HttpsError) {
+            throw error;
+        }
+        console.error('Error in sendOrderShippedEmail:', error);
+        throw new functions.https.HttpsError('internal', error.message);
     }
 });
 // ============================================

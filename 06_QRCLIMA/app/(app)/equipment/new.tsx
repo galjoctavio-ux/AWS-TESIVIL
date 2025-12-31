@@ -4,6 +4,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { useState, useEffect } from 'react';
 import { addEquipment } from '../../../services/equipment-service';
 import { getClients, ClientData } from '../../../services/clients-service';
+import { getUserProfile } from '../../../services/user-service';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function NewEquipment() {
@@ -22,6 +23,7 @@ export default function NewEquipment() {
     const [model, setModel] = useState('');
     const [btu, setBtu] = useState('');
     const [location, setLocation] = useState('');
+    const [techProfile, setTechProfile] = useState<{ phone?: string; alias?: string } | null>(null);
 
     useEffect(() => {
         const loadClients = async () => {
@@ -31,6 +33,12 @@ export default function NewEquipment() {
                 setLoadingClients(true);
                 const clientsData = await getClients(user.uid);
                 setClients(clientsData as (ClientData & { id: string })[]);
+
+                // Load technician profile for QR public view
+                const profile = await getUserProfile(user.uid);
+                if (profile) {
+                    setTechProfile({ phone: profile.phone, alias: profile.alias });
+                }
             } catch (error) {
                 console.error('Error loading clients:', error);
             } finally {
@@ -68,6 +76,8 @@ export default function NewEquipment() {
                 btu: btu ? parseInt(btu, 10) : undefined,
                 location: location.trim() || undefined,
                 technicianId: user!.uid,
+                technicianPhone: techProfile?.phone,
+                technicianAlias: techProfile?.alias,
             });
 
             Alert.alert(

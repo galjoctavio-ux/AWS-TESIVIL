@@ -3,6 +3,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useState, useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../../context/AuthContext';
 import {
     getConcepts,
@@ -17,6 +18,7 @@ interface SelectedItem extends CotizadorConcept {
 }
 
 export default function SelectConceptsScreen() {
+    const insets = useSafeAreaInsets();
     const router = useRouter();
     const { user } = useAuth();
     const params = useLocalSearchParams<{
@@ -236,7 +238,7 @@ export default function SelectConceptsScreen() {
 
             {/* Footer with Total */}
             {selectedItems.size > 0 && (
-                <View className="bg-white border-t border-gray-200 p-4">
+                <View className="bg-white border-t border-gray-200 p-4" style={{ paddingBottom: insets.bottom + 16 }}>
                     <View className="flex-row justify-between items-center mb-3">
                         <Text className="text-gray-600">{selectedItems.size} concepto{selectedItems.size !== 1 ? 's' : ''} seleccionado{selectedItems.size !== 1 ? 's' : ''}</Text>
                         <Text className="text-2xl font-bold text-green-600">{formatCurrency(grandTotal)}</Text>

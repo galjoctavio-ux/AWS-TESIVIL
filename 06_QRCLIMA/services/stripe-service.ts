@@ -150,20 +150,33 @@ export const purchaseTokens = async (
     params: TokenPurchaseParams
 ): Promise<{ success: boolean; tokensAdded?: number; error?: string }> => {
     try {
+        console.log('🛒 [TokenPurchase] Starting purchase flow...');
+        console.log('🛒 [TokenPurchase] User:', params.userId);
+        console.log('🛒 [TokenPurchase] Amount:', TOKEN_PACK.priceInCents, 'cents');
+        console.log('🛒 [TokenPurchase] Tokens:', TOKEN_PACK.tokens);
+
         const functions = getFunctions();
         const createTokenPurchaseIntent = httpsCallable(functions, 'createTokenPurchaseIntent');
 
         // 1. Create PaymentIntent for tokens
+        console.log('🛒 [TokenPurchase] Calling Cloud Function...');
         const result = await createTokenPurchaseIntent({
             userId: params.userId,
             userEmail: params.userEmail,
             amount: TOKEN_PACK.priceInCents,
-            tokens: TOKEN_PACK.tokens,
+            tokensAmount: TOKEN_PACK.tokens,
         });
 
+        console.log('🛒 [TokenPurchase] Cloud Function response:', JSON.stringify(result.data));
         const data = result.data as PaymentSheetParams;
 
+        if (!data.paymentIntent) {
+            console.error('🛒 [TokenPurchase] No paymentIntent in response!');
+            throw new Error('No se recibió respuesta del servidor');
+        }
+
         // 2. Initialize Payment Sheet
+        console.log('🛒 [TokenPurchase] Initializing Payment Sheet...');
         const { error: initError } = await initPaymentSheet({
             paymentIntentClientSecret: data.paymentIntent,
             customerEphemeralKeySecret: data.ephemeralKey,
@@ -176,24 +189,141 @@ export const purchaseTokens = async (
         });
 
         if (initError) {
+            console.error('🛒 [TokenPurchase] Init error:', initError);
             throw new Error(initError.message);
         }
 
         // 3. Present Payment Sheet
+        console.log('🛒 [TokenPurchase] Presenting Payment Sheet...');
         const { error: presentError } = await presentPaymentSheet();
 
         if (presentError) {
             if (presentError.code === 'Canceled') {
+                console.log('🛒 [TokenPurchase] User canceled');
                 return { success: false, error: 'Compra cancelada' };
             }
+            console.error('🛒 [TokenPurchase] Present error:', presentError);
             throw new Error(presentError.message);
         }
 
         // 4. Success - tokens will be added via webhook
+        console.log('🛒 [TokenPurchase] ✅ Payment successful! Tokens will be added via webhook.');
+
+        Alert.alert(
+            '✅ ¡Compra exitosa!',
+            `Tus ${TOKEN_PACK.tokens} tokens se agregarán a tu wallet en unos segundos.\n\nDesliza hacia abajo para refrescar tu balance.`
+        );
+
         return { success: true, tokensAdded: TOKEN_PACK.tokens };
 
     } catch (error: any) {
-        console.error('Token purchase error:', error);
+        console.error('🛒 [TokenPurchase] ERROR:', error);
+        Alert.alert('Error', error.message || 'No se pudo completar la compra');
+        return { success: false, error: error.message };
+    }
+};
+
+// ============================================
+// COMPRA DE PRODUCTOS MXN
+// ============================================
+
+export interface ProductPurchaseParams {
+    userId: string;
+    userEmail: string;
+    productId: string;
+    productName: string;
+    amountMxn: number; // Precio en pesos (no centavos)
+    shippingAddress?: {
+        fullName: string;
+        phone: string;
+        street: string;
+        neighborhood?: string;
+        city: string;
+        state: string;
+        postalCode: string;
+        references?: string;
+    };
+}
+
+/**
+ * Purchase a product using native Payment Sheet (Stripe)
+ */
+export const purchaseProduct = async (
+    params: ProductPurchaseParams
+): Promise<{ success: boolean; orderId?: string; error?: string }> => {
+    try {
+        console.log('🛍️ [ProductPurchase] Starting purchase flow...');
+        console.log('🛍️ [ProductPurchase] Product:', params.productName);
+        console.log('🛍️ [ProductPurchase] Amount:', params.amountMxn, 'MXN');
+
+        const functions = getFunctions();
+        const createProductPurchaseIntent = httpsCallable(functions, 'createProductPurchaseIntent');
+
+        // 1. Create PaymentIntent for product
+        console.log('🛍️ [ProductPurchase] Calling Cloud Function...');
+        const result = await createProductPurchaseIntent({
+            userId: params.userId,
+            userEmail: params.userEmail,
+            productId: params.productId,
+            productName: params.productName,
+            amount: params.amountMxn * 100, // Convert to cents
+            shippingAddress: params.shippingAddress,
+        });
+
+        console.log('🛍️ [ProductPurchase] Cloud Function response received');
+        const data = result.data as PaymentSheetParams & { orderId?: string };
+
+        if (!data.paymentIntent) {
+            console.error('🛍️ [ProductPurchase] No paymentIntent in response!');
+            throw new Error('No se recibió respuesta del servidor');
+        }
+
+        // 2. Initialize Payment Sheet
+        console.log('🛍️ [ProductPurchase] Initializing Payment Sheet...');
+        const { error: initError } = await initPaymentSheet({
+            paymentIntentClientSecret: data.paymentIntent,
+            customerEphemeralKeySecret: data.ephemeralKey,
+            customerId: data.customer,
+            merchantDisplayName: 'QRclima Tienda',
+            googlePay: {
+                merchantCountryCode: 'MX',
+                testEnv: __DEV__,
+            },
+            defaultBillingDetails: {
+                email: params.userEmail,
+            },
+        });
+
+        if (initError) {
+            console.error('🛍️ [ProductPurchase] Init error:', initError);
+            throw new Error(initError.message);
+        }
+
+        // 3. Present Payment Sheet
+        console.log('🛍️ [ProductPurchase] Presenting Payment Sheet...');
+        const { error: presentError } = await presentPaymentSheet();
+
+        if (presentError) {
+            if (presentError.code === 'Canceled') {
+                console.log('🛍️ [ProductPurchase] User canceled');
+                return { success: false, error: 'Compra cancelada' };
+            }
+            console.error('🛍️ [ProductPurchase] Present error:', presentError);
+            throw new Error(presentError.message);
+        }
+
+        // 4. Success - order will be created via webhook
+        console.log('🛍️ [ProductPurchase] ✅ Payment successful!');
+
+        Alert.alert(
+            '✅ ¡Compra exitosa!',
+            `Tu pedido de "${params.productName}" ha sido procesado.\n\nRecibirás un correo con los detalles de tu compra.`
+        );
+
+        return { success: true, orderId: data.orderId };
+
+    } catch (error: any) {
+        console.error('🛍️ [ProductPurchase] ERROR:', error);
         Alert.alert('Error', error.message || 'No se pudo completar la compra');
         return { success: false, error: error.message };
     }

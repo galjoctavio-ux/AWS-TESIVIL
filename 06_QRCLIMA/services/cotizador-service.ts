@@ -1,14 +1,15 @@
-import { 
-    collection, 
-    addDoc, 
-    getDocs, 
-    query, 
-    where, 
-    orderBy, 
-    limit, 
-    doc, 
-    updateDoc, 
-    deleteDoc, 
+import {
+    collection,
+    addDoc,
+    getDocs,
+    getDoc,
+    query,
+    where,
+    orderBy,
+    limit,
+    doc,
+    updateDoc,
+    deleteDoc,
     serverTimestamp,
     runTransaction
 } from 'firebase/firestore';
@@ -85,7 +86,7 @@ export const generateConceptCode = async (
     type: ConceptType
 ): Promise<string> => {
     const prefix = getTechnicianPrefix(userId);
-    
+
     try {
         // Obtener el último código del mismo tipo para este usuario
         const conceptsRef = collection(db, 'cotizador_concepts');
@@ -96,11 +97,11 @@ export const generateConceptCode = async (
             orderBy('createdAt', 'desc'),
             limit(1)
         );
-        
+
         const snapshot = await getDocs(q);
-        
+
         let nextNumber = 1;
-        
+
         if (!snapshot.empty) {
             const lastConcept = snapshot.docs[0].data() as CotizadorConcept;
             // Extraer el número del código (e.g., "ABC-MO-015" -> 15)
@@ -109,10 +110,10 @@ export const generateConceptCode = async (
                 nextNumber = parseInt(match[1], 10) + 1;
             }
         }
-        
+
         // Formatear el número con ceros a la izquierda (3 dígitos)
         const numberStr = nextNumber.toString().padStart(3, '0');
-        
+
         return `${prefix}-${type}-${numberStr}`;
     } catch (error) {
         console.error('Error generating concept code:', error);
@@ -135,14 +136,25 @@ export const addConcept = async (
     try {
         // Generar código único
         const code = await generateConceptCode(conceptData.technicianId, conceptData.type);
-        
-        const docRef = await addDoc(collection(db, 'cotizador_concepts'), {
-            ...conceptData,
+
+        // Limpiar campos undefined (Firebase no los acepta)
+        const cleanData: Record<string, any> = {
+            technicianId: conceptData.technicianId,
+            type: conceptData.type,
+            description: conceptData.description,
+            unitPrice: conceptData.unitPrice,
             code,
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
-        });
-        
+        };
+
+        // Solo agregar unit si tiene valor
+        if (conceptData.unit) {
+            cleanData.unit = conceptData.unit;
+        }
+
+        const docRef = await addDoc(collection(db, 'cotizador_concepts'), cleanData);
+
         console.log('Concept added with code:', code, 'ID:', docRef.id);
         return docRef.id;
     } catch (error) {
@@ -164,7 +176,7 @@ export const getConcepts = async (
             conceptsRef,
             where('technicianId', '==', technicianId)
         );
-        
+
         // Si se especifica tipo, filtrar
         if (type) {
             q = query(
@@ -173,17 +185,17 @@ export const getConcepts = async (
                 where('type', '==', type)
             );
         }
-        
+
         const snapshot = await getDocs(q);
         const concepts: CotizadorConcept[] = [];
-        
+
         snapshot.forEach((doc) => {
             concepts.push({ id: doc.id, ...doc.data() } as CotizadorConcept);
         });
-        
+
         // Ordenar por código
         concepts.sort((a, b) => a.code.localeCompare(b.code));
-        
+
         return concepts;
     } catch (error) {
         console.error('Error fetching concepts:', error);
@@ -200,10 +212,18 @@ export const updateConcept = async (
 ): Promise<boolean> => {
     try {
         const conceptRef = doc(db, 'cotizador_concepts', conceptId);
-        await updateDoc(conceptRef, {
-            ...data,
+
+        // Limpiar campos undefined (Firebase no los acepta)
+        const cleanData: Record<string, any> = {
             updatedAt: serverTimestamp(),
-        });
+        };
+
+        if (data.description !== undefined) cleanData.description = data.description;
+        if (data.unitPrice !== undefined) cleanData.unitPrice = data.unitPrice;
+        if (data.unit !== undefined && data.unit !== '') cleanData.unit = data.unit;
+        if (data.type !== undefined) cleanData.type = data.type;
+
+        await updateDoc(conceptRef, cleanData);
         console.log('Concept updated:', conceptId);
         return true;
     } catch (error) {
@@ -279,25 +299,43 @@ export const getUserCotizadorQuotes = async (
             where('technicianId', '==', technicianId),
             limit(limitCount)
         );
-        
+
         const snapshot = await getDocs(q);
         const quotes: CotizadorQuote[] = [];
-        
+
         snapshot.forEach((doc) => {
             quotes.push({ id: doc.id, ...doc.data() } as CotizadorQuote);
         });
-        
+
         // Ordenar por fecha de creación (más reciente primero)
         quotes.sort((a, b) => {
             const dateA = a.createdAt?.seconds || 0;
             const dateB = b.createdAt?.seconds || 0;
             return dateB - dateA;
         });
-        
+
         return quotes;
     } catch (error) {
         console.error('Error fetching quotes:', error);
         return [];
+    }
+};
+
+/**
+ * Obtiene una cotización específica por ID
+ */
+export const getQuoteById = async (quoteId: string): Promise<CotizadorQuote | null> => {
+    try {
+        const quoteRef = doc(db, 'cotizador_quotes', quoteId);
+        const snapshot = await getDoc(quoteRef);
+
+        if (snapshot.exists()) {
+            return { id: snapshot.id, ...snapshot.data() } as CotizadorQuote;
+        }
+        return null;
+    } catch (error) {
+        console.error('Error fetching quote:', error);
+        return null;
     }
 };
 

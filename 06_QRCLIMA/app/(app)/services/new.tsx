@@ -7,7 +7,7 @@ import { getClients, getClientById } from '../../../services/clients-service';
 import { searchError, getBrands, getModelsByBrand, BrandData, ModelData } from '../../../services/database-service';
 import { addService } from '../../../services/services-service';
 import { getUserProfile, isUserPro } from '../../../services/user-service';
-import { getEquipmentById, addEquipment, EquipmentData, markEquipmentAsInstalled } from '../../../services/equipment-service';
+import { getEquipmentById, addEquipment, EquipmentData, markEquipmentAsInstalled, extractTokenFromUrl } from '../../../services/equipment-service';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import SignatureModal from '../../../components/SignatureModal';
@@ -63,6 +63,7 @@ export default function NewService() {
     const [notes, setNotes] = useState('');
     const [reminderEnabled, setReminderEnabled] = useState(false); // Default to false, will be set based on isPro
     const [isPro, setIsPro] = useState(false); // Track if user is PRO
+    const [techProfile, setTechProfile] = useState<{ phone?: string; alias?: string } | null>(null); // For QR public view contact
     const [customReminderMonths, setCustomReminderMonths] = useState(settings.reminderMonths || 6); // Custom reminder time per service
     const [capacityBTU, setCapacityBTU] = useState(''); // BTU capacity
 
@@ -164,6 +165,13 @@ export default function NewService() {
                     const userIsPro = isUserPro(profile);
                     setIsPro(userIsPro);
                     setReminderEnabled(userIsPro); // Enable reminder by default only for PRO users
+                    // Save tech profile for QR public view
+                    console.log('*** TECH PROFILE LOADED ***', {
+                        phone: profile?.phone,
+                        alias: profile?.alias,
+                        fullProfile: profile
+                    });
+                    setTechProfile({ phone: profile?.phone, alias: profile?.alias });
                 });
             }
             loadBrands();
@@ -318,7 +326,15 @@ export default function NewService() {
             // Prepare payload to avoid undefined values which Firebase rejects
             const servicePayload: any = {
                 clientId: selectedClient.id,
+                clientName: selectedClient.name,  // For calendar display
+                address: selectedClient.address || null,  // For calendar display
+                lat: selectedClient.lat || null,  // For distance calculations
+                lng: selectedClient.lng || null,  // For distance calculations
                 technicianId: user?.uid || '',
+                technicianAlias: techProfile?.alias || 'Técnico',  // For King of the Hill
+                technicianName: techProfile?.fullName || techProfile?.alias || 'Técnico', // Full Name
+                technicianPhone: techProfile?.phone || '',          // For King of the Hill
+                equipmentId: preloadedEquipment?.id || null,        // For King of the Hill update
                 type: serviceType,
                 status: 'Terminado',
                 date: new Date(),
@@ -327,6 +343,7 @@ export default function NewService() {
                     model: selectedModel.name,
                     type: selectedModel.type,
                     capacityBTU: capacityBTU || '', // Save capacity
+                    qrId: preloadedEquipment?.token || null, // Save QR token for PDF generation
                 },
                 tasks: selectedTasks,
                 checklist: checklistData,
@@ -338,6 +355,17 @@ export default function NewService() {
                 clientSignature: signature || null,
                 warrantyMonths: warrantyMonths, // Save warranty duration
             };
+
+            // DEBUG: Log King of the Hill values before saving
+            console.log('*** HANDLE SAVE - KING OF THE HILL VALUES ***', {
+                equipmentId: servicePayload.equipmentId,
+                technicianId: servicePayload.technicianId,
+                technicianName: servicePayload.technicianName,
+                technicianAlias: servicePayload.technicianAlias,
+                technicianPhone: servicePayload.technicianPhone,
+                preloadedEquipment: preloadedEquipment,
+                techProfile: techProfile,
+            });
 
             // Only add diagnosis if it exists (repair only)
             if (serviceType === 'Reparación' && errorCode) {
@@ -462,14 +490,21 @@ export default function NewService() {
         try {
             setSavingEquipment(true);
 
+            // Extract token from scanned QR URL to use as equipment token
+            const scannedToken = qrCodeValue ? (extractTokenFromUrl(qrCodeValue) || qrCodeValue) : undefined;
+            console.log(`Virgin QR registration - scannedToken: ${scannedToken} from qrCodeValue: ${qrCodeValue}`);
+
             const { id: equipmentIdNew, token } = await addEquipment({
                 qrCode: qrCodeValue || undefined,
+                scannedToken: scannedToken, // Use the scanned token instead of generating new
                 clientId: selectedClient.id,
                 brand: inlineEquipmentData.brand.trim(),
                 model: inlineEquipmentData.model.trim(),
                 btu: inlineEquipmentData.btu ? parseInt(inlineEquipmentData.btu, 10) : undefined,
                 location: inlineEquipmentData.location.trim() || undefined,
                 technicianId: user!.uid,
+                technicianPhone: techProfile?.phone,
+                technicianAlias: techProfile?.alias,
             });
 
             // Set preloaded data

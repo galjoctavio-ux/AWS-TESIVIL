@@ -1,6 +1,7 @@
 import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc, query, where, orderBy, limit, serverTimestamp, increment } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { updateUserProfile } from './user-service';
+import { updateLastServiceTechnician } from './equipment-service';
 
 export interface ServiceData {
     clientId: string;
@@ -9,6 +10,10 @@ export interface ServiceData {
     lat?: number;  // Client latitude for route optimization
     lng?: number;  // Client longitude for route optimization
     technicianId: string;
+    technicianName?: string;    // For King of the Hill - technician full name
+    technicianAlias?: string;   // For King of the Hill - technician display name
+    technicianPhone?: string;   // For King of the Hill - technician contact
+    equipmentId?: string;       // Equipment document ID for updating lastServiceTech
     type: 'Reparación' | 'Mantenimiento' | 'Instalación' | 'Reinstalación';
     status: 'Pendiente' | 'Terminado';
     date: any; // Timestamp or Date
@@ -52,6 +57,33 @@ export const addService = async (serviceData: ServiceData) => {
             createdAt: serverTimestamp(),
         });
         console.log('Service created with ID: ', docRef.id);
+
+        // KING OF THE HILL: Update equipment with technician contact info
+        // This allows the QR public view to show WhatsApp/Call buttons
+        console.log('King of the Hill DEBUG:', {
+            equipmentId: serviceData.equipmentId,
+            technicianId: serviceData.technicianId,
+            technicianName: serviceData.technicianName,
+            technicianPhone: serviceData.technicianPhone,
+            technicianAlias: serviceData.technicianAlias,
+        });
+
+        if (serviceData.equipmentId && serviceData.technicianId) {
+            try {
+                await updateLastServiceTechnician(
+                    serviceData.equipmentId,
+                    serviceData.technicianId,
+                    serviceData.technicianPhone || '',
+                    serviceData.technicianAlias || 'Técnico',
+                    serviceData.technicianName // Pass full name
+                );
+                console.log('King of the Hill updated for equipment:', serviceData.equipmentId);
+            } catch (kingError) {
+                console.warn('Could not update King of the Hill:', kingError);
+            }
+        } else {
+            console.warn('King of the Hill SKIPPED - missing equipmentId or technicianId');
+        }
 
         // Incrementar el contador de servicios del técnico
         try {
@@ -102,27 +134,28 @@ export const getLastServices = async (technicianId: string, limitCount: number =
 
 export const getUpcomingServices = async (technicianId: string) => {
     try {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        // Get services from the last 30 days onwards (includes past and future)
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        thirtyDaysAgo.setHours(0, 0, 0, 0);
 
         const q = query(
             collection(db, 'services'),
             where('technicianId', '==', technicianId),
-            where('status', '==', 'Pendiente'),
             orderBy('date', 'asc'),
-            limit(5)
+            limit(100) // Increased limit to show more services
         );
 
         const querySnapshot = await getDocs(q);
         const services: any[] = [];
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            // Client-side filter for dates in the future (Firestore query limitations with multiple fields)
+            // Client-side filter for dates in the range (last 30 days to future)
             let serviceDate = new Date();
             if (data.date?.toDate) serviceDate = data.date.toDate();
             else if (data.date) serviceDate = new Date(data.date);
 
-            if (serviceDate >= today) {
+            if (serviceDate >= thirtyDaysAgo) {
                 services.push({ id: doc.id, ...data });
             }
         });

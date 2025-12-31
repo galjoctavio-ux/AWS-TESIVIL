@@ -8,7 +8,7 @@ import { useSettings } from '../../../context/SettingsContext';
 import { getUpcomingServices, ServiceData } from '../../../services/services-service';
 import { getLinearDistance } from '../../../services/haversine-calculator';
 import { getUserProfile, isUserPro, updateUserProfile } from '../../../services/user-service';
-import { getTrafficDistance, TrafficDistanceResult, getDailyApiUsageInfo } from '../../../services/traffic-distance-service';
+import { getTrafficDistance, TrafficDistanceResult, getDailyApiUsageInfo, forceRefreshTrafficDistance } from '../../../services/traffic-distance-service';
 import CalendarView, { CalendarMode } from '../../../components/agenda/CalendarView';
 import ActionSheet from '../../../components/agenda/ActionSheet';
 import BottomNav from '../../../components/BottomNav';
@@ -40,6 +40,7 @@ export default function AgendaScreen() {
     const [trafficData, setTrafficData] = useState<TrafficDistanceResult | null>(null);
     const [trafficDataMap, setTrafficDataMap] = useState<{ [eventId: string]: TrafficDistanceResult }>({});
     const [loadingTraffic, setLoadingTraffic] = useState(false);
+    const [refreshingDistance, setRefreshingDistance] = useState(false);
 
     // API Usage for distance mode counter
     const [apiUsage, setApiUsage] = useState<{ used: number, max: number, remaining: number }>({ used: 0, max: 10, remaining: 10 });
@@ -53,6 +54,13 @@ export default function AgendaScreen() {
             }
         }, [user])
     );
+
+    // Auto-preload today's distances when PRO user opens calendar
+    useEffect(() => {
+        if (isPro && baseLat && baseLng && events.length > 0) {
+            preloadTodayDistances(events);
+        }
+    }, [isPro, baseLat, baseLng, events.length]);
 
     const loadBaseLocation = async () => {
         try {
@@ -84,7 +92,21 @@ export default function AgendaScreen() {
         try {
             const services = await getUpcomingServices(user!.uid);
 
-            const calendarEvents = services.map(s => ({
+            // Filter out completed services and ghost events
+            const validServices = services.filter(s => {
+                // hide completed services
+                if (s.status === 'Terminado' || s.status === 'Finalizado') return false;
+
+                const hasValidDate = s.date;
+                const hasClientInfo = s.clientName || s.clientId;
+
+                // hide ghost events (missing data)
+                if (!hasValidDate || !hasClientInfo) return false;
+
+                return true;
+            });
+
+            const calendarEvents = validServices.map(s => ({
                 id: s.id,
                 title: s.clientName || 'Cliente',
                 start: s.date?.toDate ? s.date.toDate() : new Date(s.date),
@@ -97,11 +119,76 @@ export default function AgendaScreen() {
             }));
 
             setEvents(calendarEvents);
+
+            // Preload traffic data for today's events (PRO users only)
+            // This runs after events are set
+            return calendarEvents;
         } catch (error) {
             console.error(error);
+            return [];
         } finally {
             setLoading(false);
         }
+    };
+
+    // Preload distances for today's events when PRO user opens calendar
+    const preloadTodayDistances = async (calendarEvents: any[]) => {
+        if (!isPro || !baseLat || !baseLng) return;
+
+        const today = new Date();
+        const todayStr = today.toDateString();
+
+        // Filter only today's events with coordinates
+        const todayEvents = calendarEvents
+            .filter(e => {
+                const eventDate = e.start instanceof Date ? e.start : new Date(e.start);
+                return eventDate.toDateString() === todayStr && e.lat && e.lng;
+            })
+            .sort((a, b) => {
+                const aTime = a.start instanceof Date ? a.start.getTime() : new Date(a.start).getTime();
+                const bTime = b.start instanceof Date ? b.start.getTime() : new Date(b.start).getTime();
+                return aTime - bTime;
+            });
+
+        if (todayEvents.length === 0) return;
+
+        console.log(`[Agenda] Preloading distances for ${todayEvents.length} events today`);
+
+        const newTrafficDataMap: { [eventId: string]: TrafficDistanceResult } = { ...trafficDataMap };
+
+        for (let i = 0; i < todayEvents.length; i++) {
+            const event = todayEvents[i];
+
+            // Skip if already cached in state
+            if (newTrafficDataMap[event.id]) continue;
+
+            // Determine origin
+            let originLat: number, originLng: number;
+            if (i === 0) {
+                originLat = baseLat;
+                originLng = baseLng;
+            } else {
+                const prevEvent = todayEvents[i - 1];
+                originLat = prevEvent.lat || baseLat;
+                originLng = prevEvent.lng || baseLng;
+            }
+
+            try {
+                const data = await getTrafficDistance(
+                    { latitude: originLat, longitude: originLng },
+                    { latitude: event.lat, longitude: event.lng }
+                );
+                newTrafficDataMap[event.id] = data;
+            } catch (error) {
+                console.error(`[Agenda] Error loading distance for event ${event.id}:`, error);
+            }
+        }
+
+        setTrafficDataMap(newTrafficDataMap);
+
+        // Update API usage badge
+        const usage = await getDailyApiUsageInfo();
+        setApiUsage(usage);
     };
 
     const onRefresh = async () => {
@@ -163,6 +250,10 @@ export default function AgendaScreen() {
                 setTrafficData(data);
                 // Also update trafficDataMap for calendar cards
                 setTrafficDataMap(prev => ({ ...prev, [selectedEvent.id]: data }));
+
+                // Update API usage badge instantly
+                const usage = await getDailyApiUsageInfo();
+                setApiUsage(usage);
             } catch (error) {
                 console.error('[Agenda] Error loading traffic data:', error);
                 setTrafficData(null);
@@ -197,6 +288,51 @@ export default function AgendaScreen() {
             newDate.setDate(newDate.getDate() + 1);
         }
         setDate(newDate);
+    };
+
+    // Handle manual refresh of traffic distance
+    const handleRefreshDistance = async () => {
+        if (!selectedEvent || !baseLat || !baseLng) return;
+
+        const targetLat = selectedEvent.lat || selectedEvent.raw?.lat;
+        const targetLng = selectedEvent.lng || selectedEvent.raw?.lng;
+        if (!targetLat || !targetLng) return;
+
+        // Calculate origin
+        const sortedEvents = [...events].sort((a, b) => {
+            const aTime = a.start instanceof Date ? a.start.getTime() : new Date(a.start).getTime();
+            const bTime = b.start instanceof Date ? b.start.getTime() : new Date(b.start).getTime();
+            return aTime - bTime;
+        });
+        const eventIndex = sortedEvents.findIndex(e => e.id === selectedEvent.id);
+        let originLat: number, originLng: number;
+
+        if (eventIndex <= 0) {
+            originLat = baseLat;
+            originLng = baseLng;
+        } else {
+            const prevEvent = sortedEvents[eventIndex - 1];
+            originLat = prevEvent.lat || prevEvent.raw?.lat || baseLat;
+            originLng = prevEvent.lng || prevEvent.raw?.lng || baseLng;
+        }
+
+        setRefreshingDistance(true);
+        try {
+            const data = await forceRefreshTrafficDistance(
+                { latitude: originLat, longitude: originLng },
+                { latitude: targetLat, longitude: targetLng }
+            );
+            setTrafficData(data);
+            setTrafficDataMap(prev => ({ ...prev, [selectedEvent.id]: data }));
+
+            // Update API usage badge instantly
+            const usage = await getDailyApiUsageInfo();
+            setApiUsage(usage);
+        } catch (error) {
+            console.error('[Agenda] Error refreshing traffic data:', error);
+        } finally {
+            setRefreshingDistance(false);
+        }
     };
 
     const viewModes: { value: CalendarMode; label: string }[] = [
@@ -460,6 +596,8 @@ export default function AgendaScreen() {
                             updateUserProfile(user.uid, { preferredNavigationApp: app });
                         }
                     }}
+                    onRefreshDistance={handleRefreshDistance}
+                    refreshingDistance={refreshingDistance}
                 />
             )}
         </View>

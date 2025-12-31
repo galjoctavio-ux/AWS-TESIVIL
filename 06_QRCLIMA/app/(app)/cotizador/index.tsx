@@ -133,8 +133,8 @@ export default function CotizadorIndex() {
             {/* FAB - Nueva Cotización */}
             <TouchableOpacity
                 onPress={() => router.push('/(app)/cotizador/new-quote')}
-                className="absolute bottom-8 right-6 bg-green-600 w-14 h-14 rounded-full items-center justify-center shadow-lg"
-                style={{ elevation: 5 }}
+                className="absolute right-6 bg-green-600 w-14 h-14 rounded-full items-center justify-center shadow-lg"
+                style={{ elevation: 5, bottom: insets.bottom + 24 }}
             >
                 <Ionicons name="add" size={32} color="white" />
             </TouchableOpacity>

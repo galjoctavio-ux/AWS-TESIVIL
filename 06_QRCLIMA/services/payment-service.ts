@@ -133,8 +133,8 @@ export const PAYMENT_CONFIG: Record<PaymentProvider, PaymentConfig> = {
     }
 };
 
-// Proveedor por defecto para México
-const DEFAULT_PROVIDER: PaymentProvider = 'mercadopago';
+// Proveedor por defecto para México (Stripe para tarjetas y OXXO)
+const DEFAULT_PROVIDER: PaymentProvider = 'stripe';
 
 // ============================================
 // FUNCIONES PRINCIPALES

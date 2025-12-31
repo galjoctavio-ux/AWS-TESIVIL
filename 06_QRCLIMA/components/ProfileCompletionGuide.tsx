@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { UserProfile, getProfileCompletionCriteria, ProfileCriterion } from '../services/user-service';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { UserProfile, getProfileCompletionCriteria, ProfileCriterion, calculateProfileCompleteness } from '../services/user-service';
 
 interface ProfileCompletionGuideProps {
     profile: UserProfile | null;
@@ -32,13 +33,13 @@ const CATEGORY_INFO = {
 };
 
 export default function ProfileCompletionGuide({ profile, isVisible, onClose }: ProfileCompletionGuideProps) {
+    const insets = useSafeAreaInsets();
     const router = useRouter();
     const criteria = profile ? getProfileCompletionCriteria(profile) : [];
 
     const completedCount = criteria.filter(c => c.completed).length;
-    const totalWeight = criteria.reduce((sum, c) => sum + c.weight, 0);
-    const completedWeight = criteria.filter(c => c.completed).reduce((sum, c) => sum + c.weight, 0);
-    const percentage = Math.round((completedWeight / totalWeight) * 100);
+    // Usar calculateProfileCompleteness para que coincida con el valor guardado
+    const percentage = profile ? calculateProfileCompleteness(profile) : 0;
 
     const groupedCriteria = {
         profile: criteria.filter(c => c.category === 'profile'),
@@ -62,7 +63,7 @@ export default function ProfileCompletionGuide({ profile, isVisible, onClose }: 
         >
             <View className="flex-1 bg-white">
                 {/* Header */}
-                <View className="bg-blue-600 px-5 pt-4 pb-6">
+                <View className="bg-blue-600 px-5 pb-6" style={{ paddingTop: insets.top + 16 }}>
                     <View className="flex-row justify-between items-center mb-4">
                         <Text className="text-white text-xl font-bold">Guía de Perfil</Text>
                         <TouchableOpacity onPress={onClose} className="p-1">

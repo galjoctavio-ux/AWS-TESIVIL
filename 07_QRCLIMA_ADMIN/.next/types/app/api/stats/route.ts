@@ -1,4 +1,4 @@
-// File: C:\TESIVIL\AWS-TESIVIL\AWS-TESIVIL\07_MRFRIO_ADMIN\app\api\stats\route.ts
+// File: C:\TESIVIL\AWS-TESIVIL\AWS-TESIVIL\07_QRCLIMA_ADMIN\app\api\stats\route.ts
 import * as entry from '../../../../../app/api/stats/route.js'
 import type { NextRequest } from 'next/server.js'
 

@@ -53,6 +53,7 @@ export interface UserProfile {
     alias: string;                    // Nombre público único (visible en bitácoras)
     businessName?: string;            // Nombre de empresa (opcional, privado)
     city: string;                     // Ciudad base (para BTU y precios)
+    phone?: string;                   // Teléfono para contacto en QR público
     photoURL?: string;                // URL de foto de perfil (redimensionada)
     signature?: string;               // Firma digital (Base64)
 
@@ -75,6 +76,9 @@ export interface UserProfile {
 
     // Economía de Tokens
     tokenBalance?: number;            // Balance de tokens (calculado desde wallet ledger)
+    tokenBoostMultiplier?: number;    // Multiplicador de tokens activo (ej: 1.5x)
+    tokenBoostExpiry?: any;           // Fecha de expiración del boost
+    lifetimeTokensEarned?: number;    // Total de tokens ganados en toda la historia (para niveles)
 
     // PDF Branding (PRO only)
     branding?: BrandingConfig;
@@ -125,11 +129,10 @@ const DEFAULT_STATS: UserStats = {
  */
 export const calculateProfileCompleteness = (profile: Partial<UserProfile>): number => {
     const criteria = [
-        // Datos de Perfil (30%)
+        // Datos de Perfil (25% - sin empresa que es opcional)
         { check: !!profile.alias, weight: 5 },
         { check: !!profile.city, weight: 5 },
         { check: (profile.experienceYears || 0) > 0, weight: 5 },
-        { check: !!profile.businessName, weight: 5 },
         { check: !!profile.termsAcceptedAt, weight: 5 },
         { check: !!profile.privacyAcceptedAt, weight: 5 },
 
@@ -139,8 +142,8 @@ export const calculateProfileCompleteness = (profile: Partial<UserProfile>): num
         { check: !!profile.preferredNavigationApp, weight: 5 },
         { check: !!profile.photoURL, weight: 5 },
 
-        // Logros de Uso (50%)
-        { check: (profile.stats?.servicesCount || 0) >= 1, weight: 8 },
+        // Logros de Uso (55% - aumentado para compensar empresa opcional)
+        { check: (profile.stats?.servicesCount || 0) >= 1, weight: 13 },
         { check: (profile.stats?.qrsActive || 0) >= 1, weight: 8 },
         { check: !!profile.achievements?.firstClient, weight: 8 },
         { check: !!profile.achievements?.firstAgenda, weight: 8 },
@@ -189,16 +192,7 @@ export const getProfileCompletionCriteria = (profile: Partial<UserProfile>): Pro
             route: '/(app)/profile/settings',
             category: 'profile',
         },
-        {
-            id: 'business',
-            label: 'Nombre de empresa',
-            description: 'Agrega tu empresa (opcional)',
-            weight: 5,
-            completed: !!profile.businessName,
-            icon: 'business',
-            route: '/(app)/profile/settings',
-            category: 'profile',
-        },
+        // Nota: businessName (empresa) es opcional y NO cuenta para el 100%
         {
             id: 'terms',
             label: 'Términos aceptados',
@@ -259,12 +253,12 @@ export const getProfileCompletionCriteria = (profile: Partial<UserProfile>): Pro
             category: 'config',
         },
 
-        // Logros de Uso (50%)
+        // Logros de Uso (55% - aumentado para compensar empresa opcional)
         {
             id: 'firstService',
             label: 'Primer servicio',
             description: 'Registra tu primer servicio',
-            weight: 8,
+            weight: 13,
             completed: (profile.stats?.servicesCount || 0) >= 1,
             icon: 'construct',
             route: '/(app)/services',
@@ -422,14 +416,38 @@ export const checkAndExpireSubscription = async (userId: string): Promise<boolea
 
 /**
  * Activa la suscripción PRO para un usuario
+ * Si ya tiene PRO vigente, SUMA los días a la fecha existente
  */
 export const activateProSubscription = async (
     userId: string,
     tier: 'Pro' | 'Pro+',
     durationDays: number
 ): Promise<boolean> => {
-    const endDate = new Date();
+    // Obtener perfil actual para verificar si ya tiene PRO
+    const currentProfile = await getUserProfile(userId);
+    const now = new Date();
+    let endDate: Date;
+
+    // Si ya tiene PRO vigente, sumar días a la fecha existente
+    if (currentProfile?.subscriptionEndDate &&
+        (currentProfile.subscription === 'Pro' || currentProfile.subscription === 'Pro+')) {
+        const existingEnd = currentProfile.subscriptionEndDate.toDate
+            ? currentProfile.subscriptionEndDate.toDate()
+            : new Date(currentProfile.subscriptionEndDate);
+
+        // Solo sumar si la suscripción no ha expirado
+        if (existingEnd > now) {
+            endDate = new Date(existingEnd);
+            console.log(`📅 Usuario ya tiene PRO hasta ${existingEnd.toLocaleDateString()}, sumando ${durationDays} días`);
+        } else {
+            endDate = now;
+        }
+    } else {
+        endDate = now;
+    }
+
     endDate.setDate(endDate.getDate() + durationDays);
+    console.log(`✅ PRO ${tier} activado hasta ${endDate.toLocaleDateString()}`);
 
     return updateUserProfile(userId, {
         subscription: tier,

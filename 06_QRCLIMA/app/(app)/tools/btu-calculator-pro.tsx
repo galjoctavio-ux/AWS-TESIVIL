@@ -873,7 +873,7 @@ export default function BTUCalculatorPRO() {
             </ScrollView>
 
             {/* Sticky Footer with Preview */}
-            <View className="bg-white border-t border-gray-200 p-4">
+            <View className="bg-white border-t border-gray-200 p-4" style={{ paddingBottom: insets.bottom + 16 }}>
                 {result && (
                     <View className="flex-row items-center justify-between mb-3">
                         <Text className="text-gray-500">BTU Estimado:</Text>

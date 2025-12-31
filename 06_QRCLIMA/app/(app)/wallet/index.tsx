@@ -3,13 +3,16 @@ import { useState, useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { useAuth } from '../../../context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
     getTokenBalance,
     getTransactionHistory,
     calculateLevel,
     TokenTransaction,
-    EARN_RULES
+    EARN_RULES,
+    fetchTokenRules
 } from '../../../services/wallet-service';
+import { getUserProfile } from '../../../services/user-service';
 import { purchaseTokens, TOKEN_PACK } from '../../../services/stripe-service';
 
 // Iconos por tipo de transacción
@@ -27,6 +30,7 @@ const TRANSACTION_ICONS: Record<string, { icon: string; color: string }> = {
 
 export default function WalletScreen() {
     const { user } = useAuth();
+    const insets = useSafeAreaInsets();
     const [balance, setBalance] = useState(0);
     const [level, setLevel] = useState({ level: 1, name: 'Novato', progress: 0, nextLevelAt: 100 });
     const [transactions, setTransactions] = useState<TokenTransaction[]>([]);
@@ -38,13 +42,19 @@ export default function WalletScreen() {
         if (!user) return;
 
         try {
-            const [balanceData, transactionsData] = await Promise.all([
+            // Cargar reglas de tokens desde Remote Config
+            await fetchTokenRules();
+
+            const [balanceData, transactionsData, userProfile] = await Promise.all([
                 getTokenBalance(user.uid),
-                getTransactionHistory(user.uid, 30)
+                getTransactionHistory(user.uid, 30),
+                getUserProfile(user.uid)
             ]);
 
             setBalance(balanceData);
-            setLevel(calculateLevel(balanceData));
+            // Usar lifetimeTokensEarned para calcular nivel (tokens históricos, no balance actual)
+            const lifetimeTokens = userProfile?.lifetimeTokensEarned || balanceData;
+            setLevel(calculateLevel(lifetimeTokens));
             setTransactions(transactionsData);
         } catch (error) {
             console.error('Error loading wallet data:', error);
@@ -164,6 +174,7 @@ export default function WalletScreen() {
             refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
+            contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
         >
             <View className="p-6">
                 {/* Balance Card */}
@@ -188,13 +199,19 @@ export default function WalletScreen() {
                     <View className="bg-white/20 p-4 rounded-xl">
                         <View className="flex-row justify-between items-center mb-2">
                             <View className="flex-row items-center">
-                                <Text className="text-2xl mr-2">
-                                    {level.level === 1 ? '🌱' :
-                                        level.level === 2 ? '🔧' :
-                                            level.level === 3 ? '⚙️' :
-                                                level.level === 4 ? '🏆' :
-                                                    level.level === 5 ? '👑' : '🌟'}
-                                </Text>
+                                <View className="w-8 h-8 rounded-full bg-white/20 justify-center items-center mr-2">
+                                    <Ionicons
+                                        name={
+                                            level.level === 1 ? 'leaf-outline' :
+                                                level.level === 2 ? 'hammer-outline' :
+                                                    level.level === 3 ? 'construct-outline' :
+                                                        level.level === 4 ? 'trophy-outline' :
+                                                            level.level === 5 ? 'ribbon-outline' : 'star'
+                                        }
+                                        size={18}
+                                        color="white"
+                                    />
+                                </View>
                                 <View>
                                     <Text className="text-white font-bold">{level.name}</Text>
                                     <Text className="text-amber-200 text-xs">Nivel {level.level}</Text>
@@ -226,7 +243,7 @@ export default function WalletScreen() {
                             {purchasing ? (
                                 <ActivityIndicator color="#F59E0B" />
                             ) : (
-                                <Text className="text-2xl">🪙</Text>
+                                <Ionicons name="wallet-outline" size={24} color="#F59E0B" />
                             )}
                         </View>
                         <View>
@@ -241,8 +258,67 @@ export default function WalletScreen() {
                     </View>
                 </TouchableOpacity>
 
+                {/* Levels Section */}
+                <View className="flex-row items-center mb-3">
+                    <Ionicons name="trophy" size={20} color="#F59E0B" />
+                    <Text className="text-lg font-bold text-gray-800 ml-2">Niveles de Técnico</Text>
+                </View>
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    className="mb-6"
+                >
+                    {[
+                        { level: 1, name: 'Novato', threshold: 0, icon: 'leaf-outline', color: '#9CA3AF' },
+                        { level: 2, name: 'Aprendiz', threshold: 100, icon: 'hammer-outline', color: '#3B82F6' },
+                        { level: 3, name: 'Técnico', threshold: 300, icon: 'construct-outline', color: '#8B5CF6' },
+                        { level: 4, name: 'Experto', threshold: 600, icon: 'trophy-outline', color: '#F59E0B' },
+                        { level: 5, name: 'Maestro', threshold: 1000, icon: 'ribbon-outline', color: '#EF4444' },
+                        { level: 6, name: 'Leyenda', threshold: 2000, icon: 'star', color: '#10B981' },
+                    ].map((lvl) => {
+                        const isCurrentLevel = level.level === lvl.level;
+                        const isUnlocked = balance >= lvl.threshold;
+
+                        return (
+                            <View
+                                key={lvl.level}
+                                className={`p-4 rounded-xl mr-3 border-2 ${isCurrentLevel
+                                    ? 'bg-amber-50 border-amber-400'
+                                    : isUnlocked
+                                        ? 'bg-white border-gray-200'
+                                        : 'bg-gray-100 border-gray-200'
+                                    }`}
+                                style={{ width: 110, opacity: isUnlocked ? 1 : 0.5 }}
+                            >
+                                <View
+                                    className="w-12 h-12 rounded-full justify-center items-center mx-auto mb-2"
+                                    style={{ backgroundColor: lvl.color + '20' }}
+                                >
+                                    <Ionicons name={lvl.icon as any} size={24} color={lvl.color} />
+                                </View>
+                                <Text
+                                    className={`font-bold text-center ${isCurrentLevel ? 'text-amber-600' : 'text-gray-800'}`}
+                                >
+                                    {lvl.name}
+                                </Text>
+                                <Text className="text-gray-400 text-xs text-center mt-1">
+                                    {lvl.threshold === 0 ? 'Inicio' : `${lvl.threshold}+ tokens`}
+                                </Text>
+                                {isCurrentLevel && (
+                                    <View className="bg-amber-400 px-2 py-1 rounded-full mt-2">
+                                        <Text className="text-white text-xs font-bold text-center">ACTUAL</Text>
+                                    </View>
+                                )}
+                            </View>
+                        );
+                    })}
+                </ScrollView>
+
                 {/* How to Earn Section */}
-                <Text className="text-lg font-bold text-gray-800 mb-3">💰 Cómo Ganar Tokens</Text>
+                <View className="flex-row items-center mb-3">
+                    <Ionicons name="cash-outline" size={20} color="#10B981" />
+                    <Text className="text-lg font-bold text-gray-800 ml-2">Cómo Ganar Tokens</Text>
+                </View>
                 <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -284,7 +360,10 @@ export default function WalletScreen() {
 
                 {/* Transaction History */}
                 <View className="flex-row justify-between items-center mb-3">
-                    <Text className="text-lg font-bold text-gray-800">📋 Historial</Text>
+                    <View className="flex-row items-center">
+                        <Ionicons name="receipt-outline" size={20} color="#6366F1" />
+                        <Text className="text-lg font-bold text-gray-800 ml-2">Historial</Text>
+                    </View>
                     <TouchableOpacity>
                         <Text className="text-blue-600 text-sm">Ver Todo</Text>
                     </TouchableOpacity>

@@ -1,11 +1,14 @@
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Alert, TextInput } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../../context/AuthContext';
 import {
     CotizadorQuoteItem,
+    CotizadorQuote,
     saveCotizadorQuote,
+    getQuoteById,
     formatCurrency
 } from '../../../services/cotizador-service';
 import { generateCotizadorPDF } from '../../../services/pdf-generator';
@@ -13,6 +16,7 @@ import { getClientById } from '../../../services/clients-service';
 import { getUserProfile } from '../../../services/user-service';
 
 export default function QuoteSummaryScreen() {
+    const insets = useSafeAreaInsets();
     const router = useRouter();
     const { user } = useAuth();
     const params = useLocalSearchParams<{
@@ -28,10 +32,39 @@ export default function QuoteSummaryScreen() {
     const [notes, setNotes] = useState('');
     const [saving, setSaving] = useState(false);
     const [generatingPDF, setGeneratingPDF] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [existingQuote, setExistingQuote] = useState<CotizadorQuote | null>(null);
 
-    // Parse items from params
-    const items: CotizadorQuoteItem[] = params.items ? JSON.parse(params.items) : [];
-    const total = parseFloat(params.total || '0');
+    // Load existing quote if quoteId is provided
+    useEffect(() => {
+        const loadQuote = async () => {
+            if (params.quoteId) {
+                setLoading(true);
+                try {
+                    const quote = await getQuoteById(params.quoteId);
+                    if (quote) {
+                        setExistingQuote(quote);
+                        setNotes(quote.notes || '');
+                    }
+                } catch (error) {
+                    console.error('Error loading quote:', error);
+                } finally {
+                    setLoading(false);
+                }
+            }
+        };
+        loadQuote();
+    }, [params.quoteId]);
+
+    // Parse items from params OR use existing quote
+    const items: CotizadorQuoteItem[] = existingQuote
+        ? existingQuote.items
+        : (params.items ? JSON.parse(params.items) : []);
+    const total = existingQuote ? existingQuote.total : parseFloat(params.total || '0');
+    const clientName = existingQuote ? existingQuote.clientName : params.clientName;
+    const clientPhone = existingQuote ? existingQuote.clientPhone : params.clientPhone;
+    const clientAddress = existingQuote ? existingQuote.clientAddress : params.clientAddress;
+    const clientId = existingQuote ? existingQuote.clientId : params.clientId;
 
     // Separate by type
     const moItems = items.filter(i => i.type === 'MO');
@@ -48,12 +81,12 @@ export default function QuoteSummaryScreen() {
             const profile = await getUserProfile(user.uid);
 
             // Save the quote first
-            const quoteId = await saveCotizadorQuote({
+            const newQuoteId = await saveCotizadorQuote({
                 technicianId: user.uid,
-                clientId: params.clientId,
-                clientName: params.clientName,
-                clientPhone: params.clientPhone,
-                clientAddress: params.clientAddress,
+                clientId: clientId,
+                clientName: clientName,
+                clientPhone: clientPhone,
+                clientAddress: clientAddress,
                 items,
                 subtotal: total,
                 total: total,
@@ -62,18 +95,18 @@ export default function QuoteSummaryScreen() {
             });
 
             // Get full client data for PDF
-            const client = await getClientById(params.clientId);
+            const client = await getClientById(clientId);
 
             if (client) {
                 // Generate and share PDF
                 await generateCotizadorPDF({
                     quote: {
-                        id: quoteId,
+                        id: newQuoteId,
                         technicianId: user.uid,
-                        clientId: params.clientId,
-                        clientName: params.clientName,
-                        clientPhone: params.clientPhone,
-                        clientAddress: params.clientAddress,
+                        clientId: clientId,
+                        clientName: clientName,
+                        clientPhone: clientPhone,
+                        clientAddress: clientAddress,
                         items,
                         subtotal: total,
                         total,
@@ -106,10 +139,10 @@ export default function QuoteSummaryScreen() {
         try {
             await saveCotizadorQuote({
                 technicianId: user.uid,
-                clientId: params.clientId,
-                clientName: params.clientName,
-                clientPhone: params.clientPhone,
-                clientAddress: params.clientAddress,
+                clientId: clientId,
+                clientName: clientName,
+                clientPhone: clientPhone,
+                clientAddress: clientAddress,
                 items,
                 subtotal: total,
                 total: total,
@@ -152,110 +185,117 @@ export default function QuoteSummaryScreen() {
                 <View style={{ width: 24 }} />
             </View>
 
-            <ScrollView className="flex-1 px-4 pt-4">
-                {/* Client Info Card */}
-                <View className="bg-white rounded-xl p-4 mb-4 border border-gray-100 shadow-sm">
-                    <Text className="text-gray-500 text-xs font-medium mb-2">CLIENTE</Text>
-                    <Text className="font-bold text-gray-800 text-lg">{params.clientName}</Text>
-                    {params.clientPhone && (
-                        <Text className="text-gray-600 text-sm mt-1">📞 {params.clientPhone}</Text>
-                    )}
-                    {params.clientAddress && (
-                        <Text className="text-gray-500 text-sm mt-0.5">📍 {params.clientAddress}</Text>
-                    )}
+            {loading ? (
+                <View className="flex-1 items-center justify-center">
+                    <ActivityIndicator size="large" color="#2563EB" />
+                    <Text className="text-gray-500 mt-2">Cargando cotización...</Text>
                 </View>
-
-                {/* Items Table */}
-                <View className="bg-white rounded-xl p-4 mb-4 border border-gray-100 shadow-sm">
-                    {/* Table Header */}
-                    <View className="flex-row pb-2 border-b-2 border-gray-200 mb-2">
-                        <Text className="flex-1 text-gray-500 text-xs font-bold">CONCEPTO</Text>
-                        <Text className="text-gray-500 text-xs font-bold w-12 text-center">CANT</Text>
-                        <Text className="text-gray-500 text-xs font-bold w-20 text-right">P.UNIT</Text>
-                        <Text className="text-gray-500 text-xs font-bold w-24 text-right">TOTAL</Text>
-                    </View>
-
-                    {/* MO Section */}
-                    {moItems.length > 0 && (
-                        <>
-                            <Text className="text-purple-600 font-bold text-xs mt-2 mb-1">🔧 MANO DE OBRA</Text>
-                            {moItems.map(renderItemRow)}
-                        </>
-                    )}
-
-                    {/* MT Section */}
-                    {mtItems.length > 0 && (
-                        <>
-                            <Text className="text-orange-600 font-bold text-xs mt-3 mb-1">📦 MATERIALES</Text>
-                            {mtItems.map(renderItemRow)}
-                        </>
-                    )}
-
-                    {/* Total */}
-                    <View className="flex-row justify-between items-center mt-4 pt-4 border-t-2 border-gray-300">
-                        <Text className="font-bold text-gray-800 text-lg">TOTAL</Text>
-                        <Text className="font-bold text-green-600 text-2xl">{formatCurrency(total)}</Text>
-                    </View>
-                </View>
-
-                {/* Notes */}
-                <View className="bg-white rounded-xl p-4 mb-4 border border-gray-100 shadow-sm">
-                    <Text className="text-gray-500 text-xs font-medium mb-2">NOTAS (OPCIONAL)</Text>
-                    <TextInput
-                        className="bg-gray-50 p-3 rounded-lg text-gray-800"
-                        placeholder="Condiciones, observaciones..."
-                        value={notes}
-                        onChangeText={setNotes}
-                        multiline
-                        numberOfLines={3}
-                    />
-                </View>
-
-                {/* Watermark Preview */}
-                <View className="bg-gray-100 rounded-xl p-3 mb-6 border border-dashed border-gray-300">
-                    <Text className="text-gray-500 text-xs text-center italic">
-                        El PDF incluirá la marca de agua:
-                    </Text>
-                    <Text className="text-gray-600 text-sm text-center font-medium mt-1">
-                        "Elaborado con QRclima powered by TESIVIL"
-                    </Text>
-                </View>
-
-                {/* Action Buttons */}
-                <View className="mb-8">
-                    <TouchableOpacity
-                        onPress={handleSaveAndGeneratePDF}
-                        disabled={saving || generatingPDF}
-                        className={`py-4 rounded-xl mb-3 ${saving || generatingPDF ? 'bg-gray-400' : 'bg-green-600'}`}
-                    >
-                        {saving || generatingPDF ? (
-                            <View className="flex-row items-center justify-center">
-                                <ActivityIndicator color="white" />
-                                <Text className="text-white ml-2 font-bold">
-                                    {generatingPDF ? 'Generando PDF...' : 'Guardando...'}
-                                </Text>
-                            </View>
-                        ) : (
-                            <View className="flex-row items-center justify-center">
-                                <Ionicons name="document-text" size={20} color="white" />
-                                <Text className="text-white text-center font-bold text-lg ml-2">
-                                    Generar PDF y Compartir
-                                </Text>
-                            </View>
+            ) : (
+                <ScrollView className="flex-1 px-4 pt-4" contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}>
+                    {/* Client Info Card */}
+                    <View className="bg-white rounded-xl p-4 mb-4 border border-gray-100 shadow-sm">
+                        <Text className="text-gray-500 text-xs font-medium mb-2">CLIENTE</Text>
+                        <Text className="font-bold text-gray-800 text-lg">{clientName}</Text>
+                        {clientPhone && (
+                            <Text className="text-gray-600 text-sm mt-1">📞 {clientPhone}</Text>
                         )}
-                    </TouchableOpacity>
+                        {clientAddress && (
+                            <Text className="text-gray-500 text-sm mt-0.5">📍 {clientAddress}</Text>
+                        )}
+                    </View>
 
-                    <TouchableOpacity
-                        onPress={handleSaveOnly}
-                        disabled={saving}
-                        className="py-3 rounded-xl border-2 border-gray-300"
-                    >
-                        <Text className="text-gray-600 text-center font-medium">
-                            Guardar como Borrador
+                    {/* Items Table */}
+                    <View className="bg-white rounded-xl p-4 mb-4 border border-gray-100 shadow-sm">
+                        {/* Table Header */}
+                        <View className="flex-row pb-2 border-b-2 border-gray-200 mb-2">
+                            <Text className="flex-1 text-gray-500 text-xs font-bold">CONCEPTO</Text>
+                            <Text className="text-gray-500 text-xs font-bold w-12 text-center">CANT</Text>
+                            <Text className="text-gray-500 text-xs font-bold w-20 text-right">P.UNIT</Text>
+                            <Text className="text-gray-500 text-xs font-bold w-24 text-right">TOTAL</Text>
+                        </View>
+
+                        {/* MO Section */}
+                        {moItems.length > 0 && (
+                            <>
+                                <Text className="text-purple-600 font-bold text-xs mt-2 mb-1">🔧 MANO DE OBRA</Text>
+                                {moItems.map(renderItemRow)}
+                            </>
+                        )}
+
+                        {/* MT Section */}
+                        {mtItems.length > 0 && (
+                            <>
+                                <Text className="text-orange-600 font-bold text-xs mt-3 mb-1">📦 MATERIALES</Text>
+                                {mtItems.map(renderItemRow)}
+                            </>
+                        )}
+
+                        {/* Total */}
+                        <View className="flex-row justify-between items-center mt-4 pt-4 border-t-2 border-gray-300">
+                            <Text className="font-bold text-gray-800 text-lg">TOTAL</Text>
+                            <Text className="font-bold text-green-600 text-2xl">{formatCurrency(total)}</Text>
+                        </View>
+                    </View>
+
+                    {/* Notes */}
+                    <View className="bg-white rounded-xl p-4 mb-4 border border-gray-100 shadow-sm">
+                        <Text className="text-gray-500 text-xs font-medium mb-2">NOTAS (OPCIONAL)</Text>
+                        <TextInput
+                            className="bg-gray-50 p-3 rounded-lg text-gray-800"
+                            placeholder="Condiciones, observaciones..."
+                            value={notes}
+                            onChangeText={setNotes}
+                            multiline
+                            numberOfLines={3}
+                        />
+                    </View>
+
+                    {/* Watermark Preview */}
+                    <View className="bg-gray-100 rounded-xl p-3 mb-6 border border-dashed border-gray-300">
+                        <Text className="text-gray-500 text-xs text-center italic">
+                            El PDF incluirá la marca de agua:
                         </Text>
-                    </TouchableOpacity>
-                </View>
-            </ScrollView>
+                        <Text className="text-gray-600 text-sm text-center font-medium mt-1">
+                            "Elaborado con QRclima powered by TESIVIL"
+                        </Text>
+                    </View>
+
+                    {/* Action Buttons */}
+                    <View className="mb-8">
+                        <TouchableOpacity
+                            onPress={handleSaveAndGeneratePDF}
+                            disabled={saving || generatingPDF}
+                            className={`py-4 rounded-xl mb-3 ${saving || generatingPDF ? 'bg-gray-400' : 'bg-green-600'}`}
+                        >
+                            {saving || generatingPDF ? (
+                                <View className="flex-row items-center justify-center">
+                                    <ActivityIndicator color="white" />
+                                    <Text className="text-white ml-2 font-bold">
+                                        {generatingPDF ? 'Generando PDF...' : 'Guardando...'}
+                                    </Text>
+                                </View>
+                            ) : (
+                                <View className="flex-row items-center justify-center">
+                                    <Ionicons name="document-text" size={20} color="white" />
+                                    <Text className="text-white text-center font-bold text-lg ml-2">
+                                        Generar PDF y Compartir
+                                    </Text>
+                                </View>
+                            )}
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            onPress={handleSaveOnly}
+                            disabled={saving}
+                            className="py-3 rounded-xl border-2 border-gray-300"
+                        >
+                            <Text className="text-gray-600 text-center font-medium">
+                                Guardar como Borrador
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            )}
         </View>
     );
 }

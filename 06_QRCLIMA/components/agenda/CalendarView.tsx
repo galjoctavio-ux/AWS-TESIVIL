@@ -132,7 +132,7 @@ export default function CalendarView({
                     {
                         backgroundColor: bgColor,
                         borderRadius: 8,
-                        padding: 4,
+                        padding: 6,
                         marginLeft: 4, // Margin from time column
                         opacity: isCompleted ? 0.65 : 0.95
                     }
@@ -142,10 +142,10 @@ export default function CalendarView({
             >
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     {isCompleted && (
-                        <Text style={{ color: textColor, fontSize: 10, marginRight: 3 }}>✓</Text>
+                        <Text style={{ color: textColor, fontSize: 12, marginRight: 3 }}>✓</Text>
                     )}
                     <Text
-                        style={{ color: textColor, fontWeight: 'bold', fontSize: 11, flex: 1 }}
+                        style={{ color: textColor, fontWeight: 'bold', fontSize: 14, flex: 1 }}
                         numberOfLines={1}
                     >
                         {event.title}
@@ -154,13 +154,13 @@ export default function CalendarView({
                 {mode !== 'week' && (
                     <>
                         <Text
-                            style={{ color: textColor, opacity: 0.85, fontSize: 9 }}
+                            style={{ color: textColor, opacity: 0.9, fontSize: 12, marginTop: 2 }}
                             numberOfLines={1}
                         >
                             {event.address}
                         </Text>
                         {distanceInfo && (
-                            <Text style={{ color: textColor, opacity: 0.7, fontSize: 8, marginTop: 1 }}>
+                            <Text style={{ color: textColor, opacity: 0.8, fontSize: 11, marginTop: 2 }}>
                                 {distanceInfo.fromBase ? '🏠' : '📍'} {distanceInfo.distance} km
                                 {isPro && distanceMode === 'traffic' && trafficInfo?.isTrafficData && trafficInfo.durationInTrafficMinutes
                                     ? ` • 🚗 ${formatDuration(trafficInfo.durationInTrafficMinutes)}`

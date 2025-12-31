@@ -45,22 +45,69 @@ export interface TokenTransaction {
     createdAt: any;
 }
 
-// Reglas de emisión según master_plan.md - Tabla de Ganancias
-export const EARN_RULES: Record<TransactionType, { amount: number; dailyLimit: number | null; description: string }> = {
+// Reglas por defecto (usadas como fallback si no hay Remote Config)
+export const DEFAULT_EARN_RULES: Record<TransactionType, { amount: number; dailyLimit: number | null; description: string }> = {
     service_registered: { amount: 10, dailyLimit: 6, description: 'Registro de Servicio' },
     sos_thread_created: { amount: 20, dailyLimit: 1, description: 'Hilo SOS Creado' },
-    sos_solution_accepted: { amount: 50, dailyLimit: null, description: 'Solución Aceptada' }, // Sin límite
-    profile_completed: { amount: 100, dailyLimit: 1, description: 'Perfil Completado' }, // Una vez
+    sos_solution_accepted: { amount: 50, dailyLimit: null, description: 'Solución Aceptada' },
+    profile_completed: { amount: 100, dailyLimit: 1, description: 'Perfil Completado' },
     qr_linked: { amount: 15, dailyLimit: 10, description: 'QR Vinculado' },
     training_completed: { amount: 5, dailyLimit: null, description: 'Cápsula Completada' },
-    training_quiz_passed: { amount: 0, dailyLimit: null, description: 'Quiz Aprobado (variable)' }, // Variable según módulo
+    training_quiz_passed: { amount: 0, dailyLimit: null, description: 'Quiz Aprobado (variable)' },
     training_comment_approved: { amount: 2, dailyLimit: 10, description: 'Comentario Aprobado' },
     training_reaction_maestro: { amount: 5, dailyLimit: 5, description: 'Reacción Maestro Recibida' },
-    token_purchase: { amount: 50, dailyLimit: null, description: 'Compra de Tokens' }, // Micropago $19 MXN = 50 tokens
+    token_purchase: { amount: 50, dailyLimit: null, description: 'Compra de Tokens' },
     store_purchase: { amount: 0, dailyLimit: null, description: 'Compra en Tienda' },
     admin_grant: { amount: 0, dailyLimit: null, description: 'Otorgado por Admin' },
     fraud_revoked: { amount: 0, dailyLimit: null, description: 'Revocado por Fraude' },
 };
+
+// Cache para las reglas de tokens (se actualiza desde Remote Config)
+export let EARN_RULES = { ...DEFAULT_EARN_RULES };
+let rulesLastFetched = 0;
+const RULES_CACHE_TTL = 5 * 60 * 1000; // 5 minutos
+
+/**
+ * Obtiene las reglas de tokens desde Remote Config de Firebase
+ * Las cachea por 5 minutos para evitar lecturas excesivas
+ */
+export const fetchTokenRules = async (): Promise<void> => {
+    const now = Date.now();
+    if (now - rulesLastFetched < RULES_CACHE_TTL) {
+        return; // Usar cache
+    }
+
+    try {
+        const configRef = doc(db, 'remote_config', 'token_rules');
+        const configSnap = await getDoc(configRef);
+
+        if (configSnap.exists()) {
+            const remoteRules = configSnap.data();
+
+            // Merge remote rules with defaults (for any new types not in remote)
+            Object.keys(DEFAULT_EARN_RULES).forEach((key) => {
+                const type = key as TransactionType;
+                if (remoteRules[type]) {
+                    EARN_RULES[type] = {
+                        amount: remoteRules[type].amount ?? DEFAULT_EARN_RULES[type].amount,
+                        dailyLimit: remoteRules[type].dailyLimit ?? DEFAULT_EARN_RULES[type].dailyLimit,
+                        description: remoteRules[type].description ?? DEFAULT_EARN_RULES[type].description,
+                    };
+                }
+            });
+
+            rulesLastFetched = now;
+            console.log('✅ Token rules loaded from Remote Config');
+        }
+    } catch (error) {
+        console.warn('Could not fetch token rules from Remote Config, using defaults:', error);
+    }
+};
+
+/**
+ * Obtiene las reglas de tokens actuales
+ */
+export const getTokenRules = () => EARN_RULES;
 
 // ============================================
 // FUNCIONES PRINCIPALES
@@ -149,6 +196,9 @@ export const earnTokens = async (
     type: TransactionType,
     referenceId?: string
 ): Promise<{ success: boolean; message: string; amount: number; newBalance?: number }> => {
+    // Asegurar que tenemos las reglas más recientes
+    await fetchTokenRules();
+
     const rule = EARN_RULES[type];
 
     if (!rule || rule.amount <= 0) {
@@ -169,11 +219,28 @@ export const earnTokens = async (
             }
         }
 
+        // Calcular cantidad base
+        let finalAmount = rule.amount;
+
+        // Aplicar boost si está activo
+        const userRef = doc(db, 'users', userId);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+            const boostExpiry = userData.tokenBoostExpiry?.toDate?.() || userData.tokenBoostExpiry;
+            const boostMultiplier = userData.tokenBoostMultiplier || 1;
+
+            if (boostExpiry && new Date(boostExpiry) > new Date() && boostMultiplier > 1) {
+                finalAmount = Math.floor(rule.amount * boostMultiplier);
+                console.log(`🚀 Boost activo: ${rule.amount} x ${boostMultiplier} = ${finalAmount} tokens`);
+            }
+        }
+
         // Crear transacción
         const transaction: Omit<TokenTransaction, 'id'> = {
             userId,
             type,
-            amount: rule.amount,
+            amount: finalAmount,
             description: rule.description,
             referenceId,
             createdAt: serverTimestamp(),
@@ -181,10 +248,10 @@ export const earnTokens = async (
 
         await addDoc(collection(db, 'token_transactions'), transaction);
 
-        // Actualizar balance del usuario
-        const userRef = doc(db, 'users', userId);
+        // Actualizar balance del usuario y tokens históricos
         await updateDoc(userRef, {
-            tokenBalance: increment(rule.amount),
+            tokenBalance: increment(finalAmount),
+            lifetimeTokensEarned: increment(finalAmount),
         });
 
         // Obtener nuevo balance
@@ -192,13 +259,75 @@ export const earnTokens = async (
 
         return {
             success: true,
-            message: `+${rule.amount} tokens por ${rule.description}`,
-            amount: rule.amount,
+            message: `+${finalAmount} tokens por ${rule.description}`,
+            amount: finalAmount,
             newBalance
         };
     } catch (error) {
         console.error('Error earning tokens:', error);
         return { success: false, message: 'Error al procesar tokens', amount: 0 };
+    }
+};
+
+/**
+ * Otorga una cantidad personalizada de tokens (para training con tokens variables)
+ * Aplica boost si está activo
+ */
+export const earnCustomTokens = async (
+    userId: string,
+    amount: number,
+    description: string,
+    type: TransactionType = 'training_completed',
+    referenceId?: string
+): Promise<{ success: boolean; message: string; finalAmount: number; newBalance?: number }> => {
+    try {
+        const userRef = doc(db, 'users', userId);
+        const userSnap = await getDoc(userRef);
+
+        let finalAmount = amount;
+
+        // Aplicar boost si está activo
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+            const boostExpiry = userData.tokenBoostExpiry?.toDate?.() || userData.tokenBoostExpiry;
+            const boostMultiplier = userData.tokenBoostMultiplier || 1;
+
+            if (boostExpiry && new Date(boostExpiry) > new Date() && boostMultiplier > 1) {
+                finalAmount = Math.floor(amount * boostMultiplier);
+                console.log(`🚀 Boost activo: ${amount} x ${boostMultiplier} = ${finalAmount} tokens`);
+            }
+        }
+
+        // Crear transacción
+        const transaction: Omit<TokenTransaction, 'id'> = {
+            userId,
+            type,
+            amount: finalAmount,
+            description,
+            referenceId,
+            createdAt: serverTimestamp(),
+        };
+
+        await addDoc(collection(db, 'token_transactions'), transaction);
+
+        // Actualizar balance del usuario y tokens históricos
+        await updateDoc(userRef, {
+            tokenBalance: increment(finalAmount),
+            lifetimeTokensEarned: increment(finalAmount),
+        });
+
+        // Obtener nuevo balance
+        const newBalance = await getTokenBalance(userId);
+
+        return {
+            success: true,
+            message: `+${finalAmount} tokens por ${description}`,
+            finalAmount,
+            newBalance
+        };
+    } catch (error) {
+        console.error('Error earning custom tokens:', error);
+        return { success: false, message: 'Error al procesar tokens', finalAmount: 0 };
     }
 };
 
