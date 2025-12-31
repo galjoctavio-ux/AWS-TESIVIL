@@ -1,0 +1,51 @@
+# =========================================================
+# ARCHIVO TEMPORAL (SOLO PUERTO 80)
+# Propósito: Dejar que Nginx arranque para que Certbot pueda funcionar.
+# =========================================================
+server {
+    server_name tesivil.mrfrio.mx;
+
+    # Ruta al frontend
+    root /var/www/tesivil-web;
+    index index.html contacto.html;
+
+    # Importante: Permite a Certbot verificar tu dominio
+    location ~ /.well-known/acme-challenge/ {
+        allow all;
+    }
+
+    # Servir el frontend
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    # Redirigir la API al backend (Puerto 3002)
+    location /api/ {
+        proxy_pass http://localhost:3002;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/tesivil.mrfrio.mx/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/tesivil.mrfrio.mx/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+
+server {
+    if ($host = tesivil.mrfrio.mx) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen 80;
+    server_name tesivil.mrfrio.mx;
+    return 404; # managed by Certbot
+
+
+}

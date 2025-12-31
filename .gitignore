@@ -1,34 +1,37 @@
+# --- DEPENDENCIAS Y COMPILADOS GENERALES ---
 node_modules/
+*/node_modules/
 dist/
-.env
-.env.*
+build/
+vendor/
 .DS_Store
 *.log
-postgres_data/
-evolution-api/postgres_data/
-# Ignorar carpetas de datos de docker si las hay dentro de Evolution
-02_EVOLUTION_API/postgres_data/
-# Ignorar entornos virtuales de Python (donde se instalan las librerías)
+*.tmp
+
+# --- PYTHON Y ENTORNOS VIRTUALES ---
 venv/
 env/
 .venv/
 */venv/
-
-# Ignorar carpetas de dependencias de Node.js (veo que tienes package.json)
-node_modules/
-*/node_modules/
-
-# Ignorar archivos de variables de entorno (¡Seguridad!)
-.env
-*.env
-
-# Ignorar dumps de bases de datos
-# *.sql
-*.sqlite
-
-# Ignorar archivos compilados de Python
+*.venv
 __pycache__/
 *.pyc
 
-# Archivos específicos de sistema
-.DS_Store
+# --- VARIABLES DE ENTORNO Y SEGURIDAD ---
+.env
+.env.*
+*.env
+config_secret.php
+**/secrets.h
+
+# --- BASES DE DATOS Y DOCKER ---
+postgres_data/
+evolution-api/postgres_data/
+02_EVOLUTION_API/postgres_data/
+*.sqlite
+# *.sql
+
+# --- CONFIGURACIONES ESPECÍFICAS (AGENDAMIENTO/PHP) ---
+04_AGENDAMIENTO/easy_appointments_src/application/config/config.php
+04_AGENDAMIENTO/easy_appointments_src/config.php
+04_AGENDAMIENTO/easy_appointments_src/storage/sessions/*

@@ -1,0 +1,64 @@
+# =========================================================
+# ARCHIVO docker-compose.yaml CORREGIDO Y SIMPLIFICADO
+# =========================================================
+
+volumes:
+  database-data:
+  redis-data:
+
+networks:
+  stack:
+    name: stack
+    external: false
+
+services:
+  
+  # --- 1. Base de Datos (Postgres) ---
+  database:
+    container_name: database
+    image: postgres:15 # <-- ¡Correcto! Dejamos la versión 15
+    restart: always
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+    env_file: .env
+    networks:
+      - stack
+
+  # --- 2. Servidor de Caché (Redis) ---
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: always
+    volumes:
+      - redis-data:/data
+    networks:
+      - stack
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+
+  # --- 3. Aplicación Principal (Cal.com) ---
+  calcom:
+    # Esta es la imagen pre-construida que ya descargaste
+    image: calcom.docker.scarf.sh/calcom/cal.com
+    
+    # ¡IMPORTANTE! ELIMINAMOS TODA LA SECCIÓN "build:"
+    # que causaba el error de "no such file or directory"
+    
+    container_name: calcom
+    restart: always
+    networks:
+      - stack
+    ports:
+      - 3003:3000 # <-- Tu puerto personalizado, ¡perfecto!
+    env_file: .env
+    environment:
+      # Estas líneas son un "seguro" por si el .env falla
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DATABASE_HOST}/${POSTGRES_DB}
+      - DATABASE_DIRECT_URL=${DATABASE_URL}
+    depends_on:
+      - database
+      - redis # <-- Añadido para que espere a Redis también
+
+# --- FIN ---
+# Eliminamos los servicios "calcom-api" y "studio"
+# porque no son necesarios para producción.

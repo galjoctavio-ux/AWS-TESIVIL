@@ -1,0 +1,188 @@
+.wizard-container {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 90vh;
+    /* Casi pantalla completa */
+    max-height: 700px;
+}
+
+.wizard-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    background: #fff;
+    text-align: center;
+}
+
+.wizard-header h3 {
+    margin: 0;
+    color: #1e293b;
+}
+
+.step-indicator {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    display: block;
+    margin-top: 5px;
+}
+
+.wizard-step {
+    padding: 1.5rem;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.wizard-step h4 {
+    color: #334155;
+    margin-bottom: 1.2rem;
+    font-size: 1.1rem;
+}
+
+/* --- TOGGLE PAGO --- */
+.payment-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+}
+
+.payment-btn {
+    flex: 1;
+    padding: 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: white;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.payment-btn.active {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+    color: #1d4ed8;
+}
+
+.payment-btn span {
+    font-size: 1.5rem;
+}
+
+/* --- INPUT GIGANTE --- */
+.big-input {
+    font-size: 2rem;
+    padding: 1rem;
+    width: 100%;
+    text-align: center;
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #0f172a;
+}
+
+.big-input:focus {
+    border-color: #3b82f6;
+    outline: none;
+}
+
+/* --- ALERTAS --- */
+.finance-alert {
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.finance-alert.warning {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+}
+
+.finance-alert.success {
+    background: #f0fdf4;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+
+/* --- SEMÁFORO --- */
+.semaforo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 2rem;
+}
+
+.semaforo-btn {
+    padding: 1rem;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    background: #f8fafc;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.semaforo-btn.selected {
+    border-color: currentColor;
+    font-weight: bold;
+    background: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.semaforo-btn.green {
+    color: #22c55e;
+}
+
+.semaforo-btn.orange {
+    color: #f59e0b;
+}
+
+.semaforo-btn.red {
+    color: #ef4444;
+}
+
+/* --- BOTONES ACCIÓN --- */
+.wizard-actions {
+    padding: 1.5rem;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    gap: 10px;
+    background: #fff;
+}
+
+.btn-secondary {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-success {
+    background: #22c55e;
+    color: white;
+}
+
+.wizard-actions button {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.wizard-actions button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
