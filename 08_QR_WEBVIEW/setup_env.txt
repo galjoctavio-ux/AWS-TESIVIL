@@ -1,0 +1,5 @@
+NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyCn7uUld0txJnAcaCPNPOF5bzavGPuQRrM
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=mr-frio.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=mr-frio
+NEXT_PUBLIC_IOS_APP_URL=https://apps.apple.com/app/mrfrio
+NEXT_PUBLIC_ANDROID_APP_URL=https://play.google.com/store/apps/details?id=com.mrfrio
