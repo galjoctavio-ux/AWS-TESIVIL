@@ -1,5 +1,0 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
-
-ERROR - 2025-11-26 01:10:38 --> Severity: Warning --> Trying to access array offset on value of type bool /home/galj_octavio/TESIVIL_STACK/04_AGENDAMIENTO/easy_appointments_src/system/libraries/Cache/drivers/Cache_file.php 277
-ERROR - 2025-11-26 20:56:45 --> Severity: Warning --> unlink(/home/galj_octavio/TESIVIL_STACK/04_AGENDAMIENTO/easy_appointments_src/application/config/../../storage/cache/rate_limit_tmp_49.248.192.204): No such file or directory /home/galj_octavio/TESIVIL_STACK/04_AGENDAMIENTO/easy_appointments_src/system/libraries/Cache/drivers/Cache_file.php 279
-ERROR - 2025-11-26 20:56:45 --> Severity: Warning --> unlink(/home/galj_octavio/TESIVIL_STACK/04_AGENDAMIENTO/easy_appointments_src/application/config/../../storage/cache/rate_limit_key_49.248.192.204): No such file or directory /home/galj_octavio/TESIVIL_STACK/04_AGENDAMIENTO/easy_appointments_src/system/libraries/Cache/drivers/Cache_file.php 279
