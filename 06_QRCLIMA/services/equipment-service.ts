@@ -27,6 +27,7 @@ export interface EquipmentData {
     lastServiceTechId?: string;  // King of the Hill - último técnico que dio servicio
     lastServiceTechPhone?: string; // Phone for WhatsApp contact
     lastServiceTechAlias?: string; // Display name
+    lastServiceTechName?: string;  // Full name for display
     lastServiceDate?: any;       // Fecha del último servicio
     geoLocation?: GeoLocation;   // Passive geolocation capture
     createdAt?: any;

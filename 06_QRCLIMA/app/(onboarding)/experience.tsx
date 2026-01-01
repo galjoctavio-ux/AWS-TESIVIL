@@ -48,7 +48,7 @@ const EXPERIENCE_OPTIONS: ExperienceOption[] = [
 export default function ExperienceSelection() {
     const router = useRouter();
     const { user, refreshOnboardingStatus } = useAuth();
-    const params = useLocalSearchParams<{ fullName: string; alias: string; city: string; businessName?: string }>();
+    const params = useLocalSearchParams<{ fullName: string; alias: string; phone: string; city: string; businessName?: string }>();
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -71,6 +71,7 @@ export default function ExperienceSelection() {
             params: {
                 fullName: params.fullName,
                 alias: params.alias,
+                phone: params.phone,
                 city: params.city,
                 businessName: params.businessName,
                 experienceYears: option.years.toString()

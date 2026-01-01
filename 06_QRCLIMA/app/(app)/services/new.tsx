@@ -63,7 +63,7 @@ export default function NewService() {
     const [notes, setNotes] = useState('');
     const [reminderEnabled, setReminderEnabled] = useState(false); // Default to false, will be set based on isPro
     const [isPro, setIsPro] = useState(false); // Track if user is PRO
-    const [techProfile, setTechProfile] = useState<{ phone?: string; alias?: string } | null>(null); // For QR public view contact
+    const [techProfile, setTechProfile] = useState<{ phone?: string; alias?: string; fullName?: string } | null>(null); // For QR public view contact
     const [customReminderMonths, setCustomReminderMonths] = useState(settings.reminderMonths || 6); // Custom reminder time per service
     const [capacityBTU, setCapacityBTU] = useState(''); // BTU capacity
 
@@ -169,9 +169,10 @@ export default function NewService() {
                     console.log('*** TECH PROFILE LOADED ***', {
                         phone: profile?.phone,
                         alias: profile?.alias,
+                        fullName: profile?.fullName,
                         fullProfile: profile
                     });
-                    setTechProfile({ phone: profile?.phone, alias: profile?.alias });
+                    setTechProfile({ phone: profile?.phone, alias: profile?.alias, fullName: profile?.fullName });
                 });
             }
             loadBrands();

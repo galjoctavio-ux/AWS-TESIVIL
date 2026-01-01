@@ -15,22 +15,23 @@ export default function ProfileSetup() {
     const scrollViewRef = useRef<ScrollView>(null);
     const [fullName, setFullName] = useState('');
     const [alias, setAlias] = useState('');
+    const [phone, setPhone] = useState('');
     const [city, setCity] = useState('');
     const [businessName, setBusinessName] = useState('');
     const [showCityPicker, setShowCityPicker] = useState(false);
 
-    const isValid = fullName.trim().length >= 5 && alias.trim().length >= 3 && city.trim().length > 0;
+    const isValid = fullName.trim().length >= 5 && alias.trim().length >= 3 && city.trim().length > 0 && phone.trim().length >= 10;
 
     const handleContinue = () => {
         if (!isValid) {
-            Alert.alert('Campos requeridos', 'Por favor ingresa tu nombre completo, un alias y tu ciudad');
+            Alert.alert('Campos requeridos', 'Por favor ingresa tu nombre completo, un alias, teléfono y tu ciudad');
             return;
         }
 
         // Guardar en estado global o pasar como params
         router.push({
             pathname: '/(onboarding)/experience',
-            params: { fullName, alias, city, businessName }
+            params: { fullName, alias, phone, city, businessName }
         });
     };
 
@@ -106,6 +107,24 @@ export default function ProfileSetup() {
                             />
                             <Text className="text-gray-400 text-sm mt-1">
                                 Este nombre se usará en la comunidad y foros.
+                            </Text>
+                        </View>
+
+                        {/* Teléfono */}
+                        <View className="mt-4">
+                            <Text className="text-gray-700 font-semibold mb-2 flex-row items-center">
+                                <Ionicons name="call" size={16} color="#374151" /> Teléfono de Contacto *
+                            </Text>
+                            <TextInput
+                                className="bg-white border border-gray-300 rounded-xl p-4 text-lg"
+                                placeholder="Ej: 8111234567"
+                                value={phone}
+                                onChangeText={setPhone}
+                                keyboardType="phone-pad"
+                                maxLength={15}
+                            />
+                            <Text className="text-gray-400 text-sm mt-1">
+                                Este número aparecerá en las bitácoras QR para que tus clientes te contacten.
                             </Text>
                         </View>
 

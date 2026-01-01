@@ -1,9 +1,0 @@
-{
-  "/orders/page": "app/orders/page.js",
-  "/settings/page": "app/settings/page.js",
-  "/moderation/page": "app/moderation/page.js",
-  "/tokens/page": "app/tokens/page.js",
-  "/api/users/gift-tokens/route": "app/api/users/gift-tokens/route.js",
-  "/users/page": "app/users/page.js",
-  "/api/users/route": "app/api/users/route.js"
-}

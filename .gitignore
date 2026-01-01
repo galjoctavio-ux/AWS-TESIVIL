@@ -35,3 +35,15 @@ evolution-api/postgres_data/
 04_AGENDAMIENTO/easy_appointments_src/application/config/config.php
 04_AGENDAMIENTO/easy_appointments_src/config.php
 04_AGENDAMIENTO/easy_appointments_src/storage/sessions/*
+
+# --- NEXT.JS Y WEBPACK ---
+.next/
+*/.next/
+out/
+build/
+dist/
+.vercel/
+
+# Archivos temporales de Hot Module Replacement (HMR)
+*.hot-update.js
+*.hot-update.json

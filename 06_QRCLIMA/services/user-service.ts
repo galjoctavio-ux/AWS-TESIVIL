@@ -636,6 +636,7 @@ export const completeOnboarding = async (
     profileData: {
         alias: string;
         fullName: string;
+        phone: string;
         city: string;
         businessName?: string;
         experienceYears: number;

@@ -18,6 +18,7 @@ export default function PermissionsSetup() {
     const params = useLocalSearchParams<{
         fullName: string;
         alias: string;
+        phone: string;
         city: string;
         businessName?: string;
         experienceYears: string; // params llegan como string
@@ -82,6 +83,7 @@ export default function PermissionsSetup() {
             const success = await completeOnboarding(user.uid, {
                 fullName: params.fullName || '',
                 alias: params.alias || '',
+                phone: params.phone || '',
                 city: params.city || '',
                 businessName: params.businessName,
                 experienceYears: Number(params.experienceYears) || 0,
