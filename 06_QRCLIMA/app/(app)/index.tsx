@@ -84,7 +84,19 @@ export default function HomeScreen() {
     const displayName = profile?.alias || profile?.businessName || 'Técnico';
     const tokenBalance = profile?.tokenBalance || 0;
     const rankInfo = getRankLabel(profile?.rank);
-    const nextService = upcomingServices[0];
+
+    // Filter for truly upcoming services (future date and pending status)
+    const nextService = useMemo(() => {
+        const now = new Date();
+        return upcomingServices.find(service => {
+            // Check if service is pending
+            if (service.status === 'Terminado' || service.status === 'Finalizado') return false;
+
+            // Check if date is in the future
+            const serviceDate = service.date?.toDate ? service.date.toDate() : new Date(service.date);
+            return serviceDate > now;
+        });
+    }, [upcomingServices]);
 
     return (
         <View className="flex-1 bg-slate-50">
@@ -120,22 +132,35 @@ export default function HomeScreen() {
                 <View className="px-4 -mt-16">
                     <View className="bg-white rounded-3xl p-5 shadow-lg border border-gray-100">
                         {nextService ? (
-                            // Has upcoming service
-                            <View
+                            // Has upcoming service - tappable to go to agenda
+                            <TouchableOpacity
+                                onPress={() => router.push(`/(app)/agenda?selectEvent=${nextService.id}`)}
                                 className="mb-4"
                             >
                                 <View className="flex-row items-center mb-2">
                                     <View className="w-3 h-3 rounded-full bg-green-500 mr-2" />
                                     <Text className="text-gray-500 text-sm font-medium">Próximo Servicio</Text>
+                                    <View className="ml-auto">
+                                        <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
+                                    </View>
                                 </View>
                                 <Text className="text-xl font-bold text-gray-800 mb-1">
-                                    {nextService.date?.toDate ?
-                                        nextService.date.toDate().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })
-                                        : 'Hoy'
-                                    } - {nextService.type}
+                                    {nextService.date?.toDate ? (() => {
+                                        const d = nextService.date.toDate();
+                                        const today = new Date();
+                                        const isToday = d.toDateString() === today.toDateString();
+                                        const tomorrow = new Date(today);
+                                        tomorrow.setDate(tomorrow.getDate() + 1);
+                                        const isTomorrow = d.toDateString() === tomorrow.toDateString();
+
+                                        const timeStr = d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                                        if (isToday) return `Hoy ${timeStr}`;
+                                        if (isTomorrow) return `Mañana ${timeStr}`;
+                                        return d.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric', month: 'short' }) + ` ${timeStr}`;
+                                    })() : 'Próximamente'} - {nextService.type}
                                 </Text>
                                 <Text className="text-gray-500">Cliente: {nextService.clientName || 'Ver detalles'}</Text>
-                            </View>
+                            </TouchableOpacity>
                         ) : (
                             // No services
                             <View className="items-center py-2 mb-4">

@@ -1,9 +1,10 @@
-export default {
+﻿export default {
     expo: {
         ...require('./app.json').expo,
         extra: {
             // Lee la clave de la variable de entorno, con fallback para desarrollo
-            googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || 'AIzaSyBFmKunZlJbCawN4XBmz2M23sW456sDtVs',
+            // IMPORTANT: Set GOOGLE_MAPS_API_KEY env var for builds
+            googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || '',
             // Supabase (existing - for other functions)
             supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL || '',
             supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '',
@@ -12,8 +13,10 @@ export default {
             supabasePriceAnonKey: process.env.EXPO_PUBLIC_SUPABASE_PRICE_ANON_KEY || '',
             // EAS Project ID
             eas: {
-                projectId: '6cb0e6b6-938f-438c-b718-4f6d48dcca49',
+                projectId: 'ec0bc67e-48e5-438c-b0ed-d9d55aee6bf5',
             },
         },
     },
 };
+
+

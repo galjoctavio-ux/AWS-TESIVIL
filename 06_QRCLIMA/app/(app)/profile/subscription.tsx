@@ -145,7 +145,7 @@ export default function SubscriptionScreen() {
 
                     <View className="items-center py-4">
                         <View className="bg-white/20 w-20 h-20 rounded-full items-center justify-center mb-4">
-                            <Text className="text-4xl">🚀</Text>
+                            <Ionicons name="diamond" size={40} color="white" />
                         </View>
                         <Text className="text-white text-2xl font-bold text-center">
                             Desbloquea todo tu potencial

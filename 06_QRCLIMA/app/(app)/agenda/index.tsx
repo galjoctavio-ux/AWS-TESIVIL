@@ -1,6 +1,6 @@
-import { View, Text, TouchableOpacity, RefreshControl, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, RefreshControl, SafeAreaView, ScrollView, Modal } from 'react-native';
 import { useState, useCallback, useEffect } from 'react';
-import { useRouter, useFocusEffect } from 'expo-router';
+import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../../context/AuthContext';
@@ -18,6 +18,9 @@ export default function AgendaScreen() {
     const router = useRouter();
     const { user } = useAuth();
     const { settings, updateSettings } = useSettings();
+
+    // Get URL params for deep linking from home page
+    const { selectEvent } = useLocalSearchParams<{ selectEvent?: string }>();
 
     // Calendar State
     const [date, setDate] = useState(new Date());
@@ -45,6 +48,19 @@ export default function AgendaScreen() {
     // API Usage for distance mode counter
     const [apiUsage, setApiUsage] = useState<{ used: number, max: number, remaining: number }>({ used: 0, max: 10, remaining: 10 });
 
+    // Pro Feature Modal for free users
+    const [showProFeatureModal, setShowProFeatureModal] = useState(false);
+
+    // Track if we should auto-select an event
+    const [pendingSelectEvent, setPendingSelectEvent] = useState<string | null>(null);
+
+    // Set pending event when coming from home page
+    useEffect(() => {
+        if (selectEvent) {
+            setPendingSelectEvent(selectEvent);
+        }
+    }, [selectEvent]);
+
     // Data Load
     useFocusEffect(
         useCallback(() => {
@@ -61,6 +77,26 @@ export default function AgendaScreen() {
             preloadTodayDistances(events);
         }
     }, [isPro, baseLat, baseLng, events.length]);
+
+    // Auto-select event when coming from home page
+    useEffect(() => {
+        if (pendingSelectEvent && events.length > 0) {
+            const eventToSelect = events.find(e => e.id === pendingSelectEvent);
+            if (eventToSelect) {
+                // Navigate calendar to the event's date
+                const eventDate = eventToSelect.start instanceof Date
+                    ? eventToSelect.start
+                    : new Date(eventToSelect.start);
+                setDate(eventDate);
+
+                // Open the action sheet for this event
+                setSelectedEvent(eventToSelect);
+
+                // Clear the pending selection
+                setPendingSelectEvent(null);
+            }
+        }
+    }, [pendingSelectEvent, events]);
 
     const loadBaseLocation = async () => {
         try {
@@ -376,7 +412,7 @@ export default function AgendaScreen() {
                                     const newMode = settings.distanceMode === 'linear' ? 'traffic' : 'linear';
                                     updateSettings({ distanceMode: newMode });
                                 } else {
-                                    router.push('/(app)/wallet');
+                                    setShowProFeatureModal(true);
                                 }
                             }}
                             className={`w-9 h-9 rounded-full items-center justify-center mr-2 ${!isPro
@@ -600,6 +636,75 @@ export default function AgendaScreen() {
                     refreshingDistance={refreshingDistance}
                 />
             )}
+
+            {/* Pro Feature Modal for Free Users */}
+            <Modal
+                visible={showProFeatureModal}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setShowProFeatureModal(false)}
+            >
+                <View className="flex-1 bg-black/50 justify-center items-center px-6">
+                    <View className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl">
+                        {/* Header Icon */}
+                        <View className="items-center mb-4">
+                            <View className="w-16 h-16 rounded-full bg-amber-100 items-center justify-center mb-3">
+                                <Ionicons name="car" size={32} color="#F59E0B" />
+                            </View>
+                            <Text className="text-xl font-bold text-gray-800 text-center">
+                                Distancia con Tráfico
+                            </Text>
+                        </View>
+
+                        {/* Message */}
+                        <Text className="text-gray-600 text-center mb-6 leading-relaxed">
+                            Este botón calcula las distancias entre tus citas considerando el tráfico en tiempo real. {'\n\n'}
+                            Desbloquea esta función siendo PRO o actívala con tokens en la tienda.
+                        </Text>
+
+                        {/* Buttons */}
+                        <View className="space-y-3">
+                            {/* Go to Store Button */}
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setShowProFeatureModal(false);
+                                    router.push('/(app)/store');
+                                }}
+                                className="bg-blue-600 py-3.5 rounded-xl flex-row items-center justify-center mb-3"
+                            >
+                                <Ionicons name="storefront" size={20} color="white" />
+                                <Text className="text-white font-semibold text-base ml-2">
+                                    Ir a la Tienda
+                                </Text>
+                            </TouchableOpacity>
+
+                            {/* Buy PRO Button */}
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setShowProFeatureModal(false);
+                                    router.push('/(app)/profile/subscription');
+                                }}
+                                className="bg-amber-500 py-3.5 rounded-xl flex-row items-center justify-center mb-3"
+                            >
+                                <Ionicons name="diamond" size={20} color="white" />
+                                <Text className="text-white font-semibold text-base ml-2">
+                                    Comprar PRO
+                                </Text>
+                            </TouchableOpacity>
+
+                            {/* Cancel Button */}
+                            <TouchableOpacity
+                                onPress={() => setShowProFeatureModal(false)}
+                                className="py-3 rounded-xl"
+                            >
+                                <Text className="text-gray-500 font-medium text-center">
+                                    Cancelar
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }

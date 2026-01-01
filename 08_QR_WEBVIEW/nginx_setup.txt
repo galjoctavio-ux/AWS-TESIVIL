@@ -1,6 +1,6 @@
 server {
     listen 80;
-    server_name TU_DOMINIO.com; # Reemplazar con el dominio real (ej: qr.tesivil.com)
+    server_name qr.tesivil.com; # Reemplazar con el dominio real (ej: qr.tesivil.com)
 
     location / {
         proxy_pass http://localhost:3003;

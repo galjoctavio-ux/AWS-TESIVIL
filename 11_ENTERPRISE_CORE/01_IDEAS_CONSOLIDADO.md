@@ -6,32 +6,35 @@
 | 2025-12-24 | v1.3 | Antigravity | Ajuste estricto a 8 ideas metodológicas clave para el funcionamiento del sistema. |
 | 2025-12-24 | v1.4 | Antigravity | Refinamiento hacia procedimiento por fases y rol de orquestador visual. |
 | 2025-12-24 | v1.5 | Antigravity | Inclusión de la Capa Pedagógica y Definición de Límites Éticos/Operativos. |
+| 2026-01-01 | v1.6 | Definición de flujo basado en Markdown, roles y Prompt 0. |
+| 2026-01-01 | v1.7 | Roles Duales (Especialista/Arquitecto) y Prompt 1 para Planeación. |
+| 2026-01-01 | v1.8 | Prompt 2 (FODA/CAME), Análisis por Bloques y Control Humano. |
 
 # 01. Ideas Consolidado
 
 ## Estatus de Viabilidad
 *   **¿Estamos bajo el límite de 8 ideas para el MVP?**: SI
-*   **Total de Ideas Confirmadas**: 8 (Estratégicas)
+*   **Total de Ideas Confirmadas**: 8 (Estratégicas y Técnicas)
 
-## Listado de Ideas Confirmadas (El "Núcleo v1.5")
+## Listado de Ideas Confirmadas (El "Núcleo v1.8")
 
-1.  **Dependencia Explícita de AntiGravity**
-    *   *Concepto*: El sistema sabe que su "compañero" de ejecución es una IA avanzada llamada AntiGravity. Optimiza todo para ella.
-2.  **Software Windows como Orquestador Metodológico**
-    *   *Rol*: Guía visual que impone orden (ISO 9001 adaptada) antes de permitir la ejecución.
-3.  **Objetivo: MVP Estable Generado por IA**
-    *   *Promesa*: El usuario entra con una idea y sale con el código/estructura de un MVP funcional.
-4.  **Enfoque Pedagógico: Enseñar a Dirigir**
-    *   *Valor Sostenible*: No es un botón mágico; es un simulador de dirección de proyectos de IA. El usuario mejora sus habilidades al usarlo.
-5.  **Inclusión Obligatoria de Análisis de Riesgos**
-    *   *Filtro*: FODA, CAME y Matriz de Riesgos son pasos obligatorios, no opcionales.
-6.  **Ciclo de Refinamiento Iterativo**
-    *   *Flujo*: Enseñar que la primera respuesta de la IA nunca es la final. Hay que iterar y corregir.
-7.  **Exclusión de Dominios Críticos**
-    *   *Safety*: Bloqueo explícito o advertencias severas para proyectos médicos, legales o de apuestas.
-8.  **Procedimiento Reutilizable y Estandarizado**
-    *   *Activo*: El usuario se queda con una metodología de "Fábrica de Software Personal".
+1.  **Control Humano del Ritmo (El Botón de Avance)**
+    *   *Regla*: La fase no se cierra sola. El usuario debe decir "Estoy satisfecho, continuemos".
+2.  **PROMPT 2: Análisis Estratégico Exclusivo**
+    *   *Foco*: Dedicado 100% a FODA (SWOT) y CAME. No se mezcla con planeación técnica ni ideación.
+3.  **Uso de AntiGravity por Contexto Largo**
+    *   *Razón*: El Prompt 2 requiere analizar todo el contexto acumulado. AntiGravity es el motor ideal para esto.
+4.  **Análisis Obligatorio por Bloques (100 Líneas)**
+    *   *Calidad*: Prohibido hacer "resúmenes rápidos". La IA debe analizar el problema en chunks detallados.
+5.  **Separación Estricta: Análisis vs. Ejecución**
+    *   *Muro*: No se pasa a la táctica (Ejecución) sin haber digerido la estrategia (Análisis).
+6.  **FODA como Base para CAME**
+    *   *Lógica*: El CAME (Corregir, Afrontar, Mantener, Explotar) debe derivar matemáticamente del FODA previo.
+7.  **Validación Cruzada (Opcional)**
+    *   *Robustez*: El sistema permite/sugiere pegar el FODA en otra IA para tener una "Segunda Opinión".
+8.  **Criterios de Salida Claros**
+    *   *Gate*: Antes de Ejecutar, deben existir los archivos de Análisis Estratégico aprobados por el humano.
 
 ## Notas de Evolución
-*   Se añade una dimensión ética/seguridad (Idea 7) que no existía antes.
-*   Se transforma la herramienta en un "Entrenador de Directores de IA" (Idea 4).
+*   Se profundiza en la fase intermedia entre Planeación y Ejecución: El **Análisis Estratégico**.
+*   Se pone al "Contexto Largo" como una capacidad técnica habilitadora del negocio.

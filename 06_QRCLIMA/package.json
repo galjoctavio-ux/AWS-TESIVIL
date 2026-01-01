@@ -40,6 +40,7 @@
     "expo-web-browser": "~15.0.10",
     "firebase": "^12.7.0",
     "react": "19.1.0",
+    "react-dom": "19.1.0",
     "react-native": "0.81.5",
     "react-native-big-calendar": "^4.19.0",
     "react-native-css-interop": "^0.2.1",
@@ -57,6 +58,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "nativewind": "^4.2.1",
     "tailwindcss": "^3.3.2",
     "typescript": "~5.9.2"
