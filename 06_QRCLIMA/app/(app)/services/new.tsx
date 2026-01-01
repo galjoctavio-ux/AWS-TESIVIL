@@ -506,6 +506,7 @@ export default function NewService() {
                 technicianId: user!.uid,
                 technicianPhone: techProfile?.phone,
                 technicianAlias: techProfile?.alias,
+                technicianName: techProfile?.fullName,
             });
 
             // Set preloaded data

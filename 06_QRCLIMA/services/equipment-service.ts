@@ -293,6 +293,7 @@ interface AddEquipmentInput {
     technicianId: string;
     technicianPhone?: string;    // For QR public view contact
     technicianAlias?: string;    // For QR public view display
+    technicianName?: string;     // For QR public view - full name
     qrCode?: string;             // Original scanned value (for reference)
     scannedToken?: string;       // Token from scanned QR - USE THIS instead of generating new
     btu?: number;
@@ -333,6 +334,7 @@ export const addEquipment = async (equipmentData: AddEquipmentInput): Promise<{ 
             lastServiceTechId: equipmentData.technicianId,
             lastServiceTechPhone: equipmentData.technicianPhone,
             lastServiceTechAlias: equipmentData.technicianAlias,
+            lastServiceTechName: equipmentData.technicianName,
             lastServiceDate: serverTimestamp(),
             createdAt: serverTimestamp(),
         });

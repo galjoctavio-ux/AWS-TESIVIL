@@ -53,14 +53,26 @@ service cloud.firestore {
     }
     
     // ============================================
-    // EQUIPOS - lectura pública para QR, escritura dueño
+    // EQUIPOS - lectura pública para QR, escritura especial para King of the Hill
     // ============================================
     match /equipments/{equipmentId} {
       // LECTURA: pública para vista QR web
       allow read: if true;
+      // CREAR: solo el técnico que lo registra
       allow create: if request.auth != null 
         && request.auth.uid == request.resource.data.technicianId;
-      allow update, delete: if request.auth != null 
+      // ACTUALIZAR: dueño puede modificar todo, 
+      // CUALQUIER técnico autenticado puede actualizar campos lastServiceTech* (King of the Hill)
+      allow update: if request.auth != null 
+        && (
+          // El dueño puede modificar cualquier cosa
+          request.auth.uid == resource.data.technicianId
+          // O cualquier técnico autenticado puede modificar solo los campos King of the Hill
+          || request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['lastServiceTechId', 'lastServiceTechPhone', 'lastServiceTechAlias', 'lastServiceTechName', 'lastServiceDate'])
+        );
+      // ELIMINAR: solo el dueño
+      allow delete: if request.auth != null 
         && request.auth.uid == resource.data.technicianId;
     }
     
