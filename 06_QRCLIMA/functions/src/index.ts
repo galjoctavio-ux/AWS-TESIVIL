@@ -1130,6 +1130,128 @@ export const verifyPasswordResetCode = functions
     });
 
 // ============================================
+// REPORT: Reportar link incorrecto (Radar de Precios)
+// ============================================
+export const reportBadLink = functions
+    .runWith({ timeoutSeconds: 60 })
+    .https
+    .onCall(async (data, context) => {
+        // Verificar autenticación
+        if (!context.auth) {
+            throw new functions.https.HttpsError(
+                'unauthenticated',
+                'Debes estar autenticado para reportar un link'
+            );
+        }
+
+        const { productName, brand, provider, price, url } = data;
+
+        if (!productName || !url) {
+            throw new functions.https.HttpsError(
+                'invalid-argument',
+                'productName y url son requeridos'
+            );
+        }
+
+        try {
+            const { Resend } = require('resend');
+            const resend = new Resend(RESEND_API_KEY);
+
+            // Get reporter info
+            const userDoc = await db.collection('users').doc(context.auth.uid).get();
+            const userData = userDoc.data();
+            const reporterEmail = userData?.email || context.auth.token?.email || 'Usuario anónimo';
+            const reporterName = userData?.alias || userData?.fullName || 'Técnico';
+
+            const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #EF4444; color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center; }
+        .content { background: #F3F4F6; padding: 20px; border-radius: 0 0 8px 8px; }
+        .product-card { background: white; border: 1px solid #E5E7EB; border-radius: 8px; padding: 16px; margin: 16px 0; }
+        .label { color: #6B7280; font-size: 12px; text-transform: uppercase; margin-bottom: 4px; }
+        .value { color: #111827; font-weight: bold; font-size: 14px; margin-bottom: 12px; }
+        .url { word-break: break-all; color: #3B82F6; font-size: 12px; }
+        .footer { text-align: center; color: #9CA3AF; font-size: 11px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>⚠️ Link Incorrecto Reportado</h2>
+    </div>
+    <div class="content">
+        <p>Un usuario ha reportado un link incorrecto en el Radar de Precios:</p>
+        
+        <div class="product-card">
+            <div class="label">Producto</div>
+            <div class="value">${productName}</div>
+            
+            ${brand ? `<div class="label">Marca</div><div class="value">${brand}</div>` : ''}
+            
+            ${provider ? `<div class="label">Proveedor</div><div class="value">${provider}</div>` : ''}
+            
+            ${price ? `<div class="label">Precio mostrado</div><div class="value">$${price}</div>` : ''}
+            
+            <div class="label">URL Reportada</div>
+            <div class="url"><a href="${url}">${url}</a></div>
+        </div>
+        
+        <div class="product-card">
+            <div class="label">Reportado por</div>
+            <div class="value">${reporterName}</div>
+            <div style="color: #6B7280; font-size: 12px;">${reporterEmail}</div>
+        </div>
+    </div>
+    <div class="footer">
+        Enviado automáticamente desde QRClima App<br>
+        ${new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City' })}
+    </div>
+</body>
+</html>
+            `;
+
+            const { error } = await resend.emails.send({
+                from: 'QRClima Reportes <noreply@tesivil.com>',
+                to: ['soporte@tesivil.com'],
+                subject: `🔗 Link incorrecto: ${productName}`,
+                html: htmlContent,
+            });
+
+            if (error) {
+                console.error('Error sending bad link report email:', error);
+                throw new functions.https.HttpsError('internal', 'Error al enviar el reporte');
+            }
+
+            // Log the report in Firestore for tracking
+            await db.collection('link_reports').add({
+                productName,
+                brand: brand || null,
+                provider: provider || null,
+                price: price || null,
+                url,
+                reportedBy: context.auth.uid,
+                reporterEmail,
+                createdAt: admin.firestore.Timestamp.now(),
+            });
+
+            console.log(`📧 Bad link report sent for: ${productName}`);
+
+            return { success: true, message: 'Reporte enviado correctamente' };
+
+        } catch (error: any) {
+            if (error instanceof functions.https.HttpsError) {
+                throw error;
+            }
+            console.error('Error in reportBadLink:', error);
+            throw new functions.https.HttpsError('internal', error.message);
+        }
+    });
+
+// ============================================
 // NOTIFICACIONES
 // ============================================
 export * from './notifications';

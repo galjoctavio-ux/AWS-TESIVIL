@@ -81,16 +81,34 @@ export default function SummaryScreen() {
                 status: 'Draft'
             });
 
-            // Get client for PDF
-            const client = await getClientById(params.clientId);
+            // Get client for PDF - with fallback if not found
+            const clientFromDb = await getClientById(params.clientId);
+            const clientForPdf = {
+                id: params.clientId,
+                name: clientFromDb?.name || params.clientName,
+                phone: clientFromDb?.phone || params.clientPhone || '',
+                address: clientFromDb?.address || params.clientAddress || '',
+                technicianId: clientFromDb?.technicianId || user.uid,
+                createdAt: clientFromDb?.createdAt || new Date()
+            };
+
             const profile = await getUserProfile(user.uid);
 
             setGenerating(true);
 
             // Generate PDF with branding
             await generateCotizadorPDF({
-                quote: { ...{ id: quoteId, technicianId: user.uid, clientId: params.clientId, clientName: params.clientName, items, subtotal: totals.subtotal, total: totals.total, status: 'Draft' as const }, id: quoteId },
-                client: { ...client!, id: params.clientId },
+                quote: {
+                    id: quoteId,
+                    technicianId: user.uid,
+                    clientId: params.clientId,
+                    clientName: params.clientName,
+                    items,
+                    subtotal: totals.subtotal,
+                    total: totals.total,
+                    status: 'Draft' as const
+                },
+                client: clientForPdf as any, // Type assertion for compatibility
                 technicianProfile: profile || undefined
             });
 
@@ -101,7 +119,7 @@ export default function SummaryScreen() {
             );
         } catch (error) {
             console.error('Error saving quote:', error);
-            Alert.alert('Error', 'No se pudo generar la cotización');
+            Alert.alert('Error', 'No se pudo generar la cotización. Detalles: ' + (error as Error).message);
         } finally {
             setSaving(false);
             setGenerating(false);

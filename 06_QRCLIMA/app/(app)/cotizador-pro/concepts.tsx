@@ -8,6 +8,7 @@ import { useAuth } from '../../../context/AuthContext';
 import {
     getConcepts,
     deleteConcept,
+    addConcept,
     CotizadorConcept,
     ConceptType,
     formatCurrency,
@@ -15,10 +16,11 @@ import {
 } from '../../../services/cotizador-service';
 import {
     searchCatalogProducts,
+    getEssentialProducts,
     formatPrice,
     PRICE_DISCLAIMER
 } from '../../../services/price-intelligence-service';
-import type { CatalogProduct } from '../../../services/supabase-client';
+import type { CatalogProduct, EssentialProduct } from '../../../services/supabase-client';
 
 export default function ConceptsProScreen() {
     const insets = useSafeAreaInsets();
@@ -42,6 +44,8 @@ export default function ConceptsProScreen() {
     // Import modal for adding market products to catalog
     const [importModalVisible, setImportModalVisible] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<CatalogProduct | null>(null);
+    const [customPrice, setCustomPrice] = useState('');
+    const [savingProduct, setSavingProduct] = useState(false);
 
     const loadConcepts = async () => {
         if (!user) return;
@@ -56,14 +60,23 @@ export default function ConceptsProScreen() {
         }
     };
 
-    // Load market recommendations for materials tab
+    // Load market recommendations for materials tab (from v_catalogo_tecnicos_pro)
     const loadRecommendations = async () => {
         if (activeTab !== 'MT') return;
         setLoadingRecommendations(true);
         try {
-            // Get general catalog products (empty search returns top products)
-            const data = await searchCatalogProducts('', 94);
-            setRecommendations(data);
+            // Get products from v_catalogo_tecnicos_pro view
+            const data = await getEssentialProducts();
+            // Map EssentialProduct to CatalogProduct format for compatibility
+            const mapped: CatalogProduct[] = data.map((item, index) => ({
+                id: `pro-${index}`,
+                display_name: item.display_name,
+                brand: '',
+                mejor_precio: item.mejor_precio,
+                en_tienda: item.en_tienda,
+                url_reference: item.url_reference
+            }));
+            setRecommendations(mapped);
         } catch (e) {
             console.error('Error loading recommendations:', e);
         } finally {
@@ -147,22 +160,43 @@ export default function ConceptsProScreen() {
     // Handle product selection - show import modal
     const handleProductSelect = (item: CatalogProduct) => {
         setSelectedProduct(item);
+        setCustomPrice(item.mejor_precio.toString());
         setImportModalVisible(true);
     };
 
-    // Navigate to add concept with pre-filled data
-    const handleAddToCatalog = () => {
-        if (!selectedProduct) return;
-        setImportModalVisible(false);
-        setSearchModalVisible(false);
-        router.push({
-            pathname: '/(app)/cotizador/add-concept',
-            params: {
-                defaultType: 'MT',
-                defaultDescription: selectedProduct.display_name,
-                defaultPrice: selectedProduct.mejor_precio.toString()
-            }
-        });
+    // Save product directly to user's catalog with custom price
+    const handleAddToCatalog = async () => {
+        if (!selectedProduct || !user) return;
+
+        const price = parseFloat(customPrice);
+        if (isNaN(price) || price <= 0) {
+            Alert.alert('Error', 'Ingresa un precio válido');
+            return;
+        }
+
+        setSavingProduct(true);
+        try {
+            await addConcept({
+                description: selectedProduct.display_name,
+                type: 'MT',
+                unitPrice: price,
+                unit: 'PZA',
+                technicianId: user.uid
+            });
+
+            Alert.alert('✅ Agregado', `"${selectedProduct.display_name}" se guardó en tu catálogo de materiales.`);
+            setImportModalVisible(false);
+            setSearchModalVisible(false);
+            setSelectedProduct(null);
+            setCustomPrice('');
+            // Reload concepts to show the new one
+            loadConcepts();
+        } catch (error) {
+            console.error('Error saving product:', error);
+            Alert.alert('Error', 'No se pudo guardar el producto. Intenta de nuevo.');
+        } finally {
+            setSavingProduct(false);
+        }
     };
 
     const renderConcept = ({ item }: { item: CotizadorConcept }) => (
@@ -419,19 +453,13 @@ export default function ConceptsProScreen() {
                 </View>
             </Modal>
 
-            {/* Import Product Modal - Shows disclaimer and options */}
+            {/* Import Product Modal - Shows disclaimer and price input */}
             <Modal visible={importModalVisible} transparent animationType="fade">
                 <View className="flex-1 bg-black/50 items-center justify-center px-6">
                     <View className="bg-white rounded-2xl p-6 w-full max-w-sm">
-                        {/* Warning Icon */}
-                        <View className="items-center mb-4">
-                            <View className="bg-amber-100 w-16 h-16 rounded-full items-center justify-center">
-                                <Ionicons name="warning" size={32} color="#F59E0B" />
-                            </View>
-                        </View>
-
+                        {/* Header */}
                         <Text className="text-lg font-bold text-gray-800 text-center mb-2">
-                            Precio de Referencia
+                            Agregar a Mi Catálogo
                         </Text>
 
                         {/* Product Info */}
@@ -439,9 +467,10 @@ export default function ConceptsProScreen() {
                             {selectedProduct?.display_name}
                         </Text>
 
-                        {/* Price Badge */}
-                        <View className="bg-green-50 rounded-xl p-3 mb-4 items-center">
-                            <Text className="text-green-600 text-2xl font-bold">
+                        {/* Reference Price */}
+                        <View className="bg-gray-50 rounded-xl p-3 mb-4 items-center">
+                            <Text className="text-gray-400 text-xs mb-1">Precio de referencia (mercado)</Text>
+                            <Text className="text-gray-500 text-lg">
                                 {formatPrice(selectedProduct?.mejor_precio || 0)}
                             </Text>
                             <Text className="text-gray-400 text-xs">
@@ -449,22 +478,36 @@ export default function ConceptsProScreen() {
                             </Text>
                         </View>
 
+                        {/* Custom Price Input */}
+                        <View className="mb-4">
+                            <Text className="text-gray-700 font-medium mb-2">💰 Tu precio (con utilidad):</Text>
+                            <TextInput
+                                className="bg-green-50 p-4 rounded-xl text-green-700 text-xl font-bold text-center border-2 border-green-200"
+                                placeholder="$0"
+                                keyboardType="numeric"
+                                value={customPrice}
+                                onChangeText={setCustomPrice}
+                            />
+                        </View>
+
                         {/* Disclaimer */}
                         <View className="bg-amber-50 rounded-xl p-3 mb-4 border border-amber-200">
-                            <Text className="text-amber-800 text-sm font-medium mb-2">⚠️ Importante:</Text>
                             <Text className="text-amber-700 text-xs leading-5">
-                                • Este es un precio directo del mercado{"\n"}
-                                • NO incluye tu utilidad o ganancia{"\n"}
-                                • El técnico es responsable del precio que cotice al cliente
+                                ⚠️ El precio de referencia NO incluye tu utilidad. Agrega tu margen de ganancia antes de guardar.
                             </Text>
                         </View>
 
                         {/* Action Buttons */}
                         <TouchableOpacity
                             onPress={handleAddToCatalog}
-                            className="bg-orange-500 py-3 rounded-xl mb-2"
+                            disabled={savingProduct}
+                            className={`py-3 rounded-xl mb-2 ${savingProduct ? 'bg-gray-300' : 'bg-orange-500'}`}
                         >
-                            <Text className="text-white text-center font-bold">📦 Agregar a Mi Catálogo</Text>
+                            {savingProduct ? (
+                                <ActivityIndicator color="white" />
+                            ) : (
+                                <Text className="text-white text-center font-bold">✅ Guardar en Mi Catálogo</Text>
+                            )}
                         </TouchableOpacity>
 
                         <TouchableOpacity
@@ -480,6 +523,7 @@ export default function ConceptsProScreen() {
                             onPress={() => {
                                 setImportModalVisible(false);
                                 setSelectedProduct(null);
+                                setCustomPrice('');
                             }}
                             className="py-2"
                         >

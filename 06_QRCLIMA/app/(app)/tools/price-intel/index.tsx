@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, RefreshControl, Linking, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, RefreshControl, Linking, TextInput, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState, useEffect, useCallback } from 'react';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,6 +15,8 @@ import {
     PRICE_DISCLAIMER
 } from '../../../../services/price-intelligence-service';
 import type { MarketTrend, ArbitrageDeal, BestOffer } from '../../../../services/supabase-client';
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '../../../../firebaseConfig';
 
 // Tab definitions
 const TABS = [
@@ -44,6 +46,7 @@ export default function PriceIntelIndex() {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<BestOffer[]>([]);
     const [searching, setSearching] = useState(false);
+    const [reportingLink, setReportingLink] = useState<string | null>(null);
 
     // Check PRO status
     useEffect(() => {
@@ -130,20 +133,25 @@ export default function PriceIntelIndex() {
         if (url) Linking.openURL(url);
     };
 
-    // Report incorrect link via email
-    const reportBadLink = (offer: BestOffer) => {
-        const subject = encodeURIComponent('[QRClima] Link incorrecto reportado');
-        const body = encodeURIComponent(
-            `Hola equipo de soporte,\n\n` +
-            `Encontré un link incorrecto en el Radar de Precios:\n\n` +
-            `Producto: ${offer.nombre_estandarizado}\n` +
-            `Marca: ${offer.marca}\n` +
-            `Proveedor: ${offer.proveedor}\n` +
-            `Precio mostrado: $${offer.mejor_precio}\n` +
-            `URL reportada: ${offer.url}\n\n` +
-            `---\nEnviado desde QRClima App`
-        );
-        Linking.openURL(`mailto:soporte@tesivil.com?subject=${subject}&body=${body}`);
+    // Report incorrect link via Cloud Function (automatic email)
+    const reportBadLink = async (offer: BestOffer) => {
+        setReportingLink(offer.url);
+        try {
+            const reportBadLinkFn = httpsCallable(functions, 'reportBadLink');
+            await reportBadLinkFn({
+                productName: offer.nombre_estandarizado,
+                brand: offer.marca,
+                provider: offer.proveedor,
+                price: offer.mejor_precio,
+                url: offer.url
+            });
+            Alert.alert('✅ Reporte Enviado', 'Gracias por reportar. Revisaremos el link pronto.');
+        } catch (error: any) {
+            console.error('Error reporting bad link:', error);
+            Alert.alert('Error', 'No se pudo enviar el reporte. Intenta más tarde.');
+        } finally {
+            setReportingLink(null);
+        }
     };
 
     // PRO Lock Screen
