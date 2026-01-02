@@ -18,7 +18,12 @@ export const getDb = async (): Promise<SQLite.SQLiteDatabase> => {
 export const loadDatabase = async () => {
     const dbName = DB_NAME;
     const dbAsset = require('../assets/database/qrclima.db');
-    const dbUri = Asset.fromModule(dbAsset).uri;
+    const asset = Asset.fromModule(dbAsset);
+
+    // Ensure asset is downloaded/available
+    await asset.downloadAsync();
+
+    const dbUri = asset.localUri || asset.uri;
     const dbDir = FileSystem.documentDirectory + 'SQLite';
     const dbPath = dbDir + '/' + dbName;
 
@@ -34,7 +39,16 @@ export const loadDatabase = async () => {
         const dbInfo = await FileSystem.getInfoAsync(dbPath);
         if (!dbInfo.exists) {
             console.log('Copiando base de datos desde assets...');
-            await FileSystem.downloadAsync(dbUri, dbPath);
+
+            // Use copyAsync for file:// URIs, downloadAsync for http/https
+            if (dbUri.startsWith('file://')) {
+                await FileSystem.copyAsync({
+                    from: dbUri,
+                    to: dbPath
+                });
+            } else {
+                await FileSystem.downloadAsync(dbUri, dbPath);
+            }
             console.log('Base de datos copiada exitosamente.');
         } else {
             console.log('Base de datos ya existe, saltando copia.');
