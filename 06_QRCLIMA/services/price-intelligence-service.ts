@@ -263,21 +263,33 @@ export const getPriceHistory = async (
 };
 
 /**
- * @deprecated Use getCatalogProRecommendations instead
+ * Get essential products for Cotizador PRO
+ * Uses v_catalogo_tecnicos_pro view (products marked as es_esencial_pro=true)
  */
 export const getEssentialProducts = async (): Promise<EssentialProduct[]> => {
+    console.log('💡 [getEssentialProducts] Fetching from v_catalogo_tecnicos_pro...');
     try {
-        const { data, error } = await supabase
-            .from('app_feed_essentials')
+        const { data, error } = await supabasePrice
+            .from('v_catalogo_tecnicos_pro')
             .select('*')
             .limit(20);
 
         if (error) {
-            console.error('Error fetching essential products:', error);
+            console.error('❌ [getEssentialProducts] Error:', error);
             throw error;
         }
 
-        return data || [];
+        // Map to EssentialProduct format for backward compatibility
+        const mapped: EssentialProduct[] = (data || []).map(item => ({
+            display_name: item.nombre_estandarizado,
+            mejor_precio: item.mejor_precio,
+            en_tienda: item.proveedor,
+            url_reference: item.url,
+            category: item.grupo_especializado
+        }));
+
+        console.log('💡 [getEssentialProducts] Found:', mapped.length, 'items');
+        return mapped;
     } catch (error) {
         console.error('getEssentialProducts error:', error);
         return [];
@@ -285,35 +297,40 @@ export const getEssentialProducts = async (): Promise<EssentialProduct[]> => {
 };
 
 /**
- * @deprecated Use searchBestOffers instead
+ * Search catalog products for Cotizador PRO
+ * Uses v_mejores_ofertas view with flexible text matching
  */
 export const searchCatalogProducts = async (searchTerm: string, limit: number = 15): Promise<CatalogProduct[]> => {
+    console.log('🔎 [searchCatalogProducts] Searching:', searchTerm);
     try {
         if (!searchTerm || searchTerm.length < 2) {
             return [];
         }
 
-        const { data, error } = await supabase
-            .from('products')
-            .select(`
-                id,
-                display_name,
-                brand,
-                mejor_precio,
-                en_tienda,
-                url_reference
-            `)
-            .ilike('display_name', `%${searchTerm}%`)
-            .not('mejor_precio', 'is', null)
+        const { data, error } = await supabasePrice
+            .from('v_mejores_ofertas')
+            .select('*')
+            .or(`nombre_estandarizado.ilike.%${searchTerm}%,marca.ilike.%${searchTerm}%`)
             .order('mejor_precio', { ascending: true })
             .limit(limit);
 
         if (error) {
-            console.error('Error searching catalog products:', error);
+            console.error('❌ [searchCatalogProducts] Error:', error);
             throw error;
         }
 
-        return data || [];
+        // Map to CatalogProduct format for backward compatibility
+        const mapped: CatalogProduct[] = (data || []).map(item => ({
+            id: item.sku || item.nombre_estandarizado,
+            display_name: item.nombre_estandarizado,
+            brand: item.marca,
+            mejor_precio: item.mejor_precio,
+            en_tienda: item.proveedor,
+            url_reference: item.url
+        }));
+
+        console.log('🔎 [searchCatalogProducts] Found:', mapped.length, 'results');
+        return mapped;
     } catch (error) {
         console.error('searchCatalogProducts error:', error);
         return [];

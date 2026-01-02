@@ -1,6 +1,13 @@
 ﻿export default {
     expo: {
         ...require('./app.json').expo,
+        // EAS Update configuration
+        updates: {
+            url: 'https://u.expo.dev/ec0bc67e-48e5-438c-b0ed-d9d55aee6bf5',
+        },
+        runtimeVersion: {
+            policy: 'appVersion',
+        },
         extra: {
             // Lee la clave de la variable de entorno, con fallback para desarrollo
             // IMPORTANT: Set GOOGLE_MAPS_API_KEY env var for builds

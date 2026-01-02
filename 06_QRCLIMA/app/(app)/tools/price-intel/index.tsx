@@ -190,7 +190,7 @@ export default function PriceIntelIndex() {
                 </View>
             ) : (
                 trends.map((trend, index) => {
-                    const display = getTrendDisplay(trend.variacion_porcentual);
+                    const display = getTrendDisplay(trend.variacion_mercado_promedio);
                     const categoryIcon = getCategoryIcon(trend.grupo_especializado);
                     return (
                         <View key={index} className="bg-white rounded-2xl p-4 mb-3 border border-gray-100 shadow-sm">

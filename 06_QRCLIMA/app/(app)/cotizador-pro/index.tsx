@@ -176,7 +176,7 @@ export default function CotizadorProIndex() {
                         <Ionicons name="color-palette" size={20} color="white" />
                     </TouchableOpacity>
                     <TouchableOpacity
-                        onPress={() => router.push('/(app)/cotizador/concepts')}
+                        onPress={() => router.push('/(app)/cotizador-pro/concepts')}
                         className="bg-white/20 p-2 rounded-lg"
                     >
                         <Ionicons name="settings-outline" size={20} color="white" />

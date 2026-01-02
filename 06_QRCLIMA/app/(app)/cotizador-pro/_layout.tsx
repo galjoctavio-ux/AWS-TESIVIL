@@ -5,6 +5,7 @@ export default function CotizadorProLayout() {
         <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="index" />
             <Stack.Screen name="new" />
+            <Stack.Screen name="concepts" />
             <Stack.Screen name="add-concepts" />
             <Stack.Screen name="summary" />
         </Stack>

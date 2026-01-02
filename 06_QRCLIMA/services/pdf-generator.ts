@@ -835,236 +835,129 @@ export const generateQuotePDF = async (data: QuotePDFData): Promise<void> => {
         day: 'numeric'
     });
 
-    const html = `
-    < !DOCTYPE html >
-        <html>
-        <head>
-        <meta charset="utf-8" >
-            <title>Presupuesto </title>
-            <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box- sizing: border - box;
-            }
-            body {
-    font - family: 'Helvetica Neue', Arial, sans - serif;
-    color: #333;
-    line - height: 1.5;
-    padding: 30px;
-    font - size: 12px;
-}
-            .header {
-    text - align: center;
-    border - bottom: 3px solid #16A34A;
-    padding - bottom: 15px;
-    margin - bottom: 20px;
-}
-            .header h1 {
-    color: #16A34A;
-    font - size: 24px;
-    margin - bottom: 3px;
-}
-            .header.subtitle {
-    color: #666;
-    font - size: 16px;
-    font - weight: bold;
-}
-            .header.folio {
-    color: #999;
-    font - size: 11px;
-    margin - top: 5px;
-}
-            .client - section {
-    background: #F8FAFC;
-    padding: 15px;
-    border - radius: 8px;
-    margin - bottom: 20px;
-}
-            .client - section h3 {
-    color: #16A34A;
-    font - size: 12px;
-    margin - bottom: 8px;
-}
-            .section - title {
-    color: #16A34A;
-    font - size: 13px;
-    font - weight: bold;
-    margin - bottom: 10px;
-    padding - bottom: 5px;
-    border - bottom: 1px solid #E5E7EB;
-}
-            table {
-    width: 100 %;
-    border - collapse: collapse;
-    margin - bottom: 20px;
-}
-            th {
-    background: #F3F4F6;
-    padding: 10px;
-    text - align: left;
-    font - weight: bold;
-    border: 1px solid #E5E7EB;
-}
-            td {
-    padding: 10px;
-    border: 1px solid #E5E7EB;
-}
-            .text - right {
-    text - align: right;
-}
-            .totals - section {
-    background: #1F2937;
-    color: white;
-    padding: 15px;
-    border - radius: 8px;
-    margin - top: 20px;
-}
-            .totals - row {
-    display: flex;
-    justify - content: space - between;
-    padding: 5px 0;
-}
-            .totals - row.final {
-    border - top: 1px solid #4B5563;
-    padding - top: 10px;
-    margin - top: 5px;
-    font - size: 16px;
-    font - weight: bold;
-}
-            .totals - row.label {
-    color: #9CA3AF;
-}
-            .totals - row.final.label {
-    color: white;
-}
-            .totals - row.value {
-    color: #10B981;
-}
-            .footer {
-    margin - top: 30px;
-    padding - top: 15px;
-    border - top: 1px solid #E5E7EB;
-    text - align: center;
-    color: #666;
-    font - size: 10px;
-}
-            .validity {
-    background: #FEF3C7;
-    color: #92400E;
-    padding: 10px;
-    border - radius: 6px;
-    text - align: center;
-    margin - top: 15px;
-    font - weight: bold;
-}
-            .notes {
-    background: #F3F4F6;
-    padding: 10px;
-    border - radius: 6px;
-    margin - top: 15px;
-    font - style: italic;
-    color: #666;
-}
-</style>
-    </head>
-    < body >
-    <div class="header" >
-        <h1>❄️ QRclima </h1>
-            < div class="subtitle" > PRESUPUESTO </div>
-                < div class="folio" > Folio: ${folio} | Fecha: ${currentDate} </div>
-                    </div>
-
-                    < div class="client-section" >
-                        <h3>📋 DATOS DEL CLIENTE </h3>
-                            < strong > ${client.name} </strong><br>
-            ${client.phone ? `📞 ${client.phone}<br>` : ''}
-            ${client.address ? `📍 ${client.address}` : ''}
-</div>
-
-        ${laborItems.length > 0 ? `
-        <div class="section-title">🔧 SECCIÓN A: SERVICIOS / MANO DE OBRA</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Concepto</th>
-                    <th class="text-right">Importe</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${laborItems.map(item => `
-                <tr>
-                    <td>${item.description}</td>
-                    <td class="text-right">${formatCurrency(calculateLineTotal(item))}</td>
-                </tr>
-                `).join('')}
-            </tbody>
-        </table>
-        ` : ''
-        }
-
-        ${materialItems.length > 0 ? `
-        <div class="section-title">📦 SECCIÓN B: REFACCIONES Y MATERIALES</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Concepto</th>
-                    <th class="text-right">Cantidad</th>
-                    <th class="text-right">P. Unitario</th>
-                    <th class="text-right">Importe</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${materialItems.map(item => `
-                <tr>
-                    <td>${item.description}</td>
-                    <td class="text-right">${item.quantity}</td>
-                    <td class="text-right">${formatCurrency(item.unitCost)}</td>
-                    <td class="text-right">${formatCurrency(calculateLineTotal(item))}</td>
-                </tr>
-                `).join('')}
-            </tbody>
-        </table>
-        ` : ''
-        }
-
-<div class="totals-section" >
-    ${quote.requires_invoice ? `
-            <div class="totals-row">
-                <span class="label">Subtotal (Base)</span>
-                <span class="value">${formatCurrency(quote.subtotal)}</span>
-            </div>
-            <div class="totals-row">
-                <span class="label">IVA (16%)</span>
-                <span class="value">${formatCurrency(quote.tax)}</span>
-            </div>
-            ` : ''
-        }
-<div class="totals-row final" >
-    <span class="label" > TOTAL A PAGAR </span>
-        < span class="value" > ${formatCurrency(quote.total)} </span>
-            </div>
-            ${!quote.requires_invoice ? `<div style="color: #9CA3AF; font-size: 10px; margin-top: 5px;">* Precios con IVA incluido</div>` : ''}
-</div>
-
-    < div class="validity" >
-            📅 Vigencia del presupuesto: ${quote.validity_days} días(hasta ${validityStr})
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Presupuesto</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #333; line-height: 1.5; padding: 30px; font-size: 12px; }
+        .header { text-align: center; border-bottom: 3px solid #16A34A; padding-bottom: 15px; margin-bottom: 20px; }
+        .header h1 { color: #16A34A; font-size: 24px; margin-bottom: 3px; }
+        .header .subtitle { color: #666; font-size: 16px; font-weight: bold; }
+        .header .folio { color: #999; font-size: 11px; margin-top: 5px; }
+        .client-section { background: #F8FAFC; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .client-section h3 { color: #16A34A; font-size: 12px; margin-bottom: 8px; }
+        .section-title { color: #16A34A; font-size: 13px; font-weight: bold; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #E5E7EB; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th { background: #F3F4F6; padding: 10px; text-align: left; font-weight: bold; border: 1px solid #E5E7EB; }
+        td { padding: 10px; border: 1px solid #E5E7EB; }
+        .text-right { text-align: right; }
+        .totals-section { background: #1F2937; color: white; padding: 15px; border-radius: 8px; margin-top: 20px; }
+        .totals-row { display: flex; justify-content: space-between; padding: 5px 0; }
+        .totals-row.final { border-top: 1px solid #4B5563; padding-top: 10px; margin-top: 5px; font-size: 16px; font-weight: bold; }
+        .totals-row .label { color: #9CA3AF; }
+        .totals-row.final .label { color: white; }
+        .totals-row .value { color: #10B981; }
+        .footer { margin-top: 30px; padding-top: 15px; border-top: 1px solid #E5E7EB; text-align: center; color: #666; font-size: 10px; }
+        .validity { background: #FEF3C7; color: #92400E; padding: 10px; border-radius: 6px; text-align: center; margin-top: 15px; font-weight: bold; }
+        .notes { background: #F3F4F6; padding: 10px; border-radius: 6px; margin-top: 15px; font-style: italic; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>❄️ QRclima</h1>
+        <div class="subtitle">PRESUPUESTO</div>
+        <div class="folio">Folio: ${folio} | Fecha: ${currentDate}</div>
     </div>
 
-        ${quote.notes ? `
-        <div class="notes">
-            <strong>Notas:</strong> ${quote.notes}
-        </div>
-        ` : ''
-        }
+    <div class="client-section">
+        <h3>📋 DATOS DEL CLIENTE</h3>
+        <strong>${client.name}</strong><br>
+        ${client.phone ? `📞 ${client.phone}<br>` : ''}
+        ${client.address ? `📍 ${client.address}` : ''}
+    </div>
 
-<div class="footer" >
-    Técnico: ${technicianEmail || 'Técnico Certificado'} <br>
+    ${laborItems.length > 0 ? `
+    <div class="section-title">🔧 SECCIÓN A: SERVICIOS / MANO DE OBRA</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Concepto</th>
+                <th class="text-right">Importe</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${laborItems.map(item => `
+            <tr>
+                <td>${item.description}</td>
+                <td class="text-right">${formatCurrency(calculateLineTotal(item))}</td>
+            </tr>
+            `).join('')}
+        </tbody>
+    </table>
+    ` : ''}
+
+    ${materialItems.length > 0 ? `
+    <div class="section-title">📦 SECCIÓN B: REFACCIONES Y MATERIALES</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Concepto</th>
+                <th class="text-right">Cantidad</th>
+                <th class="text-right">P. Unitario</th>
+                <th class="text-right">Importe</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${materialItems.map(item => `
+            <tr>
+                <td>${item.description}</td>
+                <td class="text-right">${item.quantity}</td>
+                <td class="text-right">${formatCurrency(item.unitCost)}</td>
+                <td class="text-right">${formatCurrency(calculateLineTotal(item))}</td>
+            </tr>
+            `).join('')}
+        </tbody>
+    </table>
+    ` : ''}
+
+    <div class="totals-section">
+        ${quote.requires_invoice ? `
+        <div class="totals-row">
+            <span class="label">Subtotal (Base)</span>
+            <span class="value">${formatCurrency(quote.subtotal)}</span>
+        </div>
+        <div class="totals-row">
+            <span class="label">IVA (16%)</span>
+            <span class="value">${formatCurrency(quote.tax)}</span>
+        </div>
+        ` : ''}
+        <div class="totals-row final">
+            <span class="label">TOTAL A PAGAR</span>
+            <span class="value">${formatCurrency(quote.total)}</span>
+        </div>
+        ${!quote.requires_invoice ? `<div style="color: #9CA3AF; font-size: 10px; margin-top: 5px;">* Precios con IVA incluido</div>` : ''}
+    </div>
+
+    <div class="validity">
+        📅 Vigencia del presupuesto: ${quote.validity_days} días (hasta ${validityStr})
+    </div>
+
+    ${quote.notes ? `
+    <div class="notes">
+        <strong>Notas:</strong> ${quote.notes}
+    </div>
+    ` : ''}
+
+    <div class="footer">
+        Técnico: ${technicianEmail || 'Técnico Certificado'}<br>
         Documento generado el ${currentDate} por QRclima App
-            </div>
-            </body>
-            </html>
-                `;
+    </div>
+</body>
+</html>
+    `;
 
     try {
         // Generate PDF file
@@ -1123,297 +1016,147 @@ export const generateCotizadorPDF = async (data: CotizadorPDFData): Promise<void
     const moItems = quote.items.filter(item => item.type === 'MO');
     const mtItems = quote.items.filter(item => item.type === 'MT');
 
-    const html = `
-    < !DOCTYPE html >
-        <html>
-        <head>
-        <meta charset="utf-8" >
-            <title>Cotización </title>
-            <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box- sizing: border - box;
-            }
-            body {
-    font - family: 'Helvetica Neue', Arial, sans - serif;
-    color: #333;
-    line - height: 1.5;
-    padding: 30px;
-    font - size: 12px;
-    position: relative;
-}
-            .watermark {
-    position: fixed;
-    bottom: 20px;
-    left: 0;
-    right: 0;
-    text - align: center;
-    color: #CBD5E1;
-    font - size: 10px;
-    font - style: italic;
-    letter - spacing: 1px;
-}
-            .header {
-    text - align: center;
-    border - bottom: 3px solid #10B981;
-    padding - bottom: 15px;
-    margin - bottom: 20px;
-}
-            .header h1 {
-    color: #10B981;
-    font - size: 24px;
-    margin - bottom: 3px;
-}
-            .header.subtitle {
-    color: #666;
-    font - size: 16px;
-    font - weight: bold;
-}
-            .header.folio {
-    color: #999;
-    font - size: 11px;
-    margin - top: 5px;
-}
-            .client - section {
-    background: #F0FDF4;
-    padding: 15px;
-    border - radius: 8px;
-    margin - bottom: 20px;
-    border - left: 4px solid #10B981;
-}
-            .client - section h3 {
-    color: #10B981;
-    font - size: 12px;
-    margin - bottom: 8px;
-}
-            .section - title {
-    font - size: 13px;
-    font - weight: bold;
-    margin - bottom: 10px;
-    padding - bottom: 5px;
-    border - bottom: 1px solid #E5E7EB;
-}
-            .section - title.mo {
-    color: #7C3AED;
-}
-            .section - title.mt {
-    color: #EA580C;
-}
-            table {
-    width: 100 %;
-    border - collapse: collapse;
-    margin - bottom: 20px;
-}
-            th {
-    background: #F3F4F6;
-    padding: 10px;
-    text - align: left;
-    font - weight: bold;
-    border: 1px solid #E5E7EB;
-    font - size: 11px;
-}
-            td {
-    padding: 10px;
-    border: 1px solid #E5E7EB;
-}
-            .text - right {
-    text - align: right;
-}
-            .text - center {
-    text - align: center;
-}
-            .code - badge {
-    display: inline - block;
-    padding: 2px 6px;
-    border - radius: 4px;
-    font - size: 9px;
-    font - weight: bold;
-}
-            .code - mo {
-    background: #EDE9FE;
-    color: #7C3AED;
-}
-            .code - mt {
-    background: #FFEDD5;
-    color: #EA580C;
-}
-            .totals - section {
-    background: #1F2937;
-    color: white;
-    padding: 20px;
-    border - radius: 8px;
-    margin - top: 20px;
-}
-            .totals - row {
-    display: flex;
-    justify - content: space - between;
-    padding: 8px 0;
-}
-            .totals - row.final {
-    border - top: 2px solid #4B5563;
-    padding - top: 15px;
-    margin - top: 10px;
-    font - size: 18px;
-    font - weight: bold;
-}
-            .totals - row.label {
-    color: #9CA3AF;
-}
-            .totals - row.final.label {
-    color: white;
-}
-            .totals - row.value {
-    color: #10B981;
-    font - weight: bold;
-}
-            .notes {
-    background: #F3F4F6;
-    padding: 12px;
-    border - radius: 6px;
-    margin - top: 15px;
-    font - style: italic;
-    color: #666;
-}
-            .signatures - container {
-    display: flex;
-    justify - content: center;
-    margin - top: 40px;
-    page -break-inside: avoid;
-}
-            .signature - box {
-    width: 60 %;
-    text - align: center;
-    border - top: 1px solid #9CA3AF;
-    padding - top: 10px;
-}
-            .signature - image {
-    height: 60px;
-    margin - bottom: 5px;
-    object - fit: contain;
-    display: block;
-    margin - left: auto;
-    margin - right: auto;
-}
-            .technician - name {
-    font - weight: bold;
-    font - size: 12px;
-    color: #374151;
-}
-            .footer {
-    margin - top: 30px;
-    padding - top: 15px;
-    border - top: 1px solid #E5E7EB;
-    text - align: center;
-    color: #666;
-    font - size: 10px;
-}
-</style>
-    </head>
-    < body >
-    <div class="watermark" > Elaborado con QRclima powered by TESIVIL </div>
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Cotización</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #333; line-height: 1.5; padding: 30px; font-size: 12px; position: relative; }
+        .watermark { position: fixed; bottom: 20px; left: 0; right: 0; text-align: center; color: #CBD5E1; font-size: 10px; font-style: italic; letter-spacing: 1px; }
+        .header { text-align: center; border-bottom: 3px solid #10B981; padding-bottom: 15px; margin-bottom: 20px; }
+        .header h1 { color: #10B981; font-size: 24px; margin-bottom: 3px; }
+        .header .subtitle { color: #666; font-size: 16px; font-weight: bold; }
+        .header .folio { color: #999; font-size: 11px; margin-top: 5px; }
+        .client-section { background: #F0FDF4; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #10B981; }
+        .client-section h3 { color: #10B981; font-size: 12px; margin-bottom: 8px; }
+        .section-title { font-size: 13px; font-weight: bold; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #E5E7EB; }
+        .section-title.mo { color: #7C3AED; }
+        .section-title.mt { color: #EA580C; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th { background: #F3F4F6; padding: 10px; text-align: left; font-weight: bold; border: 1px solid #E5E7EB; font-size: 11px; }
+        td { padding: 10px; border: 1px solid #E5E7EB; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .code-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; }
+        .code-mo { background: #EDE9FE; color: #7C3AED; }
+        .code-mt { background: #FFEDD5; color: #EA580C; }
+        .totals-section { background: #1F2937; color: white; padding: 20px; border-radius: 8px; margin-top: 20px; }
+        .totals-row { display: flex; justify-content: space-between; padding: 8px 0; }
+        .totals-row.final { border-top: 2px solid #4B5563; padding-top: 15px; margin-top: 10px; font-size: 18px; font-weight: bold; }
+        .totals-row .label { color: #9CA3AF; }
+        .totals-row.final .label { color: white; }
+        .totals-row .value { color: #10B981; font-weight: bold; }
+        .notes { background: #F3F4F6; padding: 12px; border-radius: 6px; margin-top: 15px; font-style: italic; color: #666; }
+        .signatures-container { display: flex; justify-content: center; margin-top: 40px; page-break-inside: avoid; }
+        .signature-box { width: 60%; text-align: center; border-top: 1px solid #9CA3AF; padding-top: 10px; }
+        .signature-image { height: 60px; margin-bottom: 5px; object-fit: contain; display: block; margin-left: auto; margin-right: auto; }
+        .technician-name { font-weight: bold; font-size: 12px; color: #374151; }
+        .footer { margin-top: 30px; padding-top: 15px; border-top: 1px solid #E5E7EB; text-align: center; color: #666; font-size: 10px; }
+    </style>
+</head>
+<body>
+    <div class="watermark">Elaborado con QRclima powered by TESIVIL</div>
 
-        < div class="header" >
-            <h1>❄️ QRclima </h1>
-                < div class="subtitle" > COTIZACIÓN </div>
-                    < div class="folio" > Folio: ${folio} | Fecha: ${currentDate} </div>
-                        </div>
+    <div class="header">
+        <h1>❄️ QRclima</h1>
+        <div class="subtitle">COTIZACIÓN</div>
+        <div class="folio">Folio: ${folio} | Fecha: ${currentDate}</div>
+    </div>
 
-                        < div class="client-section" >
-                            <h3>📋 DATOS DEL CLIENTE </h3>
-                                < strong > ${client.name} </strong><br>
-            ${client.phone ? `📞 ${client.phone}<br>` : ''}
-            ${client.address ? `📍 ${client.address}` : ''}
-</div>
+    <div class="client-section">
+        <h3>📋 DATOS DEL CLIENTE</h3>
+        <strong>${client.name}</strong><br>
+        ${client.phone ? `📞 ${client.phone}<br>` : ''}
+        ${client.address ? `📍 ${client.address}` : ''}
+    </div>
 
-        ${moItems.length > 0 ? `
-        <div class="section-title mo">🔧 MANO DE OBRA</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Concepto</th>
-                    <th class="text-center">Cantidad</th>
-                    <th class="text-right">P. Unitario</th>
-                    <th class="text-right">Importe</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${moItems.map(item => `
-                <tr>
-                    <td><span class="code-badge code-mo">${item.code}</span></td>
-                    <td>${item.description}</td>
-                    <td class="text-center">${item.quantity}</td>
-                    <td class="text-right">${formatCotizadorCurrency(item.unitPrice)}</td>
-                    <td class="text-right"><strong>${formatCotizadorCurrency(item.total)}</strong></td>
-                </tr>
-                `).join('')}
-            </tbody>
-        </table>
-        ` : ''
-        }
+    ${moItems.length > 0 ? `
+    <div class="section-title mo">🔧 MANO DE OBRA</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Concepto</th>
+                <th class="text-center">Cantidad</th>
+                <th class="text-right">P. Unitario</th>
+                <th class="text-right">Importe</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${moItems.map(item => `
+            <tr>
+                <td><span class="code-badge code-mo">${item.code}</span></td>
+                <td>${item.description}</td>
+                <td class="text-center">${item.quantity}</td>
+                <td class="text-right">${formatCotizadorCurrency(item.unitPrice)}</td>
+                <td class="text-right"><strong>${formatCotizadorCurrency(item.total)}</strong></td>
+            </tr>
+            `).join('')}
+        </tbody>
+    </table>
+    ` : ''}
 
-        ${mtItems.length > 0 ? `
-        <div class="section-title mt">📦 MATERIALES</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Concepto</th>
-                    <th class="text-center">Cantidad</th>
-                    <th class="text-right">P. Unitario</th>
-                    <th class="text-right">Importe</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${mtItems.map(item => `
-                <tr>
-                    <td><span class="code-badge code-mt">${item.code}</span></td>
-                    <td>${item.description}</td>
-                    <td class="text-center">${item.quantity}</td>
-                    <td class="text-right">${formatCotizadorCurrency(item.unitPrice)}</td>
-                    <td class="text-right"><strong>${formatCotizadorCurrency(item.total)}</strong></td>
-                </tr>
-                `).join('')}
-            </tbody>
-        </table>
-        ` : ''
-        }
+    ${mtItems.length > 0 ? `
+    <div class="section-title mt">📦 MATERIALES</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Concepto</th>
+                <th class="text-center">Cantidad</th>
+                <th class="text-right">P. Unitario</th>
+                <th class="text-right">Importe</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${mtItems.map(item => `
+            <tr>
+                <td><span class="code-badge code-mt">${item.code}</span></td>
+                <td>${item.description}</td>
+                <td class="text-center">${item.quantity}</td>
+                <td class="text-right">${formatCotizadorCurrency(item.unitPrice)}</td>
+                <td class="text-right"><strong>${formatCotizadorCurrency(item.total)}</strong></td>
+            </tr>
+            `).join('')}
+        </tbody>
+    </table>
+    ` : ''}
 
-<div class="totals-section" >
-    <div class="totals-row final" >
-        <span class="label" > TOTAL A PAGAR </span>
-            < span class="value" > ${formatCotizadorCurrency(quote.total)} </span>
-                </div>
-                < div style = "color: #9CA3AF; font-size: 10px; margin-top: 8px;" >* Precios con IVA incluido </div>
-                    </div>
-
-        ${quote.notes ? `
-        <div class="notes">
-            <strong>Notas:</strong> ${quote.notes}
+    <div class="totals-section">
+        <div class="totals-row final">
+            <span class="label">TOTAL A PAGAR</span>
+            <span class="value">${formatCotizadorCurrency(quote.total)}</span>
         </div>
-        ` : ''
-        }
+        <div style="color: #9CA3AF; font-size: 10px; margin-top: 8px;">* Precios con IVA incluido</div>
+    </div>
 
-<div class="signatures-container" >
-    <div class="signature-box" >
-        ${technicianProfile?.signature ?
+    ${quote.notes ? `
+    <div class="notes">
+        <strong>Notas:</strong> ${quote.notes}
+    </div>
+    ` : ''}
+
+    <div class="signatures-container">
+        <div class="signature-box">
+            ${technicianProfile?.signature ?
             `<img src="${technicianProfile.signature}" class="signature-image" />` :
             '<div style="height: 60px;"></div>'
         }
-<div class="technician-name" >
-    ${technicianProfile?.fullName || technicianProfile?.businessName || technicianProfile?.email || 'Técnico Certificado'}
-</div>
-    < div style = "font-size: 10px; color: #6B7280; margin-top: 2px;" > Técnico Responsable </div>
+            <div class="technician-name">
+                ${technicianProfile?.fullName || technicianProfile?.businessName || technicianProfile?.email || 'Técnico Certificado'}
+            </div>
+            <div style="font-size: 10px; color: #6B7280; margin-top: 2px;">Técnico Responsable</div>
         </div>
-        </div>
+    </div>
 
-        < div class="footer" >
-            Documento generado el ${currentDate} por QRclima App
-                </div>
-                </body>
-                </html>
-                    `;
+    <div class="footer">
+        Documento generado el ${currentDate} por QRclima App
+    </div>
+</body>
+</html>
+    `;
 
     try {
         // Generate PDF file

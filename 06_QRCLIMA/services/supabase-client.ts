@@ -35,10 +35,12 @@ export const supabasePrice = createClient(priceUrl, priceAnonKey);
 
 /**
  * v_tendencias_mercado view - Market trends
+ * Note: View returns 'variacion_mercado_promedio', we alias it in the service
  */
 export interface MarketTrend {
     grupo_especializado: string;
-    variacion_porcentual: number;
+    total_productos_analizados: number;
+    variacion_mercado_promedio: number;
 }
 
 /**
