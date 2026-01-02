@@ -19,7 +19,7 @@ export const getMarketTrends = async (): Promise<MarketTrend[]> => {
         const { data, error } = await supabasePrice
             .from('v_tendencias_mercado')
             .select('*')
-            .order('variacion_porcentual', { ascending: true }); // Shows most decreased first
+            .order('variacion_mercado_promedio', { ascending: true }); // Shows most decreased first
 
         if (error) {
             console.error('❌ [getMarketTrends] Supabase error:', error);
@@ -299,18 +299,21 @@ export const getEssentialProducts = async (): Promise<EssentialProduct[]> => {
 /**
  * Search catalog products for Cotizador PRO
  * Uses v_mejores_ofertas view with flexible text matching
+ * If searchTerm is empty, returns top products by price
  */
 export const searchCatalogProducts = async (searchTerm: string, limit: number = 15): Promise<CatalogProduct[]> => {
-    console.log('🔎 [searchCatalogProducts] Searching:', searchTerm);
+    console.log('🔎 [searchCatalogProducts] Searching:', searchTerm || '(all products)');
     try {
-        if (!searchTerm || searchTerm.length < 2) {
-            return [];
+        let query = supabasePrice
+            .from('v_mejores_ofertas')
+            .select('*');
+
+        // If search term provided and at least 2 chars, filter by it
+        if (searchTerm && searchTerm.length >= 2) {
+            query = query.or(`nombre_estandarizado.ilike.%${searchTerm}%,marca.ilike.%${searchTerm}%`);
         }
 
-        const { data, error } = await supabasePrice
-            .from('v_mejores_ofertas')
-            .select('*')
-            .or(`nombre_estandarizado.ilike.%${searchTerm}%,marca.ilike.%${searchTerm}%`)
+        const { data, error } = await query
             .order('mejor_precio', { ascending: true })
             .limit(limit);
 

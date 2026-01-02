@@ -130,6 +130,22 @@ export default function PriceIntelIndex() {
         if (url) Linking.openURL(url);
     };
 
+    // Report incorrect link via email
+    const reportBadLink = (offer: BestOffer) => {
+        const subject = encodeURIComponent('[QRClima] Link incorrecto reportado');
+        const body = encodeURIComponent(
+            `Hola equipo de soporte,\n\n` +
+            `Encontré un link incorrecto en el Radar de Precios:\n\n` +
+            `Producto: ${offer.nombre_estandarizado}\n` +
+            `Marca: ${offer.marca}\n` +
+            `Proveedor: ${offer.proveedor}\n` +
+            `Precio mostrado: $${offer.mejor_precio}\n` +
+            `URL reportada: ${offer.url}\n\n` +
+            `---\nEnviado desde QRClima App`
+        );
+        Linking.openURL(`mailto:soporte@tesivil.com?subject=${subject}&body=${body}`);
+    };
+
     // PRO Lock Screen
     if (isPro === false) {
         return (
@@ -246,23 +262,29 @@ export default function PriceIntelIndex() {
                 <View>
                     <Text className="text-gray-500 text-sm mb-2">{searchResults.length} resultados</Text>
                     {searchResults.map((offer, index) => (
-                        <TouchableOpacity
-                            key={index}
-                            onPress={() => openUrl(offer.url)}
-                            className="bg-white rounded-xl p-4 mb-2 border border-gray-100"
-                        >
-                            <Text className="text-gray-800 font-bold" numberOfLines={2}>{offer.nombre_estandarizado}</Text>
-                            <Text className="text-gray-400 text-sm mt-1">{offer.marca} • {offer.proveedor}</Text>
-                            <View className="flex-row items-center justify-between mt-2">
-                                <Text className="text-green-600 font-bold text-lg">
-                                    {formatPrice(offer.mejor_precio)}
-                                </Text>
-                                <View className="flex-row items-center">
-                                    <Text className="text-teal-600 font-medium mr-1">Ver oferta</Text>
-                                    <Ionicons name="open-outline" size={16} color="#14B8A6" />
+                        <View key={index} className="bg-white rounded-xl p-4 mb-2 border border-gray-100">
+                            <TouchableOpacity onPress={() => openUrl(offer.url)}>
+                                <Text className="text-gray-800 font-bold" numberOfLines={2}>{offer.nombre_estandarizado}</Text>
+                                <Text className="text-gray-400 text-sm mt-1">{offer.marca} • {offer.proveedor}</Text>
+                                <View className="flex-row items-center justify-between mt-2">
+                                    <Text className="text-green-600 font-bold text-lg">
+                                        {formatPrice(offer.mejor_precio)}
+                                    </Text>
+                                    <View className="flex-row items-center">
+                                        <Text className="text-teal-600 font-medium mr-1">Ver oferta</Text>
+                                        <Ionicons name="open-outline" size={16} color="#14B8A6" />
+                                    </View>
                                 </View>
-                            </View>
-                        </TouchableOpacity>
+                            </TouchableOpacity>
+                            {/* Report Bad Link Button */}
+                            <TouchableOpacity
+                                onPress={() => reportBadLink(offer)}
+                                className="flex-row items-center justify-center mt-3 pt-2 border-t border-gray-100"
+                            >
+                                <Ionicons name="warning-outline" size={14} color="#9CA3AF" />
+                                <Text className="text-gray-400 text-xs ml-1">¿Link incorrecto? Reportar</Text>
+                            </TouchableOpacity>
+                        </View>
                     ))}
                 </View>
             )}

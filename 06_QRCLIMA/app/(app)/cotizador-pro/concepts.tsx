@@ -39,6 +39,10 @@ export default function ConceptsProScreen() {
     const [searchResults, setSearchResults] = useState<CatalogProduct[]>([]);
     const [searching, setSearching] = useState(false);
 
+    // Import modal for adding market products to catalog
+    const [importModalVisible, setImportModalVisible] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<CatalogProduct | null>(null);
+
     const loadConcepts = async () => {
         if (!user) return;
         setLoading(true);
@@ -140,6 +144,27 @@ export default function ConceptsProScreen() {
         }
     };
 
+    // Handle product selection - show import modal
+    const handleProductSelect = (item: CatalogProduct) => {
+        setSelectedProduct(item);
+        setImportModalVisible(true);
+    };
+
+    // Navigate to add concept with pre-filled data
+    const handleAddToCatalog = () => {
+        if (!selectedProduct) return;
+        setImportModalVisible(false);
+        setSearchModalVisible(false);
+        router.push({
+            pathname: '/(app)/cotizador/add-concept',
+            params: {
+                defaultType: 'MT',
+                defaultDescription: selectedProduct.display_name,
+                defaultPrice: selectedProduct.mejor_precio.toString()
+            }
+        });
+    };
+
     const renderConcept = ({ item }: { item: CotizadorConcept }) => (
         <View className="bg-white p-4 rounded-xl mb-3 border border-gray-100 shadow-sm">
             <View className="flex-row justify-between items-start">
@@ -183,7 +208,7 @@ export default function ConceptsProScreen() {
     const renderRecommendation = (item: CatalogProduct, index: number) => (
         <TouchableOpacity
             key={item.id || index}
-            onPress={() => openProductUrl(item.url_reference)}
+            onPress={() => handleProductSelect(item)}
             className="bg-white p-3 rounded-xl mb-2 border border-gray-100"
         >
             <Text className="text-gray-800 font-medium" numberOfLines={2}>{item.display_name}</Text>
@@ -391,6 +416,76 @@ export default function ConceptsProScreen() {
                             <Text className="text-amber-700 text-xs">{PRICE_DISCLAIMER}</Text>
                         </View>
                     </ScrollView>
+                </View>
+            </Modal>
+
+            {/* Import Product Modal - Shows disclaimer and options */}
+            <Modal visible={importModalVisible} transparent animationType="fade">
+                <View className="flex-1 bg-black/50 items-center justify-center px-6">
+                    <View className="bg-white rounded-2xl p-6 w-full max-w-sm">
+                        {/* Warning Icon */}
+                        <View className="items-center mb-4">
+                            <View className="bg-amber-100 w-16 h-16 rounded-full items-center justify-center">
+                                <Ionicons name="warning" size={32} color="#F59E0B" />
+                            </View>
+                        </View>
+
+                        <Text className="text-lg font-bold text-gray-800 text-center mb-2">
+                            Precio de Referencia
+                        </Text>
+
+                        {/* Product Info */}
+                        <Text className="text-gray-600 text-center mb-4" numberOfLines={2}>
+                            {selectedProduct?.display_name}
+                        </Text>
+
+                        {/* Price Badge */}
+                        <View className="bg-green-50 rounded-xl p-3 mb-4 items-center">
+                            <Text className="text-green-600 text-2xl font-bold">
+                                {formatPrice(selectedProduct?.mejor_precio || 0)}
+                            </Text>
+                            <Text className="text-gray-400 text-xs">
+                                📍 {selectedProduct?.en_tienda}
+                            </Text>
+                        </View>
+
+                        {/* Disclaimer */}
+                        <View className="bg-amber-50 rounded-xl p-3 mb-4 border border-amber-200">
+                            <Text className="text-amber-800 text-sm font-medium mb-2">⚠️ Importante:</Text>
+                            <Text className="text-amber-700 text-xs leading-5">
+                                • Este es un precio directo del mercado{"\n"}
+                                • NO incluye tu utilidad o ganancia{"\n"}
+                                • El técnico es responsable del precio que cotice al cliente
+                            </Text>
+                        </View>
+
+                        {/* Action Buttons */}
+                        <TouchableOpacity
+                            onPress={handleAddToCatalog}
+                            className="bg-orange-500 py-3 rounded-xl mb-2"
+                        >
+                            <Text className="text-white text-center font-bold">📦 Agregar a Mi Catálogo</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            onPress={() => {
+                                openProductUrl(selectedProduct?.url_reference);
+                            }}
+                            className="bg-gray-100 py-3 rounded-xl mb-2"
+                        >
+                            <Text className="text-gray-700 text-center font-medium">🔗 Ver en Tienda</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            onPress={() => {
+                                setImportModalVisible(false);
+                                setSelectedProduct(null);
+                            }}
+                            className="py-2"
+                        >
+                            <Text className="text-gray-400 text-center">Cancelar</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </Modal>
         </View>
