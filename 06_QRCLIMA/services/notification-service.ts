@@ -63,6 +63,9 @@ Notifications.setNotificationHandler({
 /**
  * Registra el dispositivo para recibir notificaciones push
  * y guarda el FCM token en Firestore
+ * 
+ * IMPORTANTE: Siempre guardamos el token FCM nativo para que
+ * Firebase Cloud Functions puedan enviar notificaciones directamente.
  */
 export const registerForPushNotifications = async (userId: string): Promise<string | null> => {
     try {
@@ -87,39 +90,21 @@ export const registerForPushNotifications = async (userId: string): Promise<stri
             return null;
         }
 
-        // Obtener el token de Expo Push (compatible con FCM)
-        // projectId debe ser el UUID del proyecto EAS o de expo.dev
-        const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+        // SIEMPRE obtener el token FCM nativo para Firebase Cloud Messaging
+        // Este token es el que usan las Cloud Functions para enviar notificaciones
+        const fcmTokenData = await Notifications.getDevicePushTokenAsync();
+        const fcmToken = fcmTokenData.data;
+        console.log('✅ FCM token nativo obtenido:', fcmToken);
 
-        if (!projectId) {
-            console.warn('⚠️ No se encontró projectId de EAS, usando FCM nativo');
-            // Si no hay projectId de EAS, obtener el FCM token nativo como fallback
-            const fcmTokenData = await Notifications.getDevicePushTokenAsync();
-            const token = fcmTokenData.data;
-            console.log('✅ FCM token nativo obtenido:', token);
-            await saveFCMToken(userId, token);
-            if (Platform.OS === 'android') {
-                await setupAndroidNotificationChannel();
-            }
-            return token;
-        }
-
-        const tokenData = await Notifications.getExpoPushTokenAsync({
-            projectId: projectId,
-        });
-
-        const token = tokenData.data;
-        console.log('✅ Push token obtenido:', token);
-
-        // Guardar token en Firestore
-        await saveFCMToken(userId, token);
+        // Guardar el token FCM nativo en Firestore
+        await saveFCMToken(userId, fcmToken);
 
         // Configurar canal de notificaciones en Android
         if (Platform.OS === 'android') {
             await setupAndroidNotificationChannel();
         }
 
-        return token;
+        return fcmToken;
     } catch (error) {
         console.error('Error registrando para push notifications:', error);
         return null;

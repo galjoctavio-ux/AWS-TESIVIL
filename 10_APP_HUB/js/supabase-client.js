@@ -82,12 +82,12 @@ const AppAPI = {
     },
 
     /**
-     * Construye la URL de descarga directa de Google Drive
-     * @param {string} driveId - ID del archivo en Google Drive
+     * Construye la URL de descarga directa desde la VM
+     * @param {string} filename - Nombre del archivo APK
      * @returns {string} URL de descarga directa
      */
-    buildDriveDownloadUrl(driveId) {
-        if (!driveId) return null;
-        return `${CONFIG.DRIVE_DOWNLOAD_BASE}${driveId}`;
+    buildDownloadUrl(filename) {
+        if (!filename) return null;
+        return `${CONFIG.DOWNLOAD_BASE_URL}${filename}`;
     }
 };

@@ -89,7 +89,7 @@ export default function TrendsScreen() {
                         </View>
                     ) : (
                         trends.map((trend, index) => {
-                            const display = getTrendDisplay(trend.variacion_porcentual);
+                            const display = getTrendDisplay(trend.variacion_mercado_promedio);
                             const categoryIcon = getCategoryIcon(trend.grupo_especializado);
 
                             return (

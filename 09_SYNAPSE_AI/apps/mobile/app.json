@@ -2,7 +2,7 @@
   "expo": {
     "name": "SYNAPSE AI",
     "slug": "synapse-ai",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -25,8 +25,7 @@
       },
       "package": "com.synapse.ai",
       "googleServicesFile": "./google-services.json",
-      "newArchEnabled": true,
-      "usesCleartextTraffic": true
+      "newArchEnabled": true
     },
     "web": {
       "bundler": "metro",
@@ -52,19 +51,29 @@
           "autoUploadSourceMaps": false
         }
       ],
-      "expo-asset"
+      "expo-asset",
+      "expo-updates",
+      "@sentry/react-native"
     ],
     "scheme": "synapse",
     "experiments": {
       "typedRoutes": true
     },
+    "updates": {
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 30000,
+      "url": "https://u.expo.dev/a8c0a5b3-20c1-4164-b8a2-c15660c7a8dd"
+    },
+    "runtimeVersion": "1.0.0",
     "extra": {
       "router": {
         "origin": false
       },
       "eas": {
-        "projectId": "18810a09-4756-4a78-9614-2e1ce9b0b1e8"
+        "projectId": "a8c0a5b3-20c1-4164-b8a2-c15660c7a8dd"
       }
-    }
+    },
+    "owner": "ranger81"
   }
 }

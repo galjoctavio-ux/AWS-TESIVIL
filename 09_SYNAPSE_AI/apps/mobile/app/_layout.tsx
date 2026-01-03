@@ -1,10 +1,10 @@
 import 'react-native-reanimated';
 import '../global.css';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Stack, useRouter, useSegments, SplashScreen, useNavigationContainerRef } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, AppState, AppStateStatus } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -13,7 +13,8 @@ import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { AliasProvider } from '@/contexts/AliasContext';
 import { initSentry } from '@/services/errorReporting';
-import { registerForPushNotificationsAsync } from '@/services/notificationService';
+import { registerForPushNotificationsAsync, checkNotificationStatus } from '@/services/notificationService';
+import { UpdateChecker } from '@/components/UpdateChecker';
 
 // Initialize Sentry
 initSentry();
@@ -42,6 +43,11 @@ function RootLayoutNav() {
     const { colors, isDark } = useTheme();
     const [isNavigationReady, setIsNavigationReady] = useState(false);
     const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState<boolean | null>(null);
+    const [isUpdateCheckComplete, setIsUpdateCheckComplete] = useState(false);
+
+    // AppState for notification check on foreground
+    const appState = useRef(AppState.currentState);
+    const hasCheckedNotificationsOnce = useRef(false);
 
     // Track when navigation is ready
     useEffect(() => {
@@ -50,71 +56,70 @@ function RootLayoutNav() {
         }
     }, [rootNavigation?.isReady()]);
 
+    // Initial setup effect
     useEffect(() => {
         checkOnboardingStatus();
         registerForPushNotificationsAsync();
 
-        // NETWORK DIAGNOSTICS
-        const checkConnections = async () => {
-            console.log('--- START NETWORK DIAGNOSTICS (GLOBAL) ---');
-            try {
-                console.log('Testing HTTPS (Google)...');
-                const r1 = await fetch('https://www.google.com', { method: 'HEAD' });
-                console.log('HTTPS Test: SUCCESS', r1.status);
-            } catch (e: any) {
-                console.error('HTTPS Test: FAILED', e.message);
-            }
+        // AppState listener for notification check when app comes to foreground
+        const subscription = AppState.addEventListener('change', handleAppStateChange);
 
-            try {
-                console.log('Testing HTTP API (13.59.28.73:3001)...');
-                const r2 = await fetch('http://13.59.28.73:3001/health', {
-                    method: 'GET',
-                    headers: { 'Cache-Control': 'no-cache' }
-                });
-                console.log('HTTP API Test: SUCCESS', r2.status);
-            } catch (e: any) {
-                console.error('HTTP API Test: FAILED', e.message);
-                console.log('Error details:', JSON.stringify(e));
-            }
-            console.log('--- END NETWORK DIAGNOSTICS (GLOBAL) ---');
+        return () => {
+            subscription.remove();
         };
-        setTimeout(checkConnections, 3000);
     }, []);
 
+    // Handle app state changes for notification verification
+    const handleAppStateChange = async (nextAppState: AppStateStatus) => {
+        // Check when app comes to foreground from background
+        if (
+            appState.current.match(/inactive|background/) &&
+            nextAppState === 'active'
+        ) {
+            console.log('[App] Returned to foreground, checking notifications...');
+            // Only show prompt if we've already checked once (avoid double-prompting on first launch)
+            if (hasCheckedNotificationsOnce.current) {
+                await checkNotificationStatus(true);
+            }
+        }
+        appState.current = nextAppState;
+    };
+
+    // Mark that we've checked notifications once after initial registration
+    useEffect(() => {
+        if (isUpdateCheckComplete) {
+            // Delay to ensure initial registration is complete
+            const timer = setTimeout(() => {
+                hasCheckedNotificationsOnce.current = true;
+            }, 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [isUpdateCheckComplete]);
+
     // Re-check onboarding status when navigating TO onboarding screen
-    // This handles the case when user clicks "Ver Onboarding" from profile
     useEffect(() => {
         const inOnboarding = segments[0] === 'onboarding';
         if (inOnboarding && isNavigationReady) {
-            // Re-read from AsyncStorage to get the latest state
             checkOnboardingStatus();
         }
     }, [segments, isNavigationReady]);
 
+    // Navigation effect
     useEffect(() => {
-        // Wait for both: onboarding status checked AND navigation ready
-        if (hasCompletedOnboarding === null || !isNavigationReady) return;
+        if (hasCompletedOnboarding === null || !isNavigationReady || !isUpdateCheckComplete) return;
 
-        // Hide splash screen once we know the onboarding status
         SplashScreen.hideAsync();
 
         const inOnboarding = segments[0] === 'onboarding';
 
-        // Defer navigation to next tick to ensure layout is fully mounted
         const timer = setTimeout(async () => {
             try {
-                // Re-read from AsyncStorage to get the LATEST state before redirecting
                 const currentValue = await AsyncStorage.getItem(ONBOARDING_COMPLETE_KEY);
                 const currentlyCompleted = currentValue === 'true';
 
                 if (!currentlyCompleted && !inOnboarding) {
-                    // User hasn't completed onboarding, redirect to onboarding
                     router.replace('/onboarding');
                 } else if (currentlyCompleted && inOnboarding) {
-                    // User has completed onboarding but is on onboarding screen
-                    // ONLY redirect if this was a fresh app launch, not intentional navigation
-                    // Check if the value was JUST removed (user wants to see onboarding again)
-                    // If AsyncStorage says complete but state says not, user just reset it - don't redirect
                     if (hasCompletedOnboarding) {
                         router.replace('/(tabs)/engine');
                     }
@@ -122,10 +127,10 @@ function RootLayoutNav() {
             } catch (error) {
                 console.error('Navigation error:', error);
             }
-        }, 100); // Increased delay to ensure navigation is ready
+        }, 100);
 
         return () => clearTimeout(timer);
-    }, [hasCompletedOnboarding, segments, isNavigationReady]);
+    }, [hasCompletedOnboarding, segments, isNavigationReady, isUpdateCheckComplete]);
 
     const checkOnboardingStatus = async () => {
         try {
@@ -137,8 +142,15 @@ function RootLayoutNav() {
         }
     };
 
-    // Always render the Stack to ensure the navigator is mounted
-    // Show loading state inside the Stack content
+    const handleUpdateComplete = () => {
+        setIsUpdateCheckComplete(true);
+    };
+
+    // Show UpdateChecker screen until updates are checked
+    if (!isUpdateCheckComplete) {
+        return <UpdateChecker onComplete={handleUpdateComplete} />;
+    }
+
     return (
         <>
             <StatusBar style={isDark ? 'light' : 'dark'} />
@@ -192,3 +204,4 @@ export default function RootLayout() {
         </GestureHandlerRootView>
     );
 }
+

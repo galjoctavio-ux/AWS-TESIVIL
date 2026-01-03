@@ -5,9 +5,30 @@ import { aggregateNews } from '../jobs/news-aggregator';
 
 // ═══════════════════════════════════════════════════════════════
 // ADMIN ROUTES - Manual triggers for sync jobs
+// Protected by X-Admin-Key header authentication
 // ═══════════════════════════════════════════════════════════════
 
+// Generated secure admin key: syn_admin_X7kP9mQr2vN5bL8cY3jF6wH1
+// Add to your .env: ADMIN_SECRET_KEY=syn_admin_X7kP9mQr2vN5bL8cY3jF6wH1
+const ADMIN_SECRET_KEY = process.env.ADMIN_SECRET_KEY || 'syn_admin_X7kP9mQr2vN5bL8cY3jF6wH1';
+
 const adminRoutes: FastifyPluginAsync = async (fastify) => {
+    // ───────────────────────────────────────────────────────────────
+    // Authentication middleware for all admin routes
+    // ───────────────────────────────────────────────────────────────
+    fastify.addHook('preHandler', async (request, reply) => {
+        const adminKey = request.headers['x-admin-key'];
+
+        if (!adminKey || adminKey !== ADMIN_SECRET_KEY) {
+            fastify.log.warn('Unauthorized admin access attempt');
+            return reply.status(401).send({
+                success: false,
+                error: 'Unauthorized: Invalid or missing admin key'
+            });
+        }
+    });
+
+
     // ───────────────────────────────────────────────────────────────
     // POST /api/admin/sync/models - Trigger AI models sync
     // ───────────────────────────────────────────────────────────────

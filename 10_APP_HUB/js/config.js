@@ -8,8 +8,8 @@ const CONFIG = {
     SUPABASE_URL: 'https://bokcbcvarvvzkaqakclu.supabase.co',
     SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJva2NiY3ZhcnZ2emthcWFrY2x1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYzNTkxNzUsImV4cCI6MjA4MTkzNTE3NX0.KUD-BrHqQqTwGtpkQL6wqPWMrK6bKSykaxuQFiivCpc',
 
-    // Google Drive Download Base URL
-    DRIVE_DOWNLOAD_BASE: 'https://drive.google.com/uc?export=download&id=',
+    // Direct Download Base URL (VM)
+    DOWNLOAD_BASE_URL: 'https://apps.tesivil.com/downloads/apks/',
 
     // App Settings
     APP_NAME: 'TESIVIL App Hub',

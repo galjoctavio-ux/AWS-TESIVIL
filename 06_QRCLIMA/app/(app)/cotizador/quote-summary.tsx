@@ -13,7 +13,8 @@ import {
 } from '../../../services/cotizador-service';
 import { generateCotizadorPDF } from '../../../services/pdf-generator';
 import { getClientById } from '../../../services/clients-service';
-import { getUserProfile } from '../../../services/user-service';
+import { getUserProfile, UserProfile, isUserPro } from '../../../services/user-service';
+import { consumePdfUnlock } from '../../../services/store-service';
 
 export default function QuoteSummaryScreen() {
     const insets = useSafeAreaInsets();
@@ -34,27 +35,37 @@ export default function QuoteSummaryScreen() {
     const [generatingPDF, setGeneratingPDF] = useState(false);
     const [loading, setLoading] = useState(false);
     const [existingQuote, setExistingQuote] = useState<CotizadorQuote | null>(null);
+    const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [pdfCredits, setPdfCredits] = useState(0);
 
-    // Load existing quote if quoteId is provided
+    // Load user profile and existing quote
     useEffect(() => {
-        const loadQuote = async () => {
-            if (params.quoteId) {
-                setLoading(true);
-                try {
+        const loadData = async () => {
+            if (!user) return;
+
+            setLoading(true);
+            try {
+                // Load profile
+                const userProfile = await getUserProfile(user.uid);
+                setProfile(userProfile);
+                setPdfCredits((userProfile as any)?.pdfUnlocksAvailable || 0);
+
+                // Load existing quote if provided
+                if (params.quoteId) {
                     const quote = await getQuoteById(params.quoteId);
                     if (quote) {
                         setExistingQuote(quote);
                         setNotes(quote.notes || '');
                     }
-                } catch (error) {
-                    console.error('Error loading quote:', error);
-                } finally {
-                    setLoading(false);
                 }
+            } catch (error) {
+                console.error('Error loading data:', error);
+            } finally {
+                setLoading(false);
             }
         };
-        loadQuote();
-    }, [params.quoteId]);
+        loadData();
+    }, [params.quoteId, user]);
 
     // Parse items from params OR use existing quote
     const items: CotizadorQuoteItem[] = existingQuote
@@ -70,15 +81,52 @@ export default function QuoteSummaryScreen() {
     const moItems = items.filter(i => i.type === 'MO');
     const mtItems = items.filter(i => i.type === 'MT');
 
-    const handleSaveAndGeneratePDF = async () => {
+    // Show PDF options based on PRO status and credits
+    const showPdfOptions = () => {
+        const isPro = isUserPro(profile);
+
+        if (isPro) {
+            // PRO users always get premium PDF
+            handleSaveAndGeneratePDF(true);
+            return;
+        }
+
+        if (pdfCredits > 0) {
+            // User has credits - show options
+            Alert.alert(
+                '📄 Generar PDF',
+                `Tienes ${pdfCredits} PDF(s) premium disponibles`,
+                [
+                    { text: 'PDF Estándar', onPress: () => handleSaveAndGeneratePDF(false) },
+                    { text: `PDF Premium ✨ (${pdfCredits})`, onPress: () => handleSaveAndGeneratePDF(true) },
+                    { text: 'Cancelar', style: 'cancel' }
+                ]
+            );
+        } else {
+            // No credits - generate standard
+            handleSaveAndGeneratePDF(false);
+        }
+    };
+
+    const handleSaveAndGeneratePDF = async (usePremium: boolean = false) => {
         if (!user) return;
 
         setSaving(true);
         setGeneratingPDF(true);
 
         try {
-            // Fetch user profile for PDF signature
-            const profile = await getUserProfile(user.uid);
+            // Check if we need to consume a token
+            const isPro = isUserPro(profile);
+            if (usePremium && !isPro) {
+                const consumed = await consumePdfUnlock(user.uid);
+                if (!consumed) {
+                    Alert.alert('Error', 'No tienes créditos de PDF premium disponibles');
+                    setSaving(false);
+                    setGeneratingPDF(false);
+                    return;
+                }
+                setPdfCredits(prev => Math.max(0, prev - 1));
+            }
 
             // Save the quote first
             const newQuoteId = await saveCotizadorQuote({
@@ -114,7 +162,8 @@ export default function QuoteSummaryScreen() {
                         status: 'Sent'
                     },
                     client: client,
-                    technicianProfile: profile || undefined
+                    technicianProfile: profile || undefined,
+                    forcePremium: usePremium
                 });
             }
 
@@ -250,22 +299,31 @@ export default function QuoteSummaryScreen() {
                         />
                     </View>
 
-                    {/* Watermark Preview */}
-                    <View className="bg-gray-100 rounded-xl p-3 mb-6 border border-dashed border-gray-300">
-                        <Text className="text-gray-500 text-xs text-center italic">
-                            El PDF incluirá la marca de agua:
-                        </Text>
-                        <Text className="text-gray-600 text-sm text-center font-medium mt-1">
-                            "Elaborado con QRclima powered by TESIVIL"
-                        </Text>
-                    </View>
+                    {/* PDF Info */}
+                    {!isUserPro(profile) && pdfCredits === 0 && (
+                        <View className="bg-gray-100 rounded-xl p-3 mb-6 border border-dashed border-gray-300">
+                            <Text className="text-gray-500 text-xs text-center italic">
+                                El PDF incluirá la marca de agua:
+                            </Text>
+                            <Text className="text-gray-600 text-sm text-center font-medium mt-1">
+                                "Elaborado con QRclima powered by TESIVIL"
+                            </Text>
+                        </View>
+                    )}
+                    {(isUserPro(profile) || pdfCredits > 0) && (
+                        <View className="bg-blue-50 rounded-xl p-3 mb-6 border border-blue-200">
+                            <Text className="text-blue-600 text-xs text-center font-medium">
+                                {isUserPro(profile) ? '✨ PDF Premium sin marca de agua' : `✨ ${pdfCredits} PDF(s) premium disponibles`}
+                            </Text>
+                        </View>
+                    )}
 
                     {/* Action Buttons */}
                     <View className="mb-8">
                         <TouchableOpacity
-                            onPress={handleSaveAndGeneratePDF}
+                            onPress={showPdfOptions}
                             disabled={saving || generatingPDF}
-                            className={`py-4 rounded-xl mb-3 ${saving || generatingPDF ? 'bg-gray-400' : 'bg-green-600'}`}
+                            className={`py-4 rounded-xl mb-3 ${saving || generatingPDF ? 'bg-gray-400' : 'bg-blue-600'}`}
                         >
                             {saving || generatingPDF ? (
                                 <View className="flex-row items-center justify-center">

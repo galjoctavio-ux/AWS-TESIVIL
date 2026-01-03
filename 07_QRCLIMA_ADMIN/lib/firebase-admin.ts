@@ -1,6 +1,7 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
+import { getMessaging } from 'firebase-admin/messaging';
 
 // ============================================
 // Firebase Admin SDK Configuration
@@ -30,6 +31,7 @@ const formatPrivateKey = (key: string | undefined): string | undefined => {
 
 let adminDb: FirebaseFirestore.Firestore;
 let adminAuth: ReturnType<typeof getAuth>;
+let adminMessaging: ReturnType<typeof getMessaging>;
 
 try {
     const privateKey = formatPrivateKey(process.env.FIREBASE_PRIVATE_KEY);
@@ -55,14 +57,16 @@ try {
     // Exportar instancias
     adminDb = getFirestore(app);
     adminAuth = getAuth(app);
+    adminMessaging = getMessaging(app);
 } catch (error) {
     console.error('Firebase Admin initialization error:', error);
     // Create mock objects to prevent crashes
     adminDb = null as any;
     adminAuth = null as any;
+    adminMessaging = null as any;
 }
 
-export { adminDb, adminAuth };
+export { adminDb, adminAuth, adminMessaging };
 
 // ============================================
 // Helper Functions

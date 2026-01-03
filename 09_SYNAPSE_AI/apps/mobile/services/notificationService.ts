@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { Platform, Alert, Linking } from 'react-native';
 import * as Device from 'expo-device';
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
@@ -61,3 +61,54 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
     }
 }
 
+/**
+ * Checks if notifications are enabled and prompts user to enable them
+ * Should be called when app comes to foreground
+ * @param showPrompt - Whether to show an alert prompting user to enable notifications
+ */
+export async function checkNotificationStatus(showPrompt: boolean = true): Promise<boolean> {
+    try {
+        if (!Device.isDevice) {
+            return false;
+        }
+
+        const { status } = await Notifications.getPermissionsAsync();
+
+        if (status === 'granted') {
+            return true;
+        }
+
+        if (status === 'denied' && showPrompt) {
+            // Notifications are denied, prompt user to enable in settings
+            Alert.alert(
+                'Notificaciones Desactivadas',
+                'Para recibir alertas de noticias importantes y actualizaciones, activa las notificaciones en la configuración.',
+                [
+                    {
+                        text: 'Ahora no',
+                        style: 'cancel',
+                    },
+                    {
+                        text: 'Ir a Configuración',
+                        onPress: () => {
+                            if (Platform.OS === 'ios') {
+                                Linking.openURL('app-settings:');
+                            } else {
+                                Linking.openSettings();
+                            }
+                        },
+                    },
+                ]
+            );
+        } else if (status === 'undetermined' && showPrompt) {
+            // First time, request permissions
+            const { status: newStatus } = await Notifications.requestPermissionsAsync();
+            return newStatus === 'granted';
+        }
+
+        return false;
+    } catch (e) {
+        console.error('[Notifications] Error checking notification status:', e);
+        return false;
+    }
+}

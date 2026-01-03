@@ -47,7 +47,7 @@ export async function apiFetch<T = any>(
             headers,
         });
 
-        const data = await response.json();
+        const data = await response.json() as ApiResponse<T>;
 
         if (!response.ok) {
             return {

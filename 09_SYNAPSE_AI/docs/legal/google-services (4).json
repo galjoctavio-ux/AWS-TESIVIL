@@ -44,35 +44,6 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:639964722922:android:6a4b5ca7e169db820b4993",
-        "android_client_info": {
-          "package_name": "com.synapse.ai"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "639964722922-o2uqfotiiia29u7u0c7ap80h84he7t5i.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDyYJPwYOgJ51DwLybATuGxSszG-ZupEOA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "639964722922-o2uqfotiiia29u7u0c7ap80h84he7t5i.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:639964722922:android:eec3ce801f71ca120b4993",
         "android_client_info": {
           "package_name": "com.tesivil.synapse"

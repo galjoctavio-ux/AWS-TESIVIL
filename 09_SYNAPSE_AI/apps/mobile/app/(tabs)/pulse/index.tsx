@@ -21,6 +21,13 @@ import { Icon } from '@/components/icons/Icon';
 import { EmptyState } from '@/components/EmptyState';
 import { SkeletonList } from '@/components/SkeletonCard';
 
+// API Response interface
+interface ApiResponse {
+    success: boolean;
+    data?: any;
+    error?: string;
+}
+
 // Fetch models from API
 async function fetchModels(category?: string): Promise<any[]> {
     const params = new URLSearchParams();
@@ -31,7 +38,7 @@ async function fetchModels(category?: string): Promise<any[]> {
     }
 
     const response = await fetch(`${API_URL}/api/models?${params.toString()}`);
-    const data = await response.json();
+    const data = await response.json() as ApiResponse;
 
     if (!data.success) {
         throw new Error(data.error || 'Error al cargar modelos');
@@ -43,7 +50,7 @@ async function fetchModels(category?: string): Promise<any[]> {
 // Fetch top 3 models
 async function fetchTopModels(): Promise<any[]> {
     const response = await fetch(`${API_URL}/api/models/top`);
-    const data = await response.json();
+    const data = await response.json() as ApiResponse;
 
     if (!data.success) {
         throw new Error(data.error || 'Error al cargar top modelos');

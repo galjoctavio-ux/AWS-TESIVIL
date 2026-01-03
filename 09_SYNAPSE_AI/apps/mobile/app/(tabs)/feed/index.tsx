@@ -24,6 +24,12 @@ import { EmptyState } from '@/components/EmptyState';
 import { SkeletonList } from '@/components/SkeletonCard';
 
 // Fetch news from API
+interface NewsApiResponse {
+    success: boolean;
+    data?: any[];
+    error?: string;
+}
+
 async function fetchNews({ pageParam = 0, queryKey }: { pageParam?: number; queryKey: string[] }): Promise<{
     articles: any[];
     nextOffset: number | null;
@@ -44,7 +50,7 @@ async function fetchNews({ pageParam = 0, queryKey }: { pageParam?: number; quer
     }
 
     const response = await fetch(url);
-    const data = await response.json();
+    const data = await response.json() as NewsApiResponse;
 
     if (!data.success) {
         throw new Error(data.error || 'Error al cargar noticias');

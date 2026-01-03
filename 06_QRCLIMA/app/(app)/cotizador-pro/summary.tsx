@@ -96,7 +96,7 @@ export default function SummaryScreen() {
 
             setGenerating(true);
 
-            // Generate PDF with branding
+            // Generate PDF with branding (always premium for cotizador-pro)
             await generateCotizadorPDF({
                 quote: {
                     id: quoteId,
@@ -109,7 +109,8 @@ export default function SummaryScreen() {
                     status: 'Draft' as const
                 },
                 client: clientForPdf as any, // Type assertion for compatibility
-                technicianProfile: profile || undefined
+                technicianProfile: profile || undefined,
+                forcePremium: true  // PRO module always generates premium PDF
             });
 
             Alert.alert(

@@ -9,6 +9,7 @@ import { ThemeProvider } from '../context/ThemeContext';
 import { SettingsProvider } from '../context/SettingsContext';
 import { StripePaymentProvider } from '../components/StripePaymentProvider';
 import AppLoadingScreen from '../components/AppLoadingScreen';
+import { registerForPushNotifications, setupNotificationListeners } from '../services/notification-service';
 import "../global.css";
 
 // Mantener el Splash Screen visible hasta que terminemos de cargar
@@ -109,6 +110,27 @@ function InitialLayout() {
             }
         }
     }, [user, authLoading, dbLoaded, segments, emailVerified, isOnboarded, checkingOnboarding, checkingUpdates]);
+
+    // 3. Refresh FCM token for authenticated users on app start
+    // This ensures existing users get their token updated even after cache clear
+    useEffect(() => {
+        if (!user || !isOnboarded || authLoading) return;
+
+        // Re-register for push notifications to ensure token is up to date
+        registerForPushNotifications(user.uid)
+            .then((token) => {
+                if (token) {
+                    console.log('✅ FCM token refreshed on app start');
+                }
+            })
+            .catch((error) => {
+                console.log('FCM token refresh skipped:', error.message);
+            });
+
+        // Setup notification listeners
+        const cleanup = setupNotificationListeners();
+        return cleanup;
+    }, [user, isOnboarded, authLoading]);
 
     if (dbError) {
         return (

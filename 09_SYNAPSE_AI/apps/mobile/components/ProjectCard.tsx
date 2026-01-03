@@ -174,6 +174,11 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     imageContainer: {
         height: 160,
         backgroundColor: colors.surfaceLight,
+        borderWidth: 1,
+        borderColor: colors.surfaceBorder,
+        margin: SPACING.sm,
+        borderRadius: RADIUS.md,
+        overflow: 'hidden',
     },
     image: {
         width: '100%',

@@ -18,10 +18,17 @@ import { ThemeColors } from '@/constants/themes';
 import { RadarChart } from '@/components/RadarChart';
 import { ReviewForm } from '@/components/ReviewForm';
 
+// API Response interface
+interface ApiResponse {
+    success: boolean;
+    data?: any;
+    error?: string;
+}
+
 // Fetch model details
 async function fetchModel(id: string) {
     const response = await fetch(`${API_URL}/api/models/${id}`);
-    const data = await response.json();
+    const data = await response.json() as ApiResponse;
     if (!data.success) throw new Error(data.error);
     return data.data;
 }
@@ -29,7 +36,7 @@ async function fetchModel(id: string) {
 // Fetch model stats
 async function fetchModelStats(id: string) {
     const response = await fetch(`${API_URL}/api/models/${id}/stats`);
-    const data = await response.json();
+    const data = await response.json() as ApiResponse;
     if (!data.success) throw new Error(data.error);
     return data.data;
 }
@@ -37,7 +44,7 @@ async function fetchModelStats(id: string) {
 // Fetch model reviews
 async function fetchModelReviews(id: string) {
     const response = await fetch(`${API_URL}/api/models/${id}/reviews`);
-    const data = await response.json();
+    const data = await response.json() as ApiResponse;
     if (!data.success) throw new Error(data.error);
     return data.data;
 }

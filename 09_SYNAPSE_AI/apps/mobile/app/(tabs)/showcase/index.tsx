@@ -27,6 +27,13 @@ import { SkeletonList } from '@/components/SkeletonCard';
 
 const VOTED_PROJECTS_KEY = '@synapse_voted_projects';
 
+// API Response interface
+interface ApiResponse {
+    success: boolean;
+    data?: any;
+    error?: string;
+}
+
 // Fetch projects from API
 async function fetchProjects({ pageParam = 0, tool, sort = 'hot' }: { pageParam?: number; tool?: string; sort?: string }): Promise<{
     projects: any[];
@@ -42,7 +49,7 @@ async function fetchProjects({ pageParam = 0, tool, sort = 'hot' }: { pageParam?
     }
 
     const response = await fetch(`${API_URL}/api/projects?${params.toString()}`);
-    const data = await response.json();
+    const data = await response.json() as ApiResponse;
 
     if (!data.success) {
         throw new Error(data.error || 'Error al cargar proyectos');
@@ -144,7 +151,7 @@ export default function ShowcaseScreen() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({}), // Empty body to satisfy Fastify
             });
-            const data = await response.json();
+            const data = await response.json() as ApiResponse;
             if (!data.success) throw new Error(data.error || 'Vote failed');
             return data;
         },
@@ -503,7 +510,7 @@ export default function ShowcaseScreen() {
                 <View
                     style={{
                         position: 'absolute',
-                        bottom: insets.bottom + 80,
+                        bottom: 90,
                         left: 0,
                         right: 0,
                         alignItems: 'flex-end', // Esto fuerza el botón a la derecha

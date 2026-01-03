@@ -73,6 +73,12 @@ export function ReviewForm({ modelId, modelName, onSuccess, onCancel }: ReviewFo
 
     const styles = createStyles(colors);
 
+    interface ReviewApiResponse {
+        success: boolean;
+        error?: string;
+        data?: any;
+    }
+
     const submitMutation = useMutation({
         mutationFn: async () => {
             const response = await fetch(`${API_URL}/api/models/${modelId}/reviews`, {
@@ -90,7 +96,7 @@ export function ReviewForm({ modelId, modelName, onSuccess, onCancel }: ReviewFo
                     authorAlias: alias,
                 }),
             });
-            const data = await response.json();
+            const data = await response.json() as ReviewApiResponse;
             if (!data.success) {
                 throw new Error(data.error || 'Failed to submit review');
             }

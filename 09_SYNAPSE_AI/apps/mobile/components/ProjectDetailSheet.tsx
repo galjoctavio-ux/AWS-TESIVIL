@@ -27,6 +27,14 @@ import { useAlias } from '@/contexts/AliasContext';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
+// API Response interface
+interface ApiResponse {
+    success: boolean;
+    data?: any;
+    error?: string;
+    reason?: string;
+}
+
 interface ProjectDetailSheetProps {
     project: {
         id: string;
@@ -54,7 +62,7 @@ interface ProjectDetailSheetProps {
 // Fetch comments
 async function fetchComments(projectId: string) {
     const response = await fetch(`${API_URL}/api/projects/${projectId}/comments`);
-    const data = await response.json();
+    const data = await response.json() as ApiResponse;
     if (!data.success) throw new Error(data.error);
     return data.data || [];
 }
@@ -69,7 +77,7 @@ async function postComment(projectId: string, content: string, parentId?: string
         },
         body: JSON.stringify({ content, parentId: parentId || null, authorAlias }),
     });
-    const data = await response.json();
+    const data = await response.json() as ApiResponse;
     if (!data.success) throw new Error(data.error || data.reason || 'Failed to post comment');
     return data.data;
 }
@@ -84,7 +92,7 @@ async function reportProject(projectId: string, reason: string) {
         },
         body: JSON.stringify({ reason }),
     });
-    const data = await response.json();
+    const data = await response.json() as ApiResponse;
     if (!data.success) throw new Error(data.error);
     return data;
 }

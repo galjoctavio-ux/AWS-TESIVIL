@@ -39,8 +39,14 @@ export default function AddressAutocomplete({
 }: AddressAutocompleteProps) {
     const ref = useRef<any>(null);
 
-    // Get API key from extra config
-    const apiKey = Constants.expoConfig?.extra?.googleMapsApiKey || '';
+    // Get API key from extra config with fallback to EXPO_PUBLIC variable
+    // The EXPO_PUBLIC variable works because it's available at runtime
+    const apiKey = Constants.expoConfig?.extra?.googleMapsApiKey
+        || process.env.EXPO_PUBLIC_GOOGLE_DIRECTIONS_API_KEY
+        || '';
+
+    // Debug log - remove after fixing
+    console.log('[AddressAutocomplete] API Key status:', apiKey ? `Loaded (${apiKey.substring(0, 10)}...)` : 'MISSING');
 
     return (
         <View className="flex-1">
@@ -54,6 +60,13 @@ export default function AddressAutocomplete({
                     placeholderTextColor: '#9CA3AF',
                 }}
                 onPress={(data, details = null) => {
+                    // Debug log - remove after fixing
+                    console.log('[AddressAutocomplete] onPress data:', JSON.stringify(data, null, 2));
+                    console.log('[AddressAutocomplete] onPress details:', details ? JSON.stringify({
+                        geometry: details.geometry,
+                        formatted_address: details.formatted_address,
+                    }, null, 2) : 'NULL - Place Details API may not be enabled');
+
                     const address = data.description;
                     const location = details?.geometry?.location;
                     onAddressSelect(address, location ? { lat: location.lat, lng: location.lng } : undefined);

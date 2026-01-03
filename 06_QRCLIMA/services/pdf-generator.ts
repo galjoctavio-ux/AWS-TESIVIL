@@ -994,14 +994,24 @@ interface CotizadorPDFData {
     quote: CotizadorQuote & { id: string };
     client: ClientData & { id: string };
     technicianProfile?: UserProfile;
+    forcePremium?: boolean;  // Force premium features (for users who purchased PDF credits)
 }
 
+// PDF Template Version for Cotizador
+const COTIZADOR_PDF_VERSION = 'FMT-COT-01 v1.0';
+
 /**
- * Generates a professional PDF for the Free Cotizador module.
- * Includes watermark: "Elaborado con QRclima powered by TESIVIL"
+ * Generates a professional PDF for the Cotizador module.
+ * Supports PRO branding (custom logo, colors) vs FREE (QRclima branding + promo banner)
+ * Version: FMT-COT-01 v1.0
  */
 export const generateCotizadorPDF = async (data: CotizadorPDFData): Promise<void> => {
-    const { quote, client, technicianProfile } = data;
+    const { quote, client, technicianProfile, forcePremium } = data;
+
+    // Determine if user is PRO for branding (or forced premium via token purchase)
+    const isPro = forcePremium || isUserPro(technicianProfile || null);
+    const branding = technicianProfile?.branding;
+    const primaryColor = isPro && branding?.primaryColor ? branding.primaryColor : '#2563EB';
 
     const currentDate = new Date().toLocaleDateString('es-MX', {
         year: 'numeric',
@@ -1010,11 +1020,16 @@ export const generateCotizadorPDF = async (data: CotizadorPDFData): Promise<void
     });
 
     // Generate folio
-    const folio = `CF - ${new Date().getFullYear()}${quote.id.substring(0, 5).toUpperCase()} `;
+    const folio = `COT-${new Date().getFullYear()}${quote.id.substring(0, 5).toUpperCase()}`;
 
     // Separate items by type
     const moItems = quote.items.filter(item => item.type === 'MO');
     const mtItems = quote.items.filter(item => item.type === 'MT');
+
+    // Brand name: businessName > fullName > QRclima
+    const brandName = isPro && (technicianProfile?.businessName || technicianProfile?.fullName)
+        ? (technicianProfile.businessName || technicianProfile.fullName)
+        : 'QRclima';
 
     const html = `<!DOCTYPE html>
 <html>
@@ -1022,56 +1037,309 @@ export const generateCotizadorPDF = async (data: CotizadorPDFData): Promise<void
     <meta charset="utf-8">
     <title>Cotización</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #333; line-height: 1.5; padding: 30px; font-size: 12px; position: relative; }
-        .watermark { position: fixed; bottom: 20px; left: 0; right: 0; text-align: center; color: #CBD5E1; font-size: 10px; font-style: italic; letter-spacing: 1px; }
-        .header { text-align: center; border-bottom: 3px solid #10B981; padding-bottom: 15px; margin-bottom: 20px; }
-        .header h1 { color: #10B981; font-size: 24px; margin-bottom: 3px; }
-        .header .subtitle { color: #666; font-size: 16px; font-weight: bold; }
-        .header .folio { color: #999; font-size: 11px; margin-top: 5px; }
-        .client-section { background: #F0FDF4; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #10B981; }
-        .client-section h3 { color: #10B981; font-size: 12px; margin-bottom: 8px; }
-        .section-title { font-size: 13px; font-weight: bold; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #E5E7EB; }
-        .section-title.mo { color: #7C3AED; }
-        .section-title.mt { color: #EA580C; }
+        @page { margin: 0; }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #333333;
+            line-height: 1.5;
+            margin: 0;
+            padding: 40px 50px;
+            font-size: 11px;
+        }
+        
+        /* Header */
+        .header-container {
+            background: linear-gradient(135deg, ${primaryColor}08 0%, ${primaryColor}15 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-bottom: 3px solid ${primaryColor};
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .brand-section {
+            display: flex;
+            align-items: center;
+        }
+        .brand-logo {
+            width: 50px;
+            height: 50px;
+            background: ${primaryColor};
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .brand-logo img {
+            height: 50px;
+            max-width: 120px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+        .brand-title {
+            color: ${primaryColor};
+            font-size: 22px;
+            margin: 0;
+            letter-spacing: 0.5px;
+            font-weight: bold;
+        }
+        .brand-subtitle {
+            color: #6B7280;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        /* Meta Info */
+        .meta-info {
+            text-align: right;
+        }
+        .folio-box {
+            background: #F3F4F6;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .folio-label {
+            color: #6B7280;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .folio-value {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #111827;
+            font-size: 14px;
+        }
+        .folio-date {
+            color: #6B7280;
+            font-size: 10px;
+            margin-top: 4px;
+        }
+        
+        /* Info Box */
+        .info-box {
+            background: #F9FAFB;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .box-title {
+            color: ${primaryColor};
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        .client-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+        .info-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+            color: #4B5563;
+            font-size: 11px;
+        }
+        
+        /* Section Title */
+        .section-title {
+            background: ${primaryColor}15;
+            color: ${primaryColor};
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 12px;
+            border-left: 3px solid ${primaryColor};
+            margin-top: 15px;
+        }
+        .section-title.mo { color: #7C3AED; background: #7C3AED15; border-left-color: #7C3AED; }
+        .section-title.mt { color: #EA580C; background: #EA580C15; border-left-color: #EA580C; }
+        
+        /* Table */
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th { background: #F3F4F6; padding: 10px; text-align: left; font-weight: bold; border: 1px solid #E5E7EB; font-size: 11px; }
-        td { padding: 10px; border: 1px solid #E5E7EB; }
+        th { 
+            background: #F3F4F6; 
+            padding: 10px; 
+            text-align: left; 
+            font-weight: bold; 
+            border: 1px solid #E5E7EB; 
+            font-size: 10px;
+            color: #374151;
+        }
+        td { padding: 10px; border: 1px solid #E5E7EB; font-size: 11px; }
         .text-right { text-align: right; }
         .text-center { text-align: center; }
-        .code-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; }
+        .code-badge { 
+            display: inline-block; 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            font-size: 9px; 
+            font-weight: bold; 
+        }
         .code-mo { background: #EDE9FE; color: #7C3AED; }
         .code-mt { background: #FFEDD5; color: #EA580C; }
-        .totals-section { background: #1F2937; color: white; padding: 20px; border-radius: 8px; margin-top: 20px; }
+        
+        /* Totals */
+        .totals-section { 
+            background: linear-gradient(135deg, #1F2937 0%, #111827 100%); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            margin-top: 20px; 
+        }
         .totals-row { display: flex; justify-content: space-between; padding: 8px 0; }
-        .totals-row.final { border-top: 2px solid #4B5563; padding-top: 15px; margin-top: 10px; font-size: 18px; font-weight: bold; }
+        .totals-row.final { 
+            border-top: 2px solid #4B5563; 
+            padding-top: 15px; 
+            margin-top: 10px; 
+            font-size: 20px; 
+            font-weight: bold; 
+        }
         .totals-row .label { color: #9CA3AF; }
         .totals-row.final .label { color: white; }
         .totals-row .value { color: #10B981; font-weight: bold; }
-        .notes { background: #F3F4F6; padding: 12px; border-radius: 6px; margin-top: 15px; font-style: italic; color: #666; }
-        .signatures-container { display: flex; justify-content: center; margin-top: 40px; page-break-inside: avoid; }
-        .signature-box { width: 60%; text-align: center; border-top: 1px solid #9CA3AF; padding-top: 10px; }
-        .signature-image { height: 60px; margin-bottom: 5px; object-fit: contain; display: block; margin-left: auto; margin-right: auto; }
-        .technician-name { font-weight: bold; font-size: 12px; color: #374151; }
-        .footer { margin-top: 30px; padding-top: 15px; border-top: 1px solid #E5E7EB; text-align: center; color: #666; font-size: 10px; }
+        
+        /* Notes */
+        .notes { 
+            background: #FFFBEB; 
+            border-left: 4px solid #F59E0B; 
+            border-radius: 0 8px 8px 0; 
+            padding: 12px 14px; 
+            margin-top: 15px; 
+        }
+        .notes-title { color: #92400E; font-weight: bold; font-size: 10px; margin-bottom: 4px; }
+        .notes-text { color: #78350F; font-size: 11px; line-height: 1.4; }
+        
+        /* Signatures */
+        .signatures-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+            page-break-inside: avoid;
+        }
+        .signature-box {
+            width: 60%;
+            text-align: center;
+        }
+        .signature-image {
+            height: 50px;
+            margin-bottom: 5px;
+            object-fit: contain;
+        }
+        .signature-line {
+            border-top: 1px solid #9CA3AF;
+            padding-top: 6px;
+            color: #4B5563;
+            font-size: 10px;
+            font-weight: 500;
+        }
+        .signature-name {
+            font-weight: bold;
+            font-size: 12px;
+            color: #374151;
+        }
+        
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: 20px;
+            left: 50px;
+            right: 50px;
+            text-align: center;
+            font-size: 9px;
+            border-top: 1px solid #E5E7EB;
+            padding-top: 10px;
+        }
+        .footer-legal {
+            color: #6B7280;
+            margin-bottom: 6px;
+        }
+        .footer-branding {
+            color: #9CA3AF;
+        }
+        .footer-meta {
+            font-family: 'Courier New', monospace;
+            font-size: 7px;
+            color: #D1D5DB;
+            margin-top: 6px;
+        }
+        .pro-badge {
+            display: inline-block;
+            background: ${primaryColor};
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 8px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        
+        /* Watermark for FREE */
+        .watermark { 
+            position: fixed; 
+            bottom: 80px; 
+            left: 0; 
+            right: 0; 
+            text-align: center; 
+            color: #CBD5E1; 
+            font-size: 10px; 
+            font-style: italic; 
+            letter-spacing: 1px; 
+        }
     </style>
 </head>
 <body>
-    <div class="watermark">Elaborado con QRclima powered by TESIVIL</div>
+    ${!isPro ? '<div class="watermark">Elaborado con QRclima powered by TESIVIL</div>' : ''}
 
-    <div class="header">
-        <h1>❄️ QRclima</h1>
-        <div class="subtitle">COTIZACIÓN</div>
-        <div class="folio">Folio: ${folio} | Fecha: ${currentDate}</div>
+    <!-- Professional Header -->
+    <div class="header-container">
+        <div class="brand-section">
+            ${isPro && branding?.logoURL
+            ? `<img src="${branding.logoURL}" style="height: 50px; max-width: 120px; object-fit: contain; margin-right: 15px; border-radius: 8px;" />`
+            : `<div class="brand-logo">❄️</div>`
+        }
+            <div>
+                <h1 class="brand-title">${brandName}</h1>
+                <div class="brand-subtitle">Cotización de Servicio</div>
+                ${!isPro && (technicianProfile?.fullName || technicianProfile?.businessName)
+            ? `<div style="color: #9CA3AF; font-size: 10px; margin-top: 2px;">Técnico: ${technicianProfile?.fullName || technicianProfile?.businessName}</div>`
+            : ''}
+            </div>
+        </div>
+        <div class="meta-info">
+            <div class="folio-box">
+                <div class="folio-label">Folio de Cotización</div>
+                <div class="folio-value">#${folio}</div>
+                <div class="folio-date">${currentDate}</div>
+            </div>
+        </div>
     </div>
 
-    <div class="client-section">
-        <h3>📋 DATOS DEL CLIENTE</h3>
-        <strong>${client.name}</strong><br>
-        ${client.phone ? `📞 ${client.phone}<br>` : ''}
-        ${client.address ? `📍 ${client.address}` : ''}
+    <!-- Client Info -->
+    <div class="info-box">
+        <div class="box-title">📋 Datos del Cliente</div>
+        <div class="client-name">${client.name}</div>
+        ${client.phone ? `<div class="info-row">📞 ${client.phone}</div>` : ''}
+        ${client.address ? `<div class="info-row">📍 ${client.address}</div>` : ''}
     </div>
 
+    <!-- Labor Items -->
     ${moItems.length > 0 ? `
     <div class="section-title mo">🔧 MANO DE OBRA</div>
     <table>
@@ -1098,6 +1366,7 @@ export const generateCotizadorPDF = async (data: CotizadorPDFData): Promise<void
     </table>
     ` : ''}
 
+    <!-- Material Items -->
     ${mtItems.length > 0 ? `
     <div class="section-title mt">📦 MATERIALES</div>
     <table>
@@ -1124,6 +1393,7 @@ export const generateCotizadorPDF = async (data: CotizadorPDFData): Promise<void
     </table>
     ` : ''}
 
+    <!-- Totals -->
     <div class="totals-section">
         <div class="totals-row final">
             <span class="label">TOTAL A PAGAR</span>
@@ -1132,27 +1402,54 @@ export const generateCotizadorPDF = async (data: CotizadorPDFData): Promise<void
         <div style="color: #9CA3AF; font-size: 10px; margin-top: 8px;">* Precios con IVA incluido</div>
     </div>
 
+    <!-- Notes -->
     ${quote.notes ? `
     <div class="notes">
-        <strong>Notas:</strong> ${quote.notes}
+        <div class="notes-title">Observaciones</div>
+        <div class="notes-text">${quote.notes}</div>
     </div>
     ` : ''}
 
+    <!-- Signature -->
     <div class="signatures-container">
         <div class="signature-box">
-            ${technicianProfile?.signature ?
-            `<img src="${technicianProfile.signature}" class="signature-image" />` :
-            '<div style="height: 60px;"></div>'
+            ${technicianProfile?.signature
+            ? `<img src="${technicianProfile.signature}" class="signature-image" />`
+            : '<div style="height: 50px;"></div>'
         }
-            <div class="technician-name">
-                ${technicianProfile?.fullName || technicianProfile?.businessName || technicianProfile?.email || 'Técnico Certificado'}
+            <div class="signature-line">
+                Técnico Responsable<br/>
+                <span class="signature-name">${technicianProfile?.businessName || technicianProfile?.fullName || 'Técnico Certificado'}</span>
             </div>
-            <div style="font-size: 10px; color: #6B7280; margin-top: 2px;">Técnico Responsable</div>
         </div>
     </div>
 
+    ${!isPro ? `
+    <!-- Promo Banner for FREE users -->
+    <div style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); border-radius: 12px; padding: 20px; margin-top: 30px; text-align: center; color: white;">
+        <div style="font-size: 14px; font-weight: bold; margin-bottom: 8px;">📱 Bitácora Digital de tu Equipo</div>
+        <div style="font-size: 11px; margin-bottom: 12px; line-height: 1.5;">
+            Solicita a tu técnico utilizar la bitácora viva de QRclima.<br/>
+            Accede al historial completo de mantenimientos de tu equipo y aprovecha beneficios exclusivos.
+        </div>
+        <a href="https://qrclima.tesivil.com/" target="_blank" style="display: inline-block; background: white; color: #4F46E5; padding: 8px 20px; border-radius: 20px; font-weight: bold; font-size: 12px; text-decoration: none;">
+            qrclima.tesivil.com
+        </a>
+    </div>
+    ` : ''}
+
+    <!-- Footer -->
     <div class="footer">
-        Documento generado el ${currentDate} por QRclima App
+        ${isPro ? `
+            <span class="pro-badge">Técnico Verificado</span>
+            <div class="footer-legal">
+                ${branding?.footerText || 'Este documento es una cotización generada digitalmente.'}
+            </div>
+        ` : `
+            <div class="footer-legal">Este documento es una cotización generada digitalmente.</div>
+            <div class="footer-branding">Powered by QRclima | TESIVIL</div>
+        `}
+        <div class="footer-meta">DocID: ${quote.id} | Formato: ${COTIZADOR_PDF_VERSION}</div>
     </div>
 </body>
 </html>

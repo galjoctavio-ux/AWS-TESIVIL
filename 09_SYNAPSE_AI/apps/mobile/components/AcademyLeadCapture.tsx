@@ -49,6 +49,10 @@ export default function AcademyLeadCapture({ source = 'direct', onSuccess, compa
 
         setLoading(true);
         try {
+            interface ApiResponse {
+                success?: boolean;
+                error?: string;
+            }
             const response = await fetch(`${API_URL}/api/academy/waitlist`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -59,7 +63,7 @@ export default function AcademyLeadCapture({ source = 'direct', onSuccess, compa
                 }),
             });
 
-            const data = await response.json();
+            const data = await response.json() as ApiResponse;
 
             if (!response.ok) {
                 throw new Error(data.error || 'Error al registrar');

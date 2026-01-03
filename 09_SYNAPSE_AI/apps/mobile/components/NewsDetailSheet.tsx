@@ -59,16 +59,23 @@ interface NewsDetailSheetProps {
 // API FUNCTIONS
 // ═══════════════════════════════════════════════════════════════
 
+interface ApiResponse {
+    success: boolean;
+    data?: any;
+    error?: string;
+    newCount?: number;
+}
+
 async function fetchArticle(id: string): Promise<NewsArticle> {
     const response = await fetch(`${API_URL}/api/news/${id}`);
-    const data = await response.json();
+    const data = await response.json() as ApiResponse;
     if (!data.success) throw new Error(data.error);
     return data.data;
 }
 
 async function fetchComments(articleId: string): Promise<Comment[]> {
     const response = await fetch(`${API_URL}/api/news/${articleId}/comments`);
-    const data = await response.json();
+    const data = await response.json() as ApiResponse;
     if (!data.success) throw new Error(data.error);
     return data.data || [];
 }
@@ -82,7 +89,7 @@ async function postComment(articleId: string, content: string, parentId?: string
         },
         body: JSON.stringify({ content, parentId: parentId || null, authorAlias }),
     });
-    const data = await response.json();
+    const data = await response.json() as ApiResponse;
     if (!data.success) throw new Error(data.error || 'Failed to post comment');
     return data.data;
 }
@@ -145,7 +152,7 @@ const NewsDetailSheet = forwardRef<BottomSheet, NewsDetailSheetProps>(
                     headers: { 'Content-Type': 'application/json' },
                     body: '{}', // Empty body required by Fastify
                 });
-                const data = await response.json();
+                const data = await response.json() as ApiResponse;
                 console.log('[NewsDetailSheet] Like response:', data);
                 if (!data.success) throw new Error(data.error || 'Like failed');
                 return data;

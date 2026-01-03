@@ -48,6 +48,12 @@ const ACTION_TYPES = [
     { id: 'inspiration', label: '👁️ Inspiración', description: 'Sin link, solo mostrar' },
 ];
 
+interface ApiResponse {
+    success: boolean;
+    data?: any;
+    error?: string;
+}
+
 // Create project API call
 async function createProject(data: {
     title: string;
@@ -80,7 +86,7 @@ async function createProject(data: {
         }),
     });
 
-    const result = await response.json();
+    const result = await response.json() as ApiResponse;
     if (!result.success) throw new Error(result.error || 'Failed to create project');
     return result.data;
 }

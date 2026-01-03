@@ -47,3 +47,5 @@ dist/
 # Archivos temporales de Hot Module Replacement (HMR)
 *.hot-update.js
 *.hot-update.json
+# Credenciales sensibles
+09_SYNAPSE_AI/docs/legal/mr-frio-593eea45e8d2.json
