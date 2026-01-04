@@ -11,6 +11,9 @@ const CONFIG = {
     // Direct Download Base URL (VM)
     DOWNLOAD_BASE_URL: 'https://apps.tesivil.com/downloads/apks/',
 
+    // Google reCAPTCHA v3
+    RECAPTCHA_SITE_KEY: '6LeW1z8sAAAAAGnKQY0jcMcs5fAhoFNLRgFcL0w3',
+
     // App Settings
     APP_NAME: 'TESIVIL App Hub',
     APP_DESCRIPTION: 'Catálogo de aplicaciones del ecosistema TESIVIL',

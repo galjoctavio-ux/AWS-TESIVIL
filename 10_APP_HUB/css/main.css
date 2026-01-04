@@ -890,3 +890,110 @@ button {
 .legal-separator {
     color: var(--color-surface-border);
 }
+
+/* -----------------------------------------------------------------------------
+   Download Modal (reCAPTCHA verification)
+   ----------------------------------------------------------------------------- */
+.download-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-base);
+}
+
+.download-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.download-modal-content {
+    background: var(--color-surface);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-2xl);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: var(--shadow-xl);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.download-modal-content p {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-primary);
+    margin-top: var(--spacing-lg);
+}
+
+.download-modal-content .btn-secondary {
+    margin-top: var(--spacing-lg);
+}
+
+/* Spinner */
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--color-surface-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Success Icon */
+.success-icon {
+    color: var(--color-success);
+    animation: successPop 0.3s ease;
+}
+
+@keyframes successPop {
+    0% {
+        transform: scale(0);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Error Icon */
+.error-icon {
+    color: var(--color-error);
+}
+
+/* State-specific styles */
+.download-modal-content.verifying p {
+    color: var(--color-text-secondary);
+}
+
+.download-modal-content.success p {
+    color: var(--color-success);
+}
+
+.download-modal-content.error p {
+    color: var(--color-error);
+}

@@ -1,5 +1,5 @@
 // API Configuration
-export const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://13.59.28.73:3001';
+export const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://api.synapse.tesivil.com';
 
 // App Configuration
 export const APP_NAME = 'SYNAPSE AI';

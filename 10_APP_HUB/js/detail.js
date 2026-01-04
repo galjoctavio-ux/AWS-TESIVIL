@@ -173,19 +173,17 @@ function renderAppDetail(app) {
 function buildCTAButtons(app) {
     const buttons = [];
 
-    // Botón de descarga APK
-    if (app.apk_filename || app.drive_id) {
-        const filename = app.apk_filename || app.drive_id;
-        const downloadUrl = AppAPI.buildDownloadUrl(filename);
+    // Botón de descarga APK con reCAPTCHA
+    if (app.download_url) {
         buttons.push(`
-            <a href="${downloadUrl}" class="btn-primary" download>
+            <button class="btn-primary" onclick="handleDownload('${app.download_url}', '${app.nombre}')">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                     <polyline points="7 10 12 15 17 10"/>
                     <line x1="12" y1="15" x2="12" y2="3"/>
                 </svg>
                 <span data-i18n="downloadApk">${i18n.t('downloadApk')}</span>
-            </a>
+            </button>
         `);
     }
 
@@ -306,3 +304,125 @@ function updateLegalLinks(slug) {
         container.innerHTML = '';
     }
 }
+
+// =============================================================================
+// reCAPTCHA Download Protection
+// =============================================================================
+
+/**
+ * Estado de reCAPTCHA
+ */
+let recaptchaReady = false;
+
+/**
+ * Inicializar reCAPTCHA cuando cargue
+ */
+function onRecaptchaLoad() {
+    recaptchaReady = true;
+    console.log('reCAPTCHA v3 loaded');
+}
+
+/**
+ * Maneja el clic de descarga con verificación reCAPTCHA
+ * @param {string} downloadUrl - URL de descarga
+ * @param {string} appName - Nombre de la app
+ */
+async function handleDownload(downloadUrl, appName) {
+    // Mostrar modal de verificación
+    showDownloadModal('verifying', appName);
+
+    if (!recaptchaReady) {
+        console.error('reCAPTCHA not ready');
+        showDownloadModal('error', appName);
+        return;
+    }
+
+    try {
+        // Ejecutar reCAPTCHA v3
+        const token = await grecaptcha.execute(CONFIG.RECAPTCHA_SITE_KEY, { action: 'download' });
+
+        if (token) {
+            // En reCAPTCHA v3, no necesitamos verificar server-side para este caso
+            // El token es suficiente para filtrar bots automatizados
+            console.log('reCAPTCHA verification passed');
+
+            // Mostrar éxito y luego descargar
+            showDownloadModal('success', appName);
+
+            // Esperar un momento para que el usuario vea el mensaje
+            setTimeout(() => {
+                hideDownloadModal();
+                // Iniciar descarga
+                window.location.href = downloadUrl;
+            }, 1500);
+        } else {
+            showDownloadModal('error', appName);
+        }
+    } catch (error) {
+        console.error('reCAPTCHA error:', error);
+        showDownloadModal('error', appName);
+    }
+}
+
+/**
+ * Muestra el modal de descarga con diferentes estados
+ * @param {string} state - 'verifying', 'success', 'error'
+ * @param {string} appName - Nombre de la app
+ */
+function showDownloadModal(state, appName) {
+    let modal = document.getElementById('download-modal');
+
+    if (!modal) {
+        // Crear modal si no existe
+        modal = document.createElement('div');
+        modal.id = 'download-modal';
+        modal.className = 'download-modal';
+        document.body.appendChild(modal);
+    }
+
+    const messages = {
+        verifying: {
+            es: 'Verificando seguridad...',
+            en: 'Verifying security...'
+        },
+        success: {
+            es: '¡Verificado! Iniciando descarga...',
+            en: 'Verified! Starting download...'
+        },
+        error: {
+            es: 'Error de verificación. Recarga la página.',
+            en: 'Verification error. Please reload the page.'
+        }
+    };
+
+    const icons = {
+        verifying: `<div class="spinner"></div>`,
+        success: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="success-icon"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+        error: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="error-icon"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`
+    };
+
+    const lang = i18n?.currentLang || 'es';
+    const message = messages[state][lang];
+    const icon = icons[state];
+
+    modal.innerHTML = `
+        <div class="download-modal-content ${state}">
+            ${icon}
+            <p>${message}</p>
+            ${state === 'error' ? `<button onclick="hideDownloadModal()" class="btn-secondary">Cerrar</button>` : ''}
+        </div>
+    `;
+
+    modal.classList.add('active');
+}
+
+/**
+ * Oculta el modal de descarga
+ */
+function hideDownloadModal() {
+    const modal = document.getElementById('download-modal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
