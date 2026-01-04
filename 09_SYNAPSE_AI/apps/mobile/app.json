@@ -25,8 +25,7 @@
       },
       "package": "com.synapse.ai",
       "googleServicesFile": "./google-services.json",
-      "newArchEnabled": true,
-      "usesCleartextTraffic": true
+      "newArchEnabled": true
     },
     "web": {
       "bundler": "metro",
