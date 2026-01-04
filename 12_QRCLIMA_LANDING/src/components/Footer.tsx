@@ -2,11 +2,11 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { Download, Mail, Shield, FileText, ExternalLink, Smartphone, Clock, HelpCircle, Sparkles } from "lucide-react";
+import { Mail, Shield, FileText, ExternalLink, Smartphone, Clock, HelpCircle, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { FAQModal } from "./FAQ";
 import { FeaturesModal } from "./Features";
-import { DOWNLOAD_LINKS } from "@/constants";
+import DownloadButton from "./DownloadButton";
 
 export default function Footer() {
     const currentYear = new Date().getFullYear();
@@ -36,19 +36,8 @@ export default function Footer() {
 
                         {/* Download Buttons */}
                         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-                            {/* Descarga Directa - Principal */}
-                            <motion.a
-                                href={DOWNLOAD_LINKS.ANDROID_APK}
-                                whileHover={{ scale: 1.03, y: -2 }}
-                                whileTap={{ scale: 0.98 }}
-                                className="flex items-center gap-3 bg-gradient-to-r from-blue-500 to-teal-500 text-white px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow"
-                            >
-                                <Download className="w-8 h-8" />
-                                <div className="text-left">
-                                    <p className="text-xs opacity-80">Descarga Directa</p>
-                                    <p className="text-lg font-bold">Android APK</p>
-                                </div>
-                            </motion.a>
+                            {/* Descarga Directa - Principal con reCAPTCHA */}
+                            <DownloadButton />
                         </div>
 
                         {/* Coming Soon */}
