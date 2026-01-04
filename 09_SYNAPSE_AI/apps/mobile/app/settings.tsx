@@ -7,6 +7,7 @@ import {
     StyleSheet,
     Switch,
     ActivityIndicator,
+    Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -65,9 +66,11 @@ export default function SettingsScreen() {
             if (!result.success) {
                 // Revert on error
                 setNotifPrefs(prev => ({ ...prev, newsLevel: oldLevel }));
+                Alert.alert('Error', result.error || 'No se pudo guardar la preferencia');
             }
-        } catch (error) {
+        } catch (error: any) {
             setNotifPrefs(prev => ({ ...prev, newsLevel: oldLevel }));
+            Alert.alert('Error de conexión', 'Verifica tu conexión a internet');
         } finally {
             setSavingPrefs(false);
         }
@@ -84,9 +87,11 @@ export default function SettingsScreen() {
             const result = await updateNotificationPreferences({ commentsEnabled: enabled });
             if (!result.success) {
                 setNotifPrefs(prev => ({ ...prev, commentsEnabled: oldValue }));
+                Alert.alert('Error', result.error || 'No se pudo guardar la preferencia');
             }
-        } catch (error) {
+        } catch (error: any) {
             setNotifPrefs(prev => ({ ...prev, commentsEnabled: oldValue }));
+            Alert.alert('Error de conexión', 'Verifica tu conexión a internet');
         } finally {
             setSavingPrefs(false);
         }

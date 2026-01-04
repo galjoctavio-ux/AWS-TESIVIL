@@ -1,5 +1,7 @@
 // API Configuration
-export const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://api.synapse.tesivil.com';
+// IMPORTANT: This URL is hardcoded because EXPO_PUBLIC_* env vars are baked into native builds
+// and don't update with EAS Update OTA updates. Change this URL and do an EAS Update if needed.
+export const API_URL = 'https://api.synapse.tesivil.com';
 
 // App Configuration
 export const APP_NAME = 'SYNAPSE AI';
