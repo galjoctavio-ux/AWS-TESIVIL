@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     View,
     Text,
@@ -6,16 +6,91 @@ import {
     TouchableOpacity,
     StyleSheet,
     Switch,
+    ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/contexts/ThemeContext';
 import { SPACING, RADIUS } from '@/constants/config';
+import { getNotificationPreferences, updateNotificationPreferences, NotificationPreferences } from '@/lib/api';
+
+// News notification level options
+const NEWS_LEVELS = [
+    { id: 'breaking' as const, label: '🔴 Solo Breaking News', desc: 'Noticias de alta importancia' },
+    { id: 'all' as const, label: '📰 Todas las noticias', desc: 'Todas las noticias nuevas' },
+    { id: 'none' as const, label: '🔕 Desactivado', desc: 'Sin notificaciones de noticias' },
+];
 
 export default function SettingsScreen() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
     const { colors, isDark, toggleTheme, theme } = useTheme();
+
+    // Notification preferences state
+    const [notifPrefs, setNotifPrefs] = useState<NotificationPreferences>({
+        newsLevel: 'breaking',
+        commentsEnabled: true,
+    });
+    const [loadingPrefs, setLoadingPrefs] = useState(true);
+    const [savingPrefs, setSavingPrefs] = useState(false);
+
+    // Load notification preferences
+    useEffect(() => {
+        loadPreferences();
+    }, []);
+
+    const loadPreferences = useCallback(async () => {
+        try {
+            setLoadingPrefs(true);
+            const result = await getNotificationPreferences();
+            if (result.success && result.data) {
+                setNotifPrefs(result.data);
+            }
+        } catch (error) {
+            console.error('Failed to load notification preferences:', error);
+        } finally {
+            setLoadingPrefs(false);
+        }
+    }, []);
+
+    const handleNewsLevelChange = async (level: 'all' | 'breaking' | 'none') => {
+        if (savingPrefs) return;
+
+        const oldLevel = notifPrefs.newsLevel;
+        setNotifPrefs(prev => ({ ...prev, newsLevel: level }));
+
+        try {
+            setSavingPrefs(true);
+            const result = await updateNotificationPreferences({ newsLevel: level });
+            if (!result.success) {
+                // Revert on error
+                setNotifPrefs(prev => ({ ...prev, newsLevel: oldLevel }));
+            }
+        } catch (error) {
+            setNotifPrefs(prev => ({ ...prev, newsLevel: oldLevel }));
+        } finally {
+            setSavingPrefs(false);
+        }
+    };
+
+    const handleCommentsToggle = async (enabled: boolean) => {
+        if (savingPrefs) return;
+
+        const oldValue = notifPrefs.commentsEnabled;
+        setNotifPrefs(prev => ({ ...prev, commentsEnabled: enabled }));
+
+        try {
+            setSavingPrefs(true);
+            const result = await updateNotificationPreferences({ commentsEnabled: enabled });
+            if (!result.success) {
+                setNotifPrefs(prev => ({ ...prev, commentsEnabled: oldValue }));
+            }
+        } catch (error) {
+            setNotifPrefs(prev => ({ ...prev, commentsEnabled: oldValue }));
+        } finally {
+            setSavingPrefs(false);
+        }
+    };
 
     const styles = createStyles(colors);
 
@@ -37,6 +112,82 @@ export default function SettingsScreen() {
                 style={styles.content}
                 contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
             >
+                {/* Notifications Section */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Notificaciones</Text>
+
+                    {loadingPrefs ? (
+                        <View style={[styles.settingCard, styles.loadingCard]}>
+                            <ActivityIndicator color={colors.primary} />
+                        </View>
+                    ) : (
+                        <>
+                            {/* News Notification Level */}
+                            <View style={styles.settingCard}>
+                                <View style={styles.settingHeader}>
+                                    <Text style={styles.settingIcon}>📰</Text>
+                                    <Text style={styles.settingLabel}>Noticias de IA</Text>
+                                </View>
+                                {NEWS_LEVELS.map((level, index) => (
+                                    <TouchableOpacity
+                                        key={level.id}
+                                        style={[
+                                            styles.optionRow,
+                                            index > 0 && styles.optionRowBorder,
+                                            notifPrefs.newsLevel === level.id && styles.optionRowSelected,
+                                        ]}
+                                        onPress={() => handleNewsLevelChange(level.id)}
+                                        disabled={savingPrefs}
+                                    >
+                                        <View style={styles.optionInfo}>
+                                            <Text style={[
+                                                styles.optionLabel,
+                                                notifPrefs.newsLevel === level.id && styles.optionLabelSelected,
+                                            ]}>
+                                                {level.label}
+                                            </Text>
+                                            <Text style={styles.optionDesc}>{level.desc}</Text>
+                                        </View>
+                                        <View style={[
+                                            styles.radioOuter,
+                                            notifPrefs.newsLevel === level.id && styles.radioOuterSelected,
+                                        ]}>
+                                            {notifPrefs.newsLevel === level.id && (
+                                                <View style={styles.radioInner} />
+                                            )}
+                                        </View>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+
+                            {/* Comments Notification Toggle */}
+                            <View style={[styles.settingCard, { marginTop: SPACING.md }]}>
+                                <View style={styles.settingRow}>
+                                    <View style={styles.settingInfo}>
+                                        <Text style={styles.settingIcon}>💬</Text>
+                                        <View>
+                                            <Text style={styles.settingLabel}>Comentarios en mis proyectos</Text>
+                                            <Text style={styles.settingDesc}>
+                                                Recibe notificaciones cuando alguien comente
+                                            </Text>
+                                        </View>
+                                    </View>
+                                    <Switch
+                                        value={notifPrefs.commentsEnabled}
+                                        onValueChange={handleCommentsToggle}
+                                        disabled={savingPrefs}
+                                        trackColor={{
+                                            false: colors.surfaceBorder,
+                                            true: colors.primary
+                                        }}
+                                        thumbColor={notifPrefs.commentsEnabled ? colors.primaryLight : '#FFFFFF'}
+                                    />
+                                </View>
+                            </View>
+                        </>
+                    )}
+                </View>
+
                 {/* Appearance Section */}
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Apariencia</Text>
@@ -163,6 +314,19 @@ const createStyles = (colors: any) => StyleSheet.create({
         borderColor: colors.surfaceBorder,
         overflow: 'hidden',
     },
+    loadingCard: {
+        padding: SPACING.xl,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    settingHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: SPACING.sm,
+        padding: SPACING.md,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.surfaceBorder,
+    },
     settingRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -173,6 +337,7 @@ const createStyles = (colors: any) => StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: SPACING.md,
+        flex: 1,
     },
     settingIcon: {
         fontSize: 24,
@@ -186,6 +351,54 @@ const createStyles = (colors: any) => StyleSheet.create({
         fontSize: 13,
         color: colors.textMuted,
         marginTop: 2,
+    },
+    optionRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: SPACING.sm,
+        paddingHorizontal: SPACING.md,
+    },
+    optionRowBorder: {
+        borderTopWidth: 1,
+        borderTopColor: colors.surfaceBorder,
+    },
+    optionRowSelected: {
+        backgroundColor: colors.primaryLight + '10',
+    },
+    optionInfo: {
+        flex: 1,
+    },
+    optionLabel: {
+        fontSize: 15,
+        color: colors.textPrimary,
+    },
+    optionLabelSelected: {
+        fontWeight: '600',
+        color: colors.primary,
+    },
+    optionDesc: {
+        fontSize: 12,
+        color: colors.textMuted,
+        marginTop: 2,
+    },
+    radioOuter: {
+        width: 22,
+        height: 22,
+        borderRadius: 11,
+        borderWidth: 2,
+        borderColor: colors.surfaceBorder,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    radioOuterSelected: {
+        borderColor: colors.primary,
+    },
+    radioInner: {
+        width: 12,
+        height: 12,
+        borderRadius: 6,
+        backgroundColor: colors.primary,
     },
     previewCard: {
         backgroundColor: colors.surface,

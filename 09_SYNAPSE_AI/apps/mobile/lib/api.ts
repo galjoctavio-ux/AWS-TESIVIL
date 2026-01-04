@@ -222,3 +222,34 @@ export async function voteProject(projectId: string) {
         requiresAuth: true,
     });
 }
+
+// ═══════════════════════════════════════════════════════════════
+// NOTIFICATIONS API
+// ═══════════════════════════════════════════════════════════════
+
+export async function registerPushToken(pushToken: string) {
+    return apiFetch('/api/notifications/register', {
+        method: 'POST',
+        body: JSON.stringify({ pushToken }),
+        requiresAuth: true,
+    });
+}
+
+export interface NotificationPreferences {
+    newsLevel: 'all' | 'breaking' | 'none';
+    commentsEnabled: boolean;
+}
+
+export async function getNotificationPreferences() {
+    return apiFetch<NotificationPreferences>('/api/notifications/preferences', {
+        requiresAuth: true,
+    });
+}
+
+export async function updateNotificationPreferences(preferences: Partial<NotificationPreferences>) {
+    return apiFetch('/api/notifications/preferences', {
+        method: 'PATCH',
+        body: JSON.stringify(preferences),
+        requiresAuth: true,
+    });
+}

@@ -2,6 +2,7 @@ import { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
 import { supabaseAdmin } from '../lib/supabase';
 import { moderateComment } from '../services/groq';
+import { notifyProjectOwner } from '../services/pushNotifications';
 
 // ═══════════════════════════════════════════════════════════════
 // VALIDATION SCHEMAS
@@ -404,6 +405,13 @@ const projectsRoutes: FastifyPluginAsync = async (fastify) => {
                 await supabaseAdmin.rpc('increment_project_comments', { p_project_id: id });
             } catch (e: any) {
                 fastify.log.warn(`Failed to increment comment count: ${e?.message || e}`);
+            }
+
+            // Notify project owner about the new comment
+            try {
+                await notifyProjectOwner(id, data.content, data.authorAlias || null);
+            } catch (notifError: any) {
+                fastify.log.warn(`Failed to send comment notification: ${notifError?.message || notifError}`);
             }
 
             return {

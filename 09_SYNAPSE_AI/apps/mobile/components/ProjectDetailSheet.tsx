@@ -19,6 +19,7 @@ import {
 } from 'react-native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as Haptics from 'expo-haptics';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SPACING, RADIUS, API_URL } from '@/constants/config';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemeColors } from '@/constants/themes';
@@ -100,6 +101,7 @@ async function reportProject(projectId: string, reason: string) {
 export function ProjectDetailSheet({ project, onClose, onVote }: ProjectDetailSheetProps) {
     const { colors } = useTheme();
     const { alias } = useAlias();
+    const insets = useSafeAreaInsets();
     const queryClient = useQueryClient();
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [commentText, setCommentText] = useState('');
@@ -221,7 +223,8 @@ export function ProjectDetailSheet({ project, onClose, onVote }: ProjectDetailSh
     return (
         <KeyboardAvoidingView
             style={styles.container}
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
         >
             {/* Header */}
             <View style={styles.header}>
@@ -415,12 +418,12 @@ export function ProjectDetailSheet({ project, onClose, onVote }: ProjectDetailSh
                     )}
                 </View>
 
-                {/* Spacer for input */}
-                <View style={{ height: 100 }} />
+                {/* Spacer for input + safe area */}
+                <View style={{ height: 120 + insets.bottom }} />
             </ScrollView>
 
-            {/* Comment Input */}
-            <View style={styles.commentInputContainer}>
+            {/* Comment Input - with safe area padding */}
+            <View style={[styles.commentInputContainer, { paddingBottom: Math.max(SPACING.md, insets.bottom + 8) }]}>
                 {/* Replying To Banner */}
                 {replyingTo && (
                     <View style={styles.replyingBanner}>

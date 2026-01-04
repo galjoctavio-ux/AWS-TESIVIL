@@ -24,6 +24,7 @@ import newsRoutes from './routes/news';
 import projectsRoutes from './routes/projects';
 import adminRoutes from './routes/admin';
 import academyRoutes from './routes/academy';
+import notificationsRoutes from './routes/notifications';
 
 
 // Cron Jobs
@@ -59,6 +60,7 @@ fastify.register(newsRoutes, { prefix: '/api/news' });
 fastify.register(projectsRoutes, { prefix: '/api/projects' });
 fastify.register(adminRoutes, { prefix: '/api/admin' });
 fastify.register(academyRoutes, { prefix: '/api/academy' });
+fastify.register(notificationsRoutes, { prefix: '/api/notifications' });
 
 // Health check
 fastify.get('/health', async () => {

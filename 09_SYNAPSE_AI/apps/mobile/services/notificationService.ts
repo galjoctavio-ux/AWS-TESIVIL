@@ -2,6 +2,7 @@ import { Platform, Alert, Linking } from 'react-native';
 import * as Device from 'expo-device';
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
+import { registerPushToken } from '@/lib/api';
 
 // Wrap in try-catch to prevent crash if notifications are not properly configured
 try {
@@ -54,6 +55,19 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
         })).data;
 
         console.log('Expo Push Token:', token);
+
+        // Register token with backend API
+        try {
+            const result = await registerPushToken(token);
+            if (result.success) {
+                console.log('[Notifications] Push token registered with backend');
+            } else {
+                console.warn('[Notifications] Failed to register token with backend:', result.error);
+            }
+        } catch (backendError) {
+            console.warn('[Notifications] Error registering token with backend:', backendError);
+        }
+
         return token;
     } catch (e) {
         console.error('[Notifications] Error registering for push notifications:', e);

@@ -1,6 +1,7 @@
 import Parser from 'rss-parser';
 import { supabaseAdmin } from '../lib/supabase';
 import { processNewsArticle, checkDuplicate } from '../services/gemini';
+import { notifyNewsSubscribers } from '../services/pushNotifications';
 
 const parser = new Parser({
     timeout: 10000,
@@ -195,6 +196,17 @@ export async function aggregateNews(): Promise<number> {
                     if (!error) {
                         newArticlesCount++;
                         console.log(`    ✓ Added: ${processed.title?.slice(0, 50)}...`);
+
+                        // Send push notification to subscribers
+                        try {
+                            await notifyNewsSubscribers(
+                                processed.title || item.title,
+                                processed.importance || 5,
+                                'new-article'
+                            );
+                        } catch (notifError) {
+                            console.warn(`    ⚠️ Failed to send news notification:`, notifError);
+                        }
                     } else {
                         console.error(`    ✗ Insert error: ${error.message}`);
                     }

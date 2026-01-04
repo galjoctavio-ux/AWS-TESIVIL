@@ -22,6 +22,7 @@
         "@supabase/supabase-js": "^2.39.0",
         "csv-parse": "^6.1.0",
         "dotenv": "^16.3.0",
+        "expo-server-sdk": "^4.0.0",
         "fastify": "^4.25.0",
         "groq-sdk": "^0.3.0",
         "node-cron": "^3.0.3",
