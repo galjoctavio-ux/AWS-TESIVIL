@@ -1,0 +1,221 @@
+/* Devices Page Styles */
+
+.devices-page {
+    max-width: 1200px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+}
+
+.page-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+
+.page-header p {
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+/* Buttons */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--color-accent);
+    color: var(--color-text-primary);
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-primary:hover {
+    background: var(--color-accent-hover);
+}
+
+.btn-full {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 24px;
+    margin-top: 16px;
+}
+
+/* Table */
+.table-container {
+    background: var(--color-bg-card);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.data-table th {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--color-bg-secondary);
+}
+
+.data-table td {
+    font-size: 14px;
+}
+
+.loading-cell,
+.empty-cell {
+    text-align: center !important;
+    color: var(--color-text-secondary);
+    padding: 40px !important;
+}
+
+.device-id {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: monospace;
+    font-weight: 600;
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-sin_vincular {
+    background: rgba(139, 139, 158, 0.2);
+    color: #8b8b9e;
+}
+
+.status-vinculado {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+}
+
+.status-servicio_7dias {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.status-suscrito {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+}
+
+.modal {
+    background: var(--color-bg-card);
+    border-radius: var(--border-radius);
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.modal-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    color: var(--color-text-secondary);
+    padding: 4px;
+}
+
+.modal-close:hover {
+    color: var(--color-text-primary);
+}
+
+/* Provision form */
+.provision-form {
+    padding: 24px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-warning);
+    margin: 24px 0 16px 0;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+}
+
+/* QR Result */
+.qr-result {
+    padding: 40px;
+    text-align: center;
+}
+
+.qr-image {
+    max-width: 200px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.qr-device-id {
+    font-size: 24px;
+    font-weight: 700;
+    font-family: monospace;
+    margin-bottom: 24px;
+}

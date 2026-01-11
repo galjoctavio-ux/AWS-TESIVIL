@@ -62,8 +62,7 @@
     "updates": {
       "enabled": true,
       "checkAutomatically": "ON_LOAD",
-      "fallbackToCacheTimeout": 30000,
-      "url": "https://u.expo.dev/a8c0a5b3-20c1-4164-b8a2-c15660c7a8dd"
+      "fallbackToCacheTimeout": 30000
     },
     "runtimeVersion": "1.0.0",
     "extra": {
@@ -71,9 +70,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "a8c0a5b3-20c1-4164-b8a2-c15660c7a8dd"
+        "projectId": "924e8f91-c527-41b7-8cd4-19b55f155a9b"
       }
     },
-    "owner": "ranger81"
+    "owner": "mirimon"
   }
 }

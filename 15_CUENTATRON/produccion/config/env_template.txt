@@ -1,0 +1,50 @@
+# ==============================================
+# CUENTATRON MVP - Variables de Entorno
+# ==============================================
+# Copia este archivo a .env y completa los valores
+
+# ==============================================
+# SUPABASE
+# ==============================================
+SUPABASE_URL=https://[PROJECT_ID].supabase.co
+SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+
+# ==============================================
+# POSTGRESQL (para receptor_mqtt.py)
+# ==============================================
+DB_HOST=db.[PROJECT_ID].supabase.co
+DB_PORT=5432
+DB_NAME=postgres
+DB_USER=postgres
+DB_PASS=
+
+# ==============================================
+# INFLUXDB (existente)
+# ==============================================
+INFLUX_URL=
+INFLUX_TOKEN=
+INFLUX_ORG=
+INFLUX_BUCKET_NEW=
+
+# ==============================================
+# MQTT (existente)
+# ==============================================
+MQTT_BROKER_HOST=
+MQTT_PORT=1883
+MQTT_USERNAME=
+MQTT_PASSWORD=
+
+# ==============================================
+# FIREBASE/FCM (Push Notifications)
+# ==============================================
+FCM_SERVER_KEY=
+
+# ==============================================
+# BATCHING CONFIG (receptor_mqtt.py)
+# ==============================================
+BATCH_SIZE=50
+BATCH_TIMEOUT=10
+MAX_RETRY_ATTEMPTS=3
+CACHE_TTL_SECONDS=1000
+GRACE_PERIOD_DAYS=30

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirma tu cuenta - Cuentatron</title>
+</head>
+
+<body
+    style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f0f1a;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+        style="background-color: #0f0f1a; padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+                    style="max-width: 480px; background-color: #1a1a2e; border-radius: 16px; overflow: hidden;">
+
+                    <!-- Header -->
+                    <tr>
+                        <td
+                            style="padding: 32px 32px 24px; text-align: center; background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);">
+                            <h1
+                                style="margin: 0; font-size: 28px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;">
+                                ⚡ Cuentatron
+                            </h1>
+                        </td>
+                    </tr>
+
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding: 40px 32px;">
+                            <h2
+                                style="margin: 0 0 16px; font-size: 22px; font-weight: 600; color: #ffffff; text-align: center;">
+                                Tu código de verificación
+                            </h2>
+
+                            <p
+                                style="margin: 0 0 32px; font-size: 15px; line-height: 1.6; color: #8b8b9e; text-align: center;">
+                                Usa este código para confirmar tu cuenta en Cuentatron.
+                                <br>Expira en 60 minutos.
+                            </p>
+
+                            <!-- OTP Code Box -->
+                            <div
+                                style="background-color: #252545; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 32px;">
+                                <span
+                                    style="font-size: 36px; font-weight: 700; color: #4f46e5; letter-spacing: 8px; font-family: monospace;">
+                                    {{ .Token }}
+                                </span>
+                            </div>
+
+                            <p style="margin: 0 0 24px; font-size: 14px; color: #8b8b9e; text-align: center;">
+                                Ingresa este código en la app para continuar.
+                            </p>
+
+                            <!-- Divider -->
+                            <hr style="border: none; border-top: 1px solid #333355; margin: 32px 0;">
+
+                            <p style="margin: 0; font-size: 13px; color: #666; text-align: center;">
+                                Si no solicitaste este código, puedes ignorar este correo.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 24px 32px; background-color: #151528; text-align: center;">
+                            <p style="margin: 0; font-size: 12px; color: #666;">
+                                © 2026 Cuentatron · Monitoreo Eléctrico Inteligente
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

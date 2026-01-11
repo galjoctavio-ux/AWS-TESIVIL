@@ -1,0 +1,63 @@
+{
+    "expo": {
+        "name": "Cuentatron",
+        "slug": "cuentatron-mvp",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./assets/icon.png",
+        "scheme": "cuentatron",
+        "userInterfaceStyle": "automatic",
+        "newArchEnabled": false,
+        "splash": {
+            "image": "./assets/splash.png",
+            "resizeMode": "contain",
+            "backgroundColor": "#1a1a2e"
+        },
+        "assetBundlePatterns": [
+            "**/*"
+        ],
+        "ios": {
+            "supportsTablet": false,
+            "bundleIdentifier": "com.tesivil.cuentatron"
+        },
+        "android": {
+            "adaptiveIcon": {
+                "foregroundImage": "./assets/adaptive-icon.png",
+                "backgroundColor": "#1a1a2e"
+            },
+            "package": "com.tesivil.cuentatron",
+            "permissions": [
+                "RECEIVE_BOOT_COMPLETED",
+                "VIBRATE",
+                "CAMERA"
+            ]
+        },
+        "plugins": [
+            "expo-router",
+            [
+                "expo-notifications",
+                {
+                    "icon": "./assets/notification-icon.png",
+                    "color": "#4f46e5"
+                }
+            ],
+            [
+                "expo-camera",
+                {
+                    "cameraPermission": "Permitir a $(PRODUCT_NAME) acceder a la cámara para escanear códigos QR."
+                }
+            ]
+        ],
+        "experiments": {
+            "typedRoutes": true
+        },
+        "extra": {
+            "router": {
+                "origin": false
+            },
+            "eas": {
+                "projectId": "YOUR_EAS_PROJECT_ID"
+            }
+        }
+    }
+}

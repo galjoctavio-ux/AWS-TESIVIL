@@ -50,11 +50,22 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
 
         const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
 
+        console.log('[Notifications] Using projectId:', projectId);
+
+        // Get Expo Push Token
         const token = (await Notifications.getExpoPushTokenAsync({
             projectId,
         })).data;
 
-        console.log('Expo Push Token:', token);
+        console.log('[Notifications] Expo Push Token:', token);
+
+        // Also log the native device token for debugging
+        try {
+            const deviceToken = await Notifications.getDevicePushTokenAsync();
+            console.log('[Notifications] Native FCM Token:', deviceToken.data);
+        } catch (e) {
+            console.log('[Notifications] Could not get native token:', e);
+        }
 
         // Register token with backend API
         try {

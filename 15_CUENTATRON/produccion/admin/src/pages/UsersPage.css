@@ -1,0 +1,147 @@
+/* Users Page Styles */
+
+.users-page {
+    max-width: 1200px;
+}
+
+.page-header {
+    margin-bottom: 32px;
+}
+
+.page-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+
+.page-header p {
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+/* Table */
+.table-container {
+    background: var(--color-bg-card);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.data-table th {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--color-bg-secondary);
+}
+
+.loading-cell,
+.empty-cell {
+    text-align: center !important;
+    color: var(--color-text-secondary);
+    padding: 40px !important;
+}
+
+/* User info */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    background: var(--color-bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-accent);
+}
+
+.user-name {
+    font-weight: 600;
+}
+
+.user-email {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+
+/* Badges */
+.tarifa-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+    border-radius: 20px;
+    font-size: 13px;
+}
+
+.date-cell {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-text-secondary);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.sub-active {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+}
+
+.sub-inactive {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.sub-grace_period {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+}
+
+.sub-expired {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.onboarding-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.onboarding-badge.complete {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+}
+
+.onboarding-badge.pending {
+    background: rgba(139, 139, 158, 0.2);
+    color: #8b8b9e;
+}

@@ -49,3 +49,12 @@ dist/
 *.hot-update.json
 # Credenciales sensibles
 09_SYNAPSE_AI/docs/legal/mr-frio-593eea45e8d2.json
+**/backend_env.txt
+**/google-services*.json
+**/supabase.ts
+**/*env_template.txt
+15_CUENTATRON/legacy_source/cuentatron_app/public/mi-cuenta.html
+**/*firebase-adminsdk*.json
+**/secrets*.h
+
+

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="IA-Flow - Flujo de desarrollo de software asistido por IA basado en ISO 9001">
+    <title>IA-Flow | Desarrollo de Software con IA</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Google reCAPTCHA -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+    <!-- Stripe -->
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/wizard.css">
+</head>
+
+<body>
+    <div class="wizard-container">
+        <!-- Visual Progress Bar -->
+        <div class="wizard-progress-bar" aria-hidden="true">
+            <div id="wizard-progress-bar-fill" class="wizard-progress-bar-fill" style="width: 10%;"></div>
+        </div>
+
+        <!-- Wizard Header -->
+        <header class="wizard-header">
+            <div class="wizard-header-left">
+                <h1 class="logo">
+                    <span class="logo-icon">⚡</span>
+                    IA-Flow
+                </h1>
+                <span id="project-name" class="project-name">Nuevo Proyecto</span>
+            </div>
+            <div class="wizard-header-right">
+                <button id="donate-btn" class="donate-header-btn" title="Apoyar IA-Flow">
+                    💝 Donar
+                </button>
+                <button id="reset-progress-btn" class="reset-btn" title="Reiniciar Progreso">
+                    🔄
+                </button>
+                <div class="step-counter">
+                    Paso <span id="current-step-number">1</span> de <span id="total-steps">10</span>
+                </div>
+                <a href="https://antigravity.google/" target="_blank" rel="noopener noreferrer"
+                    class="antigravity-link">
+                    <span class="antigravity-icon">🚀</span>
+                    <span class="antigravity-text">Antigravity</span>
+                    <svg class="external-icon" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                </a>
+            </div>
+        </header>
+
+        <!-- Reset Confirmation Modal -->
+        <div id="reset-modal" class="sync-modal" style="display: none;">
+            <div class="sync-modal-content reset-modal-content">
+                <div class="sync-modal-header">
+                    <h3>⚠️ Reiniciar Progreso</h3>
+                </div>
+                <div class="sync-modal-body">
+                    <p class="reset-warning">¿Estás seguro de que deseas reiniciar todo el progreso?</p>
+                    <p class="reset-detail">Esta acción eliminará:</p>
+                    <ul class="reset-list">
+                        <li>Todas las ideas y características</li>
+                        <li>Selección de tipo de software</li>
+                        <li>Configuraciones de todos los pasos</li>
+                        <li>Historial de sincronización</li>
+                    </ul>
+                    <p class="reset-warning-bold">⚠️ Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="sync-modal-footer">
+                    <button id="cancel-reset" class="btn-secondary">Cancelar</button>
+                    <button id="confirm-reset" class="btn-danger">🗑️ Sí, Reiniciar Todo</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <nav id="wizard-progress" class="wizard-progress">
+            <!-- Rendered by wizard.js -->
+        </nav>
+
+        <!-- Main Content -->
+        <main class="wizard-main">
+            <!-- Step Header -->
+            <div class="wizard-step-header">
+                <h2 id="wizard-step-title">💡 Descarga tus Ideas</h2>
+                <p id="wizard-step-description">Describe todas tus ideas para tu proyecto de software. No te limites.
+                </p>
+            </div>
+
+            <!-- Step Content Container -->
+            <div id="wizard-step-container" class="wizard-step-content">
+                <!-- Rendered by wizard.js based on current step -->
+            </div>
+        </main>
+
+        <!-- Wizard Footer -->
+        <footer class="wizard-footer">
+            <div class="wizard-footer-left">
+                <button id="wizard-prev" class="wizard-nav-btn" disabled>
+                    ← Anterior
+                </button>
+            </div>
+            <div class="wizard-footer-center">
+                <button id="wizard-sync" class="wizard-sync-btn" style="display: none;">
+                    📋 Generar Instrucción para Antigravity
+                </button>
+            </div>
+            <div class="wizard-footer-right">
+                <button id="wizard-next" class="wizard-nav-btn">
+                    Siguiente →
+                </button>
+            </div>
+        </footer>
+
+        <!-- Donation Popup (Non-blocking) -->
+        <div id="donation-popup" class="donation-popup" style="display: none;">
+            <div class="donation-popup-content glass-panel">
+                <button id="close-popup" class="close-popup">&times;</button>
+                <div class="popup-icon">💡</div>
+                <h3>¿Te está siendo útil IA-Flow?</h3>
+                <p>Cada consulta consume tokens de mi API. Considera hacer una donación para mantener el servicio activo
+                    y aumentar tu límite de consultas.</p>
+                <div class="donation-amount-input">
+                    <label for="donation-amount">Monto a donar (USD)</label>
+                    <div class="amount-input-wrapper">
+                        <span class="currency-symbol">$</span>
+                        <input type="number" id="donation-amount" min="1" step="1" value="5" placeholder="5">
+                        <span class="currency-label">USD</span>
+                    </div>
+                    <p class="amount-note">Mínimo: $1 USD</p>
+                </div>
+                <div class="popup-actions">
+                    <button id="popup-donate" class="btn-primary">
+                        <span>💳</span> Donar
+                    </button>
+                    <button id="popup-continue" class="btn-secondary">
+                        Continuar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="loading-overlay" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p>Procesando...</p>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toast-container" class="toast-container"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module">
+        import * as Wizard from './js/wizard.js';
+
+        // Initialize wizard when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            Wizard.init();
+        });
+    </script>
+</body>
+
+</html>
