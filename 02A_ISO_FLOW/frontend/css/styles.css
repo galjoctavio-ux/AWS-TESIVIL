@@ -155,6 +155,18 @@ body::before {
     -webkit-text-fill-color: initial;
 }
 
+.version-badge {
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    padding: 2px 8px;
+    background: rgba(99, 102, 241, 0.2);
+    border: 1px solid rgba(99, 102, 241, 0.4);
+    border-radius: var(--radius-full);
+    -webkit-text-fill-color: initial;
+    color: var(--accent-primary);
+    margin-left: var(--spacing-xs);
+}
+
 .antigravity-link {
     display: flex;
     align-items: center;

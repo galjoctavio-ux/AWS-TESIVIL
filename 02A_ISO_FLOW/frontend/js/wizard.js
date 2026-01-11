@@ -130,7 +130,7 @@ export async function init() {
 
     // Initialize Stripe with API URL
     try {
-        initStripe('http://localhost:3000/api');
+        initStripe('/api');
     } catch (error) {
         console.warn('Stripe initialization failed:', error);
     }

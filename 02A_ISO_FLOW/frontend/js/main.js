@@ -9,7 +9,7 @@ import { initStripe } from './stripe.js';
 
 // Configuration
 const CONFIG = {
-    API_URL: 'http://localhost:3000/api',
+    API_URL: '/api',
     RECAPTCHA_SITE_KEY: '', // Will be loaded from backend
     DONATION_POPUP_QUERIES: 3,
     DONATION_POPUP_WINDOW_MS: 300000 // 5 minutes

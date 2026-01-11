@@ -6,7 +6,7 @@
 import * as State from '../state.js';
 
 // API configuration
-const API_URL = 'http://localhost:3000/api';
+const API_URL = '/api';
 
 // Collected ideas and characteristics with toggle state
 let collectedIdeas = [];
