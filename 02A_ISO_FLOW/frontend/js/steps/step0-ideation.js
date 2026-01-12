@@ -1300,11 +1300,8 @@ function handleProjectNameConfirm() {
         elements.projectNameModal.style.display = 'none';
     }
 
-    // Clear chat and prepare for new iteration
-    clearChatForNewIteration();
-
-    // Show toast
-    showMoveFeedback(`Proyecto "${name}" configurado`);
+    // Reload page to properly load iteration #1
+    setTimeout(() => location.reload(), 100);
 }
 
 /**

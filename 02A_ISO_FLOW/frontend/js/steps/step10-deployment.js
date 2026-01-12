@@ -4,6 +4,7 @@
  */
 
 import * as State from '../state.js';
+import { DonationPopup } from '../donationPopup.js';
 
 /**
  * Render the deployment step
@@ -159,7 +160,10 @@ function setupEventListeners() {
     document.getElementById('confirm-deployment-done')?.addEventListener('click', () => {
         State.setNestedValue('deploymentEvaluation.completed', true);
         State.setState({ step10SyncCompleted: true });
-        setTimeout(() => location.reload(), 100);
+        // Show donation popup to invite user to support the project
+        DonationPopup.show();
+        // Wait longer before reload to let user see the popup
+        setTimeout(() => location.reload(), 2000);
     });
 
     // Modal controls
@@ -214,7 +218,10 @@ function updatePhaseUI() {
             document.getElementById('confirm-deployment-done')?.addEventListener('click', () => {
                 State.setNestedValue('deploymentEvaluation.completed', true);
                 State.setState({ step10SyncCompleted: true });
-                setTimeout(() => location.reload(), 100);
+                // Show donation popup to invite user to support the project
+                DonationPopup.show();
+                // Wait longer before reload to let user see the popup
+                setTimeout(() => location.reload(), 2000);
             });
         }
     }

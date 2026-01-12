@@ -195,6 +195,8 @@ function setupEventListeners() {
                 copyBtn.textContent = '✅ ¡Copiado!';
                 copyBtn.classList.add('copied');
             }
+            // Reload page to ensure confirm button loads correctly
+            setTimeout(() => location.reload(), 300);
         } catch (error) {
             console.error('Copy failed:', error);
         }
