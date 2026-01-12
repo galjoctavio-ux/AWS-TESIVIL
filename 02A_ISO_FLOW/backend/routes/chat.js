@@ -45,33 +45,48 @@ function filterResponse(response) {
  * Send a message and receive AI response
  */
 router.post('/', async (req, res) => {
+    const requestId = Date.now().toString(36);
+    const timestamp = new Date().toISOString();
+
+    console.log(`\n[${timestamp}] [INFO] [CHAT] ═══════════════════════════════════════════════════════`);
+    console.log(`[${timestamp}] [INFO] [CHAT] 📩 NEW CHAT REQUEST [ID: ${requestId}]`);
+
     try {
         const { message, flowState: clientFlowState, confirmAdvance } = req.body;
+        const sessionId = req.headers['x-session-id'] || 'default';
+
+        console.log(`[${timestamp}] [INFO] [CHAT] 🔑 Session: ${sessionId}`);
+        console.log(`[${timestamp}] [INFO] [CHAT] 📝 Message: ${message ? (message.length > 100 ? message.substring(0, 100) + '...' : message) : '[empty]'}`);
+        console.log(`[${timestamp}] [DEBUG] [CHAT] 🔄 Confirm Advance: ${confirmAdvance || false}`);
 
         // Validation: check type
         if (!message || typeof message !== 'string') {
+            console.log(`[${timestamp}] [WARN] [CHAT] ⚠️ Validation failed: Message required`);
             return res.status(400).json({ error: 'Mensaje requerido' });
         }
 
         // Validation: trim and check empty
         const trimmedMessage = message.trim();
         if (trimmedMessage.length === 0) {
+            console.log(`[${timestamp}] [WARN] [CHAT] ⚠️ Validation failed: Empty message`);
             return res.status(400).json({ error: 'Mensaje no puede estar vacío' });
         }
 
         // Validation: check max length (prevent DoS)
         if (trimmedMessage.length > 2000) {
+            console.log(`[${timestamp}] [WARN] [CHAT] ⚠️ Validation failed: Message too long (${trimmedMessage.length} chars)`);
             return res.status(400).json({ error: 'Mensaje demasiado largo (máx. 2000 caracteres)' });
         }
 
         // Get or initialize flow state
-        const sessionId = req.headers['x-session-id'] || 'default';
         let flowState = sessionFlows.get(sessionId) || initializeFlowState();
 
         // Merge with client state if provided
         if (clientFlowState) {
             flowState = { ...flowState, ...clientFlowState };
         }
+
+        console.log(`[${timestamp}] [DEBUG] [CHAT] 📊 Flow State: node=${flowState.currentNode}, type=${flowState.flowType || 'null'}`);
 
         // Handle user confirmation to advance to next node
         if (confirmAdvance && flowState.pendingAdvance) {
@@ -80,6 +95,8 @@ router.post('/', async (req, res) => {
             sessionFlows.set(sessionId, flowState);
 
             const newNode = getCurrentNode(flowState);
+            console.log(`[${timestamp}] [INFO] [CHAT] ✅ Advanced to node: ${newNode.name}`);
+
             return res.json({
                 response: `✅ Avanzando al siguiente paso: **${newNode.name}**\n\n¿En qué puedo ayudarte en esta etapa?`,
                 nodeAdvanced: true,
@@ -97,15 +114,19 @@ router.post('/', async (req, res) => {
         const currentNode = getCurrentNode(flowState);
 
         if (!currentNode) {
+            console.log(`[${timestamp}] [ERROR] [CHAT] ❌ Flow not initialized: no current node`);
             return res.status(400).json({
                 error: 'Flujo no inicializado correctamente'
             });
         }
 
+        console.log(`[${timestamp}] [INFO] [CHAT] 📍 Current Node: ${currentNode.name} (${currentNode.id})`);
+
         // Check if this node requires Antigravity
         const needsAntigravity = requiresAntigravity(flowState);
 
         if (needsAntigravity) {
+            console.log(`[${timestamp}] [INFO] [CHAT] 🔄 Node requires Antigravity`);
             return res.json({
                 requiresAntigravity: true,
                 response: `🔄 Este paso requiere **Antigravity** para continuar.\n\nPor favor, copia las instrucciones y pégalas en Antigravity. Cuando termine, pega aquí la respuesta.`,
@@ -121,20 +142,32 @@ router.post('/', async (req, res) => {
         }
 
         // Call AI service
+        console.log(`[${timestamp}] [INFO] [CHAT] 🤖 Calling AI service...`);
+        const aiStartTime = Date.now();
+
         const aiResult = await sendMessage(
             currentNode.systemPrompt,
             message,
             { history: flowState.history }
         );
 
+        const aiDuration = Date.now() - aiStartTime;
+        console.log(`[${timestamp}] [INFO] [CHAT] ⏱️ AI responded in ${aiDuration}ms`);
+
         if (!aiResult.success) {
+            console.log(`[${timestamp}] [ERROR] [CHAT] ❌ AI service failed: ${aiResult.error}`);
             return res.status(503).json({
                 error: aiResult.error || 'Servicio de IA no disponible'
             });
         }
 
+        console.log(`[${timestamp}] [INFO] [CHAT] ✅ AI Success (provider: ${aiResult.provider})`);
+
         // Extract data from response
         const extractedData = extractDataFromResponse(aiResult.response);
+        if (Object.keys(extractedData).length > 0) {
+            console.log(`[${timestamp}] [DEBUG] [CHAT] 📊 Extracted Data:`, JSON.stringify(extractedData));
+        }
 
         // Update flow state based on extracted data
         updateFlowState(flowState, extractedData);
@@ -160,6 +193,7 @@ router.post('/', async (req, res) => {
             flowState.flowType = determineFlowType(extractedData.totalFunciones);
             readyToAdvance = true;
             nextNodeInfo = getNextNode(flowState, extractedData);
+            console.log(`[${timestamp}] [INFO] [CHAT] 📊 Classified: ${extractedData.totalFunciones} functions, flow type: ${flowState.flowType}`);
         }
 
         if (currentNode.id === 'node_1a_single_idea_flow' && extractedData.softwareType) {
@@ -180,6 +214,7 @@ router.post('/', async (req, res) => {
         // If ready to advance, store pending advance and ask for confirmation
         if (readyToAdvance && nextNodeInfo && !nextNodeInfo.completed && nextNodeInfo.nextNode) {
             flowState.pendingAdvance = nextNodeInfo.nextNode;
+            console.log(`[${timestamp}] [INFO] [CHAT] 🔜 Ready to advance to: ${nextNodeInfo.nextNode}`);
 
             // Add confirmation prompt to response
             displayResponse += `\n\n---\n\n✨ **He completado este paso.** ¿Deseas continuar al siguiente paso o quieres agregar algo más?\n\nEscribe "**continuar**" o "**siguiente**" para avanzar, o sigue conversando si necesitas ajustar algo.`;
@@ -203,10 +238,14 @@ router.post('/', async (req, res) => {
             progress: calculateProgress(flowState)
         };
 
+        console.log(`[${timestamp}] [INFO] [CHAT] 📤 Response sent (${displayResponse.length} chars)`);
+        console.log(`[${timestamp}] [INFO] [CHAT] ═══════════════════════════════════════════════════════\n`);
+
         res.json(response);
 
     } catch (error) {
-        console.error('Chat error:', error);
+        console.error(`[${timestamp}] [ERROR] [CHAT] ❌ Chat error:`, error);
+        console.log(`[${timestamp}] [INFO] [CHAT] ═══════════════════════════════════════════════════════\n`);
         res.status(500).json({
             error: 'Error al procesar el mensaje'
         });

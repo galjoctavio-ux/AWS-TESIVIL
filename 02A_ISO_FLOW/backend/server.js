@@ -67,6 +67,37 @@ app.use(cors({
 // JSON body parser
 app.use(express.json());
 
+// ==========================================
+// Request Logging Middleware (for PM2 logs)
+// ==========================================
+app.use((req, res, next) => {
+    const startTime = Date.now();
+    const timestamp = new Date().toISOString();
+
+    // Log incoming request
+    if (req.path.startsWith('/api')) {
+        const clientIP = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+        console.log(`[${timestamp}] [INFO] [REQUEST] ➡️ ${req.method} ${req.path} (IP: ${clientIP})`);
+
+        // Log request body for POST requests (truncated)
+        if (req.method === 'POST' && req.body) {
+            const bodyPreview = JSON.stringify(req.body);
+            console.log(`[${timestamp}] [DEBUG] [REQUEST] 📦 Body: ${bodyPreview.length > 200 ? bodyPreview.substring(0, 200) + '...' : bodyPreview}`);
+        }
+    }
+
+    // Log response when finished
+    res.on('finish', () => {
+        if (req.path.startsWith('/api')) {
+            const duration = Date.now() - startTime;
+            const statusIcon = res.statusCode >= 400 ? '❌' : '✅';
+            console.log(`[${timestamp}] [INFO] [RESPONSE] ${statusIcon} ${req.method} ${req.path} - ${res.statusCode} (${duration}ms)`);
+        }
+    });
+
+    next();
+});
+
 // Static files (for production)
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '../frontend')));

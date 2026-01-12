@@ -6,6 +6,38 @@
 import Groq from 'groq-sdk';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
+// ==========================================
+// Logging Utilities
+// ==========================================
+
+/**
+ * Format timestamp for logs
+ */
+function getTimestamp() {
+    return new Date().toISOString();
+}
+
+/**
+ * Truncate text for logging (prevent huge logs)
+ */
+function truncate(text, maxLength = 200) {
+    if (!text) return '[empty]';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + `... [+${text.length - maxLength} chars]`;
+}
+
+/**
+ * Log with prefix
+ */
+function log(level, component, message, data = null) {
+    const prefix = `[${getTimestamp()}] [${level}] [${component}]`;
+    if (data) {
+        console.log(`${prefix} ${message}`, typeof data === 'object' ? JSON.stringify(data, null, 2) : data);
+    } else {
+        console.log(`${prefix} ${message}`);
+    }
+}
+
 // Lazy loaded API keys
 let groqKeys = null;
 let currentGroqKeyIndex = 0;
@@ -65,15 +97,36 @@ function getNextGroqClient() {
  * @returns {Promise<Object>} - AI response with metadata
  */
 export async function sendMessage(systemPrompt, userMessage, context = {}) {
+    log('INFO', 'AI-SERVICE', '═══════════════════════════════════════════════════════');
+    log('INFO', 'AI-SERVICE', '🚀 NEW AI REQUEST');
+    log('INFO', 'AI-SERVICE', `📝 User Message: ${truncate(userMessage, 300)}`);
+    log('DEBUG', 'AI-SERVICE', `📋 System Prompt Preview: ${truncate(systemPrompt, 150)}`);
+    log('DEBUG', 'AI-SERVICE', `📊 Context History Length: ${context.history?.length || 0} messages`);
+
     // Try Groq first
+    log('INFO', 'AI-SERVICE', '🔄 Attempting Groq API...');
     const groqResponse = await tryGroq(systemPrompt, userMessage, context);
     if (groqResponse.success) {
+        log('INFO', 'AI-SERVICE', '✅ GROQ SUCCESS');
+        log('INFO', 'AI-SERVICE', `📤 Response Preview: ${truncate(groqResponse.response, 300)}`);
+        if (groqResponse.usage) {
+            log('INFO', 'AI-SERVICE', `📊 Token Usage: prompt=${groqResponse.usage.prompt_tokens}, completion=${groqResponse.usage.completion_tokens}, total=${groqResponse.usage.total_tokens}`);
+        }
+        log('INFO', 'AI-SERVICE', '═══════════════════════════════════════════════════════');
         return groqResponse;
     }
 
     // Fallback to Gemini
-    console.log('⚠️ All Groq keys failed, falling back to Gemini');
-    return await tryGemini(systemPrompt, userMessage, context);
+    log('WARN', 'AI-SERVICE', '⚠️ All Groq keys failed, falling back to Gemini');
+    const geminiResult = await tryGemini(systemPrompt, userMessage, context);
+    if (geminiResult.success) {
+        log('INFO', 'AI-SERVICE', '✅ GEMINI SUCCESS');
+        log('INFO', 'AI-SERVICE', `📤 Response Preview: ${truncate(geminiResult.response, 300)}`);
+    } else {
+        log('ERROR', 'AI-SERVICE', '❌ ALL AI PROVIDERS FAILED', { error: geminiResult.error });
+    }
+    log('INFO', 'AI-SERVICE', '═══════════════════════════════════════════════════════');
+    return geminiResult;
 }
 
 /**
@@ -86,10 +139,13 @@ async function tryGroq(systemPrompt, userMessage, context) {
     for (let i = 0; i < maxRetries; i++) {
         const client = getNextGroqClient();
         if (!client) {
+            log('WARN', 'GROQ', 'No Groq API keys configured');
             return { success: false, error: 'No Groq API keys configured' };
         }
 
         try {
+            log('DEBUG', 'GROQ', `🔑 Trying key index ${currentGroqKeyIndex}/${groqKeys.length}`);
+
             const messages = [
                 { role: 'system', content: systemPrompt }
             ];
@@ -101,6 +157,9 @@ async function tryGroq(systemPrompt, userMessage, context) {
 
             messages.push({ role: 'user', content: userMessage });
 
+            log('DEBUG', 'GROQ', `📨 Sending ${messages.length} messages to Groq (model: llama-3.3-70b-versatile)`);
+            const startTime = Date.now();
+
             const response = await client.chat.completions.create({
                 model: 'llama-3.3-70b-versatile',
                 messages,
@@ -108,7 +167,11 @@ async function tryGroq(systemPrompt, userMessage, context) {
                 max_tokens: 4096
             });
 
+            const duration = Date.now() - startTime;
+            log('INFO', 'GROQ', `⏱️ Response received in ${duration}ms`);
+
             const content = response.choices[0]?.message?.content || '';
+            log('DEBUG', 'GROQ', `📝 Response length: ${content.length} chars`);
 
             return {
                 success: true,
@@ -117,10 +180,11 @@ async function tryGroq(systemPrompt, userMessage, context) {
                 usage: response.usage
             };
         } catch (error) {
-            console.error(`Groq key ${currentGroqKeyIndex} failed:`, error.message);
+            log('WARN', 'GROQ', `❌ Key ${currentGroqKeyIndex} failed: ${error.message}`);
 
             // If rate limited, try next key
             if (error.status === 429) {
+                log('WARN', 'GROQ', '⏳ Rate limited, trying next key...');
                 continue;
             }
 
@@ -129,6 +193,7 @@ async function tryGroq(systemPrompt, userMessage, context) {
         }
     }
 
+    log('ERROR', 'GROQ', '❌ All Groq keys exhausted');
     return { success: false, error: 'All Groq keys exhausted' };
 }
 
@@ -139,6 +204,7 @@ async function tryGemini(systemPrompt, userMessage, context) {
     initializeClients();
 
     if (!geminiClient) {
+        log('ERROR', 'GEMINI', 'No Gemini API key configured');
         return {
             success: false,
             error: 'No Gemini API key configured and all Groq keys failed'
@@ -146,14 +212,22 @@ async function tryGemini(systemPrompt, userMessage, context) {
     }
 
     try {
+        log('DEBUG', 'GEMINI', 'Attempting Gemini API (model: gemini-1.5-flash)');
         const model = geminiClient.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
         // Build the prompt
         const fullPrompt = `${systemPrompt}\n\nUser: ${userMessage}`;
+        log('DEBUG', 'GEMINI', `📨 Sending prompt (${fullPrompt.length} chars)`);
 
+        const startTime = Date.now();
         const result = await model.generateContent(fullPrompt);
+        const duration = Date.now() - startTime;
+
         const response = result.response;
         const content = response.text();
+
+        log('INFO', 'GEMINI', `⏱️ Response received in ${duration}ms`);
+        log('DEBUG', 'GEMINI', `📝 Response length: ${content.length} chars`);
 
         return {
             success: true,
@@ -161,7 +235,7 @@ async function tryGemini(systemPrompt, userMessage, context) {
             response: content
         };
     } catch (error) {
-        console.error('Gemini failed:', error.message);
+        log('ERROR', 'GEMINI', `❌ Gemini failed: ${error.message}`);
         return {
             success: false,
             error: 'AI service temporarily unavailable'
