@@ -3,13 +3,14 @@
  * Cuentatron Admin Panel
  */
 
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
 import { Session } from '@supabase/supabase-js';
 
 // Pages
 import LoginPage from './pages/LoginPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import DashboardPage from './pages/DashboardPage';
 import DevicesPage from './pages/DevicesPage';
 import UsersPage from './pages/UsersPage';
@@ -20,12 +21,13 @@ import AdminAlertsPage from './pages/AdminAlertsPage';
 import Layout from './components/Layout';
 
 // Admin email whitelist (can be moved to environment variable)
-const ADMIN_EMAILS = ['admin@tesivil.com', 'gbt22@tesivil.com'];
+const ADMIN_EMAILS = ['admin@tesivil.com', 'gbt22@tesivil.com', 'ogallardo@tesivil.com'];
 
 export default function App() {
     const [session, setSession] = useState<Session | null>(null);
     const [loading, setLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
+    const location = useLocation();
 
     useEffect(() => {
         // Get initial session
@@ -68,6 +70,11 @@ export default function App() {
                 Cargando...
             </div>
         );
+    }
+
+    // Allow reset-password route without authentication
+    if (location.pathname === '/reset-password') {
+        return <ResetPasswordPage />;
     }
 
     // Not logged in

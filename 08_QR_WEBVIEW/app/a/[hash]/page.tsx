@@ -142,6 +142,25 @@ interface ServiceRecord {
     technicianName?: string;
     technicianAlias?: string;
     technicianBadge?: string;
+    // PRO SERVICE DATA
+    isPro?: boolean;
+    proReadings?: {
+        voltage?: number;
+        amperage?: number;
+        suctionPressure?: number;
+        dischargePressure?: number;
+        returnTemp?: number;
+        supplyTemp?: number;
+        ambientTemp?: number;
+        deltaT?: number;
+        gasType?: string;
+    };
+    proPhotos?: {
+        before?: string[];
+        after?: string[];
+        equipment?: string[];
+    };
+    photos?: string[]; // Standard photos
 }
 
 interface TechnicianPublic {
@@ -267,6 +286,287 @@ function ServiceCard({ service }: { service: ServiceRecord }) {
 }
 
 // ============================================
+// PRO COMPONENTS
+// ============================================
+
+function ProMetricsCard({ readings }: { readings: ServiceRecord['proReadings'] }) {
+    if (!readings) return null;
+
+    const getStatusColor = (value: number | undefined, min: number, max: number) => {
+        if (value === undefined || value === null) return 'text-gray-400';
+        if (value >= min && value <= max) return 'text-green-600';
+        if (value >= min * 0.8 && value <= max * 1.2) return 'text-yellow-600';
+        return 'text-red-600';
+    };
+
+    const getStatusIcon = (value: number | undefined, min: number, max: number) => {
+        if (value === undefined || value === null) return '';
+        if (value >= min && value <= max) return '✓';
+        if (value >= min * 0.8 && value <= max * 1.2) return '⚠';
+        return '✗';
+    };
+
+    return (
+        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-5 border border-indigo-100 mb-4">
+            <div className="flex items-center gap-2 mb-4">
+                <div className="bg-indigo-600 p-2 rounded-lg">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                </div>
+                <div>
+                    <p className="text-indigo-900 font-bold">Lecturas Técnicas</p>
+                    <p className="text-indigo-600 text-xs">Servicio PRO verificado</p>
+                </div>
+            </div>
+
+            {/* Delta T Highlight */}
+            {readings.deltaT !== undefined && readings.deltaT !== null && (
+                <div className={`bg-white rounded-xl p-4 mb-3 border ${readings.deltaT >= 8 && readings.deltaT <= 15 ? 'border-green-200' : 'border-yellow-200'}`}>
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <p className="text-gray-500 text-xs">Delta T (Δt)</p>
+                            <p className={`text-2xl font-bold ${getStatusColor(readings.deltaT, 8, 15)}`}>
+                                {readings.deltaT}°C {getStatusIcon(readings.deltaT, 8, 15)}
+                            </p>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-gray-400 text-xs">Rango óptimo</p>
+                            <p className="text-gray-600 text-sm">8°C - 15°C</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Metrics Grid */}
+            <div className="grid grid-cols-2 gap-3">
+                {readings.voltage !== undefined && readings.voltage !== null && (
+                    <div className="bg-white rounded-lg p-3">
+                        <p className="text-gray-400 text-xs">Voltaje</p>
+                        <p className={`font-bold ${getStatusColor(readings.voltage, 200, 240)}`}>
+                            {readings.voltage}V {getStatusIcon(readings.voltage, 200, 240)}
+                        </p>
+                    </div>
+                )}
+                {readings.amperage !== undefined && readings.amperage !== null && (
+                    <div className="bg-white rounded-lg p-3">
+                        <p className="text-gray-400 text-xs">Amperaje</p>
+                        <p className={`font-bold ${getStatusColor(readings.amperage, 3, 15)}`}>
+                            {readings.amperage}A {getStatusIcon(readings.amperage, 3, 15)}
+                        </p>
+                    </div>
+                )}
+                {readings.suctionPressure !== undefined && readings.suctionPressure !== null && (
+                    <div className="bg-white rounded-lg p-3">
+                        <p className="text-gray-400 text-xs">Presión Succión</p>
+                        <p className="font-bold text-gray-800">{readings.suctionPressure} PSI</p>
+                    </div>
+                )}
+                {readings.dischargePressure !== undefined && readings.dischargePressure !== null && (
+                    <div className="bg-white rounded-lg p-3">
+                        <p className="text-gray-400 text-xs">Presión Descarga</p>
+                        <p className="font-bold text-gray-800">{readings.dischargePressure} PSI</p>
+                    </div>
+                )}
+            </div>
+
+            {/* Gas Type Badge */}
+            {readings.gasType && (
+                <div className="mt-3 flex items-center gap-2">
+                    <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
+                        Gas: {readings.gasType}
+                    </span>
+                    {readings.ambientTemp !== undefined && readings.ambientTemp !== null && (
+                        <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-medium">
+                            Ambiente: {readings.ambientTemp}°C
+                        </span>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+}
+
+function ProPhotosGallery({ photos, proPhotos }: { photos?: string[]; proPhotos?: ServiceRecord['proPhotos'] }) {
+    const allPhotos = [
+        ...(proPhotos?.before || []),
+        ...(proPhotos?.after || []),
+        ...(proPhotos?.equipment || []),
+        ...(photos || [])
+    ];
+
+    if (allPhotos.length === 0) return null;
+
+    return (
+        <div className="mb-4">
+            <p className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
+                📷 Evidencia fotográfica
+            </p>
+            <div className="flex gap-2 overflow-x-auto pb-2">
+                {allPhotos.slice(0, 4).map((url, idx) => (
+                    <img
+                        key={idx}
+                        src={url}
+                        alt={`Evidencia ${idx + 1}`}
+                        className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
+                    />
+                ))}
+                {allPhotos.length > 4 && (
+                    <div className="w-20 h-20 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                        <span className="text-gray-500 text-sm font-medium">+{allPhotos.length - 4}</span>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
+// Simple line chart for Delta T history using SVG
+function MetricsHistoryChart({ services }: { services: ServiceRecord[] }) {
+    // Filter services with PRO readings that have deltaT
+    const proServices = services
+        .filter(s => s.isPro && s.proReadings?.deltaT)
+        .reverse(); // Oldest first for chart
+
+    if (proServices.length < 2) return null; // Need at least 2 data points
+
+    const deltaTValues = proServices.map(s => s.proReadings!.deltaT!);
+    const maxValue = Math.max(...deltaTValues, 15);
+    const minValue = Math.min(...deltaTValues, 8);
+    const range = maxValue - minValue || 1;
+
+    const width = 300;
+    const height = 120;
+    const padding = 20;
+    const chartWidth = width - padding * 2;
+    const chartHeight = height - padding * 2;
+
+    // Generate points
+    const points = proServices.map((service, idx) => {
+        const x = padding + (idx / (proServices.length - 1)) * chartWidth;
+        const normalizedY = (service.proReadings!.deltaT! - minValue) / range;
+        const y = height - padding - normalizedY * chartHeight;
+        return { x, y, value: service.proReadings!.deltaT!, date: service.date };
+    });
+
+    const pathData = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+
+    const formatDate = (date: any) => {
+        if (!date) return '';
+        const d = date.toDate ? date.toDate() : new Date(date);
+        return d.toLocaleDateString('es-MX', { day: 'numeric', month: 'short' });
+    };
+
+    return (
+        <div className="bg-white rounded-2xl p-4 border border-gray-100 mb-4">
+            <div className="flex items-center gap-2 mb-3">
+                <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                </svg>
+                <div>
+                    <p className="text-gray-800 font-bold text-sm">Evolución de Δt</p>
+                    <p className="text-gray-400 text-xs">{proServices.length} servicios PRO registrados</p>
+                </div>
+            </div>
+
+            <svg viewBox={`0 0 ${width} ${height}`} className="w-full">
+                {/* Optimal range background */}
+                <rect
+                    x={padding}
+                    y={height - padding - ((15 - minValue) / range) * chartHeight}
+                    width={chartWidth}
+                    height={((15 - 8) / range) * chartHeight}
+                    fill="#dcfce7"
+                    opacity="0.5"
+                />
+
+                {/* Grid lines */}
+                {[8, 12, 15].map(val => {
+                    const y = height - padding - ((val - minValue) / range) * chartHeight;
+                    return (
+                        <g key={val}>
+                            <line x1={padding} y1={y} x2={width - padding} y2={y} stroke="#e5e7eb" strokeDasharray="4" />
+                            <text x={padding - 5} y={y + 3} fontSize="10" fill="#9ca3af" textAnchor="end">{val}°</text>
+                        </g>
+                    );
+                })}
+
+                {/* Line */}
+                <path d={pathData} fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinejoin="round" />
+
+                {/* Data points */}
+                {points.map((p, idx) => (
+                    <g key={idx}>
+                        <circle cx={p.x} cy={p.y} r="4" fill="#6366f1" />
+                        <circle cx={p.x} cy={p.y} r="2" fill="white" />
+                    </g>
+                ))}
+
+                {/* X-axis labels */}
+                {proServices.length <= 5 && points.map((p, idx) => (
+                    <text key={idx} x={p.x} y={height - 5} fontSize="8" fill="#9ca3af" textAnchor="middle">
+                        {formatDate(proServices[idx].date)}
+                    </text>
+                ))}
+            </svg>
+
+            <div className="flex justify-between mt-2 text-xs text-gray-400">
+                <span>🟢 Rango óptimo: 8°C - 15°C</span>
+                <span>Último: <strong className="text-indigo-600">{deltaTValues[deltaTValues.length - 1]}°C</strong></span>
+            </div>
+        </div>
+    );
+}
+
+// PDF Certificate Download Button
+function DownloadCertificateButton({ equipment, services, lastTech }: {
+    equipment: Equipment | null;
+    services: ServiceRecord[];
+    lastTech: TechnicianPublic | null;
+}) {
+    const hasProServices = services.some(s => s.isPro);
+    if (!hasProServices) return null;
+
+    const handlePrint = () => {
+        // Add print styles dynamically
+        const style = document.createElement('style');
+        style.id = 'print-styles';
+        style.innerHTML = `
+            @media print {
+                body * { visibility: hidden; }
+                .print-certificate, .print-certificate * { visibility: visible; }
+                .print-certificate { 
+                    position: absolute; 
+                    left: 0; 
+                    top: 0; 
+                    width: 100%;
+                    padding: 20px;
+                }
+                .no-print { display: none !important; }
+            }
+        `;
+        document.head.appendChild(style);
+        window.print();
+        // Remove styles after print
+        setTimeout(() => {
+            document.getElementById('print-styles')?.remove();
+        }, 1000);
+    };
+
+    return (
+        <button
+            onClick={handlePrint}
+            className="no-print flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-5 rounded-xl font-bold shadow-lg hover:shadow-xl transition w-full mb-4"
+        >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Descargar Certificado PRO
+        </button>
+    );
+}
+
+// ============================================
 // MAIN PAGE
 // ============================================
 
@@ -382,6 +682,11 @@ export default function QRPublicView() {
                             technicianName: data.technicianName,
                             technicianAlias: data.technicianAlias || 'Técnico',
                             technicianBadge: data.technicianRank || 'Técnico',
+                            // PRO DATA
+                            isPro: data.isPro || false,
+                            proReadings: data.proReadings || undefined,
+                            proPhotos: data.proPhotos || undefined,
+                            photos: data.photos || undefined,
                         });
                     }
 
@@ -477,7 +782,7 @@ export default function QRPublicView() {
 
     // Main view
     return (
-        <main className="min-h-screen bg-gradient-to-b from-blue-50 to-slate-100 pb-32">
+        <main className="min-h-screen bg-gradient-to-b from-blue-50 to-slate-100 pb-32 print-certificate">
             {/* Header */}
             <header className="bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-600 text-white p-6 pb-28">
                 <div className="max-w-md mx-auto">
@@ -540,6 +845,9 @@ export default function QRPublicView() {
                     </div>
                 </div>
 
+                {/* Download Certificate Button (PRO only) */}
+                <DownloadCertificateButton equipment={equipment} services={services} lastTech={lastTech} />
+
                 {/* Technician Contact Card */}
                 {lastTech && (
                     <div className="bg-white rounded-2xl p-5 shadow-xl mb-4">
@@ -596,12 +904,37 @@ export default function QRPublicView() {
                     <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
                         <span className="text-blue-600">{Icons.clipboard}</span>
                         <span>Bitácora de Servicios</span>
+                        {services.some(s => s.isPro) && (
+                            <span className="bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">PRO</span>
+                        )}
                     </h3>
+
+                    {/* PRO Insights - Show metrics from latest PRO service */}
+                    {(() => {
+                        const latestProService = services.find(s => s.isPro && s.proReadings);
+                        if (latestProService?.proReadings) {
+                            return (
+                                <ProMetricsCard readings={latestProService.proReadings} />
+                            );
+                        }
+                        return null;
+                    })()}
+
+                    {/* PRO Historical Chart - Show Delta T evolution */}
+                    <MetricsHistoryChart services={services} />
 
                     {services.length > 0 ? (
                         <div className="space-y-3">
                             {services.map(service => (
-                                <ServiceCard key={service.id} service={service} />
+                                <div key={service.id}>
+                                    <ServiceCard service={service} />
+                                    {/* Show photos if available */}
+                                    {(service.photos?.length || service.proPhotos) && (
+                                        <div className="mt-2 ml-4">
+                                            <ProPhotosGallery photos={service.photos} proPhotos={service.proPhotos} />
+                                        </div>
+                                    )}
+                                </div>
                             ))}
                         </div>
                     ) : (

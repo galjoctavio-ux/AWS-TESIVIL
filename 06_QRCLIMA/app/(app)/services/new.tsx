@@ -81,6 +81,37 @@ export default function NewService() {
     const [showWarrantyModal, setShowWarrantyModal] = useState(false);
     const [warrantyMonths, setWarrantyMonths] = useState(3); // Default 3 months
 
+    // PRO SERVICE MODE - Toggle for enhanced service data capture
+    const [isProServiceMode, setIsProServiceMode] = useState(false); // Toggle for PRO service features
+
+    // PRO TECHNICAL READINGS (Only when isProServiceMode is true)
+    const [proReadings, setProReadings] = useState({
+        voltage: '',           // Voltaje L1-L2 (V)
+        amperage: '',          // Amperaje (A)
+        suctionPressure: '',   // Presión de succión (PSI)
+        dischargePressure: '', // Presión de descarga (PSI)
+        returnTemp: '',        // Temperatura de retorno (°C)
+        supplyTemp: '',        // Temperatura de suministro (°C)
+        ambientTemp: '',       // Temperatura ambiente (°C)
+        gasType: 'R410A',      // Tipo de gas: R410A, R32, R22
+    });
+
+    // PRO STRUCTURED PHOTOS
+    const [proPhotos, setProPhotos] = useState<{
+        before: string[];      // Fotos antes del servicio
+        after: string[];       // Fotos después del servicio
+        equipment: string[];   // Fotos del equipo/placa
+    }>({
+        before: [],
+        after: [],
+        equipment: [],
+    });
+
+    // Calculate Delta T automatically
+    const deltaT = proReadings.returnTemp && proReadings.supplyTemp
+        ? Math.abs(parseFloat(proReadings.returnTemp) - parseFloat(proReadings.supplyTemp)).toFixed(1)
+        : null;
+
     // LOAD PRELOADED DATA FROM QR
     useEffect(() => {
         const loadPreloadedData = async () => {
@@ -302,6 +333,72 @@ export default function NewService() {
         }
     };
 
+    // PRO STRUCTURED PHOTOS - Pick photo with category selection
+    const pickProPhoto = (category: 'before' | 'after' | 'equipment') => {
+        const categoryLabels = {
+            before: 'Antes del Servicio',
+            after: 'Después del Servicio',
+            equipment: 'Placa/Equipo'
+        };
+
+        Alert.alert(
+            `📷 ${categoryLabels[category]}`,
+            '¿Cómo deseas agregar la foto?',
+            [
+                {
+                    text: 'Tomar Foto',
+                    onPress: async () => {
+                        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+                        if (status !== 'granted') {
+                            Alert.alert('Permiso requerido', 'Necesitamos acceso a la cámara.');
+                            return;
+                        }
+                        const result = await ImagePicker.launchCameraAsync({
+                            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                            allowsEditing: false,
+                            quality: 0.5,
+                        });
+                        if (!result.canceled) {
+                            await addProPhotoFromResult(result, category);
+                        }
+                    }
+                },
+                {
+                    text: 'Galería',
+                    onPress: async () => {
+                        const result = await ImagePicker.launchImageLibraryAsync({
+                            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                            allowsEditing: false,
+                            quality: 0.5,
+                        });
+                        if (!result.canceled) {
+                            await addProPhotoFromResult(result, category);
+                        }
+                    }
+                },
+                { text: 'Cancelar', style: 'cancel' }
+            ]
+        );
+    };
+
+    const addProPhotoFromResult = async (result: ImagePicker.ImagePickerResult, category: 'before' | 'after' | 'equipment') => {
+        if (result.canceled) return;
+        try {
+            const { compressServicePhoto } = await import('../../../services/image-service');
+            const compressed = await compressServicePhoto(result.assets[0].uri);
+
+            setProPhotos(prev => ({
+                ...prev,
+                [category]: [...prev[category], compressed.uri]
+            }));
+        } catch (e) {
+            setProPhotos(prev => ({
+                ...prev,
+                [category]: [...prev[category], result.assets[0].uri]
+            }));
+        }
+    };
+
     const handleSave = async (signature?: string) => {
         if (!selectedClient || !serviceType || !selectedBrand || !selectedModel) return;
 
@@ -355,6 +452,23 @@ export default function NewService() {
                 cost: 0, // Placeholder
                 clientSignature: signature || null,
                 warrantyMonths: warrantyMonths, // Save warranty duration
+                // PRO SERVICE DATA
+                isPro: isProServiceMode, // Mark as PRO service for web view differentiation
+                ...(isProServiceMode && {
+                    proReadings: {
+                        voltage: proReadings.voltage ? parseFloat(proReadings.voltage) : null,
+                        amperage: proReadings.amperage ? parseFloat(proReadings.amperage) : null,
+                        suctionPressure: proReadings.suctionPressure ? parseFloat(proReadings.suctionPressure) : null,
+                        dischargePressure: proReadings.dischargePressure ? parseFloat(proReadings.dischargePressure) : null,
+                        returnTemp: proReadings.returnTemp ? parseFloat(proReadings.returnTemp) : null,
+                        supplyTemp: proReadings.supplyTemp ? parseFloat(proReadings.supplyTemp) : null,
+                        ambientTemp: proReadings.ambientTemp ? parseFloat(proReadings.ambientTemp) : null,
+                        deltaT: deltaT ? parseFloat(deltaT) : null,
+                        gasType: proReadings.gasType,
+                    },
+                    proPhotos: proPhotos,
+                    proTimestamp: new Date(), // Exact timestamp for PRO data
+                }),
             };
 
             // DEBUG: Log King of the Hill values before saving
@@ -426,6 +540,38 @@ export default function NewService() {
         <View className="mb-4">
             <Text className="text-2xl font-bold text-gray-800">Nuevo Servicio</Text>
 
+            {/* PRO SERVICE MODE TOGGLE - Only visible for PRO users */}
+            {isPro && (
+                <View className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-3 mt-3">
+                    <View className="flex-row items-center justify-between">
+                        <View className="flex-row items-center flex-1">
+                            <View className="bg-indigo-600 p-2 rounded-full mr-3">
+                                <Ionicons name="sparkles" size={16} color="white" />
+                            </View>
+                            <View className="flex-1">
+                                <View className="flex-row items-center">
+                                    <Text className="text-indigo-900 font-bold text-sm">Modo PRO</Text>
+                                    <View className="bg-indigo-600 px-2 py-0.5 rounded ml-2">
+                                        <Text className="text-white text-[10px] font-bold">BETA</Text>
+                                    </View>
+                                </View>
+                                <Text className="text-indigo-700 text-xs">
+                                    {isProServiceMode
+                                        ? 'Captura lecturas técnicas y fotos detalladas'
+                                        : 'Activa para datos medibles y comparables'}
+                                </Text>
+                            </View>
+                        </View>
+                        <Switch
+                            value={isProServiceMode}
+                            onValueChange={setIsProServiceMode}
+                            trackColor={{ false: '#D1D5DB', true: '#818CF8' }}
+                            thumbColor={isProServiceMode ? '#4F46E5' : '#9CA3AF'}
+                        />
+                    </View>
+                </View>
+            )}
+
             {/* Preloaded Equipment Banner */}
             {preloadedEquipment && (
                 <View className={`${isOtherTechEquipment ? 'bg-amber-100 border-amber-200' : 'bg-purple-100 border-purple-200'} border rounded-xl p-3 mt-3 flex-row items-center`}>
@@ -450,9 +596,12 @@ export default function NewService() {
                 </View>
             )}
 
-            {/* Progress Bar */}
+            {/* Progress Bar - Add step 5 for PRO mode */}
             <View className="flex-row mt-4 mb-2">
-                {(isQrVirgin ? [0, 1, 2, 3, 4] : [1, 2, 3, 4]).map(i => (
+                {(isQrVirgin
+                    ? (isProServiceMode ? [0, 1, 2, 3, 4, 5] : [0, 1, 2, 3, 4])
+                    : (isProServiceMode ? [1, 2, 3, 4, 5] : [1, 2, 3, 4])
+                ).map(i => (
                     <View key={i} className={`h-2 flex-1 rounded-full mx-1 ${step >= i ? 'bg-blue-600' : 'bg-gray-200'}`} />
                 ))}
             </View>
@@ -460,7 +609,9 @@ export default function NewService() {
                 {step === 0 ? 'Registrar Equipo' :
                     step === 1 ? 'Seleccionar Cliente' :
                         step === 2 ? 'Tipo de Servicio' :
-                            step === 3 ? 'Equipo' : 'Detalles del Trabajo'}
+                            step === 3 ? 'Equipo' :
+                                step === 4 ? 'Detalles del Trabajo' :
+                                    'Lecturas Técnicas PRO'}
             </Text>
         </View>
     );
@@ -1465,11 +1616,20 @@ export default function NewService() {
                 />
 
                 <TouchableOpacity
-                    onPress={handleFinishService}
+                    onPress={() => {
+                        // If PRO mode is active, go to step 5 for technical readings
+                        if (isProServiceMode) {
+                            setStep(5);
+                        } else {
+                            handleFinishService();
+                        }
+                    }}
                     disabled={saving}
                     className={`bg-blue-600 p-4 rounded-xl shadow-lg items-center mb-4 ${saving ? 'opacity-70' : ''}`}
                 >
-                    <Text className="text-white font-bold text-lg">{saving ? 'Guardando...' : 'Finalizar y Firmar'}</Text>
+                    <Text className="text-white font-bold text-lg">
+                        {saving ? 'Guardando...' : (isProServiceMode ? 'Continuar a Lecturas PRO' : 'Finalizar y Firmar')}
+                    </Text>
                 </TouchableOpacity>
 
                 {/* PRO Feature: Automatic Reminder */}
@@ -1555,6 +1715,274 @@ export default function NewService() {
         );
     };
 
+    // STEP 5: PRO TECHNICAL READINGS (Only shown when isProServiceMode is true)
+    const renderStep5 = () => {
+        // Helper to check if value is in range
+        const getValueStatus = (value: string, min: number, max: number): 'ok' | 'warning' | 'error' => {
+            if (!value) return 'ok';
+            const num = parseFloat(value);
+            if (isNaN(num)) return 'ok';
+            if (num >= min && num <= max) return 'ok';
+            if (num >= min * 0.8 && num <= max * 1.2) return 'warning';
+            return 'error';
+        };
+
+        const statusColors = {
+            ok: { bg: 'bg-green-100', border: 'border-green-300', text: 'text-green-700', icon: '✓' },
+            warning: { bg: 'bg-yellow-100', border: 'border-yellow-300', text: 'text-yellow-700', icon: '⚠' },
+            error: { bg: 'bg-red-100', border: 'border-red-300', text: 'text-red-700', icon: '✗' }
+        };
+
+        // Normal ranges (approximate)
+        const deltaTStatus = deltaT ? getValueStatus(deltaT, 8, 15) : 'ok';
+        const voltageStatus = getValueStatus(proReadings.voltage, 200, 240);
+        const amperageStatus = getValueStatus(proReadings.amperage, 3, 15);
+
+        return (
+            <ScrollView
+                className="flex-1"
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 100 }}
+            >
+                {/* PRO Header Badge */}
+                <View className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-4 mb-6">
+                    <View className="flex-row items-center">
+                        <View className="bg-white/20 p-3 rounded-full mr-3">
+                            <Ionicons name="analytics" size={24} color="white" />
+                        </View>
+                        <View>
+                            <Text className="text-white font-bold text-lg">Lecturas Técnicas PRO</Text>
+                            <Text className="text-white/80 text-sm">Datos medibles para historial del equipo</Text>
+                        </View>
+                    </View>
+                </View>
+
+                {/* Gas Type Selector */}
+                <Text className="text-lg font-bold text-gray-800 mb-3">Tipo de Gas</Text>
+                <View className="flex-row mb-6">
+                    {['R410A', 'R32', 'R22'].map((gas) => (
+                        <TouchableOpacity
+                            key={gas}
+                            onPress={() => setProReadings(prev => ({ ...prev, gasType: gas }))}
+                            className={`flex-1 py-3 mx-1 rounded-xl items-center border-2 ${proReadings.gasType === gas
+                                ? 'bg-blue-600 border-blue-600'
+                                : 'bg-white border-gray-200'
+                                }`}
+                        >
+                            <Text className={`font-bold ${proReadings.gasType === gas ? 'text-white' : 'text-gray-600'}`}>
+                                {gas}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+
+                {/* Pressure Readings */}
+                <Text className="text-lg font-bold text-gray-800 mb-3">Presiones</Text>
+                <View className="flex-row mb-4">
+                    <View className="flex-1 mr-2">
+                        <Text className="text-gray-600 text-sm mb-1">Succión (PSI)</Text>
+                        <TextInput
+                            className="bg-white border border-gray-200 rounded-xl p-3 text-gray-800"
+                            placeholder="Ej: 120"
+                            keyboardType="numeric"
+                            value={proReadings.suctionPressure}
+                            onChangeText={(text) => setProReadings(prev => ({ ...prev, suctionPressure: text }))}
+                        />
+                    </View>
+                    <View className="flex-1 ml-2">
+                        <Text className="text-gray-600 text-sm mb-1">Descarga (PSI)</Text>
+                        <TextInput
+                            className="bg-white border border-gray-200 rounded-xl p-3 text-gray-800"
+                            placeholder="Ej: 350"
+                            keyboardType="numeric"
+                            value={proReadings.dischargePressure}
+                            onChangeText={(text) => setProReadings(prev => ({ ...prev, dischargePressure: text }))}
+                        />
+                    </View>
+                </View>
+
+                {/* Temperature Readings */}
+                <Text className="text-lg font-bold text-gray-800 mb-3">Temperaturas</Text>
+                <View className="flex-row mb-2">
+                    <View className="flex-1 mr-2">
+                        <Text className="text-gray-600 text-sm mb-1">Retorno (°C)</Text>
+                        <TextInput
+                            className="bg-white border border-gray-200 rounded-xl p-3 text-gray-800"
+                            placeholder="Ej: 24"
+                            keyboardType="numeric"
+                            value={proReadings.returnTemp}
+                            onChangeText={(text) => setProReadings(prev => ({ ...prev, returnTemp: text }))}
+                        />
+                    </View>
+                    <View className="flex-1 ml-2">
+                        <Text className="text-gray-600 text-sm mb-1">Suministro (°C)</Text>
+                        <TextInput
+                            className="bg-white border border-gray-200 rounded-xl p-3 text-gray-800"
+                            placeholder="Ej: 12"
+                            keyboardType="numeric"
+                            value={proReadings.supplyTemp}
+                            onChangeText={(text) => setProReadings(prev => ({ ...prev, supplyTemp: text }))}
+                        />
+                    </View>
+                </View>
+
+                {/* Delta T Display */}
+                {deltaT && (
+                    <View className={`${statusColors[deltaTStatus].bg} border ${statusColors[deltaTStatus].border} rounded-xl p-4 mb-4`}>
+                        <View className="flex-row items-center justify-between">
+                            <View>
+                                <Text className="text-gray-600 text-sm">Delta T (Δt) Calculado</Text>
+                                <Text className={`text-2xl font-bold ${statusColors[deltaTStatus].text}`}>
+                                    {deltaT}°C {statusColors[deltaTStatus].icon}
+                                </Text>
+                            </View>
+                            <View className="items-end">
+                                <Text className="text-gray-400 text-xs">Rango normal</Text>
+                                <Text className="text-gray-600 text-sm font-medium">8°C - 15°C</Text>
+                            </View>
+                        </View>
+                    </View>
+                )}
+
+                {/* Ambient Temperature */}
+                <View className="mb-6">
+                    <Text className="text-gray-600 text-sm mb-1">Temperatura Ambiente (°C)</Text>
+                    <TextInput
+                        className="bg-white border border-gray-200 rounded-xl p-3 text-gray-800"
+                        placeholder="Ej: 32"
+                        keyboardType="numeric"
+                        value={proReadings.ambientTemp}
+                        onChangeText={(text) => setProReadings(prev => ({ ...prev, ambientTemp: text }))}
+                    />
+                </View>
+
+                {/* Electrical Readings */}
+                <Text className="text-lg font-bold text-gray-800 mb-3">Lecturas Eléctricas</Text>
+                <View className="flex-row mb-6">
+                    <View className="flex-1 mr-2">
+                        <Text className="text-gray-600 text-sm mb-1">Voltaje L1-L2 (V)</Text>
+                        <TextInput
+                            className={`bg-white border rounded-xl p-3 text-gray-800 ${voltageStatus !== 'ok' ? statusColors[voltageStatus].border : 'border-gray-200'
+                                }`}
+                            placeholder="Ej: 220"
+                            keyboardType="numeric"
+                            value={proReadings.voltage}
+                            onChangeText={(text) => setProReadings(prev => ({ ...prev, voltage: text }))}
+                        />
+                    </View>
+                    <View className="flex-1 ml-2">
+                        <Text className="text-gray-600 text-sm mb-1">Amperaje (A)</Text>
+                        <TextInput
+                            className={`bg-white border rounded-xl p-3 text-gray-800 ${amperageStatus !== 'ok' ? statusColors[amperageStatus].border : 'border-gray-200'
+                                }`}
+                            placeholder="Ej: 8.5"
+                            keyboardType="numeric"
+                            value={proReadings.amperage}
+                            onChangeText={(text) => setProReadings(prev => ({ ...prev, amperage: text }))}
+                        />
+                    </View>
+                </View>
+
+                {/* PRO STRUCTURED PHOTOS */}
+                <Text className="text-lg font-bold text-gray-800 mb-3">📷 Evidencia Fotográfica</Text>
+                <Text className="text-gray-500 text-sm mb-4">Captura fotos antes y después del servicio para el historial del equipo</Text>
+
+                <View className="space-y-4 mb-6">
+                    {/* Before Photos */}
+                    <View className="bg-white rounded-xl p-4 border border-gray-100">
+                        <View className="flex-row items-center justify-between mb-3">
+                            <View className="flex-row items-center">
+                                <View className="bg-orange-100 p-2 rounded-lg mr-2">
+                                    <Ionicons name="time-outline" size={16} color="#EA580C" />
+                                </View>
+                                <Text className="font-bold text-gray-700">Antes del Servicio</Text>
+                            </View>
+                            <Text className="text-gray-400 text-xs">{proPhotos.before.length} foto(s)</Text>
+                        </View>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                            <TouchableOpacity
+                                onPress={() => pickProPhoto('before')}
+                                className="w-20 h-20 bg-orange-50 rounded-xl items-center justify-center border-2 border-dashed border-orange-200 mr-2"
+                            >
+                                <Ionicons name="add" size={24} color="#EA580C" />
+                            </TouchableOpacity>
+                            {proPhotos.before.map((uri, idx) => (
+                                <Image key={idx} source={{ uri }} className="w-20 h-20 rounded-xl mr-2" />
+                            ))}
+                        </ScrollView>
+                    </View>
+
+                    {/* After Photos */}
+                    <View className="bg-white rounded-xl p-4 border border-gray-100">
+                        <View className="flex-row items-center justify-between mb-3">
+                            <View className="flex-row items-center">
+                                <View className="bg-green-100 p-2 rounded-lg mr-2">
+                                    <Ionicons name="checkmark-done-outline" size={16} color="#16A34A" />
+                                </View>
+                                <Text className="font-bold text-gray-700">Después del Servicio</Text>
+                            </View>
+                            <Text className="text-gray-400 text-xs">{proPhotos.after.length} foto(s)</Text>
+                        </View>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                            <TouchableOpacity
+                                onPress={() => pickProPhoto('after')}
+                                className="w-20 h-20 bg-green-50 rounded-xl items-center justify-center border-2 border-dashed border-green-200 mr-2"
+                            >
+                                <Ionicons name="add" size={24} color="#16A34A" />
+                            </TouchableOpacity>
+                            {proPhotos.after.map((uri, idx) => (
+                                <Image key={idx} source={{ uri }} className="w-20 h-20 rounded-xl mr-2" />
+                            ))}
+                        </ScrollView>
+                    </View>
+
+                    {/* Equipment Photos */}
+                    <View className="bg-white rounded-xl p-4 border border-gray-100">
+                        <View className="flex-row items-center justify-between mb-3">
+                            <View className="flex-row items-center">
+                                <View className="bg-blue-100 p-2 rounded-lg mr-2">
+                                    <Ionicons name="qr-code-outline" size={16} color="#2563EB" />
+                                </View>
+                                <Text className="font-bold text-gray-700">Placa del Equipo</Text>
+                            </View>
+                            <Text className="text-gray-400 text-xs">{proPhotos.equipment.length} foto(s)</Text>
+                        </View>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                            <TouchableOpacity
+                                onPress={() => pickProPhoto('equipment')}
+                                className="w-20 h-20 bg-blue-50 rounded-xl items-center justify-center border-2 border-dashed border-blue-200 mr-2"
+                            >
+                                <Ionicons name="add" size={24} color="#2563EB" />
+                            </TouchableOpacity>
+                            {proPhotos.equipment.map((uri, idx) => (
+                                <Image key={idx} source={{ uri }} className="w-20 h-20 rounded-xl mr-2" />
+                            ))}
+                        </ScrollView>
+                    </View>
+                </View>
+
+                {/* Finish Button */}
+                <TouchableOpacity
+                    onPress={handleFinishService}
+                    disabled={saving}
+                    className={`bg-indigo-600 p-4 rounded-xl shadow-lg items-center mb-4 ${saving ? 'opacity-70' : ''}`}
+                >
+                    <View className="flex-row items-center">
+                        <Ionicons name="checkmark-circle" size={24} color="white" />
+                        <Text className="text-white font-bold text-lg ml-2">
+                            {saving ? 'Guardando...' : 'Finalizar Servicio PRO'}
+                        </Text>
+                    </View>
+                </TouchableOpacity>
+
+                {/* Back Button */}
+                <TouchableOpacity onPress={() => setStep(4)} className="p-4 items-center mb-8">
+                    <Text className="text-gray-400">Volver a Detalles</Text>
+                </TouchableOpacity>
+            </ScrollView>
+        );
+    };
+
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1 bg-slate-50 p-6 pt-12">
             <TouchableOpacity onPress={() => router.back()} className="mb-2">
@@ -1575,6 +2003,7 @@ export default function NewService() {
                     {step === 2 && renderStep2()}
                     {step === 3 && renderStep3()}
                     {step === 4 && renderStep4()}
+                    {step === 5 && isProServiceMode && renderStep5()}
                 </>
             )}
 

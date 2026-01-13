@@ -8,7 +8,7 @@
  * DEBE existir alternativa manual al QR (UXUI-069)
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -20,6 +20,7 @@ import {
     ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import { supabase } from '../src/lib/supabase';
 import { useAuth } from '../src/contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -29,6 +30,7 @@ type VinculacionStep = 'scan' | 'manual' | 'wifi' | 'success';
 export default function VinculacionScreen() {
     const router = useRouter();
     const { user } = useAuth();
+    const [permission, requestPermission] = useCameraPermissions();
 
     const [step, setStep] = useState<VinculacionStep>('scan');
     const [loading, setLoading] = useState(false);
@@ -37,6 +39,14 @@ export default function VinculacionScreen() {
     const [wifiSSID, setWifiSSID] = useState('');
     const [wifiPassword, setWifiPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [scanned, setScanned] = useState(false);
+
+    // Request permission on mount
+    useEffect(() => {
+        if (!permission?.granted && permission?.canAskAgain) {
+            requestPermission();
+        }
+    }, [permission]);
 
     // Verify device exists and is available
     const verifyDevice = async (code: string): Promise<boolean> => {
@@ -63,6 +73,23 @@ export default function VinculacionScreen() {
             console.error('Error verifying device:', error);
             Alert.alert('Error', 'No se pudo verificar el dispositivo');
             return false;
+        }
+    };
+
+    // Handle QR code scanned
+    const handleBarCodeScanned = async ({ data }: { data: string }) => {
+        if (scanned || loading) return;
+        setScanned(true);
+        setLoading(true);
+
+        const isValid = await verifyDevice(data.trim().toUpperCase());
+        setLoading(false);
+
+        if (isValid) {
+            setStep('wifi');
+        } else {
+            // Allow scanning again after error
+            setTimeout(() => setScanned(false), 2000);
         }
     };
 
@@ -129,43 +156,104 @@ export default function VinculacionScreen() {
         router.replace('/(tabs)');
     };
 
-    // Render QR scan step (placeholder - would use expo-barcode-scanner)
-    const renderScanStep = () => (
-        <View style={styles.stepContainer}>
-            <View style={styles.iconContainer}>
-                <Ionicons name="qr-code-outline" size={80} color="#4f46e5" />
-            </View>
+    // Render QR scan step with FULLSCREEN camera
+    const renderScanStep = () => {
+        // If camera permission granted and not loading, show fullscreen camera
+        if (permission?.granted && !loading) {
+            return (
+                <View style={styles.fullscreenCamera}>
+                    <CameraView
+                        style={StyleSheet.absoluteFillObject}
+                        facing="back"
+                        barcodeScannerSettings={{
+                            barcodeTypes: ['qr'],
+                        }}
+                        onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+                    />
+                    {/* Overlay with corners and instructions */}
+                    <View style={styles.cameraOverlay}>
+                        <View style={styles.overlayTop}>
+                            <TouchableOpacity style={styles.closeButton} onPress={handleSkip}>
+                                <Ionicons name="close" size={28} color="#fff" />
+                            </TouchableOpacity>
+                        </View>
 
-            <Text style={styles.title}>Vincular dispositivo</Text>
-            <Text style={styles.subtitle}>
-                Escanea el código QR que viene con tu dispositivo Cuentatron
-            </Text>
+                        <View style={styles.overlayMiddle}>
+                            <View style={styles.scanFrame}>
+                                <View style={[styles.corner, styles.cornerTL]} />
+                                <View style={[styles.corner, styles.cornerTR]} />
+                                <View style={[styles.corner, styles.cornerBL]} />
+                                <View style={[styles.corner, styles.cornerBR]} />
+                            </View>
+                        </View>
 
-            {/* QR Scanner placeholder */}
-            <View style={styles.scannerPlaceholder}>
-                <View style={styles.scannerFrame}>
-                    <View style={styles.scannerCorner} />
-                    <Ionicons name="camera" size={48} color="#666" />
-                    <Text style={styles.scannerText}>Cámara QR</Text>
-                    <Text style={styles.scannerSubtext}>(Requiere permisos)</Text>
+                        <View style={styles.overlayBottom}>
+                            <Text style={styles.scanInstruction}>Apunta al código QR del dispositivo</Text>
+                            <TouchableOpacity
+                                style={styles.manualButton}
+                                onPress={() => setStep('manual')}
+                            >
+                                <Ionicons name="keypad-outline" size={20} color="#fff" />
+                                <Text style={styles.manualButtonText}>Ingresar código manual</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
                 </View>
-            </View>
+            );
+        }
 
-            {/* Alternative: Manual code */}
-            <TouchableOpacity
-                style={styles.alternativeButton}
-                onPress={() => setStep('manual')}
-            >
-                <Text style={styles.alternativeText}>
-                    ¿No tienes QR? Ingresa el código manualmente
+        // Show permission or loading states
+        return (
+            <View style={styles.stepContainer}>
+                <View style={styles.iconContainer}>
+                    <Ionicons name="qr-code-outline" size={80} color="#4f46e5" />
+                </View>
+
+                <Text style={styles.title}>Vincular dispositivo</Text>
+                <Text style={styles.subtitle}>
+                    Escanea el código QR que viene con tu dispositivo Cuentatron
                 </Text>
-            </TouchableOpacity>
 
-            <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
-                <Text style={styles.skipText}>Omitir por ahora</Text>
-            </TouchableOpacity>
-        </View>
-    );
+                <View style={styles.scannerPlaceholder}>
+                    {!permission ? (
+                        <View style={styles.scannerFrame}>
+                            <ActivityIndicator size="large" color="#4f46e5" />
+                            <Text style={styles.scannerText}>Cargando cámara...</Text>
+                        </View>
+                    ) : !permission.granted ? (
+                        <View style={styles.scannerFrame}>
+                            <Ionicons name="camera-outline" size={48} color="#666" />
+                            <Text style={styles.scannerText}>Permisos de cámara requeridos</Text>
+                            <TouchableOpacity
+                                style={styles.permissionButton}
+                                onPress={requestPermission}
+                            >
+                                <Text style={styles.permissionButtonText}>Otorgar permisos</Text>
+                            </TouchableOpacity>
+                        </View>
+                    ) : (
+                        <View style={styles.scannerFrame}>
+                            <ActivityIndicator size="large" color="#4f46e5" />
+                            <Text style={styles.scannerText}>Verificando dispositivo...</Text>
+                        </View>
+                    )}
+                </View>
+
+                <TouchableOpacity
+                    style={styles.alternativeButton}
+                    onPress={() => setStep('manual')}
+                >
+                    <Text style={styles.alternativeText}>
+                        ¿No tienes QR? Ingresa el código manualmente
+                    </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
+                    <Text style={styles.skipText}>Omitir por ahora</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    };
 
     // Render manual code input step
     const renderManualStep = () => (
@@ -397,7 +485,26 @@ const styles = StyleSheet.create({
         borderColor: '#333',
         borderStyle: 'dashed',
     },
-    scannerCorner: {
+    cameraContainer: {
+        width: 250,
+        height: 250,
+        borderRadius: 16,
+        overflow: 'hidden',
+        position: 'relative',
+        backgroundColor: '#000',
+    },
+    camera: {
+        width: '100%',
+        height: '100%',
+    },
+    scannerOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+    },
+    scannerCornerTopLeft: {
         position: 'absolute',
         top: 20,
         left: 20,
@@ -407,14 +514,51 @@ const styles = StyleSheet.create({
         borderTopWidth: 3,
         borderColor: '#4f46e5',
     },
-    scannerText: {
-        color: '#666',
-        marginTop: 12,
+    scannerCornerTopRight: {
+        position: 'absolute',
+        top: 20,
+        right: 20,
+        width: 40,
+        height: 40,
+        borderRightWidth: 3,
+        borderTopWidth: 3,
+        borderColor: '#4f46e5',
     },
-    scannerSubtext: {
-        color: '#444',
-        fontSize: 12,
-        marginTop: 4,
+    scannerCornerBottomLeft: {
+        position: 'absolute',
+        bottom: 20,
+        left: 20,
+        width: 40,
+        height: 40,
+        borderLeftWidth: 3,
+        borderBottomWidth: 3,
+        borderColor: '#4f46e5',
+    },
+    scannerCornerBottomRight: {
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        width: 40,
+        height: 40,
+        borderRightWidth: 3,
+        borderBottomWidth: 3,
+        borderColor: '#4f46e5',
+    },
+    scannerText: {
+        color: '#888',
+        marginTop: 12,
+        textAlign: 'center',
+    },
+    permissionButton: {
+        backgroundColor: '#4f46e5',
+        paddingHorizontal: 20,
+        paddingVertical: 12,
+        borderRadius: 8,
+        marginTop: 16,
+    },
+    permissionButtonText: {
+        color: '#fff',
+        fontWeight: '600',
     },
     // Buttons
     alternativeButton: {

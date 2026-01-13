@@ -8,7 +8,7 @@
 import { useEffect, useState } from 'react';
 import { supabase, Dispositivo, Plan } from '../lib/supabase';
 import QRCode from 'qrcode';
-import { Cpu, Plus, QrCode, X } from 'lucide-react';
+import { Cpu, Plus, QrCode, X, Download } from 'lucide-react';
 import './DevicesPage.css';
 
 interface NewDevice {
@@ -28,6 +28,8 @@ export default function DevicesPage() {
     const [plans, setPlans] = useState<Plan[]>([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
+    const [showQrModal, setShowQrModal] = useState(false);
+    const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
     const [qrCode, setQrCode] = useState<string | null>(null);
     const [newDevice, setNewDevice] = useState<NewDevice>({
         device_id: '',
@@ -128,6 +130,39 @@ export default function DevicesPage() {
         });
     };
 
+    // Generate QR for existing device
+    const handleDownloadQR = async (deviceId: string) => {
+        try {
+            const qrData = await QRCode.toDataURL(deviceId, {
+                width: 300,
+                margin: 2,
+                color: { dark: '#1a1a2e', light: '#ffffff' },
+            });
+            setQrCode(qrData);
+            setSelectedDeviceId(deviceId);
+            setShowQrModal(true);
+        } catch (error) {
+            console.error('Error generating QR:', error);
+            alert('Error al generar QR');
+        }
+    };
+
+    // Download QR as image
+    const downloadQRImage = () => {
+        if (!qrCode || !selectedDeviceId) return;
+        const link = document.createElement('a');
+        link.href = qrCode;
+        link.download = `QR_${selectedDeviceId}.png`;
+        link.click();
+    };
+
+    // Close QR modal
+    const closeQrModal = () => {
+        setShowQrModal(false);
+        setSelectedDeviceId(null);
+        setQrCode(null);
+    };
+
     const calFieldCount = getCalFieldCount(newDevice.plan_id);
 
     return (
@@ -152,14 +187,15 @@ export default function DevicesPage() {
                             <th>Plan</th>
                             <th>Estado</th>
                             <th>Usuario</th>
+                            <th>Acciones</th>
                             <th>Fecha Creación</th>
                         </tr>
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr><td colSpan={5} className="loading-cell">Cargando...</td></tr>
+                            <tr><td colSpan={6} className="loading-cell">Cargando...</td></tr>
                         ) : devices.length === 0 ? (
-                            <tr><td colSpan={5} className="empty-cell">No hay dispositivos</td></tr>
+                            <tr><td colSpan={6} className="empty-cell">No hay dispositivos</td></tr>
                         ) : (
                             devices.map((device) => (
                                 <tr key={device.device_id}>
@@ -176,7 +212,15 @@ export default function DevicesPage() {
                                         </span>
                                     </td>
                                     <td>{device.usuario_id ? 'Vinculado' : 'Sin asignar'}</td>
-                                    <td>{new Date(device.created_at).toLocaleDateString('es-MX')}</td>
+                                    <td>
+                                        <button
+                                            className="btn-icon"
+                                            onClick={() => handleDownloadQR(device.device_id)}
+                                            title="Descargar QR"
+                                        >
+                                            <QrCode size={18} />
+                                        </button>
+                                    </td>
                                 </tr>
                             ))
                         )}
@@ -317,6 +361,33 @@ export default function DevicesPage() {
                                 </button>
                             </form>
                         )}
+                    </div>
+                </div>
+            )}
+
+            {/* QR Download Modal */}
+            {showQrModal && qrCode && selectedDeviceId && (
+                <div className="modal-overlay">
+                    <div className="modal">
+                        <div className="modal-header">
+                            <h2>Código QR</h2>
+                            <button className="modal-close" onClick={closeQrModal}>
+                                <X size={24} />
+                            </button>
+                        </div>
+                        <div className="qr-result">
+                            <img src={qrCode} alt="QR Code" className="qr-image" />
+                            <p className="qr-device-id">{selectedDeviceId}</p>
+                            <div className="qr-actions">
+                                <button className="btn-primary" onClick={downloadQRImage}>
+                                    <Download size={20} />
+                                    Descargar QR
+                                </button>
+                                <button className="btn-secondary" onClick={closeQrModal}>
+                                    Cerrar
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}

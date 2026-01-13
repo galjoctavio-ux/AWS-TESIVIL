@@ -219,3 +219,44 @@
     font-family: monospace;
     margin-bottom: 24px;
 }
+
+/* Icon Button */
+.btn-icon {
+    background: transparent;
+    color: var(--color-text-secondary);
+    padding: 8px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    background: var(--color-accent);
+    color: var(--color-text-primary);
+}
+
+/* Secondary Button */
+.btn-secondary {
+    background: var(--color-bg-secondary);
+    color: var(--color-text-secondary);
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+    border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+    background: var(--color-bg-card);
+    color: var(--color-text-primary);
+}
+
+/* QR Actions */
+.qr-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
