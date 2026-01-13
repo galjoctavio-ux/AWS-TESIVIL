@@ -12,6 +12,7 @@ export interface ServiceData {
     technicianId: string;
     technicianName?: string;    // For King of the Hill - technician full name
     technicianAlias?: string;   // For King of the Hill - technician display name
+    technicianDisplayName?: string; // For QR public view - respects user preference (company vs technician)
     technicianPhone?: string;   // For King of the Hill - technician contact
     equipmentId?: string;       // Equipment document ID for updating lastServiceTech
     type: 'Reparación' | 'Mantenimiento' | 'Instalación' | 'Reinstalación';
@@ -75,7 +76,8 @@ export const addService = async (serviceData: ServiceData) => {
                     serviceData.technicianId,
                     serviceData.technicianPhone || '',
                     serviceData.technicianAlias || 'Técnico',
-                    serviceData.technicianName // Pass full name
+                    serviceData.technicianName, // Full name
+                    serviceData.technicianDisplayName // Display name (respects preference)
                 );
                 console.log('King of the Hill updated for equipment:', serviceData.equipmentId);
             } catch (kingError) {

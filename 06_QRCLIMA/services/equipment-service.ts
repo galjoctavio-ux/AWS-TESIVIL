@@ -421,7 +421,8 @@ export const updateLastServiceTechnician = async (
     technicianId: string,
     technicianPhone: string,
     technicianAlias: string,
-    technicianName?: string
+    technicianName?: string,
+    technicianDisplayName?: string
 ): Promise<boolean> => {
     try {
         const equipmentRef = doc(db, 'equipments', equipmentId);
@@ -436,8 +437,12 @@ export const updateLastServiceTechnician = async (
             updateData.lastServiceTechName = technicianName;
         }
 
+        if (technicianDisplayName) {
+            updateData.lastServiceTechDisplayName = technicianDisplayName;
+        }
+
         await updateDoc(equipmentRef, updateData);
-        console.log(`King of the Hill updated: ${technicianAlias} is now the contact for equipment ${equipmentId}`);
+        console.log(`King of the Hill updated: ${technicianDisplayName || technicianAlias} is now the contact for equipment ${equipmentId}`);
         return true;
     } catch (e) {
         console.error('Error updating last service technician:', e);

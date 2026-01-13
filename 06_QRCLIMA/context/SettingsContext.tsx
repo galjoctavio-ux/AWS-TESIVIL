@@ -5,17 +5,20 @@ const SETTINGS_STORAGE_KEY = '@qrclima_settings';
 
 export type NavAppPreference = 'waze' | 'google' | 'apple' | null;
 export type DistanceMode = 'linear' | 'traffic';
+export type QrDisplayName = 'technician' | 'company';
 
 export interface AppSettings {
     reminderMonths: number; // Default: 6 months for maintenance reminder
     preferredNavApp: NavAppPreference; // Preferred navigation app
     distanceMode: DistanceMode; // 'linear' = Haversine, 'traffic' = Google Directions (PRO only)
+    qrDisplayName: QrDisplayName; // What name to show in public QR view
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
     reminderMonths: 6,
     preferredNavApp: null, // null = always ask
     distanceMode: 'linear', // default to linear (free)
+    qrDisplayName: 'technician', // default to technician name
 };
 
 interface SettingsContextType {

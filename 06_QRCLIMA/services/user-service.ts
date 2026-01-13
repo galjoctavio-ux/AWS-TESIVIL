@@ -113,6 +113,9 @@ export interface UserProfile {
 
     // Store purchases - PDF unlocks
     pdfUnlocksAvailable?: number;  // Number of PDF unlock credits purchased
+
+    // QR Public Display Preference
+    qrDisplayName?: 'technician' | 'company'; // What name to show in public QR view
 }
 
 // Perfil por defecto para usuarios nuevos

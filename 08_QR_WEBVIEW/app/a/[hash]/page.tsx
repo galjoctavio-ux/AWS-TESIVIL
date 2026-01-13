@@ -126,7 +126,8 @@ interface Equipment {
     lastServiceTechId?: string;
     lastServiceTechPhone?: string;
     lastServiceTechAlias?: string;
-    lastServiceTechName?: string;       // Full name for display
+    lastServiceTechName?: string;        // Full name for display
+    lastServiceTechDisplayName?: string; // Preferred display name (company or technician)
     lastServiceDate?: any;
     createdAt?: any;
     linkedAt?: any;
@@ -165,6 +166,7 @@ interface ServiceRecord {
 
 interface TechnicianPublic {
     name?: string;    // Full name for display
+    displayName?: string; // Preferred display name (company or technician)
     alias: string;
     rank: string;
     phone?: string;
@@ -388,36 +390,59 @@ function ProMetricsCard({ readings }: { readings: ServiceRecord['proReadings'] }
 }
 
 function ProPhotosGallery({ photos, proPhotos }: { photos?: string[]; proPhotos?: ServiceRecord['proPhotos'] }) {
-    const allPhotos = [
-        ...(proPhotos?.before || []),
-        ...(proPhotos?.after || []),
-        ...(proPhotos?.equipment || []),
-        ...(photos || [])
-    ];
+    const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
 
-    if (allPhotos.length === 0) return null;
+    const categories = [
+        { label: '📸 Antes', photos: proPhotos?.before || [] },
+        { label: '✅ Después', photos: proPhotos?.after || [] },
+        { label: '🔧 Placa/Equipo', photos: proPhotos?.equipment || [] },
+        { label: '📷 Otras', photos: photos || [] },
+    ].filter(cat => cat.photos.length > 0);
+
+    if (categories.length === 0) return null;
 
     return (
-        <div className="mb-4">
-            <p className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
-                📷 Evidencia fotográfica
-            </p>
-            <div className="flex gap-2 overflow-x-auto pb-2">
-                {allPhotos.slice(0, 4).map((url, idx) => (
+        <>
+            {/* Fullscreen Modal */}
+            {fullscreenImage && (
+                <div
+                    className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+                    onClick={() => setFullscreenImage(null)}
+                >
+                    <button
+                        className="absolute top-4 right-4 text-white text-3xl font-bold"
+                        onClick={() => setFullscreenImage(null)}
+                    >
+                        ✕
+                    </button>
                     <img
-                        key={idx}
-                        src={url}
-                        alt={`Evidencia ${idx + 1}`}
-                        className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
+                        src={fullscreenImage}
+                        alt="Foto ampliada"
+                        className="max-w-full max-h-full object-contain rounded-lg"
                     />
-                ))}
-                {allPhotos.length > 4 && (
-                    <div className="w-20 h-20 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-                        <span className="text-gray-500 text-sm font-medium">+{allPhotos.length - 4}</span>
+                </div>
+            )}
+
+            <div className="mb-4">
+                <p className="text-sm font-medium text-gray-700 mb-2">📷 Evidencia fotográfica</p>
+                {categories.map((category, catIdx) => (
+                    <div key={catIdx} className="mb-3">
+                        <p className="text-xs text-gray-500 mb-1">{category.label}</p>
+                        <div className="flex gap-2 overflow-x-auto pb-2">
+                            {category.photos.map((url, idx) => (
+                                <img
+                                    key={idx}
+                                    src={url}
+                                    alt={`${category.label} ${idx + 1}`}
+                                    className="w-20 h-20 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:opacity-80 transition"
+                                    onClick={() => setFullscreenImage(url)}
+                                />
+                            ))}
+                        </div>
                     </div>
-                )}
+                ))}
             </div>
-        </div>
+        </>
     );
 }
 
@@ -518,7 +543,7 @@ function MetricsHistoryChart({ services }: { services: ServiceRecord[] }) {
     );
 }
 
-// PDF Certificate Download Button
+// PDF Certificate Download Button - Generates Professional Certificate
 function DownloadCertificateButton({ equipment, services, lastTech }: {
     equipment: Equipment | null;
     services: ServiceRecord[];
@@ -527,35 +552,259 @@ function DownloadCertificateButton({ equipment, services, lastTech }: {
     const hasProServices = services.some(s => s.isPro);
     if (!hasProServices) return null;
 
-    const handlePrint = () => {
-        // Add print styles dynamically
-        const style = document.createElement('style');
-        style.id = 'print-styles';
-        style.innerHTML = `
-            @media print {
-                body * { visibility: hidden; }
-                .print-certificate, .print-certificate * { visibility: visible; }
-                .print-certificate { 
-                    position: absolute; 
-                    left: 0; 
-                    top: 0; 
-                    width: 100%;
-                    padding: 20px;
-                }
-                .no-print { display: none !important; }
-            }
-        `;
-        document.head.appendChild(style);
-        window.print();
-        // Remove styles after print
-        setTimeout(() => {
-            document.getElementById('print-styles')?.remove();
-        }, 1000);
+    const latestProService = services.find(s => s.isPro);
+
+    const handleDownloadCertificate = () => {
+        if (!equipment || !latestProService) return;
+
+        const serviceDate = latestProService.date?.toDate
+            ? latestProService.date.toDate().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })
+            : new Date().toLocaleDateString('es-MX');
+
+        const readings = latestProService.proReadings;
+
+        const certificateHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Certificado de Servicio PRO - ${equipment.brand} ${equipment.model}</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        @page { margin: 20px; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #1f2937;
+            line-height: 1.5;
+            padding: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 { font-size: 20px; margin-bottom: 5px; }
+        .header .subtitle { opacity: 0.9; font-size: 12px; }
+        .badge {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .section {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            color: #4f46e5;
+            font-size: 13px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        .two-cols { display: flex; gap: 20px; }
+        .col { flex: 1; }
+        .info-row { margin-bottom: 8px; font-size: 13px; }
+        .info-label { color: #6b7280; font-size: 11px; }
+        .info-value { font-weight: 600; color: #1f2937; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .metric-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        .metric-value { font-size: 20px; font-weight: bold; color: #4f46e5; }
+        .metric-label { font-size: 10px; color: #6b7280; }
+        .delta-highlight {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        .delta-highlight .metric-value { color: white; }
+        .delta-highlight .metric-label { color: rgba(255,255,255,0.9); }
+        .technician-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .tech-avatar {
+            width: 50px;
+            height: 50px;
+            background: #f59e0b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 11px;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 15px;
+        }
+        .qr-section {
+            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+            border-radius: 10px;
+        }
+        .print-btn {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+        }
+        @media print {
+            .print-btn { display: none; }
+            body { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <button class="print-btn" onclick="window.print()">📄 Imprimir / Guardar PDF</button>
+    
+    <div class="header">
+        <div>
+            <h1>Certificado de Servicio PRO</h1>
+            <div class="subtitle">Hoja de Vida del Equipo - ${serviceDate}</div>
+        </div>
+        <div class="badge">✓ SERVICIO VERIFICADO</div>
+    </div>
+
+    <div class="two-cols">
+        <div class="col">
+            <div class="section">
+                <div class="section-title">🔧 Equipo</div>
+                <div class="info-row">
+                    <div class="info-label">Marca / Modelo</div>
+                    <div class="info-value">${equipment.brand} ${equipment.model}</div>
+                </div>
+                ${equipment.btu ? `
+                <div class="info-row">
+                    <div class="info-label">Capacidad</div>
+                    <div class="info-value">${equipment.btu.toLocaleString()} BTU</div>
+                </div>` : ''}
+                <div class="info-row">
+                    <div class="info-label">Tipo de Servicio</div>
+                    <div class="info-value">${latestProService.type}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="section">
+                <div class="section-title">📊 Historial</div>
+                <div class="info-row">
+                    <div class="info-label">Total de Servicios</div>
+                    <div class="info-value">${services.length}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Servicios PRO</div>
+                    <div class="info-value">${services.filter(s => s.isPro).length}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    ${readings ? `
+    <div class="section">
+        <div class="section-title">📈 Lecturas Técnicas PRO</div>
+        <div class="metrics-grid">
+            ${readings.deltaT ? `
+            <div class="metric-card delta-highlight">
+                <div class="metric-value">${readings.deltaT.toFixed(1)}°C</div>
+                <div class="metric-label">Delta T</div>
+            </div>` : ''}
+            ${readings.voltage ? `
+            <div class="metric-card">
+                <div class="metric-value">${readings.voltage}V</div>
+                <div class="metric-label">Voltaje</div>
+            </div>` : ''}
+            ${readings.amperage ? `
+            <div class="metric-card">
+                <div class="metric-value">${readings.amperage}A</div>
+                <div class="metric-label">Amperaje</div>
+            </div>` : ''}
+            ${readings.suctionPressure ? `
+            <div class="metric-card">
+                <div class="metric-value">${readings.suctionPressure}</div>
+                <div class="metric-label">Presión Succión</div>
+            </div>` : ''}
+            ${readings.dischargePressure ? `
+            <div class="metric-card">
+                <div class="metric-value">${readings.dischargePressure}</div>
+                <div class="metric-label">Presión Descarga</div>
+            </div>` : ''}
+            ${readings.gasType ? `
+            <div class="metric-card">
+                <div class="metric-value">${readings.gasType}</div>
+                <div class="metric-label">Gas Refrigerante</div>
+            </div>` : ''}
+        </div>
+    </div>` : ''}
+
+    ${lastTech ? `
+    <div class="technician-box">
+        <div class="tech-avatar">👨‍🔧</div>
+        <div>
+            <div style="font-weight: bold;">${lastTech.displayName || lastTech.name || lastTech.alias}</div>
+            <div style="font-size: 12px; color: #92400e;">Técnico Certificado</div>
+        </div>
+    </div>` : ''}
+
+    <div class="qr-section">
+        <div style="font-weight: bold; color: #4338ca; margin-bottom: 8px;">📱 Historial Digital Verificable</div>
+        <div style="font-size: 12px; color: #6b7280;">
+            Este certificado corresponde a datos almacenados digitalmente.
+            <br/>Escanee el QR del equipo para acceder al historial completo actualizado.
+        </div>
+    </div>
+
+    <div class="footer">
+        <div>Certificado generado el ${new Date().toLocaleDateString('es-MX')} a las ${new Date().toLocaleTimeString('es-MX')}</div>
+        <div style="margin-top: 5px;">Powered by <strong>QRclima</strong> | qr.tesivil.com</div>
+    </div>
+</body>
+</html>`;
+
+        // Open in new window for printing
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+            printWindow.document.write(certificateHTML);
+            printWindow.document.close();
+        }
     };
 
     return (
         <button
-            onClick={handlePrint}
+            onClick={handleDownloadCertificate}
             className="no-print flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-5 rounded-xl font-bold shadow-lg hover:shadow-xl transition w-full mb-4"
         >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -702,6 +951,7 @@ export default function QRPublicView() {
                 if (equipData.lastServiceTechId || equipData.lastServiceTechAlias || equipData.lastServiceTechName) {
                     setLastTech({
                         name: equipData.lastServiceTechName,
+                        displayName: equipData.lastServiceTechDisplayName || equipData.lastServiceTechName,
                         alias: equipData.lastServiceTechAlias || 'Técnico',
                         rank: 'Técnico', // Default rank since we can't read from users
                         phone: equipData.lastServiceTechPhone,
@@ -859,7 +1109,7 @@ export default function QRPublicView() {
                                 {Icons.user}
                             </div>
                             <div className="flex-1">
-                                <p className="font-bold text-gray-800 text-lg">{lastTech.name || lastTech.alias}</p>
+                                <p className="font-bold text-gray-800 text-lg">{lastTech.displayName || lastTech.name || lastTech.alias}</p>
                                 <p className="text-sm text-gray-500 flex items-center gap-1">
                                     <span className={getRankDisplay(lastTech.rank).color}>
                                         {getRankDisplay(lastTech.rank).icon}

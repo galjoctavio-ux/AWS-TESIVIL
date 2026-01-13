@@ -42,11 +42,15 @@ export default function SettingsScreen() {
             const loadData = async () => {
                 if (!user) return;
                 try {
-                    // Load Profile for Base Location
+                    // Load Profile for Base Location and qrDisplayName
                     const profile = await getUserProfile(user.uid);
                     if (profile?.baseLat && profile?.baseLng) {
                         setBaseLat(profile.baseLat);
                         setBaseLng(profile.baseLng);
+                    }
+                    // Sync qrDisplayName from profile to settings
+                    if (profile?.qrDisplayName) {
+                        await updateSettings({ qrDisplayName: profile.qrDisplayName as any });
                     }
 
                     // Load Notification Preferences
@@ -257,6 +261,74 @@ export default function SettingsScreen() {
                                 </Text>
                             </View>
                         )}
+                    </View>
+                </View>
+
+                {/* QR Public Name Section */}
+                <View className="mb-6">
+                    <Text className="text-gray-500 font-medium text-sm mb-3 uppercase">
+                        Nombre en QR Público
+                    </Text>
+
+                    <View className="bg-white rounded-2xl border border-gray-100 p-4">
+                        <View className="flex-row items-center mb-4">
+                            <View className="bg-purple-100 w-10 h-10 rounded-xl items-center justify-center mr-3">
+                                <Ionicons name="qr-code" size={20} color="#9333EA" />
+                            </View>
+                            <View className="flex-1">
+                                <Text className="text-gray-800 font-bold">Mostrar en Hoja de Vida</Text>
+                                <Text className="text-gray-500 text-xs">
+                                    Elige qué nombre aparece públicamente
+                                </Text>
+                            </View>
+                        </View>
+
+                        <Text className="text-gray-600 text-sm mb-3">
+                            Cuando un cliente escanea el QR de un equipo, ¿qué nombre deseas mostrar?
+                        </Text>
+
+                        <View className="flex-row">
+                            {[
+                                { value: 'technician', label: 'Mi Nombre', icon: 'person' as const },
+                                { value: 'company', label: 'Mi Empresa', icon: 'business' as const },
+                            ].map(option => (
+                                <TouchableOpacity
+                                    key={option.value}
+                                    onPress={async () => {
+                                        if (user?.uid) {
+                                            // Update local settings first for immediate UI feedback
+                                            await updateSettings({ qrDisplayName: option.value as any });
+                                            // Then persist to Firestore
+                                            await updateUserProfile(user.uid, {
+                                                qrDisplayName: option.value as 'technician' | 'company'
+                                            });
+                                            Alert.alert('✅ Guardado', `Ahora aparecerá ${option.value === 'technician' ? 'tu nombre' : 'el nombre de tu empresa'} en los QRs.`);
+                                        }
+                                    }}
+                                    className={`flex-1 py-3 mx-1 rounded-xl items-center border-2 flex-row justify-center ${settings.qrDisplayName === option.value
+                                        ? 'bg-purple-600 border-purple-600'
+                                        : 'bg-white border-gray-200'
+                                        }`}
+                                >
+                                    <Ionicons
+                                        name={option.icon}
+                                        size={18}
+                                        color={settings.qrDisplayName === option.value ? 'white' : '#6B7280'}
+                                    />
+                                    <Text className={`font-bold ml-2 ${settings.qrDisplayName === option.value ? 'text-white' : 'text-gray-600'
+                                        }`}>
+                                        {option.label}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+
+                        <View className="bg-purple-50 p-3 rounded-xl mt-4 flex-row items-start">
+                            <Ionicons name="information-circle" size={16} color="#9333EA" />
+                            <Text className="text-purple-700 text-xs flex-1 ml-2">
+                                Esto afecta la sección "Técnico de Confianza" y las tarjetas de servicio en la hoja de vida del equipo.
+                            </Text>
+                        </View>
                     </View>
                 </View>
                 {/* Notification Settings Section */}

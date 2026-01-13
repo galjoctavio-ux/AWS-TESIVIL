@@ -63,7 +63,7 @@ export default function NewService() {
     const [notes, setNotes] = useState('');
     const [reminderEnabled, setReminderEnabled] = useState(false); // Default to false, will be set based on isPro
     const [isPro, setIsPro] = useState(false); // Track if user is PRO
-    const [techProfile, setTechProfile] = useState<{ phone?: string; alias?: string; fullName?: string } | null>(null); // For QR public view contact
+    const [techProfile, setTechProfile] = useState<{ phone?: string; alias?: string; fullName?: string; businessName?: string } | null>(null); // For QR public view contact
     const [customReminderMonths, setCustomReminderMonths] = useState(settings.reminderMonths || 6); // Custom reminder time per service
     const [capacityBTU, setCapacityBTU] = useState(''); // BTU capacity
 
@@ -203,7 +203,7 @@ export default function NewService() {
                         fullName: profile?.fullName,
                         fullProfile: profile
                     });
-                    setTechProfile({ phone: profile?.phone, alias: profile?.alias, fullName: profile?.fullName });
+                    setTechProfile({ phone: profile?.phone, alias: profile?.alias, fullName: profile?.fullName, businessName: profile?.businessName });
                 });
             }
             loadBrands();
@@ -417,11 +417,38 @@ export default function NewService() {
                 }
             }
 
+            // Upload PRO photos if in PRO mode
+            let uploadedProPhotos = { before: [] as string[], after: [] as string[], equipment: [] as string[] };
+            if (isProServiceMode) {
+                const { uploadServicePhotos } = await import('../../../services/image-service');
+                try {
+                    const [beforeUrls, afterUrls, equipmentUrls] = await Promise.all([
+                        proPhotos.before.length > 0 ? uploadServicePhotos(proPhotos.before) : Promise.resolve([]),
+                        proPhotos.after.length > 0 ? uploadServicePhotos(proPhotos.after) : Promise.resolve([]),
+                        proPhotos.equipment.length > 0 ? uploadServicePhotos(proPhotos.equipment) : Promise.resolve([]),
+                    ]);
+                    uploadedProPhotos = {
+                        before: beforeUrls,
+                        after: afterUrls,
+                        equipment: equipmentUrls,
+                    };
+                    console.log('PRO photos uploaded:', uploadedProPhotos);
+                } catch (error) {
+                    console.error('Error uploading PRO photos:', error);
+                    Alert.alert('Advertencia', 'No se pudieron subir algunas fotos PRO.');
+                }
+            }
+
             // Calculate next service date using custom reminder time selected by user
             const nextDate = new Date();
             nextDate.setMonth(nextDate.getMonth() + customReminderMonths);
 
             // Prepare payload to avoid undefined values which Firebase rejects
+            // Determine display name based on user preference (settings.qrDisplayName)
+            const displayNameForQr = settings.qrDisplayName === 'company' && techProfile?.businessName
+                ? techProfile.businessName
+                : techProfile?.fullName || techProfile?.alias || 'Técnico';
+
             const servicePayload: any = {
                 clientId: selectedClient.id,
                 clientName: selectedClient.name,  // For calendar display
@@ -431,6 +458,7 @@ export default function NewService() {
                 technicianId: user?.uid || '',
                 technicianAlias: techProfile?.alias || 'Técnico',  // For King of the Hill
                 technicianName: techProfile?.fullName || techProfile?.alias || 'Técnico', // Full Name
+                technicianDisplayName: displayNameForQr, // For QR public view - respects preference
                 technicianPhone: techProfile?.phone || '',          // For King of the Hill
                 equipmentId: preloadedEquipment?.id || null,        // For King of the Hill update
                 type: serviceType,
@@ -466,7 +494,7 @@ export default function NewService() {
                         deltaT: deltaT ? parseFloat(deltaT) : null,
                         gasType: proReadings.gasType,
                     },
-                    proPhotos: proPhotos,
+                    proPhotos: uploadedProPhotos,
                     proTimestamp: new Date(), // Exact timestamp for PRO data
                 }),
             };
@@ -1587,10 +1615,18 @@ export default function NewService() {
                 </View>
 
                 {/* EVIDENCE/PHOTOS */}
-                <View className="flex-row items-center mb-3">
+                <View className="flex-row items-center mb-2">
                     <Text className="text-lg font-bold text-gray-800">Evidencia</Text>
                     <Text className="text-xs text-gray-400 ml-2">(opcional, pero recomendada)</Text>
                 </View>
+                {isProServiceMode && (
+                    <View className="bg-indigo-50 p-3 rounded-xl mb-3 flex-row items-center">
+                        <Ionicons name="information-circle" size={18} color="#6366F1" />
+                        <Text className="text-indigo-700 text-xs flex-1 ml-2">
+                            Con Modo PRO activo, tendrás una sección de fotos estructuradas (antes/después/equipo) en el siguiente paso.
+                        </Text>
+                    </View>
+                )}
                 <ScrollView horizontal className="mb-6" showsHorizontalScrollIndicator={false}>
                     <TouchableOpacity
                         onPress={pickImage}
@@ -1735,7 +1771,18 @@ export default function NewService() {
 
         // Normal ranges (approximate)
         const deltaTStatus = deltaT ? getValueStatus(deltaT, 8, 15) : 'ok';
-        const voltageStatus = getValueStatus(proReadings.voltage, 200, 240);
+        // Voltage: accept both 110V (100-130) and 220V (200-250) ranges
+        const getVoltageStatus = (value: string): 'ok' | 'warning' | 'error' => {
+            if (!value) return 'ok';
+            const num = parseFloat(value);
+            if (isNaN(num)) return 'ok';
+            // 110V range (100-130) or 220V range (200-250)
+            if ((num >= 100 && num <= 130) || (num >= 200 && num <= 250)) return 'ok';
+            // Warning zones (slightly outside)
+            if ((num >= 90 && num <= 140) || (num >= 180 && num <= 260)) return 'warning';
+            return 'error';
+        };
+        const voltageStatus = getVoltageStatus(proReadings.voltage);
         const amperageStatus = getValueStatus(proReadings.amperage, 3, 15);
 
         return (
