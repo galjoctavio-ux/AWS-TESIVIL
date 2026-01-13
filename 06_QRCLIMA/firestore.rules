@@ -6,7 +6,13 @@ service cloud.firestore {
     // USUARIOS
     // ============================================
     match /users/{userId} {
-      allow read, write: if request.auth != null 
+      // Lectura: el propio usuario puede leer todo,
+      // O lectura pública (para QR web view que necesita leer qrDisplayName, businessName, fullName)
+      allow read: if request.auth != null && request.auth.uid == userId
+                  || true; // Allow public read for QR web display name preference
+      
+      // Escritura: solo el propio usuario
+      allow write: if request.auth != null 
         && request.auth.uid == userId;
       
       // Subcollection: Training progress

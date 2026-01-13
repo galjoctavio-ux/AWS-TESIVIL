@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator, TextInput } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -32,6 +32,15 @@ export default function SettingsScreen() {
     const [baseLng, setBaseLng] = useState<number | null>(null);
     const [loadingLocation, setLoadingLocation] = useState(false);
 
+    // Profile Data State
+    const [fullName, setFullName] = useState('');
+    const [alias, setAlias] = useState('');
+    const [businessName, setBusinessName] = useState('');
+    const [phone, setPhone] = useState('');
+    const [city, setCity] = useState('');
+    const [profileLoading, setProfileLoading] = useState(true);
+    const [profileDirty, setProfileDirty] = useState(false);
+
     // Notification Preferences State
     const [notifPrefs, setNotifPrefs] = useState<NotificationPreferences>(DEFAULT_NOTIFICATION_PREFERENCES);
     const [loadingPrefs, setLoadingPrefs] = useState(false);
@@ -41,6 +50,7 @@ export default function SettingsScreen() {
         useCallback(() => {
             const loadData = async () => {
                 if (!user) return;
+                setProfileLoading(true);
                 try {
                     // Load Profile for Base Location and qrDisplayName
                     const profile = await getUserProfile(user.uid);
@@ -53,11 +63,20 @@ export default function SettingsScreen() {
                         await updateSettings({ qrDisplayName: profile.qrDisplayName as any });
                     }
 
+                    // Load profile data for editing
+                    setFullName(profile?.fullName || '');
+                    setAlias(profile?.alias || '');
+                    setBusinessName(profile?.businessName || '');
+                    setPhone(profile?.phone || '');
+                    setCity(profile?.city || '');
+
                     // Load Notification Preferences
                     const prefs = await getNotificationPreferences(user.uid);
                     setNotifPrefs(prefs);
                 } catch (error) {
                     console.error('Error loading settings data:', error);
+                } finally {
+                    setProfileLoading(false);
                 }
             };
             loadData();
@@ -71,6 +90,27 @@ export default function SettingsScreen() {
             Alert.alert('Guardado', `El recordatorio ahora es de ${months} ${months === 1 ? 'mes' : 'meses'}`);
         } catch (error) {
             Alert.alert('Error', 'No se pudo guardar la configuración');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleSaveProfile = async () => {
+        if (!user) return;
+        try {
+            setSaving(true);
+            await updateUserProfile(user.uid, {
+                fullName: fullName.trim(),
+                alias: alias.trim(),
+                businessName: businessName.trim(),
+                phone: phone.trim(),
+                city: city.trim(),
+            });
+            setProfileDirty(false);
+            Alert.alert('✅ Guardado', 'Tus datos se actualizaron correctamente.');
+        } catch (error) {
+            console.error('Error saving profile:', error);
+            Alert.alert('Error', 'No se pudieron guardar los datos.');
         } finally {
             setSaving(false);
         }
@@ -141,6 +181,104 @@ export default function SettingsScreen() {
             </View>
 
             <ScrollView className="flex-1 px-4 pt-6" showsVerticalScrollIndicator={false}>
+                {/* Profile Data Section */}
+                <View className="mb-6">
+                    <Text className="text-gray-500 font-medium text-sm mb-3 uppercase">
+                        Mis Datos
+                    </Text>
+
+                    <View className="bg-white rounded-2xl border border-gray-100 p-4">
+                        <View className="flex-row items-center mb-4">
+                            <View className="bg-indigo-100 w-10 h-10 rounded-xl items-center justify-center mr-3">
+                                <Ionicons name="person" size={20} color="#6366F1" />
+                            </View>
+                            <View className="flex-1">
+                                <Text className="text-gray-800 font-bold">Información Personal</Text>
+                                <Text className="text-gray-500 text-xs">
+                                    El correo no se puede modificar
+                                </Text>
+                            </View>
+                        </View>
+
+                        {profileLoading ? (
+                            <ActivityIndicator size="small" color="#6366F1" />
+                        ) : (
+                            <>
+                                {/* Full Name */}
+                                <View className="mb-3">
+                                    <Text className="text-xs text-gray-500 mb-1">Nombre Completo</Text>
+                                    <TextInput
+                                        className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
+                                        placeholder="Tu nombre completo"
+                                        value={fullName}
+                                        onChangeText={(t) => { setFullName(t); setProfileDirty(true); }}
+                                    />
+                                </View>
+
+                                {/* Alias */}
+                                <View className="mb-3">
+                                    <Text className="text-xs text-gray-500 mb-1">Alias / Apodo</Text>
+                                    <TextInput
+                                        className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
+                                        placeholder="Ej: El Frío Master"
+                                        value={alias}
+                                        onChangeText={(t) => { setAlias(t); setProfileDirty(true); }}
+                                    />
+                                </View>
+
+                                {/* Business Name */}
+                                <View className="mb-3">
+                                    <Text className="text-xs text-gray-500 mb-1">Nombre de Empresa</Text>
+                                    <TextInput
+                                        className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
+                                        placeholder="Ej: Climas Pro S.A."
+                                        value={businessName}
+                                        onChangeText={(t) => { setBusinessName(t); setProfileDirty(true); }}
+                                    />
+                                </View>
+
+                                {/* Phone */}
+                                <View className="mb-3">
+                                    <Text className="text-xs text-gray-500 mb-1">Teléfono de Contacto</Text>
+                                    <TextInput
+                                        className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
+                                        placeholder="Ej: 55 1234 5678"
+                                        value={phone}
+                                        onChangeText={(t) => { setPhone(t); setProfileDirty(true); }}
+                                        keyboardType="phone-pad"
+                                    />
+                                </View>
+
+                                {/* City */}
+                                <View className="mb-4">
+                                    <Text className="text-xs text-gray-500 mb-1">Ciudad</Text>
+                                    <TextInput
+                                        className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
+                                        placeholder="Ej: Monterrey, NL"
+                                        value={city}
+                                        onChangeText={(t) => { setCity(t); setProfileDirty(true); }}
+                                    />
+                                </View>
+
+                                {/* Save Button */}
+                                <TouchableOpacity
+                                    onPress={handleSaveProfile}
+                                    disabled={!profileDirty || saving}
+                                    className={`py-3 rounded-xl items-center ${profileDirty && !saving ? 'bg-indigo-600' : 'bg-gray-300'}`}
+                                >
+                                    {saving ? (
+                                        <ActivityIndicator size="small" color="white" />
+                                    ) : (
+                                        <Text className={`font-bold ${profileDirty ? 'text-white' : 'text-gray-500'}`}>
+                                            💾 Guardar Datos
+                                        </Text>
+                                    )}
+                                </TouchableOpacity>
+                            </>
+                        )}
+                    </View>
+                </View>
+
                 {/* Base Location Section */}
                 <View className="mb-6">
                     <Text className="text-gray-500 font-medium text-sm mb-3 uppercase">

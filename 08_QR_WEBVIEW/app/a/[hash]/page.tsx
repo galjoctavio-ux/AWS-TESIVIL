@@ -554,6 +554,66 @@ function DownloadCertificateButton({ equipment, services, lastTech }: {
 
     const latestProService = services.find(s => s.isPro);
 
+    // Generate Delta T chart data
+    const proServicesForChart = services
+        .filter(s => s.isPro && s.proReadings?.deltaT)
+        .slice(0, 10) // Last 10 max
+        .reverse(); // Oldest first
+
+    const generateDeltaTChartSVG = (): string => {
+        if (proServicesForChart.length < 2) return '';
+
+        const deltaTValues = proServicesForChart.map(s => s.proReadings!.deltaT!);
+        const maxValue = Math.max(...deltaTValues, 15);
+        const minValue = Math.min(...deltaTValues, 8);
+        const range = maxValue - minValue || 1;
+
+        const width = 400;
+        const height = 150;
+        const padding = 30;
+        const chartWidth = width - padding * 2;
+        const chartHeight = height - padding * 2;
+
+        // Generate points
+        const points = proServicesForChart.map((service, idx) => {
+            const x = padding + (idx / (proServicesForChart.length - 1)) * chartWidth;
+            const normalizedY = (service.proReadings!.deltaT! - minValue) / range;
+            const y = height - padding - normalizedY * chartHeight;
+            return { x, y, value: service.proReadings!.deltaT! };
+        });
+
+        // Create path
+        const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+
+        // Create gradient area
+        const areaD = `M ${points[0].x} ${height - padding} ${pathD} L ${points[points.length - 1].x} ${height - padding} Z`;
+
+        return `
+        <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" style="display: block; margin: 0 auto;">
+            <defs>
+                <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#6366f1;stop-opacity:0.3" />
+                    <stop offset="100%" style="stop-color:#6366f1;stop-opacity:0.05" />
+                </linearGradient>
+            </defs>
+            <!-- Grid lines -->
+            <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${height - padding}" stroke="#e5e7eb" stroke-width="1"/>
+            <line x1="${padding}" y1="${height - padding}" x2="${width - padding}" y2="${height - padding}" stroke="#e5e7eb" stroke-width="1"/>
+            <!-- Optimal zone (8-15°C) -->
+            <rect x="${padding}" y="${height - padding - ((15 - minValue) / range) * chartHeight}" width="${chartWidth}" height="${((15 - 8) / range) * chartHeight}" fill="#10b981" fill-opacity="0.1" />
+            <!-- Area fill -->
+            <path d="${areaD}" fill="url(#chartGradient)" />
+            <!-- Line -->
+            <path d="${pathD}" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Points -->
+            ${points.map(p => `<circle cx="${p.x}" cy="${p.y}" r="4" fill="#6366f1" stroke="white" stroke-width="2"/>`).join('\n')}
+            <!-- Labels -->
+            <text x="${width / 2}" y="${height - 5}" text-anchor="middle" font-size="10" fill="#9ca3af">Historial de Servicios →</text>
+            <text x="5" y="${padding + 5}" font-size="10" fill="#9ca3af">${maxValue.toFixed(0)}°</text>
+            <text x="5" y="${height - padding}" font-size="10" fill="#9ca3af">${minValue.toFixed(0)}°</text>
+        </svg>`;
+    };
+
     const handleDownloadCertificate = () => {
         if (!equipment || !latestProService) return;
 
@@ -562,6 +622,7 @@ function DownloadCertificateButton({ equipment, services, lastTech }: {
             : new Date().toLocaleDateString('es-MX');
 
         const readings = latestProService.proReadings;
+        const deltaTChartSVG = generateDeltaTChartSVG();
 
         const certificateHTML = `
 <!DOCTYPE html>
@@ -770,6 +831,17 @@ function DownloadCertificateButton({ equipment, services, lastTech }: {
         </div>
     </div>` : ''}
 
+    ${deltaTChartSVG ? `
+    <div class="section">
+        <div class="section-title">📊 Evolución del Rendimiento (Delta T)</div>
+        <div style="text-align: center; padding: 10px 0;">
+            ${deltaTChartSVG}
+        </div>
+        <div style="text-align: center; font-size: 11px; color: #6b7280; margin-top: 10px;">
+            🟢 Zona óptima: 8°C - 15°C | Muestra los últimos servicios PRO
+        </div>
+    </div>` : ''}
+
     ${lastTech ? `
     <div class="technician-box">
         <div class="tech-avatar">👨‍🔧</div>
@@ -946,12 +1018,39 @@ export default function QRPublicView() {
                 }
 
                 // Use technician data stored directly in equipment document
-                // This avoids needing to read from /users collection (which is blocked)
-                // Show technician section if we have ANY info (name, alias, or phone)
+                // BUT also try to read the technician's profile for real-time display name preference
                 if (equipData.lastServiceTechId || equipData.lastServiceTechAlias || equipData.lastServiceTechName) {
+                    let displayName = equipData.lastServiceTechDisplayName || equipData.lastServiceTechName;
+
+                    // Try to read technician profile for real-time qrDisplayName preference
+                    if (equipData.lastServiceTechId) {
+                        try {
+                            const techRef = doc(db, 'users', equipData.lastServiceTechId);
+                            const techSnap = await getDoc(techRef);
+                            if (techSnap.exists()) {
+                                const techProfile = techSnap.data();
+                                // Apply real-time display name preference
+                                if (techProfile.qrDisplayName === 'company' && techProfile.businessName) {
+                                    displayName = techProfile.businessName;
+                                } else if (techProfile.qrDisplayName === 'technician' || !techProfile.qrDisplayName) {
+                                    displayName = techProfile.fullName || techProfile.alias || equipData.lastServiceTechName;
+                                }
+                                console.log('Real-time tech profile loaded:', {
+                                    qrDisplayName: techProfile.qrDisplayName,
+                                    businessName: techProfile.businessName,
+                                    fullName: techProfile.fullName,
+                                    resolvedDisplayName: displayName
+                                });
+                            }
+                        } catch (techErr) {
+                            console.warn('Could not load tech profile (using fallback):', techErr);
+                            // Fallback to stored values - this is OK
+                        }
+                    }
+
                     setLastTech({
                         name: equipData.lastServiceTechName,
-                        displayName: equipData.lastServiceTechDisplayName || equipData.lastServiceTechName,
+                        displayName: displayName,
                         alias: equipData.lastServiceTechAlias || 'Técnico',
                         rank: 'Técnico', // Default rank since we can't read from users
                         phone: equipData.lastServiceTechPhone,
@@ -959,6 +1058,7 @@ export default function QRPublicView() {
                     });
                     console.log('Technician data loaded:', {
                         name: equipData.lastServiceTechName,
+                        displayName: displayName,
                         alias: equipData.lastServiceTechAlias,
                         phone: equipData.lastServiceTechPhone
                     });
