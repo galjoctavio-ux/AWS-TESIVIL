@@ -1,7 +1,7 @@
 /**
  * Sync Chats - Chat Analyzer
  * Sincroniza mensajes de Evolution API a Supabase
- * CORREGIDO: Rutas de API actualizadas y mejor manejo de IDs
+ * CORREGIDO: Ajustado para usar rutas clásicas (findContacts/findChats)
  */
 
 import axios from 'axios';
@@ -34,23 +34,23 @@ export const syncChats = async (): Promise<void> => {
         let targets: any[] = [];
 
         try {
-            // INTENTO 1: Buscar contactos (Ruta estándar corregida)
-            const res = await api.post(`/contact/find/${EVO_INSTANCE}`, {
+            // INTENTO 1: Ruta Clásica (Más probable que funcione en tu versión)
+            const res = await api.post(`/contact/findContacts/${EVO_INSTANCE}`, {
                 where: {}
             });
             targets = Array.isArray(res.data) ? res.data : [];
-            console.log(`✅ ${targets.length} contactos encontrados via /contact/find`);
+            console.log(`✅ ${targets.length} contactos encontrados via /contact/findContacts`);
         } catch (e: any) {
-            console.log('⚠️ Fallback a chat/find...');
+            console.log(`⚠️ Fallo en contactos (${e.response?.status || e.code}), probando chats...`);
             try {
-                // INTENTO 2: Buscar chats activos
-                const resChat = await api.post(`/chat/find/${EVO_INSTANCE}`, { where: {} });
+                // INTENTO 2: Ruta de Chats Clásica
+                const resChat = await api.post(`/chat/findChats/${EVO_INSTANCE}`, { where: {} });
                 targets = Array.isArray(resChat.data) ? resChat.data : [];
-                console.log(`✅ ${targets.length} chats encontrados via /chat/find`);
+                console.log(`✅ ${targets.length} chats encontrados via /chat/findChats`);
             } catch (errChat: any) {
-                console.error('❌ No se pudo obtener contactos ni chats desde Evolution API');
-                console.error(`   URL: ${EVO_URL}, Instance: ${EVO_INSTANCE}`);
-                console.error(`   Error: ${errChat.message}`);
+                console.error('❌ No se pudo obtener datos de Evolution API');
+                console.error(`   URL: ${EVO_URL}`);
+                console.error(`   Error: ${errChat.response?.status} - ${errChat.response?.statusText || errChat.message}`);
                 return;
             }
         }
@@ -75,9 +75,7 @@ export const syncChats = async (): Promise<void> => {
 
             let whatsappId = rawId.split('@')[0];
 
-            // Fix México: Si viene como 521XXXXXXXXXX (13 digitos), lo pasamos a 10 digitos 
-            // O a formato internacional 52XXXXXXXXXX según tu preferencia.
-            // Tu código original usaba substring(3) -> dejándolo en 10 dígitos. Mantenemos eso.
+            // Fix México: 521 -> 52 (o recortar a 10 dígitos si prefieres)
             if (whatsappId.startsWith('521') && whatsappId.length === 13) {
                 whatsappId = whatsappId.substring(3);
             }
@@ -85,7 +83,7 @@ export const syncChats = async (): Promise<void> => {
             const nombre = item.pushName || item.name || item.notify || item.verifiedName || whatsappId;
 
             try {
-                // Buscar o crear cliente
+                // Buscar o crear cliente en Supabase
                 let clienteId = null;
                 const { data: clientData } = await supabaseAdmin
                     .from('clientes')
@@ -137,7 +135,7 @@ export const syncChats = async (): Promise<void> => {
                         if (!content) continue;
 
                         let timestamp = msg.messageTimestamp;
-                        // Ajuste de timestamp si viene en segundos en lugar de ms
+                        // Ajuste de timestamp
                         if (typeof timestamp === 'number' && timestamp < 10000000000) timestamp *= 1000;
 
                         msjsParaGuardar.push({
@@ -157,7 +155,7 @@ export const syncChats = async (): Promise<void> => {
                     }
                 }
 
-                await delay(50); // Pequeña pausa para no saturar
+                await delay(50); // Pequeña pausa
             } catch (error: any) {
                 errorCount++;
             }
