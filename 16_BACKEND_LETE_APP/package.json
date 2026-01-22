@@ -1,0 +1,24 @@
+{
+    "name": "lete-chat-analyzer",
+    "version": "1.0.0",
+    "description": "Cron job para análisis de chats con IA (Luz en tu Espacio)",
+    "main": "dist/daily_job.js",
+    "scripts": {
+        "build": "tsc",
+        "start": "node dist/daily_job.js",
+        "dev": "ts-node src/daily_job.ts",
+        "sync": "ts-node src/sync_chats.ts",
+        "analyze": "ts-node src/analyze_chats.ts"
+    },
+    "dependencies": {
+        "@supabase/supabase-js": "^2.45.0",
+        "axios": "^1.6.0",
+        "dotenv": "^16.4.0",
+        "groq-sdk": "^0.8.0"
+    },
+    "devDependencies": {
+        "@types/node": "^20.11.0",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.3.0"
+    }
+}
