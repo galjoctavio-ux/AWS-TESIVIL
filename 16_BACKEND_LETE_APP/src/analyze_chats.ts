@@ -109,7 +109,7 @@ export const analyzeAllChats = async (): Promise<void> => {
                     .eq('fecha', new Date().toISOString().split('T')[0])
                     .maybeSingle();
 
-                // Analizar con IA
+                // Analizar con IA (La función ahora maneja sus propios reintentos internamente)
                 const result: AnalysisResult = await analyzeChat(
                     cliente.nombre || 'Cliente',
                     mensajes.reverse(), // Orden cronológico

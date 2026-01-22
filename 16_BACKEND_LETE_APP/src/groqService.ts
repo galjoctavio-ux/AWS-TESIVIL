@@ -1,6 +1,7 @@
 /**
  * Groq Service - Chat Analyzer
  * Servicio de IA con rotación de API keys
+ * CORREGIDO: Modelo actualizado y protección de recursión
  */
 
 import Groq from 'groq-sdk';
@@ -62,11 +63,13 @@ export interface AnalysisResult {
 
 /**
  * Analiza un historial de chat y clasifica la intención
+ * @param retryCount - Contador interno para evitar bucles infinitos
  */
 export const analyzeChat = async (
     clienteNombre: string,
     mensajes: { role: string; content: string; created_at: string }[],
-    citaHoy?: { hora: string } | null
+    citaHoy?: { hora: string } | null,
+    retryCount = 0
 ): Promise<AnalysisResult> => {
     const groq = getGroqClient();
 
@@ -104,7 +107,8 @@ Analiza y clasifica:`;
 
     try {
         const completion = await groq.chat.completions.create({
-            model: 'llama-3.1-70b-versatile',
+            // CORRECCIÓN: Modelo actualizado a versión vigente
+            model: 'llama-3.3-70b-versatile',
             messages: [
                 { role: 'system', content: systemPrompt },
                 { role: 'user', content: userPrompt }
@@ -127,11 +131,14 @@ Analiza y clasifica:`;
         };
     } catch (error: any) {
         console.error(`❌ Error en Groq API:`, error.message);
-        // Si falla, intentamos con otra key
-        if (apiKeys.length > 1) {
-            console.log('🔄 Intentando con otra API key...');
-            return analyzeChat(clienteNombre, mensajes, citaHoy);
+
+        // CORRECCIÓN: Evitar reintentos si el error es de configuración (400)
+        // O si ya probamos todas las llaves
+        if (error.status !== 400 && retryCount < apiKeys.length - 1) {
+            console.log(`🔄 Intentando con llave ${currentKeyIndex + 1}...`);
+            return analyzeChat(clienteNombre, mensajes, citaHoy, retryCount + 1);
         }
+
         return {
             intent: 'sin_accion',
             confidence: 0,
