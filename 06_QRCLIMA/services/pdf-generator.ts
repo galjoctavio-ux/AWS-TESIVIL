@@ -101,6 +101,7 @@ export const generateServiceReport = async (data: ReportData): Promise<void> => 
                 line-height: 1.5;
                 margin: 0;
                 padding: 40px 50px;
+                padding-bottom: 140px;
                 font-size: 11px;
             }
             
@@ -1013,6 +1014,15 @@ export const generateCotizadorPDF = async (data: CotizadorPDFData): Promise<void
     const branding = technicianProfile?.branding;
     const primaryColor = isPro && branding?.primaryColor ? branding.primaryColor : '#2563EB';
 
+    const showDownPayment = !!branding?.cotizadorProShowDownPayment && !!(branding?.cotizadorProDownPaymentPercent || '').trim();
+    const showTransfer = !!branding?.cotizadorProShowTransfer && !!(
+        (branding?.cotizadorProTransferBank || '').trim() ||
+        (branding?.cotizadorProTransferName || '').trim() ||
+        (branding?.cotizadorProTransferAccount || '').trim() ||
+        (branding?.cotizadorProTransferClabe || '').trim()
+    );
+    const showValidity = !!branding?.cotizadorProShowValidity && !!(branding?.cotizadorProValidityText || '').trim();
+
     const currentDate = new Date().toLocaleDateString('es-MX', {
         year: 'numeric',
         month: 'long',
@@ -1045,6 +1055,7 @@ export const generateCotizadorPDF = async (data: CotizadorPDFData): Promise<void
             line-height: 1.5;
             margin: 0;
             padding: 40px 50px;
+            padding-bottom: 140px;
             font-size: 11px;
         }
         
@@ -1222,15 +1233,38 @@ export const generateCotizadorPDF = async (data: CotizadorPDFData): Promise<void
             border-radius: 0 8px 8px 0; 
             padding: 12px 14px; 
             margin-top: 15px; 
+            page-break-inside: avoid;
         }
         .notes-title { color: #92400E; font-weight: bold; font-size: 10px; margin-bottom: 4px; }
         .notes-text { color: #78350F; font-size: 11px; line-height: 1.4; }
+
+        .payment-box {
+            background: #F9FAFB;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 14px;
+            margin-top: 15px;
+            page-break-inside: avoid;
+        }
+        .payment-title {
+            color: ${primaryColor};
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        .payment-row { color: #374151; font-size: 11px; margin-bottom: 4px; }
+        .payment-row strong { color: #111827; }
         
         /* Signatures */
         .signatures-container {
             display: flex;
             justify-content: center;
             margin-top: 40px;
+            margin-bottom: 40px;
             page-break-inside: avoid;
         }
         .signature-box {
@@ -1402,6 +1436,21 @@ export const generateCotizadorPDF = async (data: CotizadorPDFData): Promise<void
         <div style="color: #9CA3AF; font-size: 10px; margin-top: 8px;">* Precios con IVA incluido</div>
     </div>
 
+    ${(showDownPayment || showTransfer || showValidity) ? `
+    <div class="payment-box">
+        <div class="payment-title">Datos de Pago</div>
+        ${showDownPayment ? `<div class="payment-row"><strong>Anticipo:</strong> ${String(branding?.cotizadorProDownPaymentPercent || '').trim()}%</div>` : ''}
+        ${showValidity ? `<div class="payment-row"><strong>Vigencia:</strong> ${String(branding?.cotizadorProValidityText || '').trim()}</div>` : ''}
+        ${showTransfer ? `
+            <div class="payment-row"><strong>Transferencia:</strong></div>
+            ${(branding?.cotizadorProTransferBank || '').trim() ? `<div class="payment-row">Banco: ${String(branding?.cotizadorProTransferBank || '').trim()}</div>` : ''}
+            ${(branding?.cotizadorProTransferName || '').trim() ? `<div class="payment-row">Nombre/Razón social: ${String(branding?.cotizadorProTransferName || '').trim()}</div>` : ''}
+            ${(branding?.cotizadorProTransferAccount || '').trim() ? `<div class="payment-row">Cuenta: ${String(branding?.cotizadorProTransferAccount || '').trim()}</div>` : ''}
+            ${(branding?.cotizadorProTransferClabe || '').trim() ? `<div class="payment-row">CLABE: ${String(branding?.cotizadorProTransferClabe || '').trim()}</div>` : ''}
+        ` : ''}
+    </div>
+    ` : ''}
+
     <!-- Notes -->
     ${quote.notes ? `
     <div class="notes">
@@ -1419,7 +1468,7 @@ export const generateCotizadorPDF = async (data: CotizadorPDFData): Promise<void
         }
             <div class="signature-line">
                 Técnico Responsable<br/>
-                <span class="signature-name">${technicianProfile?.businessName || technicianProfile?.fullName || 'Técnico Certificado'}</span>
+                <span class="signature-name">${technicianProfile?.fullName || technicianProfile?.businessName || 'Técnico Certificado'}</span>
             </div>
         </div>
     </div>

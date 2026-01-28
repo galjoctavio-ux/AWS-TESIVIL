@@ -277,7 +277,7 @@ export default function AddConceptsScreen() {
                             <Text className="text-gray-400 text-sm">No tienes conceptos guardados</Text>
                         </View>
                     ) : (
-                        concepts.slice(0, 5).map((concept, index) => (
+                        concepts.map((concept, index) => (
                             <TouchableOpacity
                                 key={concept.id}
                                 onPress={() => addLocalConcept(concept)}

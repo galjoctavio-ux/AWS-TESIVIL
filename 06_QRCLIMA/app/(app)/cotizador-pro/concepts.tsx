@@ -221,7 +221,7 @@ export default function ConceptsProScreen() {
                         <TouchableOpacity
                             className="p-2 mr-1"
                             onPress={() => router.push({
-                                pathname: '/(app)/cotizador-pro/add-concept',
+                                pathname: '/(app)/cotizador/add-concept',
                                 params: { editId: item.id }
                             })}
                         >

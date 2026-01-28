@@ -25,6 +25,18 @@ export interface BrandingConfig {
     secondaryColor?: string;        // Hex color for accents
     footerText?: string;            // Custom footer ("Mi Empresa - Tel: 555-1234")
     showQRclimaWatermark?: boolean; // Default true, PRO+ can hide
+
+    cotizadorProShowDownPayment?: boolean;
+    cotizadorProDownPaymentPercent?: string;
+
+    cotizadorProShowTransfer?: boolean;
+    cotizadorProTransferBank?: string;
+    cotizadorProTransferName?: string;
+    cotizadorProTransferAccount?: string;
+    cotizadorProTransferClabe?: string;
+
+    cotizadorProShowValidity?: boolean;
+    cotizadorProValidityText?: string;
 }
 
 // Profile Achievements - Logros de primera vez

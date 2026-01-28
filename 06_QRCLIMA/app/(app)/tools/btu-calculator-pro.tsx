@@ -415,7 +415,11 @@ export default function BTUCalculatorPRO() {
     // ========================================================================
 
     const renderStep1 = () => (
-        <ScrollView className="flex-1 bg-slate-50" showsVerticalScrollIndicator={false}>
+        <ScrollView
+            className="flex-1 bg-slate-50"
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: insets.bottom + 96 }}
+        >
             <View className="p-4">
                 {/* Info Box */}
                 <View className="bg-blue-50 p-4 rounded-xl mb-6 border border-blue-100">

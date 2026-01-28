@@ -37,6 +37,18 @@ export default function BrandingScreen() {
         secondaryColor: '#1D4ED8',
         footerText: '',
         showQRclimaWatermark: true,
+
+        cotizadorProShowDownPayment: false,
+        cotizadorProDownPaymentPercent: '',
+
+        cotizadorProShowTransfer: false,
+        cotizadorProTransferBank: '',
+        cotizadorProTransferName: '',
+        cotizadorProTransferAccount: '',
+        cotizadorProTransferClabe: '',
+
+        cotizadorProShowValidity: false,
+        cotizadorProValidityText: '',
     });
 
     useEffect(() => {
@@ -330,6 +342,132 @@ export default function BrandingScreen() {
                         <Text className="text-gray-400 text-xs text-right mt-1">
                             {branding.footerText?.length || 0}/100
                         </Text>
+                    </View>
+
+                    <View className="bg-white p-4 rounded-xl border border-gray-200 mb-4">
+                        <View className="flex-row items-center mb-3">
+                            <Ionicons name="cash-outline" size={20} color="#374151" />
+                            <Text className="text-lg font-bold text-gray-800 ml-2">Cotización PRO</Text>
+                        </View>
+
+                        <View className="bg-gray-50 rounded-xl p-4 border border-gray-200 mb-3">
+                            <View className="flex-row items-center justify-between">
+                                <View className="flex-1 mr-3">
+                                    <Text className="text-gray-800 font-bold">% de anticipo</Text>
+                                    <Text className="text-gray-500 text-sm">Opcional en el PDF</Text>
+                                </View>
+                                <TouchableOpacity
+                                    onPress={() => setBranding(prev => ({
+                                        ...prev,
+                                        cotizadorProShowDownPayment: !prev.cotizadorProShowDownPayment,
+                                    }))}
+                                    className={`w-14 h-8 rounded-full p-1 ${branding.cotizadorProShowDownPayment ? 'bg-blue-600' : 'bg-gray-300'
+                                        }`}
+                                >
+                                    <View
+                                        className={`w-6 h-6 rounded-full bg-white ${branding.cotizadorProShowDownPayment ? 'ml-auto' : 'mr-auto'
+                                            }`}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+
+                            {branding.cotizadorProShowDownPayment && (
+                                <View className="mt-3">
+                                    <TextInput
+                                        className="bg-white p-4 rounded-xl border border-gray-200"
+                                        placeholder="Ej: 50"
+                                        value={branding.cotizadorProDownPaymentPercent || ''}
+                                        onChangeText={(text) => setBranding(prev => ({ ...prev, cotizadorProDownPaymentPercent: text }))}
+                                        keyboardType="numeric"
+                                    />
+                                </View>
+                            )}
+                        </View>
+
+                        <View className="bg-gray-50 rounded-xl p-4 border border-gray-200 mb-3">
+                            <View className="flex-row items-center justify-between">
+                                <View className="flex-1 mr-3">
+                                    <Text className="text-gray-800 font-bold">Datos de transferencia</Text>
+                                    <Text className="text-gray-500 text-sm">Opcional en el PDF</Text>
+                                </View>
+                                <TouchableOpacity
+                                    onPress={() => setBranding(prev => ({
+                                        ...prev,
+                                        cotizadorProShowTransfer: !prev.cotizadorProShowTransfer,
+                                    }))}
+                                    className={`w-14 h-8 rounded-full p-1 ${branding.cotizadorProShowTransfer ? 'bg-blue-600' : 'bg-gray-300'
+                                        }`}
+                                >
+                                    <View
+                                        className={`w-6 h-6 rounded-full bg-white ${branding.cotizadorProShowTransfer ? 'ml-auto' : 'mr-auto'
+                                            }`}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+
+                            {branding.cotizadorProShowTransfer && (
+                                <View className="mt-3">
+                                    <TextInput
+                                        className="bg-white p-4 rounded-xl border border-gray-200 mb-2"
+                                        placeholder="Banco"
+                                        value={branding.cotizadorProTransferBank || ''}
+                                        onChangeText={(text) => setBranding(prev => ({ ...prev, cotizadorProTransferBank: text }))}
+                                    />
+                                    <TextInput
+                                        className="bg-white p-4 rounded-xl border border-gray-200 mb-2"
+                                        placeholder="Nombre o razón social"
+                                        value={branding.cotizadorProTransferName || ''}
+                                        onChangeText={(text) => setBranding(prev => ({ ...prev, cotizadorProTransferName: text }))}
+                                    />
+                                    <TextInput
+                                        className="bg-white p-4 rounded-xl border border-gray-200 mb-2"
+                                        placeholder="Cuenta"
+                                        value={branding.cotizadorProTransferAccount || ''}
+                                        onChangeText={(text) => setBranding(prev => ({ ...prev, cotizadorProTransferAccount: text }))}
+                                    />
+                                    <TextInput
+                                        className="bg-white p-4 rounded-xl border border-gray-200"
+                                        placeholder="CLABE"
+                                        value={branding.cotizadorProTransferClabe || ''}
+                                        onChangeText={(text) => setBranding(prev => ({ ...prev, cotizadorProTransferClabe: text }))}
+                                        keyboardType="numeric"
+                                    />
+                                </View>
+                            )}
+                        </View>
+
+                        <View className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                            <View className="flex-row items-center justify-between">
+                                <View className="flex-1 mr-3">
+                                    <Text className="text-gray-800 font-bold">Vigencia de la cotización</Text>
+                                    <Text className="text-gray-500 text-sm">Opcional en el PDF</Text>
+                                </View>
+                                <TouchableOpacity
+                                    onPress={() => setBranding(prev => ({
+                                        ...prev,
+                                        cotizadorProShowValidity: !prev.cotizadorProShowValidity,
+                                    }))}
+                                    className={`w-14 h-8 rounded-full p-1 ${branding.cotizadorProShowValidity ? 'bg-blue-600' : 'bg-gray-300'
+                                        }`}
+                                >
+                                    <View
+                                        className={`w-6 h-6 rounded-full bg-white ${branding.cotizadorProShowValidity ? 'ml-auto' : 'mr-auto'
+                                            }`}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+
+                            {branding.cotizadorProShowValidity && (
+                                <View className="mt-3">
+                                    <TextInput
+                                        className="bg-white p-4 rounded-xl border border-gray-200"
+                                        placeholder="Ej: 15 días"
+                                        value={branding.cotizadorProValidityText || ''}
+                                        onChangeText={(text) => setBranding(prev => ({ ...prev, cotizadorProValidityText: text }))}
+                                    />
+                                </View>
+                            )}
+                        </View>
                     </View>
 
                     {/* Watermark Toggle (PRO+ only) */}
